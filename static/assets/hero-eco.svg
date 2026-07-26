@@ -1,0 +1,13 @@
+<svg width="900" height="600" viewBox="0 0 900 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="600" rx="32" fill="#E6F4EA"/>
+  <path d="M120 480C120 355.817 215.817 260 340 260H560C684.183 260 780 355.817 780 480C780 528.911 740.911 568 692 568H268C219.089 568 180 528.911 180 480Z" fill="#C8EAC4"/>
+  <circle cx="320" cy="220" r="90" fill="#FFFFFF"/>
+  <path d="M320 140C343.09 140 362 158.91 362 182C362 205.09 343.09 224 320 224C296.91 224 278 205.09 278 182C278 158.91 296.91 140 320 140Z" fill="#7DB85A"/>
+  <path d="M320 180C334.911 180 347 192.089 347 207C347 221.911 334.911 234 320 234C305.089 234 293 221.911 293 207C293 192.089 305.089 180 320 180Z" fill="#F3FBF3"/>
+  <path d="M220 360C260 320 320 300 385 310C450 320 510 360 560 410L530 450C500 410 435 385 385 380C335 375 270 390 240 435L220 360Z" fill="#70A75A"/>
+  <circle cx="655" cy="180" r="45" fill="#C8EAC4"/>
+  <circle cx="575" cy="130" r="35" fill="#F6FBF6"/>
+  <circle cx="620" cy="235" r="28" fill="#FFFFFF"/>
+  <text x="40" y="70" font-family="Poppins, sans-serif" font-size="42" font-weight="700" fill="#2A5E2E">EcoMarket</text>
+  <text x="40" y="120" font-family="Poppins, sans-serif" font-size="28" fill="#3A7B3A">Diseño sostenible para tu hogar</text>
+</svg>

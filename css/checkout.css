@@ -1,0 +1,640 @@
+/*=====================================================
+    CHECKOUT.CSS
+    EcoMarket 2.0
+======================================================*/
+
+
+/*=====================================================
+    1. CONTENEDOR PRINCIPAL
+======================================================*/
+
+.checkout2{
+
+    width:100%;
+
+    min-height:100vh;
+
+    background:#f5f7f6;
+
+    padding:50px 8%;
+
+}
+
+.checkout2-contenedor{
+
+    max-width:1300px;
+
+    margin:auto;
+
+}
+
+.checkout2-titulo{
+
+    font-size:2.3rem;
+
+    color:#2E7D32;
+
+    margin-bottom:10px;
+
+}
+
+.checkout2-subtitulo{
+
+    color:#666666;
+
+    margin-bottom:35px;
+
+    font-size:1rem;
+
+}
+
+.checkout2-grid{
+
+    display:grid;
+
+    grid-template-columns:2fr 1fr;
+
+    gap:35px;
+
+}
+/*=====================================================
+    2. FORMULARIO
+======================================================*/
+
+.checkout2-formulario{
+
+    background:#ffffff;
+
+    border-radius:15px;
+
+    padding:35px;
+
+    box-shadow:0 5px 20px rgba(0,0,0,.08);
+
+}
+
+.checkout2-formulario h2{
+
+    color:#2E7D32;
+
+    margin-bottom:20px;
+
+}
+
+.campo{
+
+    display:flex;
+
+    flex-direction:column;
+
+    margin-bottom:20px;
+
+}
+
+.campo label{
+
+    margin-bottom:8px;
+
+    font-weight:600;
+
+    color:#444444;
+
+}
+
+.campo input{
+
+    padding:14px;
+
+    border:1px solid #cccccc;
+
+    border-radius:10px;
+
+    font-size:1rem;
+
+    transition:.3s;
+
+}
+
+.campo input:focus{
+
+    border-color:#2E7D32;
+
+    outline:none;
+
+    box-shadow:0 0 8px rgba(46,125,50,.2);
+
+}
+/*=====================================================
+    3. MÉTODOS DE PAGO
+======================================================*/
+
+.checkout2-pagos{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:15px;
+
+    margin:25px 0;
+
+}
+
+.metodo-pago{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding:15px;
+
+    border:2px solid #e0e0e0;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+    background:#ffffff;
+
+}
+
+.metodo-pago:hover{
+
+    border-color:#2E7D32;
+
+    background:#F1F8E9;
+
+}
+
+.metodo-pago input{
+
+    transform:scale(1.2);
+
+    cursor:pointer;
+
+}
+
+.btn-confirmar{
+
+    width:100%;
+
+    padding:16px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#2E7D32;
+
+    color:#ffffff;
+
+    font-size:1rem;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.btn-confirmar:hover{
+
+    background:#1B5E20;
+
+    transform:translateY(-2px);
+
+}
+/*=====================================================
+    4. RESUMEN DEL PEDIDO
+======================================================*/
+
+.checkout2-resumen{
+
+    background:#ffffff;
+
+    border-radius:15px;
+
+    padding:30px;
+
+    box-shadow:0 5px 20px rgba(0,0,0,.08);
+
+    height:max-content;
+
+    position:sticky;
+
+    top:20px;
+
+}
+
+.checkout2-resumen h2{
+
+    color:#2E7D32;
+
+    margin-bottom:25px;
+
+}
+
+#lista-checkout{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:15px;
+
+    margin-bottom:25px;
+
+}
+
+.checkout-item{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding-bottom:12px;
+
+    border-bottom:1px solid #eeeeee;
+
+}
+
+.checkout-item h4{
+
+    color:#333333;
+
+    font-size:1rem;
+
+}
+
+.checkout-item p{
+
+    color:#666666;
+
+    font-size:.9rem;
+
+}
+/*=====================================================
+    5. TOTALES DEL PEDIDO
+======================================================*/
+
+.checkout2-total{
+
+    margin-top:25px;
+
+    padding-top:20px;
+
+    border-top:2px solid #eeeeee;
+
+}
+
+.checkout2-total p{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:15px;
+
+    font-size:1rem;
+
+    color:#555555;
+
+}
+
+.checkout2-total span{
+
+    font-weight:600;
+
+}
+
+.total-final{
+
+    font-size:1.3rem !important;
+
+    font-weight:bold;
+
+    color:#2E7D32;
+
+    margin-top:20px;
+
+    padding-top:15px;
+
+    border-top:2px solid #dddddd;
+
+}
+/*=====================================================
+    6. EFECTOS Y ANIMACIONES
+======================================================*/
+
+.checkout2-formulario,
+
+.checkout2-resumen{
+
+    transition:.35s;
+
+}
+
+.checkout2-formulario:hover,
+
+.checkout2-resumen:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:0 10px 30px rgba(0,0,0,.12);
+
+}
+
+.checkout-item{
+
+    transition:.3s;
+
+}
+
+.checkout-item:hover{
+
+    background:#F8F8F8;
+
+    border-radius:8px;
+
+    padding-left:8px;
+
+    padding-right:8px;
+
+}
+
+.btn-confirmar:active{
+
+    transform:scale(.98);
+
+}
+
+.metodo-pago:has(input:checked){
+
+    border-color:#2E7D32;
+
+    background:#E8F5E9;
+
+}
+/*=====================================================
+    7. RESPONSIVE
+======================================================*/
+
+@media(max-width:992px){
+
+    .checkout2-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .checkout2-resumen{
+
+        position:static;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .checkout2{
+
+        padding:30px 5%;
+
+    }
+
+    .checkout2-formulario,
+
+    .checkout2-resumen{
+
+        padding:25px;
+
+    }
+
+    .checkout2-titulo{
+
+        font-size:2rem;
+
+    }
+
+    .btn-confirmar{
+
+        width:100%;
+
+    }
+
+}
+
+@media(max-width:576px){
+
+    .checkout2-titulo{
+
+        font-size:1.7rem;
+
+    }
+
+    .checkout2-subtitulo{
+
+        font-size:.95rem;
+
+    }
+
+    .campo input{
+
+        padding:12px;
+
+    }
+
+}
+/*=====================================================
+    8. TOAST Y EFECTOS VISUALES
+======================================================*/
+
+.toast{
+
+    position:fixed;
+
+    bottom:30px;
+
+    right:30px;
+
+    background:#2E7D32;
+
+    color:#ffffff;
+
+    padding:15px 25px;
+
+    border-radius:10px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.25);
+
+    opacity:0;
+
+    transform:translateY(20px);
+
+    transition:.4s;
+
+    z-index:9999;
+
+    font-weight:500;
+
+}
+
+.toast.mostrar{
+
+    opacity:1;
+
+    transform:translateY(0);
+
+}
+
+.checkout2-formulario input{
+
+    transition:.3s;
+
+}
+
+.checkout2-formulario input:hover{
+
+    border-color:#66BB6A;
+
+}
+
+.metodo-pago{
+
+    user-select:none;
+
+}
+/*=====================================================
+    9. SCROLL PERSONALIZADO
+======================================================*/
+
+::-webkit-scrollbar{
+
+    width:10px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#eeeeee;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:#2E7D32;
+
+    border-radius:20px;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#1B5E20;
+
+}
+
+
+/*=====================================================
+    EFECTOS GENERALES
+======================================================*/
+
+.checkout2-formulario,
+.checkout2-resumen{
+
+    animation:fadeIn .6s ease;
+
+}
+
+@keyframes fadeIn{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(20px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+/*=====================================================
+    10. OPTIMIZACIÓN FINAL
+======================================================*/
+
+*{
+
+    box-sizing:border-box;
+
+}
+
+html{
+
+    scroll-behavior:smooth;
+
+}
+
+body{
+
+    font-family:"Poppins",sans-serif;
+
+    background:#f5f7f6;
+
+    color:#333333;
+
+}
+
+img{
+
+    max-width:100%;
+
+    display:block;
+
+}
+
+button{
+
+    font-family:inherit;
+
+}
+
+input{
+
+    font-family:inherit;
+
+}
+
+a{
+
+    transition:.3s;
+
+}
+
+button{
+
+    transition:.3s;
+
+}
+
+button:hover{
+
+    cursor:pointer;
+
+}

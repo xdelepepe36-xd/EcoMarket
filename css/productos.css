@@ -1,0 +1,870 @@
+/*=====================================================
+    PRODUCTO.CSS
+    EcoMarket 2.0
+======================================================*/
+
+
+/*=====================================================
+    1. VARIABLES
+======================================================*/
+
+:root{
+
+    --color-principal:#2E7D32;
+
+    --color-secundario:#43A047;
+
+    --color-fondo:#F5F7F4;
+
+    --color-blanco:#FFFFFF;
+
+    --color-texto:#333333;
+
+    --color-gris:#777777;
+
+    --color-borde:#DDDDDD;
+
+    --color-sombra:0 8px 20px rgba(0,0,0,.10);
+
+    --radio:15px;
+
+    --transicion:.3s;
+
+}
+/*=====================================================
+    PRODUCTO.CSS
+    EcoMarket 2.0
+======================================================*/
+
+
+/*=====================================================
+    2. CONTENEDOR PRINCIPAL
+======================================================*/
+
+.producto2{
+
+    max-width:1400px;
+
+    margin:50px auto;
+
+    padding:20px;
+
+}
+
+
+.producto2-detalle{
+
+    display:grid;
+
+    grid-template-columns:120px 520px 1fr;
+
+    gap:40px;
+
+    align-items:start;
+
+}
+
+
+@media(max-width:1200px){
+
+.producto2-detalle{
+
+    grid-template-columns:1fr;
+
+}
+
+}
+
+
+.producto2-galeria{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:15px;
+
+}
+
+
+.producto2-info{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:18px;
+
+}
+/*=====================================================
+    PRODUCTO.CSS
+    EcoMarket 2.0
+======================================================*/
+
+
+/*=====================================================
+    3. GALERÍA DE IMÁGENES
+======================================================*/
+
+.producto2-miniaturas{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:15px;
+
+}
+
+
+.producto2-miniatura{
+
+    width:90px;
+
+    height:90px;
+
+    object-fit:cover;
+
+    border:2px solid var(--color-borde);
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    transition:var(--transicion);
+
+    background:var(--color-blanco);
+
+}
+
+
+.producto2-miniatura:hover{
+
+    border-color:var(--color-principal);
+
+    transform:scale(1.05);
+
+}
+
+
+.producto2-miniatura.activa{
+
+    border-color:var(--color-principal);
+
+    box-shadow:0 0 10px rgba(46,125,50,.35);
+
+}
+/*=====================================================
+    PRODUCTO.CSS
+    EcoMarket 2.0
+======================================================*/
+
+
+/*=====================================================
+    4. IMAGEN PRINCIPAL
+======================================================*/
+
+.producto2-imagen{
+
+    background:var(--color-blanco);
+
+    border-radius:var(--radio);
+
+    box-shadow:var(--color-sombra);
+
+    overflow:hidden;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:20px;
+
+}
+
+
+.producto2-imagen img{
+
+    width:100%;
+
+    max-width:500px;
+
+    transition:.4s;
+
+}
+
+
+.producto2-imagen img:hover{
+
+    transform:scale(1.08);
+
+}
+
+
+.producto2-badge{
+
+    position:absolute;
+
+    top:20px;
+
+    left:20px;
+
+    background:var(--color-principal);
+
+    color:var(--color-blanco);
+
+    padding:8px 16px;
+
+    border-radius:20px;
+
+    font-size:.85rem;
+
+    font-weight:bold;
+
+}
+/*=====================================================
+    PRODUCTO.CSS
+    EcoMarket 2.0
+======================================================*/
+
+
+/*=====================================================
+    5. INFORMACIÓN DEL PRODUCTO
+======================================================*/
+
+.producto2-info{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:18px;
+
+}
+
+.producto2-categoria{
+
+    color:var(--color-gris);
+
+    font-size:.95rem;
+
+    font-weight:600;
+
+}
+
+.producto2-titulo{
+
+    font-size:2.2rem;
+
+    color:var(--color-texto);
+
+    line-height:1.3;
+
+}
+
+.producto2-descripcion{
+
+    color:var(--color-gris);
+
+    line-height:1.8;
+
+    text-align:justify;
+
+}
+
+.producto2-estado{
+
+    color:var(--color-principal);
+
+    font-weight:bold;
+
+}
+/*=====================================================
+    PRODUCTO.CSS
+    EcoMarket 2.0
+======================================================*/
+
+
+/*=====================================================
+    6. PRECIO - ESTRELLAS - STOCK
+======================================================*/
+
+.producto2-precio{
+
+    font-size:2.5rem;
+
+    font-weight:bold;
+
+    color:var(--color-principal);
+
+}
+
+.producto2-estrellas{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    color:#FFC107;
+
+    font-size:1.2rem;
+
+}
+
+.producto2-calificacion{
+
+    color:var(--color-gris);
+
+    font-size:.95rem;
+
+}
+
+.producto2-stock{
+
+    display:inline-block;
+
+    width:max-content;
+
+    padding:8px 16px;
+
+    background:#E8F5E9;
+
+    color:#2E7D32;
+
+    border-radius:20px;
+
+    font-weight:bold;
+
+    border:1px solid #A5D6A7;
+
+}
+/*=====================================================
+    PRODUCTO.CSS
+    EcoMarket 2.0
+======================================================*/
+
+
+/*=====================================================
+    7. BOTONES
+======================================================*/
+
+.producto2-botones{
+
+    display:flex;
+
+    gap:15px;
+
+    flex-wrap:wrap;
+
+    margin-top:20px;
+
+}
+
+.producto2-botones button{
+
+    padding:14px 28px;
+
+    border:none;
+
+    border-radius:12px;
+
+    font-size:1rem;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:var(--transicion);
+
+}
+
+.btn-carrito{
+
+    background:var(--color-principal);
+
+    color:var(--color-blanco);
+
+}
+
+.btn-carrito:hover{
+
+    background:var(--color-secundario);
+
+    transform:translateY(-3px);
+
+}
+
+.btn-comprar{
+
+    background:#1565C0;
+
+    color:white;
+
+}
+
+.btn-comprar:hover{
+
+    background:#0D47A1;
+
+    transform:translateY(-3px);
+
+}
+
+.btn-favorito{
+
+    background:#E53935;
+
+    color:white;
+
+}
+
+.btn-favorito:hover{
+
+    background:#C62828;
+
+    transform:translateY(-3px);
+
+}
+/*=====================================================
+    PRODUCTO.CSS
+    EcoMarket 2.0
+======================================================*/
+
+
+/*=====================================================
+    8. TABS
+======================================================*/
+
+.producto2-tabs{
+
+    margin-top:60px;
+
+}
+
+.tabs-header{
+
+    display:flex;
+
+    gap:15px;
+
+    border-bottom:2px solid var(--color-borde);
+
+    margin-bottom:30px;
+
+}
+
+.tab-btn{
+
+    background:none;
+
+    border:none;
+
+    padding:15px 25px;
+
+    cursor:pointer;
+
+    font-size:1rem;
+
+    font-weight:bold;
+
+    color:var(--color-gris);
+
+    transition:var(--transicion);
+
+}
+
+.tab-btn:hover{
+
+    color:var(--color-principal);
+
+}
+
+.tab-btn.active{
+
+    color:var(--color-principal);
+
+    border-bottom:3px solid var(--color-principal);
+
+}
+
+.tab-content{
+
+    background:var(--color-blanco);
+
+    padding:30px;
+
+    border-radius:15px;
+
+    box-shadow:var(--color-sombra);
+
+}
+/*=====================================================
+    PRODUCTO.CSS
+    EcoMarket 2.0
+======================================================*/
+
+
+/*=====================================================
+    9. PRODUCTOS RELACIONADOS
+======================================================*/
+
+.producto2-relacionados{
+
+    margin-top:70px;
+
+}
+
+.productos-relacionados{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+
+    gap:25px;
+
+    margin-top:30px;
+
+}
+
+.producto2-card{
+
+    background:var(--color-blanco);
+
+    border-radius:15px;
+
+    overflow:hidden;
+
+    box-shadow:var(--color-sombra);
+
+    transition:var(--transicion);
+
+    text-align:center;
+
+    padding:20px;
+
+}
+
+.producto2-card:hover{
+
+    transform:translateY(-8px);
+
+}
+
+.producto2-card img{
+
+    width:100%;
+
+    height:180px;
+
+    object-fit:cover;
+
+    border-radius:10px;
+
+}
+
+.producto2-card h3{
+
+    margin:15px 0 10px;
+
+    color:var(--color-texto);
+
+}
+
+.producto2-card p{
+
+    color:var(--color-principal);
+
+    font-weight:bold;
+
+    margin-bottom:15px;
+
+}
+
+.producto2-card .btn-producto{
+
+    display:inline-block;
+
+    text-decoration:none;
+
+    background:var(--color-principal);
+
+    color:white;
+
+    padding:10px 18px;
+
+    border-radius:8px;
+
+    transition:var(--transicion);
+
+}
+
+.producto2-card .btn-producto:hover{
+
+    background:var(--color-secundario);
+
+}
+/*=====================================================
+    PRODUCTO.CSS
+    EcoMarket 2.0
+======================================================*/
+
+
+/*=====================================================
+    10. BENEFICIOS
+======================================================*/
+
+.producto2-beneficios{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+
+    gap:25px;
+
+    margin:70px 0;
+
+}
+
+.beneficio-card{
+
+    background:var(--color-blanco);
+
+    border-radius:15px;
+
+    padding:30px;
+
+    text-align:center;
+
+    box-shadow:var(--color-sombra);
+
+    transition:var(--transicion);
+
+}
+
+.beneficio-card:hover{
+
+    transform:translateY(-6px);
+
+}
+
+.beneficio-icono{
+
+    font-size:3rem;
+
+    margin-bottom:15px;
+
+}
+
+.beneficio-card h3{
+
+    color:var(--color-principal);
+
+    margin-bottom:10px;
+
+}
+
+.beneficio-card p{
+
+    color:var(--color-gris);
+
+    line-height:1.6;
+
+}
+/*=====================================================
+    PRODUCTO.CSS
+    EcoMarket 2.0
+======================================================*/
+
+
+/*=====================================================
+    11. VENDEDOR
+======================================================*/
+
+.producto2-vendedor{
+
+    margin-top:70px;
+
+}
+
+.vendedor-card{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:25px;
+
+    background:var(--color-blanco);
+
+    padding:30px;
+
+    border-radius:15px;
+
+    box-shadow:var(--color-sombra);
+
+}
+
+.vendedor-card img{
+
+    width:120px;
+
+    height:120px;
+
+    object-fit:cover;
+
+    border-radius:50%;
+
+    border:4px solid var(--color-principal);
+
+}
+
+.vendedor-info{
+
+    flex:1;
+
+}
+
+.vendedor-info h3{
+
+    color:var(--color-principal);
+
+    margin-bottom:10px;
+
+}
+
+.vendedor-info p{
+
+    color:var(--color-gris);
+
+    margin:8px 0;
+
+}
+
+.btn-contactar{
+
+    margin-top:15px;
+
+    background:var(--color-principal);
+
+    color:white;
+
+    border:none;
+
+    padding:12px 25px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+    transition:var(--transicion);
+
+}
+
+.btn-contactar:hover{
+
+    background:var(--color-secundario);
+
+}
+/*=====================================================
+    PRODUCTO.CSS
+    EcoMarket 2.0
+======================================================*/
+
+
+/*=====================================================
+    12. RESPONSIVE Y ANIMACIONES
+======================================================*/
+
+@media(max-width:992px){
+
+    .producto2-detalle{
+
+        grid-template-columns:1fr;
+
+        gap:30px;
+
+    }
+
+    .producto2-miniaturas{
+
+        flex-direction:row;
+
+        justify-content:center;
+
+        flex-wrap:wrap;
+
+    }
+
+    .producto2-botones{
+
+        justify-content:center;
+
+    }
+
+    .vendedor-card{
+
+        flex-direction:column;
+
+        text-align:center;
+
+    }
+
+}
+
+
+@media(max-width:576px){
+
+    .producto2-precio{
+
+        font-size:2rem;
+
+    }
+
+    .producto2-titulo{
+
+        font-size:1.7rem;
+
+    }
+
+    .producto2-card{
+
+        padding:15px;
+
+    }
+
+}
+
+
+.producto2-card,
+
+.beneficio-card,
+
+.vendedor-card,
+
+.producto2-imagen{
+
+    transition:all .35s ease;
+
+}
+
+.producto2-card:hover,
+
+.beneficio-card:hover,
+
+.vendedor-card:hover{
+
+    transform:translateY(-8px);
+
+}
+
+html{
+
+    scroll-behavior:smooth;
+
+}

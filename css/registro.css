@@ -1,0 +1,500 @@
+/*=====================================================
+    REGISTRO.CSS
+    EcoMarket 2.0
+======================================================*/
+
+
+/*=====================================================
+    1. CONTENEDOR PRINCIPAL
+======================================================*/
+
+.registro2{
+
+    width:100%;
+
+    min-height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:#f5f7f6;
+
+    padding:50px 8%;
+
+}
+
+.registro2-contenedor{
+
+    width:100%;
+
+    max-width:550px;
+
+    margin:auto;
+
+}
+/*=====================================================
+    2. TARJETA REGISTRO
+======================================================*/
+
+.registro2-card{
+
+    background:#ffffff;
+
+    padding:40px;
+
+    border-radius:15px;
+
+    box-shadow:0 8px 25px rgba(0,0,0,.10);
+
+    text-align:center;
+
+}
+
+.registro2-card h1{
+
+    color:#2E7D32;
+
+    margin-bottom:10px;
+
+    font-size:2rem;
+
+}
+
+.registro2-card p{
+
+    color:#666666;
+
+    margin-bottom:30px;
+
+    line-height:1.6;
+
+}
+/*=====================================================
+    3. FORMULARIO
+======================================================*/
+
+#form-registro{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:20px;
+
+}
+
+.campo{
+
+    display:flex;
+
+    flex-direction:column;
+
+    text-align:left;
+
+}
+
+.campo label{
+
+    margin-bottom:8px;
+
+    font-weight:600;
+
+    color:#333333;
+
+}
+
+.campo input{
+
+    width:100%;
+
+    padding:14px;
+
+    border:1px solid #cccccc;
+
+    border-radius:10px;
+
+    font-size:1rem;
+
+    outline:none;
+
+    transition:.3s;
+
+}
+
+.campo input:focus{
+
+    border-color:#2E7D32;
+
+    box-shadow:0 0 8px rgba(46,125,50,.20);
+
+}
+/*=====================================================
+    4. BOTONES Y OPCIONES
+======================================================*/
+
+.btn-mostrar-password{
+
+    margin-top:10px;
+
+    align-self:flex-end;
+
+    background:none;
+
+    border:none;
+
+    color:#2E7D32;
+
+    font-size:.9rem;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+}
+
+.btn-mostrar-password:hover{
+
+    text-decoration:underline;
+
+}
+
+.registro2-opciones{
+
+    text-align:left;
+
+    font-size:.95rem;
+
+}
+
+.registro2-opciones label{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    cursor:pointer;
+
+}
+
+.btn-registro{
+
+    width:100%;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#2E7D32;
+
+    color:#ffffff;
+
+    font-size:1rem;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.btn-registro:hover{
+
+    background:#1B5E20;
+
+    transform:translateY(-2px);
+
+}
+/*=====================================================
+    5. ENLACE DE INICIO DE SESIÓN
+======================================================*/
+
+.registro2-login{
+
+    margin-top:25px;
+
+    text-align:center;
+
+    color:#666666;
+
+    font-size:.95rem;
+
+}
+
+.registro2-login a{
+
+    color:#2E7D32;
+
+    font-weight:600;
+
+    text-decoration:none;
+
+    transition:.3s;
+
+}
+
+.registro2-login a:hover{
+
+    color:#1B5E20;
+
+    text-decoration:underline;
+
+}
+/*=====================================================
+    6. TOAST Y ANIMACIONES
+======================================================*/
+
+.toast{
+
+    position:fixed;
+
+    bottom:30px;
+
+    right:30px;
+
+    background:#2E7D32;
+
+    color:#ffffff;
+
+    padding:15px 25px;
+
+    border-radius:10px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.25);
+
+    opacity:0;
+
+    transform:translateY(20px);
+
+    transition:.4s;
+
+    z-index:9999;
+
+    font-weight:500;
+
+}
+
+.toast.mostrar{
+
+    opacity:1;
+
+    transform:translateY(0);
+
+}
+
+.registro2-card{
+
+    animation:fadeRegistro .6s ease;
+
+}
+
+@keyframes fadeRegistro{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(25px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+/*=====================================================
+    7. RESPONSIVE
+======================================================*/
+
+@media(max-width:768px){
+
+    .registro2{
+
+        padding:30px 5%;
+
+    }
+
+    .registro2-card{
+
+        padding:30px 25px;
+
+    }
+
+    .registro2-card h1{
+
+        font-size:1.8rem;
+
+    }
+
+    .btn-registro{
+
+        width:100%;
+
+    }
+
+}
+
+@media(max-width:480px){
+
+    .registro2-card{
+
+        padding:25px 20px;
+
+    }
+
+    .campo input{
+
+        font-size:.95rem;
+
+    }
+
+    .btn-mostrar-password{
+
+        font-size:.85rem;
+
+    }
+
+}
+/*=====================================================
+    8. EFECTOS VISUALES
+======================================================*/
+
+.registro2-card:hover{
+
+    transform:translateY(-4px);
+
+    transition:.3s;
+
+    box-shadow:0 12px 30px rgba(0,0,0,.15);
+
+}
+
+.campo input:hover{
+
+    border-color:#2E7D32;
+
+}
+
+.btn-registro:active{
+
+    transform:scale(.98);
+
+}
+
+.registro2-opciones input[type="checkbox"]{
+
+    cursor:pointer;
+
+}
+
+.registro2-opciones label{
+
+    cursor:pointer;
+
+}
+/*=====================================================
+    9. SCROLL Y TRANSICIONES
+======================================================*/
+
+::-webkit-scrollbar{
+
+    width:10px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#eeeeee;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:#2E7D32;
+
+    border-radius:20px;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#1B5E20;
+
+}
+
+*{
+
+    transition:color .3s,
+               background .3s,
+               border-color .3s;
+
+}
+/*=====================================================
+    10. OPTIMIZACIÓN FINAL
+======================================================*/
+
+*{
+
+    box-sizing:border-box;
+
+}
+
+html{
+
+    scroll-behavior:smooth;
+
+}
+
+body{
+
+    font-family:"Poppins",sans-serif;
+
+    background:#f5f7f6;
+
+    color:#333333;
+
+}
+
+img{
+
+    max-width:100%;
+
+    display:block;
+
+}
+
+button{
+
+    font-family:inherit;
+
+}
+
+input{
+
+    font-family:inherit;
+
+}
+
+a{
+
+    transition:.3s;
+
+}
+
+.registro2{
+
+    overflow:hidden;
+
+}

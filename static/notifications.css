@@ -1,0 +1,36 @@
+.toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    display: grid;
+    gap: 12px;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+.toast {
+    min-width: 260px;
+    max-width: 320px;
+    padding: 14px 18px;
+    border-radius: 18px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+    color: #fff;
+    background: rgba(34, 139, 34, 0.95);
+    opacity: 0;
+    transform: translateY(-16px) scale(0.95);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: auto;
+}
+
+.toast.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.toast-danger {
+    background: rgba(201, 36, 47, 0.96);
+}
+
+.toast-info {
+    background: rgba(26, 115, 232, 0.95);
+}

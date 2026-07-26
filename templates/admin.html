@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block title %}EcoMarket - Panel Admin{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="section-head">
+            <div>
+                <h2 class="section-title"><i class="bi bi-shield-check"></i> Panel de Administración</h2>
+                <p>Gestiona productos y usuarios registrados en EcoMarket.</p>
+            </div>
+            <a href="{{ url_for('publicar') }}" class="btn-principal"><i class="bi bi-plus-circle"></i> Nuevo producto</a>
+        </div>
+
+        <!-- Stats rápidas -->
+        <div class="admin-stats">
+            <div class="admin-stat-card">
+                <i class="bi bi-box-seam"></i>
+                <strong>{{ productos | length }}</strong>
+                <span>Productos</span>
+            </div>
+            <div class="admin-stat-card">
+                <i class="bi bi-people"></i>
+                <strong>{{ usuarios | length }}</strong>
+                <span>Usuarios</span>
+            </div>
+            <div class="admin-stat-card">
+                <i class="bi bi-tags"></i>
+                <strong>{{ productos | map(attribute='categoria') | list | unique | list | length }}</strong>
+                <span>Categorías</span>
+            </div>
+        </div>
+
+        <!-- Tabla productos -->
+        <h3 style="margin: 32px 0 16px; color:var(--verde);">Productos</h3>
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Precio</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for producto in productos %}
+                    <tr>
+                        <td>{{ producto.id }}</td>
+                        <td>{{ producto.nombre }}</td>
+                        <td><span class="categoria">{{ producto.categoria }}</span></td>
+                        <td><strong>S/. {{ '%.2f'|format(producto.precio) }}</strong></td>
+                        <td class="admin-actions">
+                            <a href="{{ url_for('producto_detalle', producto_id=producto.id) }}" class="btn-secundario btn-sm">
+                                <i class="bi bi-eye"></i> Ver
+                            </a>
+                            <form method="POST" action="{{ url_for('eliminar_producto', producto_id=producto.id) }}" style="display:inline;" onsubmit="return confirm('¿Eliminar este producto?')">
+                                <button type="submit" class="btn-danger btn-sm">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Tabla usuarios -->
+        <h3 style="margin: 40px 0 16px; color:var(--verde);">Usuarios registrados</h3>
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td>{{ usuario.id }}</td>
+                        <td>{{ usuario.nombre }}</td>
+                        <td>{{ usuario.email }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

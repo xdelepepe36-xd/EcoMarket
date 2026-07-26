@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}EcoMarket - Favoritos{% endblock %}
+
+{% block content %}
+<section class="section favoritos-page">
+    <div class="container">
+        <div class="section-head">
+            <div>
+                <h2 class="section-title">Tus favoritos</h2>
+                <p>Guarda los productos que más te interesan y vuelve a ellos cuando quieras.</p>
+            </div>
+        </div>
+        <div class="productos-grid">
+            {% for producto in productos %}
+            <article class="producto-card" data-producto-id="{{ producto.id }}">
+                <img src="{% if producto.imagen.startswith('http') %}{{ producto.imagen }}{% else %}{{ url_for('static', filename=producto.imagen) }}{% endif %}" alt="{{ producto.nombre }}">
+                <div class="producto-info">
+                    <span class="categoria">{{ producto.categoria }}</span>
+                    <h3>{{ producto.nombre }}</h3>
+                    <p>{{ producto.descripcion }}</p>
+                    <div class="producto-footer">
+                        <strong>S/. {{ '%.2f'|format(producto.precio) }}</strong>
+                        <div class="card-actions">
+                            <a class="btn-secundario" href="{{ url_for('producto_detalle', producto_id=producto.id) }}">Ver detalles</a>
+                            <button class="favorite-btn" data-producto-id="{{ producto.id }}">❤</button>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        <div id="noFavoritesMessage" class="no-results" hidden>Aún no tienes favoritos. Marca productos como favoritos desde el catálogo.</div>
+    </div>
+</section>
+{% endblock %}

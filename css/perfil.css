@@ -1,0 +1,636 @@
+/*=====================================================
+    PERFIL.CSS
+    EcoMarket 2.0
+======================================================*/
+
+
+/*=====================================================
+    1. CONTENEDOR PRINCIPAL
+======================================================*/
+
+.perfil2{
+
+    width:100%;
+
+    min-height:100vh;
+
+    background:#f5f7f6;
+
+    padding:50px 8%;
+
+}
+
+.perfil2-contenedor{
+
+    max-width:1300px;
+
+    margin:auto;
+
+}
+
+.perfil2-header{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:30px;
+
+    background:#ffffff;
+
+    padding:30px;
+
+    border-radius:15px;
+
+    box-shadow:0 5px 20px rgba(0,0,0,.08);
+
+    margin-bottom:35px;
+
+}
+/*=====================================================
+    2. AVATAR E INFORMACIÓN
+======================================================*/
+
+.perfil2-avatar{
+
+    width:140px;
+
+    height:140px;
+
+    border-radius:50%;
+
+    object-fit:cover;
+
+    border:5px solid #2E7D32;
+
+}
+
+.perfil2-info h1{
+
+    font-size:2rem;
+
+    color:#2E7D32;
+
+    margin-bottom:10px;
+
+}
+
+.perfil2-info p{
+
+    color:#666666;
+
+    margin-bottom:15px;
+
+}
+
+.perfil2-badge{
+
+    display:inline-block;
+
+    background:#E8F5E9;
+
+    color:#2E7D32;
+
+    padding:8px 18px;
+
+    border-radius:20px;
+
+    font-weight:600;
+
+}
+/*=====================================================
+    3. MENÚ DE PESTAÑAS
+======================================================*/
+
+.perfil2-menu{
+
+    display:flex;
+
+    gap:15px;
+
+    flex-wrap:wrap;
+
+    margin-bottom:30px;
+
+}
+
+.perfil2-tab{
+
+    background:#ffffff;
+
+    border:2px solid #e0e0e0;
+
+    padding:14px 22px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    font-size:1rem;
+
+    font-weight:600;
+
+    color:#555555;
+
+    transition:.3s;
+
+}
+
+.perfil2-tab:hover{
+
+    background:#E8F5E9;
+
+    border-color:#2E7D32;
+
+    color:#2E7D32;
+
+}
+
+.perfil2-tab.activa{
+
+    background:#2E7D32;
+
+    color:#ffffff;
+
+    border-color:#2E7D32;
+
+}
+/*=====================================================
+    4. PANELES DEL PERFIL
+======================================================*/
+
+.perfil2-contenido{
+
+    background:#ffffff;
+
+    border-radius:15px;
+
+    padding:35px;
+
+    box-shadow:0 5px 20px rgba(0,0,0,.08);
+
+}
+
+.perfil2-panel{
+
+    display:none;
+
+    animation:fadePerfil .4s ease;
+
+}
+
+.perfil2-panel.activa{
+
+    display:block;
+
+}
+
+.perfil2-panel h2{
+
+    color:#2E7D32;
+
+    margin-bottom:25px;
+
+    font-size:1.6rem;
+
+}
+
+@keyframes fadePerfil{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(20px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+/*=====================================================
+    5. FORMULARIO DEL PERFIL
+======================================================*/
+
+.perfil2-formulario{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:20px;
+
+}
+
+.campo{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.campo label{
+
+    margin-bottom:8px;
+
+    font-weight:600;
+
+    color:#444444;
+
+}
+
+.campo input{
+
+    padding:14px;
+
+    border:1px solid #cccccc;
+
+    border-radius:10px;
+
+    font-size:1rem;
+
+    transition:.3s;
+
+}
+
+.campo input:focus{
+
+    border-color:#2E7D32;
+
+    outline:none;
+
+    box-shadow:0 0 8px rgba(46,125,50,.20);
+
+}
+
+.btn-guardar{
+
+    grid-column:1 / -1;
+
+    background:#2E7D32;
+
+    color:#ffffff;
+
+    border:none;
+
+    padding:15px;
+
+    border-radius:10px;
+
+    font-size:1rem;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.btn-guardar:hover{
+
+    background:#1B5E20;
+
+    transform:translateY(-2px);
+
+}
+/*=====================================================
+    6. PEDIDOS Y FAVORITOS
+======================================================*/
+
+#lista-pedidos,
+
+#lista-favoritos{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+
+    gap:20px;
+
+}
+
+.perfil2-card{
+
+    background:#ffffff;
+
+    border:1px solid #eeeeee;
+
+    border-radius:12px;
+
+    padding:20px;
+
+    transition:.3s;
+
+}
+
+.perfil2-card:hover{
+
+    transform:translateY(-5px);
+
+    box-shadow:0 8px 20px rgba(0,0,0,.10);
+
+}
+
+.perfil2-card h3{
+
+    color:#2E7D32;
+
+    margin-bottom:10px;
+
+}
+
+.perfil2-card p{
+
+    color:#666666;
+
+    margin-bottom:8px;
+
+}
+
+.perfil2-card img{
+
+    width:100%;
+
+    height:180px;
+
+    object-fit:cover;
+
+    border-radius:10px;
+
+    margin-bottom:15px;
+
+}
+/*=====================================================
+    7. CONFIGURACIÓN
+======================================================*/
+
+.btn-cerrar,
+
+.btn-eliminar{
+
+    width:100%;
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:15px;
+
+    font-size:1rem;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+    margin-top:15px;
+
+}
+
+.btn-cerrar{
+
+    background:#2E7D32;
+
+    color:#ffffff;
+
+}
+
+.btn-cerrar:hover{
+
+    background:#1B5E20;
+
+    transform:translateY(-2px);
+
+}
+
+.btn-eliminar{
+
+    background:#E53935;
+
+    color:#ffffff;
+
+}
+
+.btn-eliminar:hover{
+
+    background:#C62828;
+
+    transform:translateY(-2px);
+
+}
+/*=====================================================
+    8. RESPONSIVE
+======================================================*/
+
+@media(max-width:992px){
+
+    .perfil2-header{
+
+        flex-direction:column;
+
+        text-align:center;
+
+    }
+
+    .perfil2-formulario{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .perfil2{
+
+        padding:30px 5%;
+
+    }
+
+    .perfil2-menu{
+
+        flex-direction:column;
+
+    }
+
+    .perfil2-tab{
+
+        width:100%;
+
+    }
+
+    .perfil2-contenido{
+
+        padding:25px;
+
+    }
+
+}
+
+@media(max-width:576px){
+
+    .perfil2-avatar{
+
+        width:110px;
+
+        height:110px;
+
+    }
+
+    .perfil2-info h1{
+
+        font-size:1.6rem;
+
+    }
+
+    .perfil2-panel h2{
+
+        font-size:1.3rem;
+
+    }
+
+}
+/*=====================================================
+    9. TOAST Y ANIMACIONES
+======================================================*/
+
+.toast{
+
+    position:fixed;
+
+    bottom:30px;
+
+    right:30px;
+
+    background:#2E7D32;
+
+    color:#ffffff;
+
+    padding:15px 25px;
+
+    border-radius:10px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.25);
+
+    opacity:0;
+
+    transform:translateY(20px);
+
+    transition:.4s;
+
+    z-index:9999;
+
+    font-weight:500;
+
+}
+
+.toast.mostrar{
+
+    opacity:1;
+
+    transform:translateY(0);
+
+}
+
+.perfil2-header,
+
+.perfil2-contenido{
+
+    transition:.35s;
+
+}
+
+.perfil2-header:hover,
+
+.perfil2-contenido:hover{
+
+    box-shadow:0 10px 30px rgba(0,0,0,.12);
+
+}
+/*=====================================================
+    10. SCROLL Y OPTIMIZACIÓN FINAL
+======================================================*/
+
+::-webkit-scrollbar{
+
+    width:10px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#eeeeee;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:#2E7D32;
+
+    border-radius:20px;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#1B5E20;
+
+}
+
+*{
+
+    box-sizing:border-box;
+
+}
+
+html{
+
+    scroll-behavior:smooth;
+
+}
+
+body{
+
+    font-family:"Poppins",sans-serif;
+
+    background:#f5f7f6;
+
+    color:#333333;
+
+}
+
+img{
+
+    max-width:100%;
+
+    display:block;
+
+}
+
+button{
+
+    font-family:inherit;
+
+}
+
+input{
+
+    font-family:inherit;
+
+}
+
+a{
+
+    transition:.3s;
+
+}

@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}EcoMarket - Contacto{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="section-head">
+            <div>
+                <h2 class="section-title">Contacto</h2>
+                <p>¿Tienes dudas o quieres publicar en EcoMarket? Escríbenos y te responderemos pronto.</p>
+            </div>
+        </div>
+        <div class="contact-grid">
+            <div class="contact-card">
+                <h3>Estamos disponibles</h3>
+                <p>Envía tu mensaje y un agente de soporte te contactará dentro de las siguientes 24 horas.</p>
+                <p><strong>Email:</strong> hola@EcoMarket.com</p>
+                <p><strong>Teléfono:</strong> +51 999 888 777</p>
+            </div>
+            <form id="contactForm" class="form-card">
+                <label>Nombre</label>
+                <input type="text" name="nombre" placeholder="Tu nombre" required>
+                <label>Email</label>
+                <input type="email" name="email" placeholder="tu@email.com" required>
+                <label>Mensaje</label>
+                <textarea name="mensaje" rows="5" placeholder="Cuéntanos cómo podemos ayudarte" required></textarea>
+                <button class="btn-principal" type="submit">Enviar mensaje</button>
+                <div id="contactSuccess" class="flash flash-success" hidden>Mensaje enviado. Nos pondremos en contacto pronto.</div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

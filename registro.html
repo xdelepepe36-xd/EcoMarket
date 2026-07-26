@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoMarket - Registro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="eco-styles.css">
+    <style>
+        :root {
+            --verde: #2e7d32;
+            --verde-claro: #4caf50;
+            --verde-suave: #e8f5e9;
+            --texto: #1f2a21;
+            --texto-sec: #5d6a5f;
+            --blanco: #ffffff;
+            --error: #b91c1c;
+            --error-bg: #fdecea;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: var(--blanco);
+        }
+
+        /* PANEL IZQUIERDO */
+        .panel-left {
+            background: linear-gradient(145deg, #1b5e20, #2e7d32, #388e3c);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+        .panel-left::before {
+            content: '';
+            position: absolute;
+            width: 420px; height: 420px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            top: -120px; right: -120px;
+        }
+        .panel-left::after {
+            content: '';
+            position: absolute;
+            width: 280px; height: 280px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.04);
+            bottom: -60px; left: -60px;
+        }
+        .panel-logo {
+            color: #fff;
+            font-size: 1.6rem;
+            font-weight: 800;
+            text-decoration: none;
+            position: relative;
+            z-index: 1;
+        }
+        .panel-content { position: relative; z-index: 1; }
+        .panel-content h2 {
+            color: #fff;
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 14px;
+        }
+        .panel-content p {
+            color: rgba(255,255,255,0.78);
+            line-height: 1.8;
+            margin-bottom: 28px;
+        }
+        .panel-steps { display: flex; flex-direction: column; gap: 18px; }
+        .panel-step {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: rgba(255,255,255,0.88);
+        }
+        .step-num {
+            width: 36px; height: 36px;
+            background: rgba(255,255,255,0.18);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .panel-bottom {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.85rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* PANEL DERECHO */
+        .panel-right {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 48px;
+            background: #fafffe;
+            overflow-y: auto;
+        }
+        .form-header { margin-bottom: 28px; }
+        .form-header h1 { font-size: 1.9rem; color: var(--texto); font-weight: 800; margin-bottom: 6px; }
+        .form-header p { color: var(--texto-sec); font-size: 0.95rem; }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-weight: 600; color: var(--texto); margin-bottom: 7px; font-size: 0.88rem; }
+        .input-wrap { position: relative; }
+        .input-wrap i.icon {
+            position: absolute; left: 14px; top: 50%;
+            transform: translateY(-50%);
+            color: var(--texto-sec); font-size: 1rem; pointer-events: none;
+        }
+        input {
+            width: 100%;
+            padding: 13px 14px 13px 42px;
+            border: 1.5px solid rgba(46,125,50,0.2);
+            border-radius: 13px;
+            font-family: inherit;
+            font-size: 0.93rem;
+            color: var(--texto);
+            background: var(--blanco);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input:focus {
+            border-color: var(--verde-claro);
+            box-shadow: 0 0 0 4px rgba(76,175,80,0.1);
+        }
+        input.error { border-color: var(--error); box-shadow: 0 0 0 4px rgba(185,28,28,0.07); }
+        .toggle-pass {
+            position: absolute; right: 12px; top: 50%;
+            transform: translateY(-50%);
+            background: none; border: none; cursor: pointer;
+            color: var(--texto-sec); font-size: 1rem;
+        }
+        .error-msg { color: var(--error); font-size: 0.8rem; margin-top: 5px; display: none; }
+        .error-msg.show { display: block; }
+
+        /* Fortaleza contraseña */
+        .strength-bar { display: flex; gap: 4px; margin-top: 8px; }
+        .strength-seg {
+            flex: 1; height: 4px; border-radius: 999px;
+            background: rgba(46,125,50,0.12);
+            transition: background 0.3s;
+        }
+        .strength-seg.weak { background: #ef4444; }
+        .strength-seg.medium { background: #f59e0b; }
+        .strength-seg.strong { background: var(--verde-claro); }
+        .strength-label { font-size: 0.78rem; color: var(--texto-sec); margin-top: 4px; }
+
+        /* Términos */
+        .terms-wrap {
+            display: flex; align-items: flex-start; gap: 10px;
+            margin-bottom: 20px; cursor: pointer;
+        }
+        .terms-wrap input { width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0; padding: 0; }
+        .terms-wrap span { font-size: 0.85rem; color: var(--texto-sec); line-height: 1.6; }
+        .terms-wrap a { color: var(--verde); font-weight: 600; text-decoration: none; }
+
+        .btn-submit {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, var(--verde-claro), var(--verde));
+            color: #fff; border: none; border-radius: 13px;
+            font-family: inherit; font-size: 1rem; font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 12px 28px rgba(46,125,50,0.28);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 18px 36px rgba(46,125,50,0.35); }
+        .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+        .alert {
+            padding: 13px 16px; border-radius: 12px;
+            margin-bottom: 18px; font-weight: 600; font-size: 0.88rem;
+            display: none; align-items: center; gap: 10px;
+        }
+        .alert.show { display: flex; }
+        .alert-error { background: var(--error-bg); color: var(--error); }
+        .alert-success { background: var(--verde-suave); color: var(--verde); }
+
+        .login-link {
+            text-align: center; margin-top: 22px;
+            color: var(--texto-sec); font-size: 0.9rem;
+        }
+        .login-link a { color: var(--verde); font-weight: 700; text-decoration: none; }
+        .login-link a:hover { text-decoration: underline; }
+
+        @media (max-width: 900px) {
+            body { grid-template-columns: 1fr; }
+            .panel-left { display: none; }
+            .panel-right { padding: 36px 24px; }
+        }
+        @media (max-width: 520px) {
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="panel-left">
+        <a href="index.html" class="panel-logo">🌱 EcoMarket</a>
+        <div class="panel-content">
+            <h2>Únete a la comunidad 🌿</h2>
+            <p>Crea tu cuenta gratis y empieza a comprar y vender productos ecológicos hoy mismo.</p>
+            <div class="panel-steps">
+                <div class="panel-step">
+                    <div class="step-num">1</div>
+                    <span>Crea tu cuenta en segundos</span>
+                </div>
+                <div class="panel-step">
+                    <div class="step-num">2</div>
+                    <span>Explora el catálogo ecológico</span>
+                </div>
+                <div class="panel-step">
+                    <div class="step-num">3</div>
+                    <span>Publica y vende tus productos</span>
+                </div>
+                <div class="panel-step">
+                    <div class="step-num">4</div>
+                    <span>Contribuye al planeta 💚</span>
+                </div>
+            </div>
+        </div>
+        <div class="panel-bottom">© 2026 EcoMarket — Lima, Perú</div>
+    </div>
+
+    <div class="panel-right">
+        <div class="form-header">
+            <h1>Crear cuenta</h1>
+            <p>Completa el formulario para unirte a EcoMarket.</p>
+        </div>
+
+        <div class="alert alert-error" id="alertError">
+            <i class="bi bi-x-circle"></i><span id="alertMsg">Error al crear la cuenta.</span>
+        </div>
+        <div class="alert alert-success" id="alertSuccess">
+            <i class="bi bi-check-circle"></i><span>¡Cuenta creada! Redirigiendo...</span>
+        </div>
+
+        <form id="registerForm" novalidate>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nombre</label>
+                    <div class="input-wrap">
+                        <i class="bi bi-person icon"></i>
+                        <input type="text" id="nombre" placeholder="Tu nombre">
+                    </div>
+                    <p class="error-msg" id="nombreError">Ingresa tu nombre.</p>
+                </div>
+                <div class="form-group">
+                    <label>Apellido</label>
+                    <div class="input-wrap">
+                        <i class="bi bi-person icon"></i>
+                        <input type="text" id="apellido" placeholder="Tu apellido">
+                    </div>
+                    <p class="error-msg" id="apellidoError">Ingresa tu apellido.</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Correo electrónico</label>
+                <div class="input-wrap">
+                    <i class="bi bi-envelope icon"></i>
+                    <input type="email" id="email" placeholder="tu@correo.com">
+                </div>
+                <p class="error-msg" id="emailError">Ingresa un correo válido.</p>
+            </div>
+
+            <div class="form-group">
+                <label>Contraseña</label>
+                <div class="input-wrap">
+                    <i class="bi bi-lock icon"></i>
+                    <input type="password" id="password" placeholder="Mínimo 6 caracteres" id="password">
+                    <button type="button" class="toggle-pass" id="togglePass1">
+                        <i class="bi bi-eye" id="eye1"></i>
+                    </button>
+                </div>
+                <div class="strength-bar">
+                    <div class="strength-seg" id="s1"></div>
+                    <div class="strength-seg" id="s2"></div>
+                    <div class="strength-seg" id="s3"></div>
+                    <div class="strength-seg" id="s4"></div>
+                </div>
+                <p class="strength-label" id="strengthLabel">Ingresa una contraseña</p>
+                <p class="error-msg" id="passError">Mínimo 6 caracteres.</p>
+            </div>
+
+            <div class="form-group">
+                <label>Confirmar contraseña</label>
+                <div class="input-wrap">
+                    <i class="bi bi-lock-fill icon"></i>
+                    <input type="password" id="password2" placeholder="Repite tu contraseña">
+                    <button type="button" class="toggle-pass" id="togglePass2">
+                        <i class="bi bi-eye" id="eye2"></i>
+                    </button>
+                </div>
+                <p class="error-msg" id="pass2Error">Las contraseñas no coinciden.</p>
+            </div>
+
+            <label class="terms-wrap">
+                <input type="checkbox" id="terms">
+                <span>Acepto los <a href="#">Términos y Condiciones</a> y la <a href="#">Política de Privacidad</a> de EcoMarket.</span>
+            </label>
+            <p class="error-msg" id="termsError">Debes aceptar los términos.</p>
+
+            <button type="submit" class="btn-submit">
+                <i class="bi bi-person-check"></i> Crear cuenta gratis
+            </button>
+        </form>
+
+        <p class="login-link">¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a></p>
+    </div>
+
+    <script src="eco-toast.js"></script>
+    <script src="eco-cart.js"></script>
+    <script src="eco-favorites.js"></script>
+    <script src="eco-search.js"></script>
+    <script src="eco-animations.js"></script>
+    <script>
+        // Toggle contraseñas
+        function togglePassword(btnId, inputId, iconId) {
+            document.getElementById(btnId).addEventListener('click', function () {
+                const input = document.getElementById(inputId);
+                const icon = document.getElementById(iconId);
+                input.type = input.type === 'password' ? 'text' : 'password';
+                icon.className = input.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
+            });
+        }
+        togglePassword('togglePass1', 'password', 'eye1');
+        togglePassword('togglePass2', 'password2', 'eye2');
+
+        // Fortaleza de contraseña
+        document.getElementById('password').addEventListener('input', function () {
+            const val = this.value;
+            const segs = [document.getElementById('s1'), document.getElementById('s2'), document.getElementById('s3'), document.getElementById('s4')];
+            const label = document.getElementById('strengthLabel');
+            segs.forEach(s => s.className = 'strength-seg');
+            if (!val) { label.textContent = 'Ingresa una contraseña'; return; }
+            let score = 0;
+            if (val.length >= 6) score++;
+            if (val.length >= 10) score++;
+            if (/[A-Z]/.test(val) && /[0-9]/.test(val)) score++;
+            if (/[^A-Za-z0-9]/.test(val)) score++;
+            const levels = ['weak','weak','medium','strong'];
+            const labels = ['Muy débil','Débil','Media','Fuerte'];
+            for (let i = 0; i < score; i++) segs[i].classList.add(levels[score - 1]);
+            label.textContent = `Contraseña: ${labels[score - 1] || 'Muy débil'}`;
+        });
+
+        // Submit
+        document.getElementById('registerForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            let valid = true;
+            const fields = [
+                { id: 'nombre', errId: 'nombreError', check: v => v.trim().length > 0 },
+                { id: 'apellido', errId: 'apellidoError', check: v => v.trim().length > 0 },
+                { id: 'email', errId: 'emailError', check: v => /\S+@\S+\.\S+/.test(v) },
+                { id: 'password', errId: 'passError', check: v => v.length >= 6 },
+            ];
+            fields.forEach(f => {
+                const input = document.getElementById(f.id);
+                const err = document.getElementById(f.errId);
+                if (!f.check(input.value)) {
+                    input.classList.add('error'); err.classList.add('show'); valid = false;
+                } else {
+                    input.classList.remove('error'); err.classList.remove('show');
+                }
+            });
+            const p2 = document.getElementById('password2');
+            const p2Err = document.getElementById('pass2Error');
+            if (p2.value !== document.getElementById('password').value) {
+                p2.classList.add('error'); p2Err.classList.add('show'); valid = false;
+            } else { p2.classList.remove('error'); p2Err.classList.remove('show'); }
+
+            const terms = document.getElementById('terms');
+            const termsErr = document.getElementById('termsError');
+            if (!terms.checked) { termsErr.classList.add('show'); valid = false; }
+            else { termsErr.classList.remove('show'); }
+
+            if (!valid) return;
+            const btn = this.querySelector('.btn-submit');
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Creando cuenta...';
+            btn.disabled = true;
+            setTimeout(() => {
+                EcoToast.eco('¡Cuenta creada! Bienvenido a EcoMarket 🌱');
+                document.getElementById('alertSuccess').classList.add('show');
+                setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+            }, 1000);
+        });
+    </script>
+    <script src='eco-notifications.js'></script>
+    <script src='eco-theme.js'></script>
+    <script src='eco-gamification.js'></script>
+</body>
+</html>
+
+
+

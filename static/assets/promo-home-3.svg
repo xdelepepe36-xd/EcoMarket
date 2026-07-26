@@ -1,0 +1,13 @@
+<svg width="900" height="600" viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#B2DFDB"/>
+      <stop offset="100%" stop-color="#E0F2F1"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="600" rx="36" fill="url(#g3)"/>
+  <circle cx="250" cy="220" r="90" fill="#FFFFFF" opacity="0.85"/>
+  <path d="M480 250C520 220 580 210 640 230C700 250 740 290 720 350C700 410 650 450 590 450C530 450 510 410 500 360C490 320 460 280 480 250Z" fill="#4CAF50"/>
+  <path d="M280 340C320 310 350 260 320 210C290 160 230 130 180 150C130 170 110 240 130 300C150 360 200 390 250 380C280 374 294 350 280 340Z" fill="#00796B"/>
+  <text x="100" y="520" fill="#004D40" font-family="Poppins, sans-serif" font-size="48" font-weight="700">Regalos eco</text>
+</svg>

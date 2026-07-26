@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% block title %}EcoMarket - Catálogo{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="section-head" style="flex-wrap:wrap">
+            <div>
+                <h2 class="section-title">🌿 Catálogo de productos</h2>
+                <p>Descubre artículos ecológicos. {{ total_productos }} producto(s) disponible(s).</p>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <a class="btn-principal" href="{{ url_for('publicar') }}"><i class="bi bi-plus-circle"></i> Publicar</a>
+            </div>
+        </div>
+
+        <!-- Filtros rápidos -->
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:20px">
+            <div style="flex:1;min-width:200px;position:relative">
+                <i class="bi bi-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--texto-sec)"></i>
+                <input id="searchInput" type="text" placeholder="Buscar productos..." style="width:100%;padding:12px 12px 12px 38px;border:1.5px solid rgba(46,125,50,0.18);border-radius:12px;font-family:inherit;font-size:0.9rem;outline:none">
+            </div>
+            <select id="ordenSelect" onchange="window.location='{{ url_for('productos_view') }}?orden='+this.value" style="padding:12px 16px;border:1.5px solid rgba(46,125,50,0.18);border-radius:12px;font-family:inherit;font-size:0.9rem;outline:none;cursor:pointer">
+                <option value="nuevos" {{ 'selected' if orden_sel == 'nuevos' else '' }}>📅 Más nuevos</option>
+                <option value="populares" {{ 'selected' if orden_sel == 'populares' else '' }}>🔥 Más populares</option>
+                <option value="baratos" {{ 'selected' if orden_sel == 'baratos' else '' }}>💰 Menor precio</option>
+                <option value="caros" {{ 'selected' if orden_sel == 'caros' else '' }}>💎 Mayor precio</option>
+                <option value="mejor_valorados" {{ 'selected' if orden_sel == 'mejor_valorados' else '' }}>⭐ Mejor valorados</option>
+            </select>
+        </div>
+
+        <!-- Categorías -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px">
+            <a href="{{ url_for('productos_view') }}" class="btn-filtro {{ 'active' if not categoria_sel }}" style="padding:8px 16px;border-radius:999px;border:1.5px solid rgba(46,125,50,0.18);background:var(--blanco);text-decoration:none;font-size:0.85rem;font-weight:600;color:var(--texto);transition:all 0.2s">Todas</a>
+            {% for cat in categorias %}
+            <a href="{{ url_for('productos_view', categoria=cat) }}" class="btn-filtro {{ 'active' if categoria_sel == cat }}" style="padding:8px 16px;border-radius:999px;border:1.5px solid rgba(46,125,50,0.18);background:var(--blanco);text-decoration:none;font-size:0.85rem;font-weight:600;color:var(--texto);transition:all 0.2s">{{ cat }}</a>
+            {% endfor %}
+        </div>
+
+        <p style="font-size:0.85rem;color:var(--texto-sec);margin-bottom:16px">📦 Mostrando {{ productos|length }} producto(s)</p>
+
+        <!-- Grid -->
+        <div class="productos-grid" id="productosGrid">
+            {% for producto in productos %}
+            <article class="producto-card" style="position:relative;display:flex;flex-direction:column">
+                <!-- Badge condición -->
+                <div style="position:absolute;top:10px;left:10px;z-index:2;background:{% if producto.condicion == 'nuevo' %}#2e7d32{% else %}#f59e0b{% endif %};color:#fff;padding:4px 10px;border-radius:999px;font-size:0.72rem;font-weight:700">
+                    {{ producto.condicion|upper }}
+                </div>
+                {% if producto.precio_original and producto.precio_original > producto.precio %}
+                <div style="position:absolute;top:10px;right:10px;z-index:2;background:#e53935;color:#fff;padding:4px 10px;border-radius:999px;font-size:0.72rem;font-weight:700">
+                    -{{ ((1 - producto.precio / producto.precio_original) * 100)|round }}%
+                </div>
+                {% endif %}
+
+                <a href="{{ url_for('producto_detalle', producto_id=producto.id) }}" style="text-decoration:none;color:inherit;flex:1;display:flex;flex-direction:column">
+                    <img src="{% if producto.imagen.startswith('http') %}{{ producto.imagen }}{% else %}{{ url_for('static', filename=producto.imagen) }}{% endif %}" alt="{{ producto.nombre }}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22%3E%3Crect fill=%22%23e8f5e9%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%22100%22 y=%22115%22 text-anchor=%22middle%22 font-size=%2260%22%3E📦%3C/text%3E%3C/svg%3E'" style="width:100%;height:200px;object-fit:cover">
+                    <div class="producto-info" style="flex:1;display:flex;flex-direction:column;padding:16px">
+                        <span class="categoria" style="font-size:0.72rem;color:var(--texto-sec);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">{{ producto.categoria }}</span>
+                        <h3 style="font-size:0.9rem;font-weight:700;margin-bottom:6px;line-height:1.4">{{ producto.nombre }}</h3>
+                        <p style="font-size:0.82rem;color:var(--texto-sec);line-height:1.6;margin-bottom:8px;flex:1">{{ producto.descripcion[:100] }}{% if producto.descripcion|length > 100 %}...{% endif %}</p>
+                        
+                        <!-- Rating -->
+                        <div style="display:flex;align-items:center;gap:4px;margin-bottom:8px">
+                            <div style="display:flex;gap:2px;font-size:0.8rem;color:#f59e0b">
+                                {% for i in range(5) %}
+                                <span>{% if i < (producto.rating_promedio|round) %}★{% else %}☆{% endif %}</span>
+                                {% endfor %}
+                            </div>
+                            <span style="font-size:0.75rem;color:var(--texto-sec)">{{ '%.1f'|format(producto.rating_promedio) }} ({{ producto.total_resenas }})</span>
+                        </div>
+
+                        <!-- Vendedor y stock -->
+                        <div style="display:flex;gap:8px;font-size:0.75rem;color:var(--texto-sec);margin-bottom:8px">
+                            <span>👤 {{ producto.vendedor_nombre or 'Anónimo' }}</span>
+                            <span>📦 Stock: {{ producto.stock }}</span>
+                            <span>👁️ {{ producto.vistas }}</span>
+                        </div>
+
+                        <div class="producto-footer" style="display:flex;align-items:center;justify-content:space-between;margin-top:auto">
+                            <div>
+                                <strong style="font-size:1.1rem;color:var(--verde)">S/. {{ '%.2f'|format(producto.precio) }}</strong>
+                                {% if producto.precio_original and producto.precio_original > producto.precio %}
+                                <span style="font-size:0.78rem;text-decoration:line-through;color:var(--texto-sec);margin-left:4px">S/. {{ '%.2f'|format(producto.precio_original) }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                
+                <!-- Botones de acción -->
+                <div style="padding:0 16px 16px;display:flex;gap:8px">
+                    <a href="{{ url_for('producto_detalle', producto_id=producto.id) }}" class="btn-secundario" style="flex:1;padding:8px;font-size:0.82rem;text-align:center;text-decoration:none">Ver más</a>
+                    <button class="btn-principal add-cart" style="flex:1;padding:8px;font-size:0.82rem;border:none;cursor:pointer" 
+                        data-producto-id="{{ producto.id }}" 
+                        data-producto-nombre="{{ producto.nombre }}" 
+                        data-producto-categoria="{{ producto.categoria }}" 
+                        data-producto-precio="{{ '%.2f'|format(producto.precio) }}" 
+                        data-producto-imagen="{{ producto.imagen }}">
+                        <i class="bi bi-bag-plus"></i> Carrito
+                    </button>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+
+        <div id="noResultsMessage" class="no-results" hidden style="text-align:center;padding:60px 20px">
+            <i class="bi bi-search" style="font-size:3rem;display:block;margin-bottom:16px;color:rgba(46,125,50,0.3)"></i>
+            <h3 style="margin-bottom:8px">Sin resultados</h3>
+            <p style="color:var(--texto-sec)">Intenta con otros filtros o términos de búsqueda.</p>
+        </div>
+    </div>
+</section>
+
+<script>
+// Filtros activos
+document.querySelectorAll('.btn-filtro').forEach(btn => {
+    btn.addEventListener('mouseenter', function() {
+        if (!this.classList.contains('active')) {
+            this.style.background = 'var(--verde-suave)';
+            this.style.borderColor = 'var(--verde-claro)';
+        }
+    });
+    btn.addEventListener('mouseleave', function() {
+        if (!this.classList.contains('active')) {
+            this.style.background = 'var(--blanco)';
+            this.style.borderColor = 'rgba(46,125,50,0.18)';
+        }
+    });
+});
+
+// Búsqueda en tiempo real
+document.getElementById('searchInput').addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    let visible = 0;
+    document.querySelectorAll('.producto-card').forEach(card => {
+        const text = card.textContent.toLowerCase();
+        const show = text.includes(q);
+        card.style.display = show ? '' : 'none';
+        if (show) visible++;
+    });
+    document.getElementById('noResultsMessage').hidden = visible > 0;
+});
+</script>
+
+<style>
+.producto-card {
+    transition: transform 0.25s, box-shadow 0.25s;
+    background: var(--blanco);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--sombra);
+    border: 1px solid rgba(46,125,50,0.08);
+}
+.producto-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 28px 60px rgba(0,0,0,0.1);
+}
+.btn-filtro.active {
+    background: var(--verde) !important;
+    color: #fff !important;
+    border-color: var(--verde) !important;
+}
+@media (max-width: 768px) {
+    .productos-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .section-head {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+</style>
+{% endblock %}

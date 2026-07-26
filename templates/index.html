@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% block title %}EcoMarket - Marketplace Ecológico{% endblock %}
+
+{% block content %}
+<!-- HERO SECTION -->
+<section style="background:linear-gradient(135deg,#1b5e20 0%,#2e7d32 45%,#388e3c 100%);padding:80px 5%;position:relative;overflow:hidden;min-height:85vh;display:flex;align-items:center">
+    <div style="position:absolute;inset:0;background:url('data:image/svg+xml,%3Csvg width=80 height=80 viewBox=0 0 80 80 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill=%22%23ffffff%22 fill-opacity=%220.03%22%3E%3Ccircle cx=40 cy=40 r=6/%3E%3C/g%3E%3C/svg%3E')"></div>
+    <div style="position:absolute;right:-100px;top:-100px;width:600px;height:600px;border-radius:50%;background:rgba(255,255,255,0.04)"></div>
+    <div class="container" style="position:relative;z-index:1">
+        <div style="max-width:600px">
+            <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.15);color:#fff;padding:8px 18px;border-radius:999px;font-size:0.85rem;font-weight:600;margin-bottom:28px;backdrop-filter:blur(8px)">
+                <span style="width:8px;height:8px;border-radius:50%;background:#a5d6a7;display:inline-block;animation:pulse 2s infinite"></span>
+                Marketplace 100% ecológico
+            </div>
+            <h1 style="font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;color:#fff;line-height:1.15;margin-bottom:22px">
+                Compra y vende<br>productos <em style="color:#a5d6a7;font-style:normal">sostenibles</em>
+            </h1>
+            <p style="font-size:1.05rem;color:rgba(255,255,255,0.82);line-height:1.8;margin-bottom:36px;max-width:480px">
+                Descubre miles de productos ecológicos de vendedores comprometidos con el planeta. Cada compra genera un impacto positivo real.
+            </p>
+            <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:48px">
+                <a href="{{ url_for('productos_view') }}" class="btn-hero-main" style="background:#fff;color:var(--verde);padding:15px 32px;border-radius:14px;font-weight:800;font-size:0.95rem;text-decoration:none;box-shadow:0 10px 28px rgba(0,0,0,0.15);display:flex;align-items:center;gap:8px;transition:transform 0.2s">
+                    <i class="bi bi-bag"></i> Explorar productos
+                </a>
+                <a href="{{ url_for('publicar') }}" class="btn-hero-sec" style="border:2px solid rgba(255,255,255,0.5);color:#fff;padding:15px 32px;border-radius:14px;font-weight:700;font-size:0.95rem;text-decoration:none;display:flex;align-items:center;gap:8px;transition:background 0.2s">
+                    <i class="bi bi-plus-lg"></i> Publicar gratis
+                </a>
+            </div>
+            <div style="display:flex;gap:32px;flex-wrap:wrap">
+                <div><strong style="display:block;font-size:1.6rem;font-weight:800;color:#fff">4,800+</strong><span style="font-size:0.82rem;color:rgba(255,255,255,0.7)">Familias impactadas</span></div>
+                <div><strong style="display:block;font-size:1.6rem;font-weight:800;color:#fff">1,200+</strong><span style="font-size:0.82rem;color:rgba(255,255,255,0.7)">Productos eco</span></div>
+                <div><strong style="display:block;font-size:1.6rem;font-weight:800;color:#fff">3.2 ton</strong><span style="font-size:0.82rem;color:rgba(255,255,255,0.7)">Plástico evitado</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CATEGORÍAS -->
+<section style="padding:72px 5%;max-width:1200px;margin:0 auto">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:12px">
+        <div>
+            <span style="display:inline-block;background:var(--verde-suave);color:var(--verde);padding:5px 14px;border-radius:999px;font-size:0.78rem;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em">Explora</span>
+            <h2 style="font-size:clamp(1.3rem,2.5vw,1.9rem);font-weight:800">Categorías populares</h2>
+        </div>
+        <a href="{{ url_for('productos_view') }}" style="font-size:0.88rem;color:var(--verde);font-weight:600;text-decoration:none">Ver todos →</a>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:16px">
+        {% for cat in categorias %}
+        <a href="{{ url_for('productos_view', categoria=cat) }}" style="background:var(--verde-suave);border-radius:20px;padding:24px 16px;text-align:center;text-decoration:none;color:var(--texto);transition:transform 0.25s,box-shadow 0.25s;border:1px solid rgba(0,0,0,0.04)" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='var(--sombra)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+            <div style="font-size:2.2rem;margin-bottom:10px">{% if cat == 'Hogar' %}🏠{% elif cat == 'Accesorios' %}💧{% elif cat == 'Higiene' %}🪥{% elif cat == 'Jardín' %}🌿{% elif cat == 'Alimentación' %}🥗{% elif cat == 'Ropa' %}👕{% else %}📦{% endif %}</div>
+            <strong style="display:block;font-size:0.9rem;font-weight:700;color:var(--verde)">{{ cat }}</strong>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- PRODUCTOS DESTACADOS -->
+<section style="background:var(--blanco);padding:72px 5%">
+    <div style="max-width:1200px;margin:0 auto">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:12px">
+            <div>
+                <span style="display:inline-block;background:var(--verde-suave);color:var(--verde);padding:5px 14px;border-radius:999px;font-size:0.78rem;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em">Destacados</span>
+                <h2 style="font-size:clamp(1.3rem,2.5vw,1.9rem);font-weight:800">Más vendidos esta semana</h2>
+            </div>
+            <a href="{{ url_for('productos_view') }}" style="font-size:0.88rem;color:var(--verde);font-weight:600;text-decoration:none">Ver catálogo completo →</a>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:22px">
+            {% for producto in productos %}
+            <a href="{{ url_for('producto_detalle', producto_id=producto.id) }}" style="background:var(--blanco);border-radius:20px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08);overflow:hidden;text-decoration:none;color:var(--texto);transition:transform 0.25s,box-shadow 0.25s" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 28px 60px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+                <div style="height:180px;background:linear-gradient(135deg,var(--verde-suave),#c8e6c9);display:flex;align-items:center;justify-content:center;font-size:4rem;position:relative">
+                    {% if producto.precio_original and producto.precio_original > producto.precio %}
+                    <span style="position:absolute;top:10px;left:10px;background:#e53935;color:#fff;padding:3px 10px;border-radius:999px;font-size:0.72rem;font-weight:700">-{{ ((1 - producto.precio / producto.precio_original) * 100)|round }}%</span>
+                    {% endif %}
+                </div>
+                <div style="padding:16px">
+                    <div style="font-size:0.72rem;color:var(--texto-sec);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em">{{ producto.categoria }}</div>
+                    <h3 style="font-size:0.9rem;font-weight:700;margin-bottom:6px;line-height:1.4">{{ producto.nombre }}</h3>
+                    <div style="display:flex;gap:2px;font-size:0.78rem;color:#f59e0b;margin-bottom:10px">
+                        {% for i in range(5) %}
+                        <span>{% if i < (producto.rating_promedio|round) %}★{% else %}☆{% endif %}</span>
+                        {% endfor %}
+                        <span style="color:var(--texto-sec);margin-left:4px">({{ producto.total_resenas }})</span>
+                    </div>
+                    <div style="display:flex;align-items:center;justify-content:space-between">
+                        <strong style="font-size:1rem;font-weight:800;color:var(--verde)">S/. {{ '%.2f'|format(producto.precio) }}</strong>
+                        {% if producto.precio_original and producto.precio_original > producto.precio %}
+                        <span style="font-size:0.78rem;color:var(--texto-sec);text-decoration:line-through">S/. {{ '%.2f'|format(producto.precio_original) }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- IMPACTO -->
+<section style="background:var(--verde-suave);padding:80px 5%">
+    <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1.4fr;gap:60px;align-items:center">
+        <div>
+            <span style="display:inline-block;background:var(--blanco);color:var(--verde);padding:5px 14px;border-radius:999px;font-size:0.78rem;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em">Impacto real</span>
+            <h2 style="font-size:clamp(1.5rem,3vw,2.2rem);font-weight:800;margin-bottom:12px">Cada compra cuenta</h2>
+            <p style="color:var(--texto-sec);font-size:0.95rem;line-height:1.8;margin:14px 0 24px;max-width:420px">En EcoMarket medimos el impacto ambiental de cada transacción. Juntos estamos construyendo un futuro más sostenible.</p>
+            <a href="{{ url_for('impacto') }}" style="color:var(--verde);font-weight:700;font-size:0.92rem;text-decoration:none;display:inline-flex;align-items:center;gap:6px">Ver nuestro impacto completo →</a>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div style="background:var(--blanco);border-radius:20px;padding:24px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08);transition:transform 0.25s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+                <div style="width:48px;height:48px;border-radius:14px;background:var(--verde-suave);color:var(--verde);display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:12px"><i class="bi bi-tree"></i></div>
+                <strong style="display:block;font-size:1.8rem;font-weight:800;color:var(--verde);line-height:1;margin-bottom:6px">1,240</strong>
+                <span style="font-size:0.82rem;color:var(--texto-sec)">Árboles equivalentes salvados</span>
+            </div>
+            <div style="background:var(--blanco);border-radius:20px;padding:24px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08);transition:transform 0.25s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+                <div style="width:48px;height:48px;border-radius:14px;background:#e3f2fd;color:#1565c0;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:12px"><i class="bi bi-droplet"></i></div>
+                <strong style="display:block;font-size:1.8rem;font-weight:800;color:var(--verde);line-height:1;margin-bottom:6px">85,600</strong>
+                <span style="font-size:0.82rem;color:var(--texto-sec)">Litros de agua ahorrados</span>
+            </div>
+            <div style="background:var(--blanco);border-radius:20px;padding:24px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08);transition:transform 0.25s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+                <div style="width:48px;height:48px;border-radius:14px;background:#fff3e0;color:#e65100;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:12px"><i class="bi bi-recycle"></i></div>
+                <strong style="display:block;font-size:1.8rem;font-weight:800;color:var(--verde);line-height:1;margin-bottom:6px">3,200</strong>
+                <span style="font-size:0.82rem;color:var(--texto-sec)">Kg de plástico evitados</span>
+            </div>
+            <div style="background:var(--blanco);border-radius:20px;padding:24px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08);transition:transform 0.25s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+                <div style="width:48px;height:48px;border-radius:14px;background:#f3e5f5;color:#6a1b9a;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:12px"><i class="bi bi-people"></i></div>
+                <strong style="display:block;font-size:1.8rem;font-weight:800;color:var(--verde);line-height:1;margin-bottom:6px">4,800</strong>
+                <span style="font-size:0.82rem;color:var(--texto-sec)">Familias impactadas</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section style="background:linear-gradient(135deg,#1b5e20,#2e7d32);padding:80px 5%">
+    <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center">
+        <div>
+            <h2 style="font-size:clamp(1.5rem,2.5vw,2.2rem);font-weight:800;color:#fff;margin-bottom:12px">¿Tienes productos ecológicos?</h2>
+            <p style="color:rgba(255,255,255,0.8);font-size:0.95rem;line-height:1.8;margin-bottom:28px">Publica gratis y llega a miles de compradores comprometidos con el planeta.</p>
+            <div style="display:flex;gap:14px;flex-wrap:wrap">
+                <a href="{{ url_for('publicar') }}" style="background:#fff;color:var(--verde);padding:13px 28px;border-radius:14px;font-weight:800;font-size:0.92rem;text-decoration:none;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,0.15);transition:transform 0.2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''"><i class="bi bi-plus-lg"></i> Publicar ahora</a>
+                <a href="{{ url_for('registro') }}" style="border:2px solid rgba(255,255,255,0.4);color:#fff;padding:13px 28px;border-radius:14px;font-weight:700;font-size:0.92rem;text-decoration:none;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background=''">Crear cuenta gratis</a>
+            </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.9);font-size:0.92rem;font-weight:500"><i class="bi bi-check-circle-fill" style="color:#a5d6a7;font-size:1.1rem"></i> Sin comisión los primeros 3 meses</div>
+            <div style="display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.9);font-size:0.92rem;font-weight:500"><i class="bi bi-check-circle-fill" style="color:#a5d6a7;font-size:1.1rem"></i> Panel de vendedor completo</div>
+            <div style="display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.9);font-size:0.92rem;font-weight:500"><i class="bi bi-check-circle-fill" style="color:#a5d6a7;font-size:1.1rem"></i> Pagos seguros y rápidos</div>
+            <div style="display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.9);font-size:0.92rem;font-weight:500"><i class="bi bi-check-circle-fill" style="color:#a5d6a7;font-size:1.1rem"></i> Soporte 7 días a la semana</div>
+        </div>
+    </div>
+</section>
+
+<!-- TESTIMONIOS -->
+<section style="padding:80px 5%;background:var(--blanco)">
+    <div style="max-width:1200px;margin:0 auto">
+        <div style="text-align:center;margin-bottom:40px">
+            <span style="display:inline-block;background:var(--verde-suave);color:var(--verde);padding:5px 14px;border-radius:999px;font-size:0.78rem;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em">Comunidad</span>
+            <h2 style="font-size:clamp(1.3rem,2.5vw,1.9rem);font-weight:800">Lo que dice nuestra comunidad</h2>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px">
+            <div style="background:#f4fbf5;border-radius:22px;padding:28px;border:1px solid rgba(46,125,50,0.08);transition:transform 0.25s,box-shadow 0.25s" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='var(--sombra)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+                <div style="font-size:2rem;color:var(--verde);margin-bottom:12px"><i class="bi bi-quote"></i></div>
+                <p style="font-size:0.9rem;line-height:1.8;color:var(--texto-sec);margin-bottom:14px;font-style:italic">"Desde que compro en EcoMarket siento que mis decisiones de consumo realmente importan. Los productos son increíbles."</p>
+                <div style="color:#f59e0b;font-size:0.9rem;margin-bottom:16px">★★★★★</div>
+                <div style="display:flex;align-items:center;gap:12px">
+                    <div style="width:40px;height:40px;border-radius:50%;background:#2e7d32;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.95rem">M</div>
+                    <div><strong style="display:block;font-size:0.88rem">María García</strong><span style="font-size:0.75rem;color:var(--texto-sec)">Lima, Perú</span></div>
+                </div>
+            </div>
+            <div style="background:linear-gradient(135deg,#1b5e20,#2e7d32);border-radius:22px;padding:28px;color:#fff;transition:transform 0.25s,box-shadow 0.25s" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='var(--sombra)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+                <div style="font-size:2rem;color:rgba(255,255,255,0.5);margin-bottom:12px"><i class="bi bi-quote"></i></div>
+                <p style="font-size:0.9rem;line-height:1.8;color:rgba(255,255,255,0.85);margin-bottom:14px;font-style:italic">"Publiqué mis productos artesanales y en un mes ya tenía 20 ventas. La plataforma es muy fácil de usar."</p>
+                <div style="color:#f59e0b;font-size:0.9rem;margin-bottom:16px">★★★★★</div>
+                <div style="display:flex;align-items:center;gap:12px">
+                    <div style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.2);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.95rem">C</div>
+                    <div><strong style="display:block;font-size:0.88rem;color:#fff">Carlos López</strong><span style="font-size:0.75rem;color:rgba(255,255,255,0.6)">Bogotá, Colombia</span></div>
+                </div>
+            </div>
+            <div style="background:#f4fbf5;border-radius:22px;padding:28px;border:1px solid rgba(46,125,50,0.08);transition:transform 0.25s,box-shadow 0.25s" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='var(--sombra)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+                <div style="font-size:2rem;color:var(--verde);margin-bottom:12px"><i class="bi bi-quote"></i></div>
+                <p style="font-size:0.9rem;line-height:1.8;color:var(--texto-sec);margin-bottom:14px;font-style:italic">"Me encanta que puedo ver el impacto real de cada compra. Es motivador saber que estoy ayudando al planeta."</p>
+                <div style="color:#f59e0b;font-size:0.9rem;margin-bottom:16px">★★★★★</div>
+                <div style="display:flex;align-items:center;gap:12px">
+                    <div style="width:40px;height:40px;border-radius:50%;background:#6a1b9a;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.95rem">A</div>
+                    <div><strong style="display:block;font-size:0.88rem">Ana Torres</strong><span style="font-size:0.75rem;color:var(--texto-sec)">Santiago, Chile</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(1.3)} }
+.btn-hero-main:hover { transform: translateY(-3px) !important; color: var(--verde) !important; }
+.btn-hero-sec:hover { background: rgba(255,255,255,0.1) !important; color: #fff !important; }
+@media (max-width: 1024px) {
+    div[style*="grid-template-columns: repeat(6,1fr)"] { grid-template-columns: repeat(3,1fr) !important; }
+    div[style*="grid-template-columns: repeat(4,1fr)"] { grid-template-columns: 1fr 1fr !important; }
+}
+@media (max-width: 768px) {
+    div[style*="grid-template-columns: 1fr 1.4fr"] { grid-template-columns: 1fr !important; gap: 36px !important; }
+    div[style*="grid-template-columns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
+    div[style*="grid-template-columns: repeat(3,1fr)"] { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 600px) {
+    div[style*="grid-template-columns: repeat(6,1fr)"] { grid-template-columns: repeat(2,1fr) !important; }
+    div[style*="grid-template-columns: repeat(4,1fr)"] { grid-template-columns: 1fr 1fr !important; }
+}
+</style>
+{% endblock %}

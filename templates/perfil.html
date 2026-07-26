@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% block title %}EcoMarket - Mi Perfil{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="section-head">
+            <div>
+                <h2 class="section-title">Mi Panel</h2>
+                <p>Bienvenido, <strong>{{ session.get('nombre') }}</strong>. Gestiona tus productos, reseñas y más.</p>
+            </div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+                <a href="{{ url_for('publicar') }}" class="btn-principal"><i class="bi bi-plus-circle"></i> Publicar producto</a>
+                <a href="{{ url_for('logout') }}" class="btn-secundario" style="color:#b91c1c;border-color:#b91c1c;"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
+            </div>
+        </div>
+
+        <!-- Stats rápidas -->
+        <div class="stats-grid" style="margin-bottom:28px">
+            <div class="stat-card" style="text-align:center;padding:20px;border-radius:20px;background:var(--blanco);box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
+                <div style="font-size:2rem;font-weight:800;color:var(--verde)">{{ total_publicaciones }}</div>
+                <div style="font-size:0.85rem;color:var(--texto-sec)">Publicaciones</div>
+            </div>
+            <div class="stat-card" style="text-align:center;padding:20px;border-radius:20px;background:var(--blanco);box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
+                <div style="font-size:2rem;font-weight:800;color:var(--verde)">{{ total_favoritos }}</div>
+                <div style="font-size:0.85rem;color:var(--texto-sec)">Favoritos</div>
+            </div>
+            <div class="stat-card" style="text-align:center;padding:20px;border-radius:20px;background:var(--blanco);box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
+                <div style="font-size:2rem;font-weight:800;color:var(--verde)">{{ total_resenas_recibidas }}</div>
+                <div style="font-size:0.85rem;color:var(--texto-sec)">Reseñas recibidas</div>
+            </div>
+            <div class="stat-card" style="text-align:center;padding:20px;border-radius:20px;background:var(--blanco);box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
+                <div style="font-size:2rem;font-weight:800;color:var(--verde)">{{ total_ventas }}</div>
+                <div style="font-size:0.85rem;color:var(--texto-sec)">Ventas</div>
+            </div>
+            <div class="stat-card" style="text-align:center;padding:20px;border-radius:20px;background:var(--blanco);box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
+                <div style="font-size:1.5rem;font-weight:800;color:var(--verde)">S/. {{ '%.0f'|format(valor_total) }}</div>
+                <div style="font-size:0.85rem;color:var(--texto-sec)">Valor productos</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div style="display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;border-bottom:2px solid rgba(46,125,50,0.1);padding-bottom:0">
+            <button class="tab-btn active" onclick="setTab(event,'productos')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-box-seam"></i> Mis productos ({{ mis_productos|length }})</button>
+            <button class="tab-btn" onclick="setTab(event,'favoritos')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-heart"></i> Favoritos ({{ favoritos|length }})</button>
+            <button class="tab-btn" onclick="setTab(event,'resenas')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-star"></i> Mis reseñas ({{ resenas|length }})</button>
+            <button class="tab-btn" onclick="setTab(event,'pedidos')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-bag-check"></i> Pedidos ({{ pedidos|length }})</button>
+        </div>
+
+        <!-- TAB: MIS PRODUCTOS -->
+        <div id="tab-productos" class="tab-content">
+            {% if mis_productos %}
+            <div class="productos-grid">
+                {% for p in mis_productos %}
+                <article class="producto-card" style="position:relative">
+                    <div style="position:absolute;top:10px;left:10px;background:{% if p.condicion == 'nuevo' %}#2e7d32{% else %}#f59e0b{% endif %};color:#fff;padding:4px 10px;border-radius:999px;font-size:0.72rem;font-weight:700;z-index:2">{{ p.condicion|upper }}</div>
+                    <img src="{% if p.imagen.startswith('http') %}{{ p.imagen }}{% else %}{{ url_for('static', filename=p.imagen) }}{% endif %}" alt="{{ p.nombre }}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23e8f5e9%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2260%22 text-anchor=%22middle%22 font-size=%2230%22%3E📦%3C/text%3E%3C/svg%3E'">
+                    <div class="producto-info">
+                        <span class="categoria">{{ p.categoria }}</span>
+                        <h3>{{ p.nombre }}</h3>
+                        <p style="font-size:0.82rem;color:var(--texto-sec);margin-bottom:8px">{{ p.descripcion[:80] }}{% if p.descripcion|length > 80 %}...{% endif %}</p>
+                        <div style="display:flex;gap:4px;font-size:0.8rem;color:#f59e0b;margin-bottom:8px">
+                            {% for i in range(5) %}
+                            <span>{% if i < (p.rating_promedio|round) %}★{% else %}☆{% endif %}</span>
+                            {% endfor %}
+                            <span style="color:var(--texto-sec);margin-left:4px">({{ p.total_resenas }})</span>
+                        </div>
+                        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;font-size:0.78rem;color:var(--texto-sec)">
+                            <span>📦 Stock: {{ p.stock }}</span>
+                            <span>👁️ {{ p.vistas }} vistas</span>
+                        </div>
+                        <div class="producto-footer">
+                            <strong style="font-size:1.1rem;color:var(--verde)">S/. {{ '%.2f'|format(p.precio) }}</strong>
+                            <div style="display:flex;gap:6px">
+                                <a href="{{ url_for('producto_detalle', producto_id=p.id) }}" class="btn-secundario" style="padding:6px 14px;font-size:0.82rem"><i class="bi bi-eye"></i></a>
+                                <form method="POST" action="{{ url_for('eliminar_producto', producto_id=p.id) }}" style="display:inline" onsubmit="return confirm('¿Eliminar este producto?')">
+                                    <button type="submit" class="btn-danger" style="padding:6px 14px;font-size:0.82rem"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-results" style="padding:60px 20px;text-align:center;background:var(--blanco);border-radius:24px;box-shadow:var(--sombra)">
+                <i class="bi bi-box-seam" style="font-size:3rem;display:block;margin-bottom:16px;color:rgba(46,125,50,0.3)"></i>
+                <h3 style="margin-bottom:8px">No has publicado productos</h3>
+                <p style="color:var(--texto-sec);margin-bottom:20px">Publica tu primer producto y empieza a vender.</p>
+                <a href="{{ url_for('publicar') }}" class="btn-principal"><i class="bi bi-plus-circle"></i> Publicar ahora</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- TAB: FAVORITOS -->
+        <div id="tab-favoritos" class="tab-content" style="display:none">
+            {% if favoritos %}
+            <div class="productos-grid">
+                {% for f in favoritos %}
+                <article class="producto-card">
+                    <img src="{% if f.imagen.startswith('http') %}{{ f.imagen }}{% else %}{{ url_for('static', filename=f.imagen) }}{% endif %}" alt="{{ f.nombre }}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23e8f5e9%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2260%22 text-anchor=%22middle%22 font-size=%2230%22%3E📦%3C/text%3E%3C/svg%3E'">
+                    <div class="producto-info">
+                        <span class="categoria">{{ f.categoria }}</span>
+                        <h3>{{ f.nombre }}</h3>
+                        <p style="font-size:0.78rem;color:var(--texto-sec);margin-bottom:6px">❤️ Agregado {{ f.fecha_favorito[:10] }}</p>
+                        <div class="producto-footer">
+                            <strong style="color:var(--verde)">S/. {{ '%.2f'|format(f.precio) }}</strong>
+                            <div style="display:flex;gap:6px">
+                                <a href="{{ url_for('producto_detalle', producto_id=f.id) }}" class="btn-secundario" style="padding:6px 14px;font-size:0.82rem"><i class="bi bi-eye"></i></a>
+                                <button onclick="removeFav({{ f.id }})" class="btn-danger" style="padding:6px 14px;font-size:0.82rem"><i class="bi bi-heartbreak"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-results" style="padding:60px 20px;text-align:center;background:var(--blanco);border-radius:24px;box-shadow:var(--sombra)">
+                <i class="bi bi-heart" style="font-size:3rem;display:block;margin-bottom:16px;color:rgba(46,125,50,0.3)"></i>
+                <h3 style="margin-bottom:8px">No tienes favoritos</h3>
+                <p style="color:var(--texto-sec);margin-bottom:20px">Explora productos y guarda tus favoritos.</p>
+                <a href="{{ url_for('productos_view') }}" class="btn-principal">Explorar productos</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- TAB: RESEÑAS -->
+        <div id="tab-resenas" class="tab-content" style="display:none">
+            {% if resenas %}
+            <div style="display:flex;flex-direction:column;gap:14px">
+                {% for r in resenas %}
+                <div style="background:var(--blanco);border-radius:18px;padding:20px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+                        <div style="display:flex;gap:2px;font-size:1rem;color:#f59e0b">
+                            {% for i in range(5) %}
+                            <span>{% if i < r.rating %}★{% else %}☆{% endif %}</span>
+                            {% endfor %}
+                        </div>
+                        <strong style="font-size:0.9rem">{{ r.producto_nombre }}</strong>
+                        <span style="font-size:0.75rem;color:var(--texto-sec);margin-left:auto">{{ r.created_at[:10] }}</span>
+                    </div>
+                    {% if r.comentario %}
+                    <p style="font-size:0.88rem;color:var(--texto-sec);line-height:1.7">{{ r.comentario }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-results" style="padding:60px 20px;text-align:center;background:var(--blanco);border-radius:24px;box-shadow:var(--sombra)">
+                <i class="bi bi-star" style="font-size:3rem;display:block;margin-bottom:16px;color:rgba(46,125,50,0.3)"></i>
+                <h3 style="margin-bottom:8px">No has escrito reseñas</h3>
+                <p style="color:var(--texto-sec)">Compra productos y comparte tu experiencia.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- TAB: PEDIDOS -->
+        <div id="tab-pedidos" class="tab-content" style="display:none">
+            {% if pedidos %}
+            <div style="display:flex;flex-direction:column;gap:14px">
+                {% for pedido in pedidos %}
+                <div style="background:var(--blanco);border-radius:18px;padding:20px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+                        <div>
+                            <strong style="font-size:1rem">#ECO-{{ pedido.id }}</strong>
+                            <span style="display:inline-block;margin-left:12px;padding:4px 12px;border-radius:999px;background:{% if pedido.estado == 'confirmado' %}#e8f5e9{% elif pedido.estado == 'enviado' %}#e3f2fd{% else %}#fff3e0{% endif %};color:{% if pedido.estado == 'confirmado' %}#2e7d32{% elif pedido.estado == 'enviado' %}#1565c0{% else %}#e65100{% endif %};font-size:0.78rem;font-weight:700">{{ pedido.estado|upper }}</span>
+                        </div>
+                        <div style="text-align:right">
+                            <strong style="font-size:1.1rem;color:var(--verde)">S/. {{ '%.2f'|format(pedido.total) }}</strong>
+                            <div style="font-size:0.75rem;color:var(--texto-sec)">{{ pedido.created_at[:10] }}</div>
+                        </div>
+                    </div>
+                    <div style="margin-top:10px;font-size:0.85rem;color:var(--texto-sec)">
+                        📍 {{ pedido.direccion[:60] }}{% if pedido.direccion|length > 60 %}...{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-results" style="padding:60px 20px;text-align:center;background:var(--blanco);border-radius:24px;box-shadow:var(--sombra)">
+                <i class="bi bi-bag-check" style="font-size:3rem;display:block;margin-bottom:16px;color:rgba(46,125,50,0.3)"></i>
+                <h3 style="margin-bottom:8px">Sin pedidos aún</h3>
+                <p style="color:var(--texto-sec);margin-bottom:20px">Tus compras aparecerán aquí.</p>
+                <a href="{{ url_for('productos_view') }}" class="btn-principal">Ver productos</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<script>
+function setTab(e, tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('active');
+        b.style.color = 'var(--texto-sec)';
+        b.style.borderBottomColor = 'transparent';
+    });
+    e.currentTarget.classList.add('active');
+    e.currentTarget.style.color = 'var(--verde)';
+    e.currentTarget.style.borderBottomColor = 'var(--verde)';
+    document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+    document.getElementById('tab-' + tab).style.display = 'block';
+}
+
+function removeFav(productoId) {
+    if (!confirm('¿Quitar de favoritos?')) return;
+    fetch('/api/favorito/' + productoId, { method: 'DELETE' })
+        .then(r => r.json())
+        .then(d => { if(d.success) location.reload(); });
+}
+</script>
+
+<style>
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 14px;
+}
+@media (max-width: 600px) {
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+{% endblock %}

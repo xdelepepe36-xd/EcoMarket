@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}EcoMarket - Términos y Condiciones{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container" style="max-width:800px;margin:0 auto">
+        <h2 class="section-title">📋 Términos y Condiciones</h2>
+        <p style="color:var(--texto-sec);margin-bottom:32px">Última actualización: Julio 2026</p>
+
+        <div style="background:var(--blanco);border-radius:24px;padding:36px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
+            <h3 style="color:var(--verde);margin-bottom:12px">1. Aceptación de términos</h3>
+            <p style="color:var(--texto-sec);line-height:1.8;margin-bottom:24px">Al acceder y utilizar EcoMarket, aceptas cumplir con estos términos y condiciones. Si no estás de acuerdo, no debes usar la plataforma.</p>
+
+            <h3 style="color:var(--verde);margin-bottom:12px">2. Registro de cuenta</h3>
+            <p style="color:var(--texto-sec);line-height:1.8;margin-bottom:24px">Para publicar productos, debes crear una cuenta proporcionando información veraz. Eres responsable de mantener la confidencialidad de tu contraseña.</p>
+
+            <h3 style="color:var(--verde);margin-bottom:12px">3. Publicación de productos</h3>
+            <p style="color:var(--texto-sec);line-height:1.8;margin-bottom:24px">Los productos publicados deben ser ecológicos, sostenibles o reciclados. EcoMarket se reserva el derecho de eliminar productos que no cumplan con estos criterios.</p>
+
+            <h3 style="color:var(--verde);margin-bottom:12px">4. Compras y pagos</h3>
+            <p style="color:var(--texto-sec);line-height:1.8;margin-bottom:24px">Los precios están en soles peruanos (S/.). El pago se realiza directamente entre comprador y vendedor. EcoMarket no procesa pagos directamente.</p>
+
+            <h3 style="color:var(--verde);margin-bottom:12px">5. Envíos y devoluciones</h3>
+            <p style="color:var(--texto-sec);line-height:1.8;margin-bottom:24px">Los envíos son responsabilidad del vendedor. Las devoluciones deben gestionarse directamente entre las partes. EcoMarket recomienda acordar términos claros antes de cada transacción.</p>
+
+            <h3 style="color:var(--verde);margin-bottom:12px">6. Privacidad de datos</h3>
+            <p style="color:var(--texto-sec);line-height:1.8;margin-bottom:24px">Protegemos tus datos personales. No compartimos tu información con terceros sin tu consentimiento explícito. Ver nuestra <a href="{{ url_for('privacidad') }}" style="color:var(--verde)">Política de Privacidad</a>.</p>
+
+            <h3 style="color:var(--verde);margin-bottom:12px">7. Conducta del usuario</h3>
+            <p style="color:var(--texto-sec);line-height:1.8;margin-bottom:24px">Está prohibido publicar contenido falso, engañoso o ilegal. Los usuarios deben tratar a otros con respeto. El incumplimiento puede resultar en la suspensión de la cuenta.</p>
+
+            <h3 style="color:var(--verde);margin-bottom:12px">8. Modificaciones</h3>
+            <p style="color:var(--texto-sec);line-height:1.8;margin-bottom:24px">EcoMarket puede modificar estos términos en cualquier momento. Los cambios serán notificados a través de la plataforma.</p>
+
+            <h3 style="color:var(--verde);margin-bottom:12px">9. Contacto</h3>
+            <p style="color:var(--texto-sec);line-height:1.8">Para consultas sobre estos términos, contáctanos en <a href="mailto:hola@ecomarket.com" style="color:var(--verde)">hola@ecomarket.com</a>.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

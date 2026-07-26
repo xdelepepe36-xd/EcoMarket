@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoMarket - Publicar Producto</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="eco-styles.css">
+    <style>
+        :root {
+            --verde: #2e7d32;
+            --verde-claro: #4caf50;
+            --verde-suave: #e8f5e9;
+            --texto: #1f2a21;
+            --texto-sec: #5d6a5f;
+            --blanco: #ffffff;
+            --sombra: 0 20px 50px rgba(0,0,0,0.07);
+            --rojo: #b91c1c;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Poppins', sans-serif; color: var(--texto); background: #f4fbf5; }
+
+        /* NAV */
+        nav {
+            background: rgba(255,255,255,0.96); backdrop-filter: blur(12px);
+            padding: 0 5%; height: 68px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 100;
+            border-bottom: 1px solid rgba(46,125,50,0.1);
+        }
+        .nav-logo { font-size: 1.3rem; font-weight: 800; color: var(--verde); text-decoration: none; }
+        .nav-links { display: flex; gap: 28px; list-style: none; }
+        .nav-links a { text-decoration: none; color: var(--texto-sec); font-weight: 500; font-size: 0.92rem; transition: color 0.2s; }
+        .nav-links a:hover { color: var(--verde); }
+        .nav-cta {
+            background: linear-gradient(135deg, var(--verde-claro), var(--verde));
+            color: #fff; padding: 10px 22px; border-radius: 12px;
+            font-weight: 700; font-size: 0.88rem; text-decoration: none;
+            box-shadow: 0 6px 16px rgba(46,125,50,0.25); transition: transform 0.2s;
+        }
+        .nav-cta:hover { transform: translateY(-2px); color: #fff; }
+
+        /* HERO */
+        .hero {
+            background: linear-gradient(135deg, #1b5e20, #2e7d32);
+            padding: 52px 5% 48px; text-align: center;
+        }
+        .hero h1 { font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 800; color: #fff; margin-bottom: 10px; }
+        .hero p { color: rgba(255,255,255,0.8); font-size: 0.95rem; }
+
+        /* STEPS */
+        .steps-bar {
+            background: var(--blanco); padding: 20px 5%;
+            border-bottom: 1px solid rgba(46,125,50,0.08);
+        }
+        .steps { display: flex; align-items: center; justify-content: center; gap: 0; max-width: 600px; margin: 0 auto; }
+        .step { display: flex; align-items: center; gap: 10px; flex: 1; }
+        .step-num {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: var(--verde-suave); color: var(--texto-sec);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.85rem; flex-shrink: 0;
+            transition: background 0.3s, color 0.3s;
+        }
+        .step.active .step-num { background: var(--verde); color: #fff; }
+        .step.done .step-num { background: var(--verde-claro); color: #fff; }
+        .step-label { font-size: 0.82rem; font-weight: 600; color: var(--texto-sec); }
+        .step.active .step-label { color: var(--verde); }
+        .step-line { flex: 1; height: 2px; background: var(--verde-suave); margin: 0 8px; }
+        .step-line.done { background: var(--verde-claro); }
+
+        /* LAYOUT */
+        .layout {
+            display: grid; grid-template-columns: 1fr 340px;
+            gap: 28px; max-width: 1100px; margin: 36px auto;
+            padding: 0 5%;
+        }
+
+        /* FORM CARD */
+        .form-card {
+            background: var(--blanco); border-radius: 24px;
+            padding: 36px; box-shadow: var(--sombra);
+            border: 1px solid rgba(46,125,50,0.08);
+        }
+        .form-section { margin-bottom: 32px; }
+        .form-section-title {
+            font-size: 1rem; font-weight: 700; margin-bottom: 20px;
+            padding-bottom: 12px; border-bottom: 1px solid rgba(46,125,50,0.1);
+            display: flex; align-items: center; gap: 8px; color: var(--verde);
+        }
+        .field-group { margin-bottom: 18px; }
+        .field-group label {
+            display: block; font-size: 0.82rem; font-weight: 600;
+            color: var(--texto-sec); margin-bottom: 7px;
+        }
+        .field-group label span { color: var(--rojo); }
+        .field-group input, .field-group select, .field-group textarea {
+            width: 100%; padding: 12px 16px;
+            border: 1.5px solid rgba(46,125,50,0.18); border-radius: 14px;
+            font-family: inherit; font-size: 0.9rem; color: var(--texto);
+            background: var(--blanco); outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .field-group input:focus, .field-group select:focus, .field-group textarea:focus {
+            border-color: var(--verde-claro);
+            box-shadow: 0 0 0 3px rgba(76,175,80,0.1);
+        }
+        .field-group input.error { border-color: var(--rojo); }
+        .field-group textarea { resize: vertical; min-height: 110px; }
+        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .char-count { font-size: 0.75rem; color: var(--texto-sec); text-align: right; margin-top: 4px; }
+        .field-hint { font-size: 0.75rem; color: var(--texto-sec); margin-top: 4px; }
+        .error-msg { font-size: 0.75rem; color: var(--rojo); margin-top: 4px; display: none; }
+
+        /* UPLOAD */
+        .upload-zone {
+            border: 2px dashed rgba(46,125,50,0.3); border-radius: 16px;
+            padding: 36px 20px; text-align: center; cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            background: #fafffe;
+        }
+        .upload-zone:hover, .upload-zone.drag { border-color: var(--verde-claro); background: var(--verde-suave); }
+        .upload-zone i { font-size: 2.2rem; color: var(--verde-claro); margin-bottom: 10px; display: block; }
+        .upload-zone p { font-size: 0.88rem; color: var(--texto-sec); }
+        .upload-zone span { font-size: 0.78rem; color: var(--texto-sec); opacity: 0.7; }
+        .upload-zone input { display: none; }
+        .preview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 16px; }
+        .preview-item {
+            aspect-ratio: 1; border-radius: 12px;
+            background: var(--verde-suave);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; position: relative; overflow: hidden;
+        }
+        .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+        .preview-remove {
+            position: absolute; top: 4px; right: 4px;
+            width: 22px; height: 22px; border-radius: 50%;
+            background: rgba(0,0,0,0.5); color: #fff;
+            border: none; cursor: pointer; font-size: 0.7rem;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* ECO BADGES */
+        .eco-badges { display: flex; flex-wrap: wrap; gap: 10px; }
+        .eco-badge-opt {
+            padding: 8px 16px; border-radius: 999px;
+            border: 1.5px solid rgba(46,125,50,0.2);
+            font-size: 0.82rem; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; background: var(--blanco);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .eco-badge-opt:hover { border-color: var(--verde-claro); background: var(--verde-suave); }
+        .eco-badge-opt.selected { background: var(--verde); color: #fff; border-color: var(--verde); }
+
+        /* SIDEBAR */
+        .sidebar { display: flex; flex-direction: column; gap: 20px; }
+        .side-card {
+            background: var(--blanco); border-radius: 20px;
+            padding: 24px; box-shadow: var(--sombra);
+            border: 1px solid rgba(46,125,50,0.08);
+        }
+        .side-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .side-card h4 i { color: var(--verde); }
+        .preview-card { background: var(--verde-suave); border-radius: 16px; overflow: hidden; }
+        .preview-img {
+            height: 160px; background: linear-gradient(135deg, #c8e6c9, #a5d6a7);
+            display: flex; align-items: center; justify-content: center; font-size: 4rem;
+        }
+        .preview-body { padding: 16px; }
+        .preview-body strong { display: block; font-size: 0.95rem; margin-bottom: 4px; }
+        .preview-body .price { font-size: 1.2rem; font-weight: 800; color: var(--verde); }
+        .preview-body .cat { font-size: 0.78rem; color: var(--texto-sec); }
+        .tip-list { display: flex; flex-direction: column; gap: 12px; }
+        .tip-item { display: flex; gap: 10px; align-items: flex-start; font-size: 0.85rem; }
+        .tip-item i { color: var(--verde-claro); margin-top: 2px; flex-shrink: 0; }
+        .tip-item span { color: var(--texto-sec); line-height: 1.6; }
+
+        /* SUBMIT */
+        .form-footer {
+            display: flex; gap: 14px; justify-content: flex-end;
+            padding-top: 24px; border-top: 1px solid rgba(46,125,50,0.1);
+        }
+        .btn-draft {
+            padding: 13px 28px; border-radius: 14px;
+            border: 1.5px solid rgba(46,125,50,0.2);
+            background: var(--blanco); color: var(--texto);
+            font-family: inherit; font-weight: 600; font-size: 0.92rem;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .btn-draft:hover { background: var(--verde-suave); }
+        .btn-publish {
+            padding: 13px 32px; border-radius: 14px; border: none;
+            background: linear-gradient(135deg, var(--verde-claro), var(--verde));
+            color: #fff; font-family: inherit; font-weight: 700; font-size: 0.92rem;
+            cursor: pointer; display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 8px 20px rgba(46,125,50,0.3); transition: transform 0.2s;
+        }
+        .btn-publish:hover { transform: translateY(-2px); }
+
+        /* SUCCESS */
+        .success-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .success-overlay.show { opacity: 1; pointer-events: auto; }
+        .success-box {
+            background: var(--blanco); border-radius: 28px;
+            padding: 48px 40px; text-align: center; max-width: 420px; width: 90%;
+            transform: scale(0.85); transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .success-overlay.show .success-box { transform: scale(1); }
+        .success-icon {
+            width: 72px; height: 72px; border-radius: 50%;
+            background: var(--verde-suave); color: var(--verde);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; margin: 0 auto 20px;
+            animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.2s both;
+        }
+        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+        .success-box h3 { font-size: 1.4rem; margin-bottom: 10px; }
+        .success-box p { color: var(--texto-sec); font-size: 0.9rem; line-height: 1.7; margin-bottom: 28px; }
+        .success-btns { display: flex; gap: 12px; justify-content: center; }
+        .btn-ver {
+            background: linear-gradient(135deg, var(--verde-claro), var(--verde));
+            color: #fff; padding: 12px 24px; border-radius: 12px;
+            font-weight: 700; text-decoration: none; font-size: 0.9rem;
+        }
+        .btn-otro {
+            border: 1.5px solid rgba(46,125,50,0.2); color: var(--texto);
+            padding: 12px 24px; border-radius: 12px;
+            font-weight: 600; text-decoration: none; font-size: 0.9rem;
+            background: var(--blanco);
+        }
+
+        @media (max-width: 900px) {
+            .layout { grid-template-columns: 1fr; }
+            .sidebar { order: -1; }
+            .nav-links { display: none; }
+        }
+        @media (max-width: 600px) {
+            .field-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <a href="index.html" class="nav-logo">🌱 EcoMarket</a>
+        <ul class="nav-links">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="productos.html">Productos</a></li>
+            <li><a href="impacto.html">Impacto</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+        </ul>
+        <a href="productos.html" class="nav-cta">Explorar</a>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero">
+        <h1>Publica tu producto ecológico</h1>
+        <p>Llega a miles de compradores comprometidos con el medio ambiente</p>
+    </div>
+
+    <!-- STEPS -->
+    <div class="steps-bar">
+        <div class="steps">
+            <div class="step active" id="step1">
+                <div class="step-num">1</div>
+                <div class="step-label">Información</div>
+            </div>
+            <div class="step-line" id="line1"></div>
+            <div class="step" id="step2">
+                <div class="step-num">2</div>
+                <div class="step-label">Imágenes</div>
+            </div>
+            <div class="step-line" id="line2"></div>
+            <div class="step" id="step3">
+                <div class="step-num">3</div>
+                <div class="step-label">Publicar</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LAYOUT -->
+    <div class="layout">
+        <form class="form-card" id="publishForm" action="/publicar" method="POST" novalidate>
+
+            <!-- INFO BÁSICA -->
+            <div class="form-section">
+                <div class="form-section-title"><i class="bi bi-info-circle"></i> Información básica</div>
+                <div class="field-group">
+                    <label>Nombre del producto <span>*</span></label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Ej: Botella reutilizable de acero inoxidable" maxlength="80">
+                    <div class="char-count"><span id="nombreCount">0</span>/80</div>
+                    <div class="error-msg" id="errNombre">El nombre es obligatorio</div>
+                </div>
+                <div class="field-group">
+                    <label>Descripción <span>*</span></label>
+                    <textarea id="descripcion" name="descripcion" placeholder="Describe tu producto: materiales, beneficios, uso..." maxlength="500"></textarea>
+                    <div class="char-count"><span id="descCount">0</span>/500</div>
+                    <div class="error-msg" id="errDesc">La descripción es obligatoria</div>
+                </div>
+                <div class="field-row">
+                    <div class="field-group">
+                        <label>Categoría <span>*</span></label>
+                        <select id="categoria" name="categoria">
+                            <option value="">Seleccionar...</option>
+                            <option>Hogar</option>
+                            <option>Accesorios</option>
+                            <option>Higiene</option>
+                            <option>Jardín</option>
+                            <option>Alimentación</option>
+                            <option>Ropa</option>
+                        </select>
+                        <div class="error-msg" id="errCat">Selecciona una categoría</div>
+                    </div>
+                    <div class="field-group">
+                        <label>Precio (S/.) <span>*</span></label>
+                        <input type="number" id="precio" name="precio" placeholder="0.00" min="1" step="0.01">
+                        <div class="error-msg" id="errPrecio">Ingresa un precio válido</div>
+                    </div>
+                </div>
+                <div class="field-row">
+                    <div class="field-group">
+                        <label>Stock disponible</label>
+                        <input type="number" name="stock" placeholder="Ej: 10" min="1">
+                    </div>
+                    <div class="field-group">
+                        <label>Ubicación</label>
+                        <input type="text" name="ubicacion" placeholder="Ej: Lima, Perú">
+                    </div>
+                </div>
+            </div>
+
+            <!-- IMÁGENES -->
+            <div class="form-section">
+                <div class="form-section-title"><i class="bi bi-images"></i> Imágenes del producto</div>
+                <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+                    <i class="bi bi-cloud-upload"></i>
+                    <p>Arrastra tus fotos aquí o haz clic para seleccionar</p>
+                    <span>PNG, JPG hasta 5MB · Máximo 4 imágenes</span>
+                    <input type="file" id="fileInput" accept="image/*" multiple>
+                </div>
+                <div class="preview-grid" id="previewGrid"></div>
+            </div>
+
+            <!-- ECO ATRIBUTOS -->
+            <div class="form-section">
+                <div class="form-section-title"><i class="bi bi-leaf"></i> Atributos ecológicos</div>
+                <p style="font-size:0.85rem;color:var(--texto-sec);margin-bottom:16px">Selecciona las características sostenibles de tu producto</p>
+                <div class="eco-badges">
+                    <div class="eco-badge-opt" onclick="this.classList.toggle('selected')">♻️ Reciclado</div>
+                    <div class="eco-badge-opt" onclick="this.classList.toggle('selected')">🌱 Biodegradable</div>
+                    <div class="eco-badge-opt" onclick="this.classList.toggle('selected')">🌿 Orgánico</div>
+                    <div class="eco-badge-opt" onclick="this.classList.toggle('selected')">💧 Ahorra agua</div>
+                    <div class="eco-badge-opt" onclick="this.classList.toggle('selected')">☀️ Energía solar</div>
+                    <div class="eco-badge-opt" onclick="this.classList.toggle('selected')">🐾 Sin crueldad animal</div>
+                    <div class="eco-badge-opt" onclick="this.classList.toggle('selected')">📦 Empaque mínimo</div>
+                    <div class="eco-badge-opt" onclick="this.classList.toggle('selected')">🤝 Comercio justo</div>
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="form-footer">
+                <button type="button" class="btn-draft">Guardar borrador</button>
+                <button type="submit" class="btn-publish"><i class="bi bi-send"></i> Publicar producto</button>
+            </div>
+        </form>
+
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="side-card">
+                <h4><i class="bi bi-eye"></i> Vista previa</h4>
+                <div class="preview-card">
+                    <div class="preview-img" id="previewEmoji">📦</div>
+                    <div class="preview-body">
+                        <strong id="previewNombre">Nombre del producto</strong>
+                        <div class="cat" id="previewCat">Categoría</div>
+                        <div class="price" id="previewPrecio">S/. 0.00</div>
+                    </div>
+                </div>
+            </div>
+            <div class="side-card">
+                <h4><i class="bi bi-lightbulb"></i> Consejos</h4>
+                <div class="tip-list">
+                    <div class="tip-item"><i class="bi bi-check-circle-fill"></i><span>Usa fotos claras con buena iluminación natural</span></div>
+                    <div class="tip-item"><i class="bi bi-check-circle-fill"></i><span>Describe los materiales y su origen sostenible</span></div>
+                    <div class="tip-item"><i class="bi bi-check-circle-fill"></i><span>Menciona cuánto plástico o CO₂ se ahorra</span></div>
+                    <div class="tip-item"><i class="bi bi-check-circle-fill"></i><span>Precio justo = más ventas y mejor reputación</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUCCESS OVERLAY -->
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-box">
+            <div class="success-icon"><i class="bi bi-check-lg"></i></div>
+            <h3>¡Producto publicado!</h3>
+            <p>Tu producto ya está visible en EcoMarket. Pronto recibirás tus primeras consultas.</p>
+            <div class="success-btns">
+                <a href="productos.html" class="btn-ver">Ver productos</a>
+                <a href="publicar.html" class="btn-otro">Publicar otro</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="eco-toast.js"></script>
+    <script src="eco-cart.js"></script>
+    <script src="eco-favorites.js"></script>
+    <script src="eco-search.js"></script>
+    <script src="eco-animations.js"></script>
+    <script>
+        // Char counters
+        document.getElementById('nombre').addEventListener('input', function() {
+            document.getElementById('nombreCount').textContent = this.value.length;
+            document.getElementById('previewNombre').textContent = this.value || 'Nombre del producto';
+        });
+        document.getElementById('descripcion').addEventListener('input', function() {
+            document.getElementById('descCount').textContent = this.value.length;
+        });
+        document.getElementById('categoria').addEventListener('change', function() {
+            document.getElementById('previewCat').textContent = this.value || 'Categoría';
+            const emojis = { Hogar:'🏠', Accesorios:'💧', Higiene:'🪥', Jardín:'🌿', Alimentación:'🥗', Ropa:'👕' };
+            document.getElementById('previewEmoji').textContent = emojis[this.value] || '📦';
+        });
+        document.getElementById('precio').addEventListener('input', function() {
+            document.getElementById('previewPrecio').textContent = `S/. ${parseFloat(this.value || 0).toFixed(2)}`;
+        });
+
+        // Upload
+        const zone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const grid = document.getElementById('previewGrid');
+        let files = [];
+
+        zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+        zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+        zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag'); handleFiles(e.dataTransfer.files); });
+        fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+
+        function handleFiles(newFiles) {
+            [...newFiles].slice(0, 4 - files.length).forEach(f => {
+                if (!f.type.startsWith('image/')) return;
+                files.push(f);
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const item = document.createElement('div');
+                    item.className = 'preview-item';
+                    item.innerHTML = `<img src="${e.target.result}"><button class="preview-remove" onclick="removeFile(this)"><i class="bi bi-x"></i></button>`;
+                    grid.appendChild(item);
+                };
+                reader.readAsDataURL(f);
+            });
+        }
+        function removeFile(btn) { btn.closest('.preview-item').remove(); }
+
+        // Validación
+        document.getElementById('publishForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let valid = true;
+            const checks = [
+                { id: 'nombre', err: 'errNombre', check: v => v.trim().length > 0 },
+                { id: 'descripcion', err: 'errDesc', check: v => v.trim().length > 0 },
+                { id: 'categoria', err: 'errCat', check: v => v !== '' },
+                { id: 'precio', err: 'errPrecio', check: v => parseFloat(v) > 0 }
+            ];
+            checks.forEach(({ id, err, check }) => {
+                const el = document.getElementById(id);
+                const errEl = document.getElementById(err);
+                if (!check(el.value)) {
+                    el.classList.add('error'); errEl.style.display = 'block'; valid = false;
+                } else {
+                    el.classList.remove('error'); errEl.style.display = 'none';
+                }
+            });
+            if (valid) {
+                EcoToast.success('¡Producto publicado exitosamente!');
+                document.getElementById('successOverlay').classList.add('show');
+            }
+        });
+
+        // Steps highlight
+        document.getElementById('nombre').addEventListener('focus', () => setStep(1));
+        document.getElementById('fileInput').addEventListener('change', () => setStep(2));
+        document.querySelector('.btn-publish').addEventListener('mouseenter', () => setStep(3));
+        function setStep(n) {
+            [1,2,3].forEach(i => {
+                document.getElementById(`step${i}`).className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+            });
+            [1,2].forEach(i => {
+                const line = document.getElementById(`line${i}`);
+                if (line) line.className = 'step-line' + (i < n ? ' done' : '');
+            });
+        }
+    </script>
+    <script src='eco-notifications.js'></script>
+    <script src='eco-theme.js'></script>
+    <script src='eco-gamification.js'></script>
+</body>
+</html>
+
+
+

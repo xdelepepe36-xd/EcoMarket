@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoMarket - Nuestro Impacto</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="eco-styles.css">
+    <style>
+        :root {
+            --verde: #2e7d32;
+            --verde-claro: #4caf50;
+            --verde-suave: #e8f5e9;
+            --texto: #1f2a21;
+            --texto-sec: #5d6a5f;
+            --blanco: #ffffff;
+            --sombra: 0 20px 50px rgba(0,0,0,0.07);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Poppins', sans-serif; color: var(--texto); background: #f4fbf5; }
+
+        /* NAV */
+        nav {
+            background: rgba(255,255,255,0.96); backdrop-filter: blur(12px);
+            padding: 0 5%; height: 68px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 100;
+            border-bottom: 1px solid rgba(46,125,50,0.1);
+        }
+        .nav-logo { font-size: 1.3rem; font-weight: 800; color: var(--verde); text-decoration: none; }
+        .nav-links { display: flex; gap: 28px; list-style: none; }
+        .nav-links a { text-decoration: none; color: var(--texto-sec); font-weight: 500; font-size: 0.92rem; transition: color 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--verde); }
+        .nav-cta {
+            background: linear-gradient(135deg, var(--verde-claro), var(--verde));
+            color: #fff; padding: 10px 22px; border-radius: 12px;
+            font-weight: 700; font-size: 0.88rem; text-decoration: none;
+            box-shadow: 0 6px 16px rgba(46,125,50,0.25); transition: transform 0.2s;
+        }
+        .nav-cta:hover { transform: translateY(-2px); color: #fff; }
+
+        /* HERO */
+        .hero {
+            background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 50%, #388e3c 100%);
+            padding: 90px 5% 80px; text-align: center; position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: ''; position: absolute; inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.15); color: #fff;
+            padding: 8px 18px; border-radius: 999px; font-size: 0.85rem; font-weight: 600;
+            margin-bottom: 24px; backdrop-filter: blur(8px);
+        }
+        .hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; color: #fff; margin-bottom: 18px; line-height: 1.2; }
+        .hero h1 span { color: #a5d6a7; }
+        .hero p { font-size: 1.05rem; color: rgba(255,255,255,0.82); max-width: 580px; margin: 0 auto; line-height: 1.8; }
+
+        /* COUNTERS */
+        .counters-section { padding: 0 5%; margin-top: -40px; position: relative; z-index: 10; }
+        .counters-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 20px; max-width: 1100px; margin: 0 auto;
+        }
+        .counter-card {
+            background: var(--blanco); border-radius: 20px;
+            padding: 28px 20px; text-align: center;
+            box-shadow: var(--sombra); border: 1px solid rgba(46,125,50,0.08);
+            transition: transform 0.3s;
+        }
+        .counter-card:hover { transform: translateY(-4px); }
+        .counter-icon {
+            width: 56px; height: 56px; border-radius: 16px;
+            background: var(--verde-suave); color: var(--verde);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; margin: 0 auto 14px;
+        }
+        .counter-num {
+            font-size: 2.2rem; font-weight: 800; color: var(--verde);
+            display: block; line-height: 1;
+        }
+        .counter-label { font-size: 0.85rem; color: var(--texto-sec); margin-top: 6px; }
+
+        /* SECTION */
+        section { padding: 80px 5%; }
+        .section-tag {
+            display: inline-block; background: var(--verde-suave); color: var(--verde);
+            padding: 6px 16px; border-radius: 999px; font-size: 0.8rem; font-weight: 700;
+            margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .section-title { font-size: clamp(1.5rem, 3vw, 2.2rem); font-weight: 800; margin-bottom: 12px; }
+        .section-sub { color: var(--texto-sec); font-size: 0.95rem; line-height: 1.8; max-width: 560px; }
+
+        /* ODS GRID */
+        .ods-section { background: var(--blanco); }
+        .ods-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; max-width: 1100px; margin: 0 auto; }
+        .ods-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .ods-card {
+            background: var(--verde-suave); border-radius: 18px;
+            padding: 20px; display: flex; align-items: flex-start; gap: 14px;
+            transition: transform 0.25s, box-shadow 0.25s;
+        }
+        .ods-card:hover { transform: translateY(-3px); box-shadow: var(--sombra); }
+        .ods-num {
+            width: 40px; height: 40px; border-radius: 12px;
+            background: var(--verde); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 1rem; flex-shrink: 0;
+        }
+        .ods-card strong { display: block; font-size: 0.88rem; margin-bottom: 4px; }
+        .ods-card p { font-size: 0.78rem; color: var(--texto-sec); line-height: 1.6; }
+
+        /* TIMELINE */
+        .timeline-section { background: #f4fbf5; }
+        .timeline-inner { max-width: 700px; margin: 0 auto; }
+        .timeline { position: relative; padding-left: 32px; }
+        .timeline::before {
+            content: ''; position: absolute; left: 10px; top: 0; bottom: 0;
+            width: 2px; background: linear-gradient(180deg, var(--verde-claro), var(--verde-suave));
+        }
+        .tl-item { position: relative; margin-bottom: 36px; }
+        .tl-dot {
+            position: absolute; left: -36px; top: 4px;
+            width: 20px; height: 20px; border-radius: 50%;
+            background: var(--verde); border: 3px solid var(--verde-suave);
+            box-shadow: 0 0 0 4px rgba(46,125,50,0.15);
+        }
+        .tl-year {
+            font-size: 0.78rem; font-weight: 700; color: var(--verde);
+            text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;
+        }
+        .tl-item h4 { font-size: 1rem; margin-bottom: 6px; }
+        .tl-item p { font-size: 0.88rem; color: var(--texto-sec); line-height: 1.7; }
+
+        /* PROGRESS BARS */
+        .progress-section { background: var(--blanco); }
+        .progress-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; max-width: 1100px; margin: 0 auto; }
+        .progress-list { display: flex; flex-direction: column; gap: 22px; }
+        .progress-item label {
+            display: flex; justify-content: space-between;
+            font-size: 0.88rem; font-weight: 600; margin-bottom: 8px;
+        }
+        .progress-item label span { color: var(--verde); }
+        .progress-bar-bg {
+            height: 10px; background: var(--verde-suave); border-radius: 999px; overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%; border-radius: 999px;
+            background: linear-gradient(90deg, var(--verde-claro), var(--verde));
+            width: 0; transition: width 1.2s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .progress-img {
+            border-radius: 24px; overflow: hidden;
+            background: linear-gradient(135deg, var(--verde-suave), #c8e6c9);
+            height: 320px; display: flex; align-items: center; justify-content: center;
+            font-size: 6rem;
+        }
+
+        /* TESTIMONIOS */
+        .testimonios-section { background: #f4fbf5; }
+        .test-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1100px; margin: 40px auto 0; }
+        .test-card {
+            background: var(--blanco); border-radius: 20px;
+            padding: 28px; box-shadow: var(--sombra);
+            border: 1px solid rgba(46,125,50,0.08);
+        }
+        .test-stars { color: #f59e0b; font-size: 0.9rem; margin-bottom: 14px; }
+        .test-card p { font-size: 0.9rem; color: var(--texto-sec); line-height: 1.8; margin-bottom: 20px; font-style: italic; }
+        .test-author { display: flex; align-items: center; gap: 12px; }
+        .test-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: #fff; font-size: 0.95rem;
+        }
+        .test-author strong { display: block; font-size: 0.88rem; }
+        .test-author span { font-size: 0.78rem; color: var(--texto-sec); }
+
+        /* CTA */
+        .cta-section {
+            background: linear-gradient(135deg, #1b5e20, #2e7d32);
+            text-align: center; padding: 80px 5%;
+        }
+        .cta-section h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 800; color: #fff; margin-bottom: 16px; }
+        .cta-section p { color: rgba(255,255,255,0.8); font-size: 1rem; margin-bottom: 36px; }
+        .cta-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+        .btn-white {
+            background: #fff; color: var(--verde);
+            padding: 14px 32px; border-radius: 14px;
+            font-weight: 700; font-size: 0.95rem; text-decoration: none;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15); transition: transform 0.2s;
+        }
+        .btn-white:hover { transform: translateY(-3px); color: var(--verde); }
+        .btn-outline-white {
+            border: 2px solid rgba(255,255,255,0.5); color: #fff;
+            padding: 14px 32px; border-radius: 14px;
+            font-weight: 700; font-size: 0.95rem; text-decoration: none;
+            transition: background 0.2s;
+        }
+        .btn-outline-white:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+        /* FOOTER */
+        footer {
+            background: #1b5e20; color: rgba(255,255,255,0.7);
+            text-align: center; padding: 28px 5%;
+            font-size: 0.85rem;
+        }
+        footer a { color: #a5d6a7; text-decoration: none; }
+
+        @media (max-width: 900px) {
+            .counters-grid { grid-template-columns: 1fr 1fr; }
+            .ods-layout, .progress-layout { grid-template-columns: 1fr; gap: 36px; }
+            .test-grid { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+        }
+        @media (max-width: 600px) {
+            .counters-grid { grid-template-columns: 1fr 1fr; }
+            .ods-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <a href="index.html" class="nav-logo">🌱 EcoMarket</a>
+        <ul class="nav-links">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="productos.html">Productos</a></li>
+            <li><a href="impacto.html" class="active">Impacto</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+        </ul>
+        <a href="productos.html" class="nav-cta">Explorar</a>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="hero-badge"><i class="bi bi-globe-americas"></i> Impacto ambiental real</div>
+        <h1>Cada compra <span>transforma</span><br>el planeta</h1>
+        <p>En EcoMarket medimos el impacto real de cada producto. Aquí te mostramos lo que hemos logrado juntos.</p>
+    </div>
+
+    <!-- COUNTERS -->
+    <div class="counters-section">
+        <div class="counters-grid">
+            <div class="counter-card">
+                <div class="counter-icon"><i class="bi bi-tree"></i></div>
+                <span class="counter-num" data-target="1240">0</span>
+                <div class="counter-label">Árboles equivalentes salvados</div>
+            </div>
+            <div class="counter-card">
+                <div class="counter-icon"><i class="bi bi-droplet"></i></div>
+                <span class="counter-num" data-target="85600">0</span>
+                <div class="counter-label">Litros de agua ahorrados</div>
+            </div>
+            <div class="counter-card">
+                <div class="counter-icon"><i class="bi bi-recycle"></i></div>
+                <span class="counter-num" data-target="3200">0</span>
+                <div class="counter-label">Kg de plástico evitados</div>
+            </div>
+            <div class="counter-card">
+                <div class="counter-icon"><i class="bi bi-people"></i></div>
+                <span class="counter-num" data-target="4800">0</span>
+                <div class="counter-label">Familias impactadas</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ODS -->
+    <section class="ods-section">
+        <div class="ods-layout">
+            <div>
+                <span class="section-tag">Objetivos globales</span>
+                <h2 class="section-title">Alineados con los ODS de la ONU</h2>
+                <p class="section-sub">Nuestras acciones contribuyen directamente a los Objetivos de Desarrollo Sostenible de las Naciones Unidas.</p>
+            </div>
+            <div class="ods-grid">
+                <div class="ods-card">
+                    <div class="ods-num">12</div>
+                    <div>
+                        <strong>Producción responsable</strong>
+                        <p>Promovemos productos con ciclo de vida sostenible.</p>
+                    </div>
+                </div>
+                <div class="ods-card">
+                    <div class="ods-num">13</div>
+                    <div>
+                        <strong>Acción climática</strong>
+                        <p>Reducimos la huella de carbono en cada transacción.</p>
+                    </div>
+                </div>
+                <div class="ods-card">
+                    <div class="ods-num">14</div>
+                    <div>
+                        <strong>Vida submarina</strong>
+                        <p>Menos plástico en océanos con cada compra eco.</p>
+                    </div>
+                </div>
+                <div class="ods-card">
+                    <div class="ods-num">15</div>
+                    <div>
+                        <strong>Vida de ecosistemas</strong>
+                        <p>Apoyamos la biodiversidad y bosques nativos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TIMELINE -->
+    <section class="timeline-section">
+        <div class="timeline-inner">
+            <span class="section-tag">Nuestra historia</span>
+            <h2 class="section-title">Cómo llegamos hasta aquí</h2>
+            <br>
+            <div class="timeline">
+                <div class="tl-item">
+                    <div class="tl-dot"></div>
+                    <div class="tl-year">2022</div>
+                    <h4>Nace EcoMarket</h4>
+                    <p>Lanzamos la plataforma con 12 productos y 3 vendedores comprometidos con el medio ambiente.</p>
+                </div>
+                <div class="tl-item">
+                    <div class="tl-dot"></div>
+                    <div class="tl-year">2023</div>
+                    <h4>Crecimiento sostenido</h4>
+                    <p>Alcanzamos 500 usuarios activos y más de 200 productos verificados como ecológicos.</p>
+                </div>
+                <div class="tl-item">
+                    <div class="tl-dot"></div>
+                    <div class="tl-year">2024</div>
+                    <h4>Certificación verde</h4>
+                    <p>Obtuvimos la certificación B-Corp y lanzamos el programa de compensación de carbono.</p>
+                </div>
+                <div class="tl-item">
+                    <div class="tl-dot"></div>
+                    <div class="tl-year">2025</div>
+                    <h4>Expansión regional</h4>
+                    <p>Presencia en 5 países de Latinoamérica con más de 4,800 familias impactadas.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROGRESS -->
+    <section class="progress-section">
+        <div class="progress-layout">
+            <div>
+                <span class="section-tag">Metas 2025</span>
+                <h2 class="section-title">Avance hacia nuestros objetivos</h2>
+                <p class="section-sub" style="margin-bottom:32px">Cada año nos ponemos metas más ambiciosas. Así vamos en 2025.</p>
+                <div class="progress-list">
+                    <div class="progress-item">
+                        <label>Reducción de plástico <span>78%</span></label>
+                        <div class="progress-bar-bg"><div class="progress-bar" data-w="78%"></div></div>
+                    </div>
+                    <div class="progress-item">
+                        <label>Vendedores certificados <span>65%</span></label>
+                        <div class="progress-bar-bg"><div class="progress-bar" data-w="65%"></div></div>
+                    </div>
+                    <div class="progress-item">
+                        <label>Envíos carbono neutro <span>52%</span></label>
+                        <div class="progress-bar-bg"><div class="progress-bar" data-w="52%"></div></div>
+                    </div>
+                    <div class="progress-item">
+                        <label>Empaques biodegradables <span>89%</span></label>
+                        <div class="progress-bar-bg"><div class="progress-bar" data-w="89%"></div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="progress-img">🌍</div>
+        </div>
+    </section>
+
+    <!-- TESTIMONIOS -->
+    <section class="testimonios-section">
+        <div style="max-width:1100px;margin:0 auto;text-align:center">
+            <span class="section-tag">Comunidad</span>
+            <h2 class="section-title">Lo que dice nuestra comunidad</h2>
+        </div>
+        <div class="test-grid">
+            <div class="test-card">
+                <div class="test-stars">★★★★★</div>
+                <p>"Desde que compro en EcoMarket siento que mis decisiones de consumo realmente importan. Los productos son increíbles."</p>
+                <div class="test-author">
+                    <div class="test-avatar" style="background:#2e7d32">M</div>
+                    <div><strong>María García</strong><span>Lima, Perú</span></div>
+                </div>
+            </div>
+            <div class="test-card">
+                <div class="test-stars">★★★★★</div>
+                <p>"Publiqué mis productos artesanales y en un mes ya tenía 20 ventas. La plataforma es muy fácil de usar."</p>
+                <div class="test-author">
+                    <div class="test-avatar" style="background:#1565c0">C</div>
+                    <div><strong>Carlos López</strong><span>Bogotá, Colombia</span></div>
+                </div>
+            </div>
+            <div class="test-card">
+                <div class="test-stars">★★★★★</div>
+                <p>"Me encanta que puedo ver el impacto real de cada compra. Es motivador saber que estoy ayudando al planeta."</p>
+                <div class="test-author">
+                    <div class="test-avatar" style="background:#6a1b9a">A</div>
+                    <div><strong>Ana Torres</strong><span>Santiago, Chile</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <h2>Únete al movimiento verde</h2>
+        <p>Cada producto que compras o vendes en EcoMarket genera un impacto positivo real.</p>
+        <div class="cta-btns">
+            <a href="productos.html" class="btn-white">🛍️ Explorar productos</a>
+            <a href="publicar.html" class="btn-outline-white">Publicar mi producto</a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>© 2025 EcoMarket — Marketplace ecológico · <a href="contacto.html">Contacto</a> · <a href="impacto.html">Impacto</a></p>
+    </footer>
+
+    <script src="eco-toast.js"></script>
+    <script src="eco-cart.js"></script>
+    <script src="eco-favorites.js"></script>
+    <script src="eco-search.js"></script>
+    <script src="eco-animations.js"></script>
+    <script>
+        // Contadores con data-target
+        const counterObs = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                const el = entry.target;
+                EcoAnimations.counter(el, +el.dataset.target);
+                counterObs.unobserve(el);
+            });
+        }, { threshold: 0.3 });
+        document.querySelectorAll('.counter-num').forEach(c => counterObs.observe(c));
+
+        // Progress bars
+        const barObs = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                entry.target.style.width = entry.target.dataset.w;
+                barObs.unobserve(entry.target);
+            });
+        }, { threshold: 0.3 });
+        document.querySelectorAll('.progress-bar').forEach(b => barObs.observe(b));
+    </script>
+    <script src='eco-notifications.js'></script>
+    <script src='eco-theme.js'></script>
+    <script src='eco-gamification.js'></script>
+</body>
+</html>
+
+
+

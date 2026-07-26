@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}EcoMarket - Pedido Confirmado{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container confirmacion-container">
+        <div class="confirmacion-card form-card fade-in">
+            <div class="confirmacion-icon">✅</div>
+            <h2 class="section-title">¡Pedido confirmado!</h2>
+            <p>Gracias por confiar en EcoMarket. Tu pedido ha sido registrado y será procesado en las próximas horas.</p>
+
+            <div class="confirmacion-badges">
+                <span class="badge"><i class="bi bi-box-seam"></i> En proceso</span>
+                <span class="badge"><i class="bi bi-truck"></i> Envío próximo</span>
+                <span class="badge">🌱 Compra ecológica</span>
+            </div>
+
+            <div class="confirmacion-info">
+                <div class="confirmacion-step">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Pedido recibido</span>
+                </div>
+                <div class="confirmacion-step confirmacion-step-pending">
+                    <i class="bi bi-circle"></i>
+                    <span>En preparación</span>
+                </div>
+                <div class="confirmacion-step confirmacion-step-pending">
+                    <i class="bi bi-circle"></i>
+                    <span>En camino</span>
+                </div>
+                <div class="confirmacion-step confirmacion-step-pending">
+                    <i class="bi bi-circle"></i>
+                    <span>Entregado</span>
+                </div>
+            </div>
+
+            <div class="confirmacion-actions">
+                <a href="{{ url_for('productos_view') }}" class="btn-principal">
+                    <i class="bi bi-grid"></i> Seguir comprando
+                </a>
+                <a href="{{ url_for('index') }}" class="btn-secundario">
+                    <i class="bi bi-house"></i> Volver al inicio
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

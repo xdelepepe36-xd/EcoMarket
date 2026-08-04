@@ -65,6 +65,11 @@ def get_product_image(categoria):
 # ── DB ──────────────────────────────────────────────────────────────────────
 
 def get_db():
+    """Obtiene una conexión a la base de datos SQLite con configuración optimizada.
+    
+    Returns:
+        sqlite3.Connection: Conexión con row_factory configurado y PRAGMAs aplicados.
+    """
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
@@ -74,6 +79,16 @@ def get_db():
 
 
 def init_db():
+    """Inicializa la base de datos creando todas las tablas, seeds e índices.
+    
+    Crea las tablas si no existen, inserta productos y cupones de ejemplo
+    si están vacías, aplica migraciones y crea índices para optimizar búsquedas.
+    """
+    # Asegurar que el directorio de la base de datos existe
+    db_dir = os.path.dirname(DB_PATH)
+    if db_dir:
+        os.makedirs(db_dir, exist_ok=True)
+
     conn = get_db()
     conn.executescript('''
         CREATE TABLE IF NOT EXISTS usuarios (
@@ -277,6 +292,17 @@ def init_db():
         conn.commit()
     except sqlite3.OperationalError:
         pass  # La columna ya existe
+
+    # ── Índices para optimizar búsquedas ──────────────────────
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_productos_categoria ON productos(categoria)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_productos_precio ON productos(precio)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_productos_nombre ON productos(nombre)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_productos_usuario ON productos(usuario_id)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_resenas_producto ON resenas(producto_id)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_favoritos_usuario ON favoritos(usuario_id)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_pedidos_usuario ON pedidos(usuario_id)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_notificaciones_usuario ON notificaciones(usuario_id)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_producto_imagenes_producto ON producto_imagenes(producto_id)')
 
     conn.commit()
     conn.close()
@@ -1104,6 +1130,15 @@ def seguir_usuario(usuario_id):
 def login():
     if 'usuario_id' in session:
         return redirect(url_for('index'))
+
+    # ── Rate limiting: máximo 5 intentos por 15 minutos ──
+    intentos = session.get('login_intentos', 0)
+    bloqueo_hasta = session.get('login_bloqueo_hasta', 0)
+    if bloqueo_hasta and datetime.now().timestamp() < bloqueo_hasta:
+        restante = int(bloqueo_hasta - datetime.now().timestamp())
+        flash(f'Demasiados intentos fallidos. Espera {restante // 60} minuto(s).', 'danger')
+        return render_template('login.html')
+
     if request.method == 'POST':
         email = request.form.get('email', '').strip()
         password = request.form.get('password', '').strip()
@@ -1111,13 +1146,25 @@ def login():
         usuario = conn.execute('SELECT * FROM usuarios WHERE email = ?', (email,)).fetchone()
         conn.close()
         if usuario and check_password_hash(usuario['password'], password):
+            # Login exitoso: limpiar intentos
+            session.pop('login_intentos', None)
+            session.pop('login_bloqueo_hasta', None)
             session['usuario_id'] = usuario['id']
             session['nombre'] = usuario['nombre']
             session['email'] = usuario['email']
             session['rol'] = usuario['rol']
             flash(f'¡Bienvenido, {usuario["nombre"]}!', 'success')
             return redirect(url_for('index'))
-        flash('Correo o contraseña incorrectos.', 'danger')
+
+        # Login fallido: incrementar intentos
+        session['login_intentos'] = intentos + 1
+        if session['login_intentos'] >= 5:
+            session['login_bloqueo_hasta'] = datetime.now().timestamp() + 15 * 60  # 15 min
+            session['login_intentos'] = 0
+            flash('Demasiados intentos fallidos. Acceso bloqueado por 15 minutos.', 'danger')
+        else:
+            restantes = 5 - session['login_intentos']
+            flash(f'Correo o contraseña incorrectos. {restantes} intento(s) restante(s).', 'danger')
     return render_template('login.html')
 
 

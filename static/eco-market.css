@@ -1335,6 +1335,28 @@ a {
    ════════════════════════════════════════════════════════════ */
 .detalle-section { padding-top: 50px; }
 
+/* ── Botones de compartir ───────────────────────── */
+.share-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid rgba(46,125,50,0.15);
+    background: var(--blanco);
+    color: var(--verde);
+    cursor: pointer;
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+.share-btn:hover {
+    background: var(--verde);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46,125,50,0.2);
+}
+
 /* ── Eco-score badge ────────────────────────────── */
 .eco-score-badge {
     display: inline-flex;

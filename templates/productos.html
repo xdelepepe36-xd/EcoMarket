@@ -18,7 +18,8 @@
         <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:20px">
             <div style="flex:1;min-width:200px;position:relative">
                 <i class="bi bi-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--texto-sec)"></i>
-                <input id="searchInput" type="text" placeholder="Buscar productos..." style="width:100%;padding:12px 12px 12px 38px;border:1.5px solid rgba(46,125,50,0.18);border-radius:12px;font-family:inherit;font-size:0.9rem;outline:none">
+                <input id="searchInput" type="text" placeholder="Buscar productos..." autocomplete="off" style="width:100%;padding:12px 12px 12px 38px;border:1.5px solid rgba(46,125,50,0.18);border-radius:12px;font-family:inherit;font-size:0.9rem;outline:none">
+                <div id="searchSuggestions" class="search-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--blanco);border:1px solid rgba(46,125,50,0.12);border-radius:12px;box-shadow:var(--sombra-lg);z-index:100;max-height:300px;overflow-y:auto;margin-top:4px"></div>
             </div>
             <select id="ordenSelect" onchange="window.location='{{ url_for('productos_view') }}?orden='+this.value" style="padding:12px 16px;border:1.5px solid rgba(46,125,50,0.18);border-radius:12px;font-family:inherit;font-size:0.9rem;outline:none;cursor:pointer">
                 <option value="nuevos" {{ 'selected' if orden_sel == 'nuevos' else '' }}>📅 Más nuevos</option>
@@ -27,6 +28,18 @@
                 <option value="caros" {{ 'selected' if orden_sel == 'caros' else '' }}>💎 Mayor precio</option>
                 <option value="mejor_valorados" {{ 'selected' if orden_sel == 'mejor_valorados' else '' }}>⭐ Mejor valorados</option>
             </select>
+        </div>
+
+        <!-- Filtro de precio -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px;padding:12px 16px;background:var(--blanco);border-radius:12px;border:1px solid rgba(46,125,50,0.08)">
+            <span style="font-size:0.85rem;font-weight:600;color:var(--texto-sec)"><i class="bi bi-currency-dollar"></i> Precio:</span>
+            <input type="number" id="precioMin" placeholder="Mín" min="0" step="0.01" value="{{ request.args.get('precio_min', '') }}" style="width:90px;padding:8px 10px;border:1.5px solid rgba(46,125,50,0.18);border-radius:8px;font-family:inherit;font-size:0.85rem;outline:none">
+            <span style="color:var(--texto-sec)">—</span>
+            <input type="number" id="precioMax" placeholder="Máx" min="0" step="0.01" value="{{ request.args.get('precio_max', '') }}" style="width:90px;padding:8px 10px;border:1.5px solid rgba(46,125,50,0.18);border-radius:8px;font-family:inherit;font-size:0.85rem;outline:none">
+            <button onclick="aplicarFiltroPrecio()" class="btn-principal" style="padding:8px 16px;font-size:0.82rem;border:none;cursor:pointer"><i class="bi bi-funnel"></i> Filtrar</button>
+            {% if request.args.get('precio_min') or request.args.get('precio_max') %}
+            <a href="{{ url_for('productos_view', categoria=categoria_sel, orden=orden_sel) }}" style="font-size:0.8rem;color:var(--texto-sec);text-decoration:underline">Limpiar</a>
+            {% endif %}
         </div>
 
         <!-- Categorías -->
@@ -176,7 +189,60 @@ document.getElementById('searchInput').addEventListener('input', function() {
         if (show) visible++;
     });
     document.getElementById('noResultsMessage').hidden = visible > 0;
+    buscarSugerencias(this.value);
 });
+
+// Autocompletado de búsqueda
+let searchTimer;
+function buscarSugerencias(q) {
+    const container = document.getElementById('searchSuggestions');
+    if (!q || q.length < 2) {
+        container.style.display = 'none';
+        return;
+    }
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(function() {
+        fetch('/api/buscar?q=' + encodeURIComponent(q))
+            .then(r => r.json())
+            .then(data => {
+                if (data.length === 0) {
+                    container.style.display = 'none';
+                    return;
+                }
+                container.innerHTML = data.map(p => `
+                    <a href="/producto/${p.id}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;text-decoration:none;color:var(--texto);border-bottom:1px solid rgba(46,125,50,0.06);transition:background 0.2s">
+                        <span style="font-size:1.3rem">📦</span>
+                        <div style="flex:1;min-width:0">
+                            <div style="font-size:0.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.nombre}</div>
+                            <div style="font-size:0.75rem;color:var(--texto-sec)">${p.categoria} · S/. ${parseFloat(p.precio).toFixed(2)}</div>
+                        </div>
+                        <i class="bi bi-arrow-right" style="color:var(--verde)"></i>
+                    </a>
+                `).join('');
+                container.style.display = 'block';
+            })
+            .catch(() => { container.style.display = 'none'; });
+    }, 300);
+}
+
+// Ocultar sugerencias al hacer clic fuera
+document.addEventListener('click', function(e) {
+    const container = document.getElementById('searchSuggestions');
+    const input = document.getElementById('searchInput');
+    if (container && !container.contains(e.target) && e.target !== input) {
+        container.style.display = 'none';
+    }
+});
+
+// Filtro de precio
+function aplicarFiltroPrecio() {
+    const min = document.getElementById('precioMin').value;
+    const max = document.getElementById('precioMax').value;
+    const params = new URLSearchParams(window.location.search);
+    if (min) params.set('precio_min', min); else params.delete('precio_min');
+    if (max) params.set('precio_max', max); else params.delete('precio_max');
+    window.location = '{{ url_for('productos_view') }}?' + params.toString();
+}
 </script>
 
 <style>

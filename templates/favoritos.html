@@ -6,30 +6,74 @@
     <div class="container">
         <div class="section-head">
             <div>
-                <h2 class="section-title">Tus favoritos</h2>
+                <h2 class="section-title"><i class="bi bi-heart-fill"></i> Tus favoritos</h2>
                 <p>Guarda los productos que más te interesan y vuelve a ellos cuando quieras.</p>
             </div>
         </div>
+
+        {% if productos %}
         <div class="productos-grid">
             {% for producto in productos %}
+            {% set img_url = producto.imagen if producto.imagen.startswith('http') else url_for('static', filename=producto.imagen) %}
             <article class="producto-card" data-producto-id="{{ producto.id }}">
-                <img src="{% if producto.imagen.startswith('http') %}{{ producto.imagen }}{% else %}{{ url_for('static', filename=producto.imagen) }}{% endif %}" alt="{{ producto.nombre }}">
+                <div style="position:relative;overflow:hidden">
+                    <img src="{{ img_url }}" alt="{{ producto.nombre }}" style="width:100%;height:200px;object-fit:cover" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22%3E%3Crect fill=%22%23e8f5e9%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%22100%22 y=%22115%22 text-anchor=%22middle%22 font-size=%2260%22%3E📦%3C/text%3E%3C/svg%3E'">
+                    <button class="favorite-btn" data-producto-id="{{ producto.id }}" onclick="quitarFavorito({{ producto.id }}, this)" title="Quitar de favoritos" style="position:absolute;top:10px;right:10px;background:#fdecea;color:#e53935;border:none;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s">
+                        <i class="bi bi-heart-fill"></i>
+                    </button>
+                </div>
                 <div class="producto-info">
                     <span class="categoria">{{ producto.categoria }}</span>
                     <h3>{{ producto.nombre }}</h3>
-                    <p>{{ producto.descripcion }}</p>
+                    <p>{{ producto.descripcion[:100] }}{% if producto.descripcion|length > 100 %}...{% endif %}</p>
+                    <div style="display:flex;gap:2px;font-size:0.8rem;color:#f59e0b;margin-bottom:8px">
+                        {% for i in range(5) %}
+                        <span>{% if i < (producto.rating_promedio|round) %}★{% else %}☆{% endif %}</span>
+                        {% endfor %}
+                        <span style="color:var(--texto-sec);margin-left:4px">({{ producto.total_resenas }})</span>
+                    </div>
                     <div class="producto-footer">
-                        <strong>S/. {{ '%.2f'|format(producto.precio) }}</strong>
+                        <strong style="color:var(--verde);font-size:1.1rem">S/. {{ '%.2f'|format(producto.precio) }}</strong>
                         <div class="card-actions">
-                            <a class="btn-secundario" href="{{ url_for('producto_detalle', producto_id=producto.id) }}">Ver detalles</a>
-                            <button class="favorite-btn" data-producto-id="{{ producto.id }}">❤</button>
+                            <a class="btn-secundario" href="{{ url_for('producto_detalle', producto_id=producto.id) }}" style="padding:8px 14px;font-size:0.82rem;text-decoration:none">Ver detalles</a>
                         </div>
                     </div>
                 </div>
             </article>
             {% endfor %}
         </div>
-        <div id="noFavoritesMessage" class="no-results" hidden>Aún no tienes favoritos. Marca productos como favoritos desde el catálogo.</div>
+        {% else %}
+        <div class="no-results" style="text-align:center;padding:60px 20px">
+            <i class="bi bi-heart" style="font-size:3rem;display:block;margin-bottom:16px;color:rgba(46,125,50,0.3)"></i>
+            <h3 style="margin-bottom:8px">Aún no tienes favoritos</h3>
+            <p style="color:var(--texto-sec);margin-bottom:20px">Marca productos como favoritos desde el catálogo para encontrarlos aquí.</p>
+            <a href="{{ url_for('productos_view') }}" class="btn-principal" style="display:inline-block"><i class="bi bi-grid"></i> Explorar productos</a>
+        </div>
+        {% endif %}
     </div>
 </section>
+
+<script>
+function quitarFavorito(productoId, btn) {
+    fetch('/api/favorito/' + productoId, { method: 'DELETE' })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success) {
+            const card = btn.closest('.producto-card');
+            card.style.transition = 'opacity 0.3s, transform 0.3s';
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.9)';
+            setTimeout(function() {
+                card.remove();
+                if (document.querySelectorAll('.producto-card').length === 0) {
+                    location.reload();
+                }
+            }, 300);
+            if (window.EcoCart && EcoCart.showToast) {
+                EcoCart.showToast('Producto eliminado de favoritos', 'info');
+            }
+        }
+    });
+}
+</script>
 {% endblock %}

@@ -31,6 +31,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-market.css') }}">
     <link rel="manifest" href="/static/manifest.json">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+    {% block head %}{% endblock %}
 </head>
 <body data-user-id="{{ session.get('usuario_id', '') }}">
     <!-- SPLASH SCREEN -->

@@ -1,5 +1,34 @@
 {% extends 'base.html' %}
+{% set imagen_principal = producto.imagen if producto.imagen.startswith('http') else url_for('static', filename=producto.imagen) %}
 {% block title %}EcoMarket - {{ producto.nombre }}{% endblock %}
+
+{% block head %}
+<meta name="description" content="{{ producto.descripcion[:160] }}">
+<meta property="og:title" content="{{ producto.nombre }} - EcoMarket">
+<meta property="og:description" content="{{ producto.descripcion[:160] }}">
+<meta property="og:type" content="product">
+<meta property="og:image" content="{{ imagen_principal }}">
+<meta property="og:url" content="{{ request.url }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ producto.nombre }} - EcoMarket">
+<meta name="twitter:description" content="{{ producto.descripcion[:160] }}">
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "{{ producto.nombre }}",
+    "description": "{{ producto.descripcion[:200] }}",
+    "image": "{{ imagen_principal }}",
+    "category": "{{ producto.categoria }}",
+    "offers": {
+        "@type": "Offer",
+        "price": "{{ producto.precio }}",
+        "priceCurrency": "PEN",
+        "availability": "{% if producto.stock > 0 %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}"
+    }
+}
+</script>
+{% endblock %}
 
 {% block content %}
 {% set imagen_principal = producto.imagen if producto.imagen.startswith('http') else url_for('static', filename=producto.imagen) %}

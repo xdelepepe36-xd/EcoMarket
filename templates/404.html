@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}EcoMarket - Página no encontrada{% endblock %}
+
+{% block content %}
+<section class="section" style="min-height:70vh;display:flex;align-items:center">
+    <div class="container" style="text-align:center">
+        <div style="font-size:8rem;line-height:1;margin-bottom:16px;opacity:0.8">🌱</div>
+        <h1 style="font-size:clamp(3rem,6vw,5rem);font-weight:800;color:var(--verde);line-height:1;margin-bottom:8px">404</h1>
+        <h2 style="font-size:1.5rem;font-weight:700;margin-bottom:12px">Página no encontrada</h2>
+        <p style="color:var(--texto-sec);max-width:480px;margin:0 auto 28px;line-height:1.8">
+            La página que buscas no existe o ha sido movida. 
+            <br>¡No te preocupes, vuelve al inicio y sigue explorando!
+        </p>
+        <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+            <a href="{{ url_for('index') }}" class="btn-principal" style="padding:14px 32px">
+                <i class="bi bi-house"></i> Volver al inicio
+            </a>
+            <a href="{{ url_for('productos_view') }}" class="btn-secundario" style="padding:14px 32px">
+                <i class="bi bi-grid"></i> Ver productos
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

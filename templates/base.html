@@ -4,23 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}EcoMarket{% endblock %}</title>
+    <meta name="description" content="EcoMarket - Marketplace ecológico. Compra y vende productos sostenibles.">
+    <meta name="theme-color" content="#2e7d32">
+    <meta property="og:title" content="EcoMarket - Marketplace Ecológico">
+    <meta property="og:description" content="Compra y vende productos sostenibles. Marketplace 100% ecológico.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1200&h=630&fit=crop">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="EcoMarket - Marketplace Ecológico">
+    <meta name="twitter:description" content="Compra y vende productos sostenibles. Marketplace 100% ecológico.">
+    <link rel="canonical" href="{{ request.url }}">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "EcoMarket",
+        "url": "{{ request.url_root }}",
+        "description": "Marketplace ecológico para comprar y vender productos sostenibles."
+    }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='animations.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='notifications.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='modal.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='polish.css') }}">
-    <link rel="stylesheet" href="eco-styles.css">
-    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="{{ url_for('static', filename='eco-market.css') }}">
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
 </head>
 <body data-user-id="{{ session.get('usuario_id', '') }}">
+    <!-- SPLASH SCREEN -->
+    <div id="splashScreen" class="splash-screen">
+        <div class="splash-icon">🌱</div>
+        <div class="splash-title">EcoMarket</div>
+        <div class="splash-subtitle">Cargando...</div>
+        <div class="splash-loader">
+            <div class="splash-loader-bar"></div>
+        </div>
+    </div>
+
     <header class="header" id="header">
         <div class="container header-container">
             <a href="{{ url_for('index') }}" class="logo">
-                <span>🌱</span> EcoMarket
+                <i class="bi bi-flower2"></i> EcoMarket
             </a>
             <nav class="navbar" id="navbar">
                 <a href="{{ url_for('index') }}" class="nav-link"><i class="bi bi-house"></i> Inicio</a>
@@ -38,7 +64,7 @@
                         <button class="nav-user-btn"><i class="bi bi-person-circle"></i> {{ session.get('nombre', 'Usuario') }}</button>
                         <div class="nav-user-dropdown">
                             <a href="{{ url_for('perfil') }}"><i class="bi bi-person"></i> Mi perfil</a>
-                            {% if session.get('email') == 'admin@ecomarket.com' %}
+                            {% if session.get('rol') == 'admin' %}
                             <a href="{{ url_for('admin') }}"><i class="bi bi-shield-check"></i> Admin</a>
                             {% endif %}
                             <a href="{{ url_for('logout') }}" class="logout-link"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
@@ -66,7 +92,7 @@
                 {% if messages %}
                     <div class="flash-grid">
                         {% for category, message in messages %}
-                            <div class="flash flash-{{ category }}">{{ message }}</div>
+                            <div class="flash flash-{{ category }}"><i class="bi bi-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-triangle{% else %}info-circle{% endif %}"></i> {{ message }}</div>
                         {% endfor %}
                     </div>
                 {% endif %}
@@ -79,78 +105,112 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <a class="logo footer-logo" href="{{ url_for('index') }}">🌱 EcoMarket</a>
+                    <a class="logo footer-logo" href="{{ url_for('index') }}"><i class="bi bi-flower2"></i> EcoMarket</a>
                     <p>Marketplace ecológico donde puedes comprar, vender y dar una segunda vida a productos reciclados y sostenibles.</p>
                     <div class="footer-social">
                         <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
                         <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
                         <a href="#" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" aria-label="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+                        <a href="#" aria-label="TikTok"><i class="bi bi-tiktok"></i></a>
                     </div>
                 </div>
                 <div class="footer-col">
-                    <h4>Navegación</h4>
-                    <a href="{{ url_for('index') }}">Inicio</a>
-                    <a href="{{ url_for('productos_view') }}">Catálogo</a>
-                    <a href="{{ url_for('favoritos_view') }}">Favoritos</a>
-                    <a href="{{ url_for('impacto') }}">Impacto</a>
+                    <h4><i class="bi bi-compass"></i> Navegación</h4>
+                    <a href="{{ url_for('index') }}"><i class="bi bi-chevron-right"></i> Inicio</a>
+                    <a href="{{ url_for('productos_view') }}"><i class="bi bi-chevron-right"></i> Catálogo</a>
+                    <a href="{{ url_for('favoritos_view') }}"><i class="bi bi-chevron-right"></i> Favoritos</a>
+                    <a href="{{ url_for('impacto') }}"><i class="bi bi-chevron-right"></i> Impacto</a>
+                    <a href="{{ url_for('contacto') }}"><i class="bi bi-chevron-right"></i> Contacto</a>
                 </div>
                 <div class="footer-col">
-                    <h4>Cuenta</h4>
+                    <h4><i class="bi bi-person"></i> Cuenta</h4>
                     {% if session.get('usuario_id') %}
-                        <a href="{{ url_for('perfil') }}">Mi perfil</a>
-                        <a href="{{ url_for('publicar') }}">Publicar producto</a>
-                        <a href="{{ url_for('logout') }}">Cerrar sesión</a>
+                        <a href="{{ url_for('perfil') }}"><i class="bi bi-chevron-right"></i> Mi perfil</a>
+                        <a href="{{ url_for('publicar') }}"><i class="bi bi-chevron-right"></i> Publicar producto</a>
+                        <a href="{{ url_for('logout') }}"><i class="bi bi-chevron-right"></i> Cerrar sesión</a>
                     {% else %}
-                        <a href="{{ url_for('login') }}">Iniciar sesión</a>
-                        <a href="{{ url_for('registro') }}">Registrarse</a>
+                        <a href="{{ url_for('login') }}"><i class="bi bi-chevron-right"></i> Iniciar sesión</a>
+                        <a href="{{ url_for('registro') }}"><i class="bi bi-chevron-right"></i> Registrarse</a>
                     {% endif %}
-                    <a href="{{ url_for('carrito_view') }}">Mi carrito</a>
+                    <a href="{{ url_for('carrito_view') }}"><i class="bi bi-chevron-right"></i> Mi carrito</a>
                 </div>
                 <div class="footer-col">
-                    <h4>Legal</h4>
-                    <a href="{{ url_for('terminos') }}">Términos y condiciones</a>
-                    <a href="{{ url_for('privacidad') }}">Política de privacidad</a>
-                    <a href="{{ url_for('contacto') }}">Contacto</a>
+                    <h4><i class="bi bi-shield-check"></i> Legal</h4>
+                    <a href="{{ url_for('terminos') }}"><i class="bi bi-chevron-right"></i> Términos y condiciones</a>
+                    <a href="{{ url_for('privacidad') }}"><i class="bi bi-chevron-right"></i> Política de privacidad</a>
+                    <a href="{{ url_for('contacto') }}"><i class="bi bi-chevron-right"></i> Contacto</a>
                 </div>
                 <div class="footer-col">
-                    <h4>Contacto</h4>
+                    <h4><i class="bi bi-headset"></i> Contacto</h4>
                     <p><i class="bi bi-envelope"></i> hola@ecomarket.com</p>
                     <p><i class="bi bi-telephone"></i> +51 999 888 777</p>
                     <p><i class="bi bi-geo-alt"></i> Lima, Perú</p>
+                    <p><i class="bi bi-clock"></i> Lun - Sáb: 9am - 6pm</p>
                 </div>
             </div>
             <div class="footer-bottom">
                 <p>© 2026 EcoMarket — Todos los derechos reservados.</p>
-                <p>Hecho con 💚 para el planeta</p>
+                <p>Hecho con <i class="bi bi-heart-fill footer-heart"></i> para el planeta</p>
             </div>
         </div>
     </footer>
 
-    <script src="eco-auth.js"></script>
-    <script src="eco-toast.js"></script>
-    <script src="eco-cart.js"></script>
-    <script src="eco-favorites.js"></script>
-    <script src="eco-search.js"></script>
-    <script src="eco-animations.js"></script>
-    <script src="eco-notifications.js"></script>
-    <script src="eco-theme.js"></script>
-    <script src="eco-gamification.js"></script>
-    <script src="eco-reviews.js"></script>
-    <script src="eco-analytics.js"></script>
-    <script src="eco-chat.js"></script>
-    <script src="eco-improvements.js"></script>
+    <!-- Botón volver arriba -->
+    <button id="backToTop" class="back-to-top" aria-label="Volver arriba">
+        <i class="bi bi-arrow-up"></i>
+    </button>
+
+    <!-- EcoMarket Core Scripts -->
+    <script src="{{ url_for('static', filename='eco-auth.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-toast.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-cart.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-favorites.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-search.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-animations.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-notifications.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-gamification.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-reviews.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-analytics.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-chat.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-improvements.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-marketplace.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-profile.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-admin.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-i18n.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-ux.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-effects.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-ai.js') }}"></script>
     <script>
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js');
+        navigator.serviceWorker.register('/static/sw.js');
       }
+      // Splash screen auto-hide
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          var splash = document.getElementById('splashScreen');
+          if (splash) {
+            splash.style.opacity = '0';
+            splash.style.visibility = 'hidden';
+          }
+        }, 800);
+      });
+    </script>
+    <script>
+      // Back to top
+      var backToTop = document.getElementById('backToTop');
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 400) {
+          backToTop.classList.add('visible');
+        } else {
+          backToTop.classList.remove('visible');
+        }
+      });
+      backToTop.addEventListener('click', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
     </script>
     <script src="{{ url_for('static', filename='main.js') }}"></script>
-    <script src="{{ url_for('static', filename='favorites.js') }}"></script>
-    <script src="{{ url_for('static', filename='notifications.js') }}"></script>
-    <script src="{{ url_for('static', filename='polish.js') }}"></script>
-    <script src="{{ url_for('static', filename='modal.js') }}"></script>
-    <script src="{{ url_for('static', filename='cart.js') }}"></script>
-    <script src="{{ url_for('static', filename='checkout.js') }}"></script>
-    <script src="{{ url_for('static', filename='theme.js') }}"></script>
 </body>
 </html>

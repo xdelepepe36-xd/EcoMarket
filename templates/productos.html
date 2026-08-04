@@ -6,7 +6,7 @@
     <div class="container">
         <div class="section-head" style="flex-wrap:wrap">
             <div>
-                <h2 class="section-title">🌿 Catálogo de productos</h2>
+                <h2 class="section-title"><i class="bi bi-grid"></i> Catálogo de productos</h2>
                 <p>Descubre artículos ecológicos. {{ total_productos }} producto(s) disponible(s).</p>
             </div>
             <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -37,11 +37,12 @@
             {% endfor %}
         </div>
 
-        <p style="font-size:0.85rem;color:var(--texto-sec);margin-bottom:16px">📦 Mostrando {{ productos|length }} producto(s)</p>
+            <p style="font-size:0.85rem;color:var(--texto-sec);margin-bottom:16px"><i class="bi bi-box"></i> Mostrando {{ productos|length }} producto(s)</p>
 
         <!-- Grid -->
         <div class="productos-grid" id="productosGrid">
             {% for producto in productos %}
+            {% set img_url = producto.imagen if producto.imagen.startswith('http') else url_for('static', filename=producto.imagen) %}
             <article class="producto-card" style="position:relative;display:flex;flex-direction:column">
                 <!-- Badge condición -->
                 <div style="position:absolute;top:10px;left:10px;z-index:2;background:{% if producto.condicion == 'nuevo' %}#2e7d32{% else %}#f59e0b{% endif %};color:#fff;padding:4px 10px;border-radius:999px;font-size:0.72rem;font-weight:700">
@@ -54,7 +55,12 @@
                 {% endif %}
 
                 <a href="{{ url_for('producto_detalle', producto_id=producto.id) }}" style="text-decoration:none;color:inherit;flex:1;display:flex;flex-direction:column">
-                    <img src="{% if producto.imagen.startswith('http') %}{{ producto.imagen }}{% else %}{{ url_for('static', filename=producto.imagen) }}{% endif %}" alt="{{ producto.nombre }}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22%3E%3Crect fill=%22%23e8f5e9%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%22100%22 y=%22115%22 text-anchor=%22middle%22 font-size=%2260%22%3E📦%3C/text%3E%3C/svg%3E'" style="width:100%;height:200px;object-fit:cover">
+                    <div style="position:relative;overflow:hidden">
+                        <img src="{{ img_url }}" alt="{{ producto.nombre }}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22%3E%3Crect fill=%22%23e8f5e9%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%22100%22 y=%22115%22 text-anchor=%22middle%22 font-size=%2260%22%3E📦%3C/text%3E%3C/svg%3E'" style="width:100%;height:200px;object-fit:cover;transition:transform 0.3s ease">
+                        <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.5));padding:8px 12px;color:#fff;font-size:0.72rem;font-weight:600;opacity:0;transition:opacity 0.3s ease">
+                            <i class="bi bi-eye"></i> {{ producto.vistas }} vistas
+                        </div>
+                    </div>
                     <div class="producto-info" style="flex:1;display:flex;flex-direction:column;padding:16px">
                         <span class="categoria" style="font-size:0.72rem;color:var(--texto-sec);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">{{ producto.categoria }}</span>
                         <h3 style="font-size:0.9rem;font-weight:700;margin-bottom:6px;line-height:1.4">{{ producto.nombre }}</h3>
@@ -72,9 +78,8 @@
 
                         <!-- Vendedor y stock -->
                         <div style="display:flex;gap:8px;font-size:0.75rem;color:var(--texto-sec);margin-bottom:8px">
-                            <span>👤 {{ producto.vendedor_nombre or 'Anónimo' }}</span>
-                            <span>📦 Stock: {{ producto.stock }}</span>
-                            <span>👁️ {{ producto.vistas }}</span>
+                            <span><i class="bi bi-person"></i> {{ producto.vendedor_nombre or 'Anónimo' }}</span>
+                            <span><i class="bi bi-box-seam"></i> Stock: {{ producto.stock }}</span>
                         </div>
 
                         <div class="producto-footer" style="display:flex;align-items:center;justify-content:space-between;margin-top:auto">
@@ -109,6 +114,37 @@
             <h3 style="margin-bottom:8px">Sin resultados</h3>
             <p style="color:var(--texto-sec)">Intenta con otros filtros o términos de búsqueda.</p>
         </div>
+
+        <!-- Paginación -->
+        {% if total_paginas > 1 %}
+        <div style="display:flex;justify-content:center;align-items:center;gap:8px;margin-top:32px;flex-wrap:wrap">
+            {% if pagina > 1 %}
+            <a href="{{ url_for('productos_view', pagina=pagina-1, categoria=categoria_sel, orden=orden_sel, q=busqueda) }}" class="btn-secundario" style="padding:10px 18px;font-size:0.85rem">
+                <i class="bi bi-chevron-left"></i> Anterior
+            </a>
+            {% endif %}
+            
+            {% for p in range(1, total_paginas + 1) %}
+                {% if p == pagina %}
+                <span style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#4caf50,#2e7d32);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem">{{ p }}</span>
+                {% elif p == 1 or p == total_paginas or (p >= pagina - 2 and p <= pagina + 2) %}
+                <a href="{{ url_for('productos_view', pagina=p, categoria=categoria_sel, orden=orden_sel, q=busqueda) }}" style="width:40px;height:40px;border-radius:12px;background:var(--blanco);color:var(--texto);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:0.9rem;text-decoration:none;border:1px solid rgba(46,125,50,0.12);transition:all 0.2s"
+                   onmouseover="this.style.background='var(--verde-suave)'" onmouseout="this.style.background='var(--blanco)'">{{ p }}</a>
+                {% elif p == pagina - 3 or p == pagina + 3 %}
+                <span style="color:var(--texto-sec);font-size:0.9rem">...</span>
+                {% endif %}
+            {% endfor %}
+
+            {% if pagina < total_paginas %}
+            <a href="{{ url_for('productos_view', pagina=pagina+1, categoria=categoria_sel, orden=orden_sel, q=busqueda) }}" class="btn-secundario" style="padding:10px 18px;font-size:0.85rem">
+                Siguiente <i class="bi bi-chevron-right"></i>
+            </a>
+            {% endif %}
+        </div>
+        <div style="text-align:center;margin-top:12px;font-size:0.82rem;color:var(--texto-sec)">
+            Página {{ pagina }} de {{ total_paginas }} ({{ total_productos }} productos)
+        </div>
+        {% endif %}
     </div>
 </section>
 

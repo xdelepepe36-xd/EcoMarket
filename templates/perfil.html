@@ -6,7 +6,7 @@
     <div class="container">
         <div class="section-head">
             <div>
-                <h2 class="section-title">Mi Panel</h2>
+                <h2 class="section-title"><i class="bi bi-person-circle"></i> Mi Panel</h2>
                 <p>Bienvenido, <strong>{{ session.get('nombre') }}</strong>. Gestiona tus productos, reseñas y más.</p>
             </div>
             <div style="display:flex;gap:12px;flex-wrap:wrap">
@@ -15,27 +15,59 @@
             </div>
         </div>
 
+        <!-- Perfil Header -->
+        <div style="background:var(--blanco);border-radius:24px;overflow:hidden;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08);margin-bottom:28px">
+            <div style="height:100px;background:linear-gradient(135deg,#1b5e20,#2e7d32);position:relative">
+                {% if usuario and usuario.banner %}
+                <img src="{{ usuario.banner }}" style="width:100%;height:100%;object-fit:cover">
+                {% endif %}
+            </div>
+            <div style="padding:0 24px 24px;margin-top:-40px;display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap">
+                <div style="width:80px;height:80px;border-radius:50%;background:{{ usuario.avatar_color if usuario and usuario.avatar_color else '#2e7d32' }};border:4px solid var(--blanco);display:flex;align-items:center;justify-content:center;font-size:2rem;color:#fff;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,0.1)">
+                    {{ session.get('nombre', 'U')[0] | upper }}
+                </div>
+                <div style="flex:1">
+                    <h3 style="font-size:1.3rem;font-weight:800;margin-bottom:2px">{{ session.get('nombre') }}</h3>
+                    <p style="font-size:0.85rem;color:var(--texto-sec)">{{ usuario.bio if usuario and usuario.bio else '🌱 Amante del planeta' }}</p>
+                </div>
+                <div style="display:flex;gap:16px;flex-wrap:wrap">
+                    <div style="text-align:center">
+                        <div style="font-size:1.1rem;font-weight:800;color:var(--verde)">{{ seguidores }}</div>
+                        <div style="font-size:0.72rem;color:var(--texto-sec)">Seguidores</div>
+                    </div>
+                    <div style="text-align:center">
+                        <div style="font-size:1.1rem;font-weight:800;color:var(--verde)">{{ siguiendo }}</div>
+                        <div style="font-size:0.72rem;color:var(--texto-sec)">Siguiendo</div>
+                    </div>
+                    <div style="text-align:center">
+                        <div style="font-size:1.1rem;font-weight:800;color:var(--verde)">{{ usuario.xp if usuario else 0 }}</div>
+                        <div style="font-size:0.72rem;color:var(--texto-sec)">XP</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Stats rápidas -->
         <div class="stats-grid" style="margin-bottom:28px">
             <div class="stat-card" style="text-align:center;padding:20px;border-radius:20px;background:var(--blanco);box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
                 <div style="font-size:2rem;font-weight:800;color:var(--verde)">{{ total_publicaciones }}</div>
-                <div style="font-size:0.85rem;color:var(--texto-sec)">Publicaciones</div>
+                <div style="font-size:0.85rem;color:var(--texto-sec)"><i class="bi bi-box-seam"></i> Publicaciones</div>
             </div>
             <div class="stat-card" style="text-align:center;padding:20px;border-radius:20px;background:var(--blanco);box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
                 <div style="font-size:2rem;font-weight:800;color:var(--verde)">{{ total_favoritos }}</div>
-                <div style="font-size:0.85rem;color:var(--texto-sec)">Favoritos</div>
+                <div style="font-size:0.85rem;color:var(--texto-sec)"><i class="bi bi-heart"></i> Favoritos</div>
             </div>
             <div class="stat-card" style="text-align:center;padding:20px;border-radius:20px;background:var(--blanco);box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
                 <div style="font-size:2rem;font-weight:800;color:var(--verde)">{{ total_resenas_recibidas }}</div>
-                <div style="font-size:0.85rem;color:var(--texto-sec)">Reseñas recibidas</div>
+                <div style="font-size:0.85rem;color:var(--texto-sec)"><i class="bi bi-star"></i> Reseñas recibidas</div>
             </div>
             <div class="stat-card" style="text-align:center;padding:20px;border-radius:20px;background:var(--blanco);box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
                 <div style="font-size:2rem;font-weight:800;color:var(--verde)">{{ total_ventas }}</div>
-                <div style="font-size:0.85rem;color:var(--texto-sec)">Ventas</div>
+                <div style="font-size:0.85rem;color:var(--texto-sec)"><i class="bi bi-cart"></i> Ventas</div>
             </div>
             <div class="stat-card" style="text-align:center;padding:20px;border-radius:20px;background:var(--blanco);box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
                 <div style="font-size:1.5rem;font-weight:800;color:var(--verde)">S/. {{ '%.0f'|format(valor_total) }}</div>
-                <div style="font-size:0.85rem;color:var(--texto-sec)">Valor productos</div>
+                <div style="font-size:0.85rem;color:var(--texto-sec)"><i class="bi bi-currency-dollar"></i> Valor productos</div>
             </div>
         </div>
 
@@ -45,6 +77,7 @@
             <button class="tab-btn" onclick="setTab(event,'favoritos')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-heart"></i> Favoritos ({{ favoritos|length }})</button>
             <button class="tab-btn" onclick="setTab(event,'resenas')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-star"></i> Mis reseñas ({{ resenas|length }})</button>
             <button class="tab-btn" onclick="setTab(event,'pedidos')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-bag-check"></i> Pedidos ({{ pedidos|length }})</button>
+            <button class="tab-btn" onclick="setTab(event,'config')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-gear"></i> Configuración</button>
         </div>
 
         <!-- TAB: MIS PRODUCTOS -->
@@ -66,8 +99,8 @@
                             <span style="color:var(--texto-sec);margin-left:4px">({{ p.total_resenas }})</span>
                         </div>
                         <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;font-size:0.78rem;color:var(--texto-sec)">
-                            <span>📦 Stock: {{ p.stock }}</span>
-                            <span>👁️ {{ p.vistas }} vistas</span>
+                            <span><i class="bi bi-box-seam"></i> Stock: {{ p.stock }}</span>
+                            <span><i class="bi bi-eye"></i> {{ p.vistas }} vistas</span>
                         </div>
                         <div class="producto-footer">
                             <strong style="font-size:1.1rem;color:var(--verde)">S/. {{ '%.2f'|format(p.precio) }}</strong>
@@ -102,7 +135,7 @@
                     <div class="producto-info">
                         <span class="categoria">{{ f.categoria }}</span>
                         <h3>{{ f.nombre }}</h3>
-                        <p style="font-size:0.78rem;color:var(--texto-sec);margin-bottom:6px">❤️ Agregado {{ f.fecha_favorito[:10] }}</p>
+                        <p style="font-size:0.78rem;color:var(--texto-sec);margin-bottom:6px"><i class="bi bi-heart"></i> Agregado {{ f.fecha_favorito[:10] }}</p>
                         <div class="producto-footer">
                             <strong style="color:var(--verde)">S/. {{ '%.2f'|format(f.precio) }}</strong>
                             <div style="display:flex;gap:6px">
@@ -171,7 +204,7 @@
                         </div>
                     </div>
                     <div style="margin-top:10px;font-size:0.85rem;color:var(--texto-sec)">
-                        📍 {{ pedido.direccion[:60] }}{% if pedido.direccion|length > 60 %}...{% endif %}
+                        <i class="bi bi-geo-alt"></i> {{ pedido.direccion[:60] }}{% if pedido.direccion|length > 60 %}...{% endif %}
                     </div>
                 </div>
                 {% endfor %}
@@ -184,6 +217,44 @@
                 <a href="{{ url_for('productos_view') }}" class="btn-principal">Ver productos</a>
             </div>
             {% endif %}
+        </div>
+
+        <!-- TAB: CONFIGURACIÓN -->
+        <div id="tab-config" class="tab-content" style="display:none">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+                <div style="background:var(--blanco);border-radius:20px;padding:24px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
+                    <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:16px"><i class="bi bi-person"></i> Actualizar perfil</h3>
+                    <form method="POST" action="{{ url_for('actualizar_perfil') }}">
+                        <div class="form-group">
+                            <label class="form-label">Nombre</label>
+                            <input type="text" name="nombre" class="form-input" value="{{ session.get('nombre', '') }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Biografía</label>
+                            <textarea name="bio" class="form-input" rows="3" placeholder="Cuéntanos sobre ti...">{{ usuario.bio if usuario else '' }}</textarea>
+                        </div>
+                        <button type="submit" class="btn-principal"><i class="bi bi-check-lg"></i> Guardar cambios</button>
+                    </form>
+                </div>
+                <div style="background:var(--blanco);border-radius:20px;padding:24px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
+                    <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:16px"><i class="bi bi-shield-lock"></i> Cambiar contraseña</h3>
+                    <form method="POST" action="{{ url_for('cambiar_password') }}">
+                        <div class="form-group">
+                            <label class="form-label">Contraseña actual</label>
+                            <input type="password" name="password_actual" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nueva contraseña</label>
+                            <input type="password" name="password_nueva" class="form-input" required minlength="6">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Confirmar contraseña</label>
+                            <input type="password" name="password_confirmar" class="form-input" required minlength="6">
+                        </div>
+                        <button type="submit" class="btn-principal"><i class="bi bi-check-lg"></i> Actualizar contraseña</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </section>
@@ -218,6 +289,7 @@ function removeFav(productoId) {
 }
 @media (max-width: 600px) {
     .stats-grid { grid-template-columns: 1fr 1fr; }
+    #tab-config > div { grid-template-columns: 1fr !important; }
 }
 </style>
 {% endblock %}

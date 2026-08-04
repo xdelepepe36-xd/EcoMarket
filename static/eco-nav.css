@@ -1,0 +1,395 @@
+/**
+ * eco-nav.css - Estilos premium para navegación EcoMarket
+ * Botones decorados con glassmorphism, hover effects, animaciones
+ */
+
+/* ── Navbar Container ──────────────────────────────────── */
+.navbar {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+/* ── Nav Links Premium ─────────────────────────────────── */
+.nav-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 14px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--texto);
+    text-decoration: none;
+    background: transparent;
+    border: 1px solid transparent;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+/* Glassmorphism background */
+.nav-link::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(46, 125, 50, 0.05), rgba(76, 175, 80, 0.02));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+/* Icon decoration */
+.nav-link i {
+    font-size: 1.1rem;
+    color: var(--verde);
+    transition: all 0.3s ease;
+}
+
+/* Hover effect */
+.nav-link:hover {
+    background: rgba(46, 125, 50, 0.08);
+    border-color: rgba(46, 125, 50, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.12);
+    color: var(--verde);
+}
+
+.nav-link:hover::before {
+    opacity: 1;
+}
+
+.nav-link:hover i {
+    transform: scale(1.15);
+    color: var(--verde);
+}
+
+/* Active state */
+.nav-link.active {
+    background: linear-gradient(135deg, rgba(46, 125, 50, 0.12), rgba(76, 175, 80, 0.08));
+    border-color: rgba(46, 125, 50, 0.2);
+    color: var(--verde);
+    box-shadow: 0 2px 8px rgba(46, 125, 50, 0.1);
+}
+
+.nav-link.active i {
+    color: var(--verde);
+}
+
+/* Bottom line decoration on hover */
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--verde-claro), var(--verde));
+    border-radius: 999px;
+    transform: translateX(-50%);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 60%;
+}
+
+/* ── Cart Badge ────────────────────────────────────────── */
+.cart-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #e53935, #c62828);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 800;
+    box-shadow: 0 2px 6px rgba(229, 57, 53, 0.3);
+    animation: badgePop 0.3s ease;
+}
+
+@keyframes badgePop {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* ── Nav Buttons (Publicar, Ingresar, Registrarse) ────── */
+.nav-publish {
+    position: relative;
+    overflow: hidden;
+    padding: 10px 22px !important;
+    border-radius: 14px !important;
+    font-weight: 700 !important;
+    font-size: 0.85rem !important;
+    background: linear-gradient(135deg, var(--verde-claro), var(--verde)) !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 4px 14px rgba(46, 125, 50, 0.25) !important;
+    transition: all 0.3s ease !important;
+}
+
+.nav-publish i {
+    color: #fff !important;
+    font-size: 1rem !important;
+}
+
+.nav-publish:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 24px rgba(46, 125, 50, 0.35) !important;
+}
+
+.nav-publish::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.nav-publish:hover::after {
+    transform: translateX(100%);
+}
+
+/* Secondary button (Ingresar) */
+.nav-login {
+    padding: 10px 22px !important;
+    border-radius: 14px !important;
+    font-weight: 700 !important;
+    font-size: 0.85rem !important;
+    background: rgba(46, 125, 50, 0.06) !important;
+    color: var(--verde) !important;
+    border: 1.5px solid rgba(46, 125, 50, 0.2) !important;
+    transition: all 0.3s ease !important;
+}
+
+.nav-login:hover {
+    background: rgba(46, 125, 50, 0.12) !important;
+    border-color: var(--verde) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.12) !important;
+}
+
+/* ── User Menu Button ──────────────────────────────────── */
+.nav-user-btn {
+    background: linear-gradient(135deg, rgba(46, 125, 50, 0.1), rgba(76, 175, 80, 0.06)) !important;
+    border: 1.5px solid rgba(46, 125, 50, 0.18) !important;
+    color: var(--verde) !important;
+    border-radius: 14px !important;
+    padding: 10px 20px !important;
+    font-weight: 700 !important;
+    font-size: 0.85rem !important;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease !important;
+}
+
+.nav-user-btn:hover {
+    background: linear-gradient(135deg, rgba(46, 125, 50, 0.15), rgba(76, 175, 80, 0.1)) !important;
+    border-color: rgba(46, 125, 50, 0.3) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.12);
+}
+
+.nav-user-btn i {
+    font-size: 1.1rem;
+}
+
+/* ── User Dropdown ─────────────────────────────────────── */
+.nav-user-dropdown {
+    border-radius: 16px !important;
+    border: 1px solid rgba(46, 125, 50, 0.12) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12) !important;
+    padding: 6px !important;
+    min-width: 200px !important;
+}
+
+.nav-user-dropdown a {
+    border-radius: 10px !important;
+    padding: 12px 16px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+}
+
+.nav-user-dropdown a:hover {
+    background: rgba(46, 125, 50, 0.08) !important;
+    color: var(--verde) !important;
+    transform: translateX(4px);
+}
+
+.nav-user-dropdown a i {
+    font-size: 1.1rem;
+    width: 22px;
+    text-align: center;
+}
+
+.logout-link {
+    color: #b91c1c !important;
+}
+
+.logout-link:hover {
+    background: rgba(185, 28, 28, 0.08) !important;
+    color: #b91c1c !important;
+}
+
+/* ── Theme Toggle ──────────────────────────────────────── */
+.theme-toggle {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 14px !important;
+    border: 1.5px solid rgba(46, 125, 50, 0.15) !important;
+    background: rgba(46, 125, 50, 0.05) !important;
+    color: var(--texto) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    font-size: 1.1rem !important;
+    transition: all 0.3s ease !important;
+}
+
+.theme-toggle:hover {
+    background: rgba(46, 125, 50, 0.12) !important;
+    border-color: rgba(46, 125, 50, 0.25) !important;
+    transform: translateY(-2px) rotate(15deg);
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.1);
+}
+
+/* ── Language Switcher ─────────────────────────────────── */
+#langSwitcher button {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 14px !important;
+    border: 1.5px solid rgba(46, 125, 50, 0.15) !important;
+    background: rgba(46, 125, 50, 0.05) !important;
+    color: var(--texto) !important;
+    font-weight: 800 !important;
+    font-size: 0.8rem !important;
+    letter-spacing: 0.05em;
+    transition: all 0.3s ease !important;
+}
+
+#langSwitcher button:hover {
+    background: rgba(46, 125, 50, 0.12) !important;
+    border-color: rgba(46, 125, 50, 0.25) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.1);
+}
+
+/* ── Nav Toggle (Mobile) ───────────────────────────────── */
+.nav-toggle {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 14px !important;
+    border: 1.5px solid rgba(46, 125, 50, 0.15) !important;
+    background: rgba(46, 125, 50, 0.05) !important;
+    padding: 12px !important;
+    transition: all 0.3s ease !important;
+}
+
+.nav-toggle:hover {
+    background: rgba(46, 125, 50, 0.12) !important;
+    border-color: rgba(46, 125, 50, 0.25) !important;
+}
+
+.nav-toggle span {
+    height: 2.5px !important;
+    border-radius: 999px !important;
+    background: var(--texto) !important;
+}
+
+/* ── Header Actions Container ──────────────────────────── */
+.header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 960px) {
+    .navbar {
+        padding: 12px 0;
+        gap: 4px;
+    }
+    
+    .nav-link {
+        padding: 10px 16px;
+        font-size: 0.85rem;
+        border-radius: 12px;
+    }
+    
+    .nav-link::after {
+        display: none;
+    }
+}
+
+@media (max-width: 680px) {
+    .nav-link {
+        padding: 8px 14px;
+        font-size: 0.82rem;
+    }
+    
+    .nav-publish,
+    .nav-login {
+        padding: 8px 18px !important;
+        font-size: 0.82rem !important;
+    }
+}
+
+/* ── Dark Mode ─────────────────────────────────────────── */
+[data-theme='dark'] .nav-link {
+    color: var(--blanco);
+}
+
+[data-theme='dark'] .nav-link:hover {
+    background: rgba(126, 217, 87, 0.1);
+    border-color: rgba(126, 217, 87, 0.2);
+    color: var(--verde);
+}
+
+[data-theme='dark'] .nav-link.active {
+    background: rgba(126, 217, 87, 0.12);
+    border-color: rgba(126, 217, 87, 0.25);
+}
+
+[data-theme='dark'] .nav-user-btn {
+    background: rgba(126, 217, 87, 0.1) !important;
+    border-color: rgba(126, 217, 87, 0.2) !important;
+    color: var(--verde) !important;
+}
+
+[data-theme='dark'] .nav-user-btn:hover {
+    background: rgba(126, 217, 87, 0.15) !important;
+}
+
+[data-theme='dark'] .theme-toggle,
+[data-theme='dark'] #langSwitcher button,
+[data-theme='dark'] .nav-toggle {
+    background: rgba(126, 217, 87, 0.08) !important;
+    border-color: rgba(126, 217, 87, 0.15) !important;
+    color: var(--blanco) !important;
+}
+
+[data-theme='dark'] .theme-toggle:hover,
+[data-theme='dark'] #langSwitcher button:hover,
+[data-theme='dark'] .nav-toggle:hover {
+    background: rgba(126, 217, 87, 0.15) !important;
+}
+
+[data-theme='dark'] .nav-login {
+    background: rgba(126, 217, 87, 0.08) !important;
+    border-color: rgba(126, 217, 87, 0.2) !important;
+    color: var(--verde) !important;
+}
+
+[data-theme='dark'] .nav-login:hover {
+    background: rgba(126, 217, 87, 0.15) !important;
+}

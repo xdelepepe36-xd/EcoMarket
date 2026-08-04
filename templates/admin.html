@@ -16,46 +16,68 @@
         <div class="admin-stats">
             <div class="admin-stat-card">
                 <i class="bi bi-box-seam"></i>
-                <strong>{{ productos | length }}</strong>
+                <strong>{{ stats.total_productos }}</strong>
                 <span>Productos</span>
             </div>
             <div class="admin-stat-card">
                 <i class="bi bi-people"></i>
-                <strong>{{ usuarios | length }}</strong>
+                <strong>{{ stats.total_usuarios }}</strong>
                 <span>Usuarios</span>
             </div>
             <div class="admin-stat-card">
-                <i class="bi bi-tags"></i>
-                <strong>{{ productos | map(attribute='categoria') | list | unique | list | length }}</strong>
-                <span>Categorías</span>
+                <i class="bi bi-star"></i>
+                <strong>{{ stats.total_resenas }}</strong>
+                <span>Reseñas</span>
+            </div>
+            <div class="admin-stat-card">
+                <i class="bi bi-bag-check"></i>
+                <strong>{{ stats.total_pedidos }}</strong>
+                <span>Pedidos</span>
+            </div>
+            <div class="admin-stat-card">
+                <i class="bi bi-eye"></i>
+                <strong>{{ stats.total_visitas }}</strong>
+                <span>Visitas</span>
             </div>
         </div>
 
         <!-- Tabla productos -->
-        <h3 style="margin: 32px 0 16px; color:var(--verde);">Productos</h3>
+        <div style="display:flex;align-items:center;gap:12px;margin:32px 0 16px">
+            <i class="bi bi-box-seam" style="font-size:1.3rem;color:var(--verde)"></i>
+            <h3 style="color:var(--verde);margin:0">Productos ({{ productos|length }})</h3>
+        </div>
         <div class="admin-table-wrap">
             <table class="admin-table">
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Nombre</th>
-                        <th>Categoría</th>
-                        <th>Precio</th>
-                        <th>Acciones</th>
+                        <th><i class="bi bi-hash"></i></th>
+                        <th><i class="bi bi-card-text"></i> Nombre</th>
+                        <th><i class="bi bi-tag"></i> Categoría</th>
+                        <th><i class="bi bi-currency-dollar"></i> Precio</th>
+                        <th><i class="bi bi-person"></i> Vendedor</th>
+                        <th><i class="bi bi-star"></i> Rating</th>
+                        <th><i class="bi bi-tools"></i> Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for producto in productos %}
                     <tr>
                         <td>{{ producto.id }}</td>
-                        <td>{{ producto.nombre }}</td>
-                        <td><span class="categoria">{{ producto.categoria }}</span></td>
+                        <td><strong>{{ producto.nombre[:40] }}{% if producto.nombre|length > 40 %}...{% endif %}</strong></td>
+                        <td><span class="badge badge-success">{{ producto.categoria }}</span></td>
                         <td><strong>S/. {{ '%.2f'|format(producto.precio) }}</strong></td>
+                        <td>{{ producto.vendedor_nombre or 'Anónimo' }}</td>
+                        <td>
+                            <div style="display:flex;align-items:center;gap:4px;color:#f59e0b">
+                                <i class="bi bi-star-fill" style="font-size:0.8rem"></i>
+                                <span>{{ '%.1f'|format(producto.rating_promedio) }}</span>
+                            </div>
+                        </td>
                         <td class="admin-actions">
                             <a href="{{ url_for('producto_detalle', producto_id=producto.id) }}" class="btn-secundario btn-sm">
                                 <i class="bi bi-eye"></i> Ver
                             </a>
-                            <form method="POST" action="{{ url_for('eliminar_producto', producto_id=producto.id) }}" style="display:inline;" onsubmit="return confirm('¿Eliminar este producto?')">
+                            <form method="POST" action="{{ url_for('eliminar_producto_admin', producto_id=producto.id) }}" style="display:inline;" onsubmit="return confirm('¿Eliminar este producto?')">
                                 <button type="submit" class="btn-danger btn-sm">
                                     <i class="bi bi-trash"></i> Eliminar
                                 </button>
@@ -68,22 +90,35 @@
         </div>
 
         <!-- Tabla usuarios -->
-        <h3 style="margin: 40px 0 16px; color:var(--verde);">Usuarios registrados</h3>
+        <div style="display:flex;align-items:center;gap:12px;margin:40px 0 16px">
+            <i class="bi bi-people" style="font-size:1.3rem;color:var(--verde)"></i>
+            <h3 style="color:var(--verde);margin:0">Usuarios registrados ({{ usuarios|length }})</h3>
+        </div>
         <div class="admin-table-wrap">
             <table class="admin-table">
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Nombre</th>
-                        <th>Correo</th>
+                        <th><i class="bi bi-hash"></i></th>
+                        <th><i class="bi bi-person"></i> Nombre</th>
+                        <th><i class="bi bi-envelope"></i> Correo</th>
+                        <th><i class="bi bi-calendar"></i> Registro</th>
+                        <th><i class="bi bi-tools"></i> Acción</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for usuario in usuarios %}
                     <tr>
                         <td>{{ usuario.id }}</td>
-                        <td>{{ usuario.nombre }}</td>
+                        <td><strong>{{ usuario.nombre }}</strong></td>
                         <td>{{ usuario.email }}</td>
+                        <td>{{ usuario.created_at[:10] if usuario.created_at else '-' }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('eliminar_usuario_admin', usuario_id=usuario.id) }}" style="display:inline;" onsubmit="return confirm('¿Eliminar este usuario?')">
+                                <button type="submit" class="btn-danger btn-sm" {% if usuario.email == 'admin@ecomarket.com' %}disabled{% endif %}>
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>

@@ -2,14 +2,43 @@
 {% block title %}EcoMarket - {{ producto.nombre }}{% endblock %}
 
 {% block content %}
+{% set imagen_principal = producto.imagen if producto.imagen.startswith('http') else url_for('static', filename=producto.imagen) %}
 <section class="section detalle-section">
+    <div class="container">
+        <!-- Breadcrumbs -->
+        <nav class="detalle-breadcrumbs" aria-label="breadcrumb">
+            <a href="{{ url_for('index') }}"><i class="bi bi-house"></i> Inicio</a>
+            <span class="breadcrumb-sep">›</span>
+            <a href="{{ url_for('productos_view') }}">Catálogo</a>
+            <span class="breadcrumb-sep">›</span>
+            <a href="{{ url_for('productos_view', categoria=producto.categoria) }}">{{ producto.categoria }}</a>
+            <span class="breadcrumb-sep">›</span>
+            <span class="breadcrumb-current">{{ producto.nombre[:40] }}{% if producto.nombre|length > 40 %}...{% endif %}</span>
+        </nav>
+    </div>
     <div class="container detalle-container">
-        <!-- Imagen -->
-        <div class="detalle-image">
-            <img src="{% if producto.imagen.startswith('http') %}{{ producto.imagen }}{% else %}{{ url_for('static', filename=producto.imagen) }}{% endif %}" alt="{{ producto.nombre }}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22%3E%3Crect fill=%22%23e8f5e9%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%22100%22 y=%22120%22 text-anchor=%22middle%22 font-size=%2260%22%3E📦%3C/text%3E%3C/svg%3E'">
+        <!-- GALERÍA DE IMÁGENES -->
+        <div class="detalle-gallery">
+            <div class="detalle-gallery-main">
+                <img id="mainImage" src="{{ imagen_principal }}" alt="{{ producto.nombre }}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22%3E%3Crect fill=%22%23e8f5e9%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%22100%22 y=%22120%22 text-anchor=%22middle%22 font-size=%2260%22%3E📦%3C/text%3E%3C/svg%3E'">
+            </div>
+            {% set total_imagenes = 1 + imagenes_extra|length %}
+            {% if total_imagenes > 1 %}
+            <div class="detalle-gallery-thumbs">
+                <button class="gallery-thumb active" onclick="cambiarImagen(this, '{{ imagen_principal }}')">
+                    <img src="{{ imagen_principal }}" alt="Vista principal">
+                </button>
+                {% for img in imagenes_extra %}
+                {% set img_url = img.imagen if img.imagen.startswith('http') else url_for('static', filename=img.imagen) %}
+                <button class="gallery-thumb" onclick="cambiarImagen(this, '{{ img_url }}')">
+                    <img src="{{ img_url }}" alt="Vista {{ loop.index + 1 }}">
+                </button>
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
 
-        <!-- Info -->
+        <!-- INFO -->
         <div class="detalle-info">
             <span class="categoria">{{ producto.categoria }}</span>
             <h2>{{ producto.nombre }}</h2>
@@ -22,7 +51,7 @@
                     {% endfor %}
                 </div>
                 <strong style="font-size:1rem">{{ '%.1f'|format(producto.rating_promedio) }}</strong>
-                <span style="color:var(--texto-sec);font-size:0.85rem">({{ total_resenas }} reseñas)</span>
+                <span style="color:var(--texto-sec);font-size:0.85rem">({{ producto.total_resenas }} reseñas)</span>
                 <span style="color:var(--texto-sec);font-size:0.85rem">· 👁️ {{ producto.vistas }} vistas</span>
             </div>
 
@@ -44,6 +73,11 @@
                     {% if producto.condicion == 'nuevo' %}🆕 Nuevo{% else %}♻️ Usado{% endif %}
                 </span>
                 <span class="badge"><i class="bi bi-leaf"></i> Eco-friendly</span>
+                {% if producto.eco_score and producto.eco_score > 0 %}
+                <span class="eco-score-badge" title="Puntaje de sostenibilidad del producto">
+                    <i class="bi bi-star-fill"></i> Eco-score: {{ producto.eco_score }}/100
+                </span>
+                {% endif %}
             </div>
 
             <!-- Descripción -->
@@ -80,76 +114,145 @@
         </div>
     </div>
 
-    <!-- SECCIÓN RESEÑAS -->
+    <!-- PESTAÑAS DE INFORMACIÓN -->
     <div class="container" style="margin-top:48px">
-        <h3 style="font-size:1.4rem;color:var(--verde);margin-bottom:24px">⭐ Reseñas y valoraciones</h3>
+        <div class="detalle-tabs">
+            <button class="detalle-tab active" onclick="cambiarTab('descripcion', this)"><i class="bi bi-file-text"></i> Descripción</button>
+            <button class="detalle-tab" onclick="cambiarTab('especificaciones', this)"><i class="bi bi-list-check"></i> Especificaciones</button>
+            <button class="detalle-tab" onclick="cambiarTab('envio', this)"><i class="bi bi-truck"></i> Envío y devoluciones</button>
+            <button class="detalle-tab" onclick="cambiarTab('resenas', this)"><i class="bi bi-star"></i> Reseñas ({{ producto.total_resenas }})</button>
+        </div>
 
-        <div style="display:grid;grid-template-columns:280px 1fr;gap:28px;align-items:start">
-            <!-- Resumen de estrellas -->
-            <div style="background:var(--blanco);border-radius:20px;padding:24px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08);text-align:center">
-                <div style="font-size:3.5rem;font-weight:800;color:var(--verde)">{{ '%.1f'|format(producto.rating_promedio) }}</div>
-                <div style="display:flex;gap:2px;justify-content:center;font-size:1.3rem;color:#f59e0b;margin:8px 0">
-                    {% for i in range(5) %}
-                    <span>{% if i < (producto.rating_promedio|round) %}★{% else %}☆{% endif %}</span>
+        <!-- Tab: Descripción -->
+        <div class="detalle-tab-content active" id="tab-descripcion">
+            <div class="detalle-tab-panel">
+                <h3><i class="bi bi-info-circle"></i> Descripción del producto</h3>
+                <p>{{ producto.descripcion }}</p>
+                {% if producto.etiquetas %}
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+                    {% for tag in producto.etiquetas.split(',') %}
+                    <span class="badge" style="background:var(--verde-suave);color:var(--verde)">#{{ tag.strip() }}</span>
                     {% endfor %}
-                </div>
-                <div style="font-size:0.9rem;color:var(--texto-sec);margin-bottom:16px">{{ total_resenas }} reseña(s)</div>
-
-                {% for i in range(5,0,-1) %}
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:0.82rem">
-                    <span style="width:20px;text-align:right">{{ i }}</span>
-                    <div style="flex:1;height:8px;background:var(--verde-suave);border-radius:999px;overflow:hidden">
-                        {% set total = total_resenas if total_resenas > 0 else 1 %}
-                        {% set pct = (estrellas.get(i, 0) / total * 100) %}
-                        <div style="height:100%;width:{{ pct }}%;background:#f59e0b;border-radius:999px"></div>
-                    </div>
-                    <span style="width:24px;color:var(--texto-sec)">{{ estrellas.get(i, 0) }}</span>
-                </div>
-                {% endfor %}
-            </div>
-
-            <!-- Lista de reseñas -->
-            <div>
-                {% if session.get('usuario_id') %}
-                <div style="background:var(--blanco);border-radius:18px;padding:20px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08);margin-bottom:20px">
-                    <h4 style="margin-bottom:12px">✍️ Escribe una reseña</h4>
-                    <div style="display:flex;gap:4px;font-size:1.5rem;margin-bottom:12px" id="starSelector">
-                        {% for i in range(1,6) %}
-                        <span onclick="setRating({{ i }})" onmouseover="hoverStars({{ i }})" onmouseout="resetStars()" style="cursor:pointer;color:#ddd;transition:color 0.2s" data-star="{{ i }}">★</span>
-                        {% endfor %}
-                    </div>
-                    <textarea id="reviewComment" placeholder="Comparte tu experiencia..." style="width:100%;padding:12px;border:1.5px solid rgba(46,125,50,0.18);border-radius:12px;font-family:inherit;font-size:0.88rem;resize:vertical;min-height:80px;outline:none;margin-bottom:12px"></textarea>
-                    <button onclick="enviarResena({{ producto.id }})" class="btn-principal" style="padding:10px 20px;font-size:0.88rem"><i class="bi bi-send"></i> Enviar reseña</button>
                 </div>
                 {% endif %}
+            </div>
+        </div>
 
-                <div style="display:flex;flex-direction:column;gap:14px">
-                    {% if resenas %}
-                    {% for r in resenas %}
-                    <div style="background:var(--blanco);border-radius:16px;padding:18px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
-                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-                            <div style="width:36px;height:36px;border-radius:50%;background:var(--verde);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem">{{ r.nombre_usuario[0] }}</div>
-                            <div>
-                                <strong style="font-size:0.88rem">{{ r.nombre_usuario }}</strong>
-                                <div style="display:flex;gap:2px;font-size:0.85rem;color:#f59e0b">
-                                    {% for i in range(5) %}
-                                    <span>{% if i < r.rating %}★{% else %}☆{% endif %}</span>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                            <span style="margin-left:auto;font-size:0.72rem;color:var(--texto-sec)">{{ r.created_at[:10] }}</span>
-                        </div>
-                        {% if r.comentario %}
-                        <p style="font-size:0.85rem;color:var(--texto-sec);line-height:1.7">{{ r.comentario }}</p>
-                        {% endif %}
-                    </div>
+        <!-- Tab: Especificaciones -->
+        <div class="detalle-tab-content" id="tab-especificaciones">
+            <div class="detalle-tab-panel">
+                <h3><i class="bi bi-list-check"></i> Especificaciones técnicas</h3>
+                {% if especificaciones %}
+                <table class="spec-table">
+                    {% for clave, valor in especificaciones.items() %}
+                    <tr>
+                        <td><strong>{{ clave }}</strong></td>
+                        <td>{{ valor }}</td>
+                    </tr>
                     {% endfor %}
-                    {% else %}
-                    <div style="text-align:center;padding:40px 20px;color:var(--texto-sec)">
-                        <i class="bi bi-star" style="font-size:2.5rem;display:block;margin-bottom:12px;opacity:0.3"></i>
-                        <p>No hay reseñas aún. ¡Sé el primero en opinar!</p>
+                </table>
+                {% else %}
+                <p style="color:var(--texto-sec)">No hay especificaciones detalladas para este producto.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Tab: Envío -->
+        <div class="detalle-tab-content" id="tab-envio">
+            <div class="detalle-tab-panel">
+                <h3><i class="bi bi-truck"></i> Envío y devoluciones</h3>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:16px">
+                    <div class="envio-card">
+                        <i class="bi bi-lightning-charge" style="font-size:1.8rem;color:var(--verde)"></i>
+                        <strong>Envío rápido</strong>
+                        <p>Entrega en 2-4 días hábiles en Lima Metropolitana.</p>
                     </div>
-                    {% endif %}
+                    <div class="envio-card">
+                        <i class="bi bi-globe-americas" style="font-size:1.8rem;color:var(--verde)"></i>
+                        <strong>En todo el Perú</strong>
+                        <p>Envíos a nivel nacional con empresas de confianza.</p>
+                    </div>
+                    <div class="envio-card">
+                        <i class="bi bi-arrow-repeat" style="font-size:1.8rem;color:var(--verde)"></i>
+                        <strong>Devoluciones gratis</strong>
+                        <p>30 días para devolver tu producto sin costo.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Reseñas -->
+        <div class="detalle-tab-content" id="tab-resenas">
+            <div class="detalle-tab-panel">
+                <h3><i class="bi bi-star"></i> Reseñas y valoraciones</h3>
+                <div style="display:grid;grid-template-columns:280px 1fr;gap:28px;align-items:start;margin-top:20px">
+                    <!-- Resumen de estrellas -->
+                    <div style="background:var(--blanco);border-radius:20px;padding:24px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08);text-align:center">
+                        <div style="font-size:3.5rem;font-weight:800;color:var(--verde)">{{ '%.1f'|format(producto.rating_promedio) }}</div>
+                        <div style="display:flex;gap:2px;justify-content:center;font-size:1.3rem;color:#f59e0b;margin:8px 0">
+                            {% for i in range(5) %}
+                            <span>{% if i < (producto.rating_promedio|round) %}★{% else %}☆{% endif %}</span>
+                            {% endfor %}
+                        </div>
+                        <div style="font-size:0.9rem;color:var(--texto-sec);margin-bottom:16px">{{ producto.total_resenas }} reseña(s)</div>
+
+                        {% for i in range(5,0,-1) %}
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:0.82rem">
+                            <span style="width:20px;text-align:right">{{ i }}</span>
+                            <div style="flex:1;height:8px;background:var(--verde-suave);border-radius:999px;overflow:hidden">
+                                {% set total = producto.total_resenas if producto.total_resenas > 0 else 1 %}
+                                {% set pct = (estrellas.get(i, 0) / total * 100) %}
+                                <div style="height:100%;width:{{ pct }}%;background:#f59e0b;border-radius:999px"></div>
+                            </div>
+                            <span style="width:24px;color:var(--texto-sec)">{{ estrellas.get(i, 0) }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Lista de reseñas -->
+                    <div>
+                        {% if session.get('usuario_id') %}
+                        <div style="background:var(--blanco);border-radius:18px;padding:20px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08);margin-bottom:20px">
+                            <h4 style="margin-bottom:12px">✍️ Escribe una reseña</h4>
+                            <div style="display:flex;gap:4px;font-size:1.5rem;margin-bottom:12px" id="starSelector">
+                                {% for i in range(1,6) %}
+                                <span onclick="setRating({{ i }})" onmouseover="hoverStars({{ i }})" onmouseout="resetStars()" style="cursor:pointer;color:#ddd;transition:color 0.2s" data-star="{{ i }}">★</span>
+                                {% endfor %}
+                            </div>
+                            <textarea id="reviewComment" placeholder="Comparte tu experiencia..." style="width:100%;padding:12px;border:1.5px solid rgba(46,125,50,0.18);border-radius:12px;font-family:inherit;font-size:0.88rem;resize:vertical;min-height:80px;outline:none;margin-bottom:12px"></textarea>
+                            <button onclick="enviarResena({{ producto.id }})" class="btn-principal" style="padding:10px 20px;font-size:0.88rem"><i class="bi bi-send"></i> Enviar reseña</button>
+                        </div>
+                        {% endif %}
+
+                        <div style="display:flex;flex-direction:column;gap:14px">
+                            {% if resenas %}
+                            {% for r in resenas %}
+                            <div style="background:var(--blanco);border-radius:16px;padding:18px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
+                                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+                                    <div style="width:36px;height:36px;border-radius:50%;background:var(--verde);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem">{{ r.nombre_usuario[0] }}</div>
+                                    <div>
+                                        <strong style="font-size:0.88rem">{{ r.nombre_usuario }}</strong>
+                                        <div style="display:flex;gap:2px;font-size:0.85rem;color:#f59e0b">
+                                            {% for i in range(5) %}
+                                            <span>{% if i < r.rating %}★{% else %}☆{% endif %}</span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <span style="margin-left:auto;font-size:0.72rem;color:var(--texto-sec)">{{ r.created_at[:10] }}</span>
+                                </div>
+                                {% if r.comentario %}
+                                <p style="font-size:0.85rem;color:var(--texto-sec);line-height:1.7">{{ r.comentario }}</p>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                            {% else %}
+                            <div style="text-align:center;padding:40px 20px;color:var(--texto-sec)">
+                                <i class="bi bi-star" style="font-size:2.5rem;display:block;margin-bottom:12px;opacity:0.3"></i>
+                                <p>No hay reseñas aún. ¡Sé el primero en opinar!</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -190,6 +293,22 @@
 <script>
 let selectedRating = 5;
 
+// ── Galería de imágenes ──────────────────────────
+function cambiarImagen(btn, src) {
+    document.getElementById('mainImage').src = src;
+    document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+}
+
+// ── Pestañas ─────────────────────────────────────
+function cambiarTab(tabId, btn) {
+    document.querySelectorAll('.detalle-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.detalle-tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + tabId).classList.add('active');
+}
+
+// ── Reseñas ──────────────────────────────────────
 function setRating(val) {
     selectedRating = val;
     document.querySelectorAll('#starSelector span').forEach((s, i) => {

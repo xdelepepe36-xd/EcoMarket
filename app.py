@@ -9,11 +9,27 @@ import json
 from functools import wraps
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
+import hashlib
+import secrets
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'eco_secret_2026')
+app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 DB_PATH = os.environ.get('DATABASE_URL', os.path.join(os.path.dirname(__file__), 'data', 'ecomarket.db'))
+
+
+# ── Filtros Jinja2 personalizados ────────────────────────────────────────────
+
+@app.template_filter('fromjson')
+def fromjson_filter(value):
+    """Convierte una cadena JSON a un objeto Python."""
+    if not value:
+        return {}
+    try:
+        return json.loads(value)
+    except (json.JSONDecodeError, TypeError):
+        return {}
 
 # Configuración de subida de imágenes
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
@@ -21,6 +37,18 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'}
 MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5MB
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
+ITEMS_PER_PAGE = 12
+
+# Imágenes por defecto para productos (Unsplash)
+PRODUCT_IMAGES = {
+    'Hogar': 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=300&fit=crop',
+    'Accesorios': 'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=400&h=300&fit=crop',
+    'Higiene': 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&h=300&fit=crop',
+    'Jardín': 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=300&fit=crop',
+    'Alimentación': 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&h=300&fit=crop',
+    'Ropa': 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=300&fit=crop',
+    'default': 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&h=300&fit=crop'
+}
 
 # Asegurar que la carpeta de uploads existe
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -30,12 +58,18 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+def get_product_image(categoria):
+    return PRODUCT_IMAGES.get(categoria, PRODUCT_IMAGES['default'])
+
+
 # ── DB ──────────────────────────────────────────────────────────────────────
 
 def get_db():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA cache_size=-8000")
     return conn
 
 
@@ -49,26 +83,44 @@ def init_db():
             password TEXT NOT NULL,
             avatar TEXT DEFAULT '',
             avatar_color TEXT DEFAULT '#2e7d32',
+            banner TEXT DEFAULT '',
             bio TEXT DEFAULT '',
+            rol TEXT DEFAULT 'comprador',
+            xp INTEGER DEFAULT 0,
+            nivel INTEGER DEFAULT 1,
+            rango TEXT DEFAULT 'Semilla 🌱',
+            eco_puntos INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         
-        CREATE TABLE IF NOT EXISTS productos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nombre TEXT NOT NULL,
-            categoria TEXT NOT NULL,
-            precio REAL NOT NULL,
-            precio_original REAL,
-            descripcion TEXT NOT NULL,
-            imagen TEXT DEFAULT 'uploads/placeholder.svg',
-            stock INTEGER DEFAULT 10,
-            condicion TEXT DEFAULT 'nuevo',
-            etiquetas TEXT DEFAULT '',
-            usuario_id INTEGER,
-            vistas INTEGER DEFAULT 0,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
-        );
+         CREATE TABLE IF NOT EXISTS productos (
+             id INTEGER PRIMARY KEY AUTOINCREMENT,
+             nombre TEXT NOT NULL,
+             categoria TEXT NOT NULL,
+             precio REAL NOT NULL,
+             precio_original REAL,
+             descripcion TEXT NOT NULL,
+             imagen TEXT DEFAULT '',
+             stock INTEGER DEFAULT 10,
+             condicion TEXT DEFAULT 'nuevo',
+             etiquetas TEXT DEFAULT '',
+             eco_score INTEGER DEFAULT 0,
+             especificaciones TEXT DEFAULT '',
+             usuario_id INTEGER,
+             vistas INTEGER DEFAULT 0,
+             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+             FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
+         );
+         
+         CREATE TABLE IF NOT EXISTS producto_imagenes (
+             id INTEGER PRIMARY KEY AUTOINCREMENT,
+             producto_id INTEGER NOT NULL,
+             imagen TEXT NOT NULL,
+             titulo TEXT DEFAULT '',
+             orden INTEGER DEFAULT 0,
+             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+             FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE CASCADE
+         );
         
         CREATE TABLE IF NOT EXISTS favoritos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -100,6 +152,7 @@ def init_db():
             direccion TEXT NOT NULL,
             total REAL NOT NULL,
             estado TEXT DEFAULT 'confirmado',
+            metodo_pago TEXT DEFAULT '',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
         );
@@ -132,6 +185,55 @@ def init_db():
             ip TEXT DEFAULT '',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
+        
+        CREATE TABLE IF NOT EXISTS seguidores (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            seguidor_id INTEGER NOT NULL,
+            seguido_id INTEGER NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(seguidor_id, seguido_id),
+            FOREIGN KEY (seguidor_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+            FOREIGN KEY (seguido_id) REFERENCES usuarios(id) ON DELETE CASCADE
+        );
+        
+        CREATE TABLE IF NOT EXISTS logros (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            usuario_id INTEGER NOT NULL,
+            logro_id TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(usuario_id, logro_id),
+            FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+        );
+        
+        CREATE TABLE IF NOT EXISTS insignias (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            usuario_id INTEGER NOT NULL,
+            insignia_id TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(usuario_id, insignia_id),
+            FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+        );
+        
+        CREATE TABLE IF NOT EXISTS historial_busquedas (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            usuario_id INTEGER,
+            termino TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+        );
+        
+        CREATE TABLE IF NOT EXISTS cupones (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            codigo TEXT UNIQUE NOT NULL,
+            descuento REAL NOT NULL,
+            tipo TEXT DEFAULT '%',
+            minimo REAL DEFAULT 0,
+            usos_maximos INTEGER DEFAULT 100,
+            usos_actuales INTEGER DEFAULT 0,
+            expira TIMESTAMP,
+            activo INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
     ''')
 
     # Seed productos si la tabla está vacía
@@ -142,14 +244,40 @@ def init_db():
                 try:
                     productos = json.load(f)
                     for p in productos:
+                        imagen = p.get('imagen', '')
+                        if not imagen or imagen == 'uploads/placeholder.svg':
+                            imagen = get_product_image(p.get('categoria', 'default'))
                         conn.execute(
                             'INSERT INTO productos (nombre, categoria, precio, precio_original, descripcion, imagen, stock, condicion, vistas) VALUES (?,?,?,?,?,?,?,?,?)',
                             (p['nombre'], p['categoria'], p['precio'], p.get('precio_original', p['precio']),
-                             p['descripcion'], p.get('imagen', 'uploads/placeholder.svg'),
+                             p['descripcion'], imagen,
                              p.get('stock', 10), p.get('condicion', 'nuevo'), p.get('vistas', 0))
                         )
                 except json.JSONDecodeError:
                     pass
+
+    # Seed cupones si la tabla está vacía
+    if conn.execute('SELECT COUNT(*) FROM cupones').fetchone()[0] == 0:
+        cupones = [
+            ('ECO10', 10, '%', 30, 100, '2026-12-31'),
+            ('ECO20', 20, '%', 80, 100, '2026-12-31'),
+            ('ENVIOFREE', 100, 'shipping', 0, 100, '2026-12-31'),
+            ('BIENVENIDO', 15, 'fixed', 0, 200, '2026-12-31'),
+        ]
+        for c in cupones:
+            conn.execute(
+                'INSERT INTO cupones (codigo, descuento, tipo, minimo, usos_maximos, expira) VALUES (?,?,?,?,?,?)',
+                c
+            )
+
+    # ── Migraciones para BD existentes ─────────────────────────
+    # Agregar columna especificaciones si no existe
+    try:
+        conn.execute('ALTER TABLE productos ADD COLUMN especificaciones TEXT DEFAULT ""')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass  # La columna ya existe
+
     conn.commit()
     conn.close()
 
@@ -171,8 +299,8 @@ def login_required(f):
 def admin_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        if session.get('email') != 'admin@ecomarket.com':
-            flash('Acceso restringido.', 'danger')
+        if session.get('rol') != 'admin':
+            flash('Acceso restringido. Se requieren permisos de administrador.', 'danger')
             return redirect(url_for('index'))
         return f(*args, **kwargs)
     return decorated
@@ -225,6 +353,16 @@ def get_producto_detalle(producto_id):
             ORDER BY RANDOM() LIMIT 4
         ''', (producto['categoria'], producto_id)).fetchall()
 
+        similares = conn.execute('''
+            SELECT p.*, COALESCE(AVG(r.rating), 0) as rating_promedio,
+                COUNT(DISTINCT r.id) as total_resenas
+            FROM productos p
+            LEFT JOIN resenas r ON p.id = r.producto_id
+            WHERE p.id != ? AND p.precio BETWEEN ? * 0.7 AND ? * 1.3
+            GROUP BY p.id
+            ORDER BY RANDOM() LIMIT 4
+        ''', (producto_id, producto['precio'], producto['precio'])).fetchall()
+
         resenas = conn.execute('''
             SELECT r.*, COALESCE(u.nombre, r.nombre) as nombre_usuario
             FROM resenas r
@@ -241,12 +379,29 @@ def get_producto_detalle(producto_id):
             ).fetchone()[0]
             estrellas[i] = count
 
+        # Imágenes adicionales del producto (galería)
+        imagenes_extra = conn.execute(
+            'SELECT * FROM producto_imagenes WHERE producto_id = ? ORDER BY orden ASC, id ASC',
+            (producto_id,)
+        ).fetchall()
+
+        # Especificaciones del producto (JSON)
+        especificaciones = {}
+        if producto['especificaciones']:
+            try:
+                especificaciones = json.loads(producto['especificaciones'])
+            except (json.JSONDecodeError, TypeError):
+                especificaciones = {}
+
         conn.close()
         return {
             'producto': producto,
             'relacionados': relacionados,
+            'similares': similares,
             'resenas': resenas,
-            'estrellas': estrellas
+            'estrellas': estrellas,
+            'imagenes_extra': imagenes_extra,
+            'especificaciones': especificaciones
         }
     conn.close()
     return None
@@ -283,6 +438,19 @@ def registrar_visita(pagina):
         pass
 
 
+def add_xp(usuario_id, cantidad):
+    conn = get_db()
+    conn.execute('UPDATE usuarios SET xp = xp + ? WHERE id = ?', (cantidad, usuario_id))
+    usuario = conn.execute('SELECT xp, nivel, rango FROM usuarios WHERE id = ?', (usuario_id,)).fetchone()
+    if usuario:
+        xp = usuario['xp']
+        nuevo_nivel = min(50, 1 + xp // 100)
+        if nuevo_nivel > usuario['nivel']:
+            conn.execute('UPDATE usuarios SET nivel = ? WHERE id = ?', (nuevo_nivel, usuario_id))
+    conn.commit()
+    conn.close()
+
+
 # ── Rutas principales ────────────────────────────────────────────────────────
 
 @app.route('/')
@@ -302,6 +470,7 @@ def productos_view():
     precio_min = request.args.get('precio_min', '')
     precio_max = request.args.get('precio_max', '')
     busqueda = request.args.get('q', '')
+    pagina = int(request.args.get('pagina', 1))
 
     query = '''
         SELECT p.*, u.nombre as vendedor_nombre,
@@ -312,22 +481,38 @@ def productos_view():
         LEFT JOIN resenas r ON p.id = r.producto_id
         WHERE 1=1
     '''
+    count_query = 'SELECT COUNT(*) FROM (SELECT p.id FROM productos p WHERE 1=1'
     params = []
+    count_params = []
 
     if categoria and categoria != 'Todas':
         query += ' AND p.categoria = ?'
+        count_query += ' AND p.categoria = ?'
         params.append(categoria)
+        count_params.append(categoria)
     if busqueda:
         query += ' AND (p.nombre LIKE ? OR p.descripcion LIKE ?)'
+        count_query += ' AND (p.nombre LIKE ? OR p.descripcion LIKE ?)'
         params.extend([f'%{busqueda}%', f'%{busqueda}%'])
+        count_params.extend([f'%{busqueda}%', f'%{busqueda}%'])
     if precio_min:
         query += ' AND p.precio >= ?'
+        count_query += ' AND p.precio >= ?'
         params.append(float(precio_min))
+        count_params.append(float(precio_min))
     if precio_max:
         query += ' AND p.precio <= ?'
+        count_query += ' AND p.precio <= ?'
         params.append(float(precio_max))
+        count_params.append(float(precio_max))
 
     query += ' GROUP BY p.id'
+    count_query += ')'
+
+    total_productos = conn.execute(count_query, count_params).fetchone()[0]
+    total_paginas = max(1, (total_productos + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE)
+    pagina = max(1, min(pagina, total_paginas))
+    offset = (pagina - 1) * ITEMS_PER_PAGE
 
     ordenes = {
         'nuevos': 'ORDER BY p.created_at DESC',
@@ -337,6 +522,7 @@ def productos_view():
         'mejor_valorados': 'ORDER BY rating_promedio DESC'
     }
     query += ' ' + ordenes.get(orden, 'ORDER BY p.created_at DESC')
+    query += f' LIMIT {ITEMS_PER_PAGE} OFFSET {offset}'
 
     productos = conn.execute(query, params).fetchall()
     categorias = [r['categoria'] for r in
@@ -346,10 +532,12 @@ def productos_view():
     return render_template('productos.html',
                            productos=productos,
                            categorias=categorias,
-                           total_productos=len(productos),
+                           total_productos=total_productos,
                            categoria_sel=categoria,
                            orden_sel=orden,
-                           busqueda=busqueda)
+                           busqueda=busqueda,
+                           pagina=pagina,
+                           total_paginas=total_paginas)
 
 
 @app.route('/producto/<int:producto_id>')
@@ -395,6 +583,7 @@ def toggle_favorito_api(producto_id):
                  (session['usuario_id'], producto_id))
     conn.commit()
     conn.close()
+    add_xp(session['usuario_id'], 5)
     return jsonify({'favorito': True})
 
 
@@ -427,6 +616,7 @@ def agregar_resena_api(producto_id):
             'success'
         )
     conn.close()
+    add_xp(session['usuario_id'], 10)
     return jsonify({'success': True})
 
 
@@ -485,6 +675,7 @@ def checkout():
         email = data.get('email', '').strip()
         direccion = data.get('direccion', '').strip()
         items = data.get('items', [])
+        metodo_pago = data.get('metodo_pago', '')
 
         if not all([nombre, email, direccion]):
             return jsonify({'error': 'Completa todos los campos'}), 400
@@ -493,8 +684,8 @@ def checkout():
 
         conn = get_db()
         cursor = conn.execute(
-            'INSERT INTO pedidos (usuario_id, nombre, email, direccion, total) VALUES (?,?,?,?,?)',
-            (session['usuario_id'], nombre, email, direccion, total)
+            'INSERT INTO pedidos (usuario_id, nombre, email, direccion, total, metodo_pago) VALUES (?,?,?,?,?,?)',
+            (session['usuario_id'], nombre, email, direccion, total, metodo_pago)
         )
         pedido_id = cursor.lastrowid
 
@@ -509,6 +700,7 @@ def checkout():
 
         add_notificacion(session['usuario_id'], '📦 Pedido confirmado',
                          f'Tu pedido #{pedido_id} por S/.{total:.2f} ha sido confirmado.', 'success')
+        add_xp(session['usuario_id'], 25)
 
         return jsonify({'success': True, 'pedido_id': pedido_id})
 
@@ -537,9 +729,10 @@ def publicar():
         descripcion = request.form.get('descripcion', '').strip()
         stock = request.form.get('stock', '10').strip()
         condicion = request.form.get('condicion', 'nuevo').strip()
-        imagen = 'uploads/placeholder.svg'
+        especificaciones_raw = request.form.get('especificaciones', '').strip()
+        imagen = get_product_image(categoria)
 
-        # Subir imagen si se proporcionó
+        # Subir imagen principal si se proporcionó
         if 'imagen' in request.files:
             file = request.files['imagen']
             if file and file.filename and allowed_file(file.filename):
@@ -559,16 +752,45 @@ def publicar():
             flash('Precio o stock inválido.', 'danger')
             return redirect(url_for('publicar'))
 
+        # Procesar especificaciones (formato: "clave: valor" por línea)
+        especificaciones_json = ''
+        if especificaciones_raw:
+            specs = {}
+            for linea in especificaciones_raw.split('\n'):
+                if ':' in linea:
+                    clave, valor = linea.split(':', 1)
+                    specs[clave.strip()] = valor.strip()
+            if specs:
+                especificaciones_json = json.dumps(specs, ensure_ascii=False)
+
         conn = get_db()
-        conn.execute(
-            'INSERT INTO productos (nombre, categoria, precio, descripcion, imagen, stock, condicion, usuario_id) VALUES (?,?,?,?,?,?,?,?)',
-            (nombre, categoria, precio_valor, descripcion, imagen, stock_valor, condicion, session['usuario_id'])
+        cursor = conn.execute(
+            'INSERT INTO productos (nombre, categoria, precio, descripcion, imagen, stock, condicion, especificaciones, usuario_id) VALUES (?,?,?,?,?,?,?,?,?)',
+            (nombre, categoria, precio_valor, descripcion, imagen, stock_valor, condicion, especificaciones_json, session['usuario_id'])
         )
+        producto_id = cursor.lastrowid
+
+        # Subir imágenes adicionales (galería)
+        if 'imagenes_extra' in request.files:
+            files = request.files.getlist('imagenes_extra')
+            orden = 0
+            for file in files:
+                if file and file.filename and allowed_file(file.filename):
+                    ext = file.filename.rsplit('.', 1)[1].lower()
+                    filename = f"{uuid.uuid4().hex}.{ext}"
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    conn.execute(
+                        'INSERT INTO producto_imagenes (producto_id, imagen, titulo, orden) VALUES (?,?,?,?)',
+                        (producto_id, f'uploads/{filename}', '', orden)
+                    )
+                    orden += 1
+
         conn.commit()
         conn.close()
 
+        add_xp(session['usuario_id'], 15)
         flash('¡Producto publicado con éxito!', 'success')
-        return redirect(url_for('productos_view'))
+        return redirect(url_for('producto_detalle', producto_id=producto_id))
 
     return render_template('publicar.html', categorias=categorias)
 
@@ -595,11 +817,23 @@ def editar_producto(producto_id):
         precio = request.form.get('precio', '').strip()
         descripcion = request.form.get('descripcion', '').strip()
         stock = request.form.get('stock', '10').strip()
+        especificaciones_raw = request.form.get('especificaciones', '').strip()
+
+        # Procesar especificaciones
+        especificaciones_json = ''
+        if especificaciones_raw:
+            specs = {}
+            for linea in especificaciones_raw.split('\n'):
+                if ':' in linea:
+                    clave, valor = linea.split(':', 1)
+                    specs[clave.strip()] = valor.strip()
+            if specs:
+                especificaciones_json = json.dumps(specs, ensure_ascii=False)
 
         if all([nombre, categoria, precio, descripcion]):
             conn.execute(
-                'UPDATE productos SET nombre=?, categoria=?, precio=?, descripcion=?, stock=? WHERE id=?',
-                (nombre, categoria, float(precio), descripcion, int(stock), producto_id)
+                'UPDATE productos SET nombre=?, categoria=?, precio=?, descripcion=?, stock=?, especificaciones=? WHERE id=?',
+                (nombre, categoria, float(precio), descripcion, int(stock), especificaciones_json, producto_id)
             )
             conn.commit()
             flash('Producto actualizado.', 'success')
@@ -665,34 +899,39 @@ def api_dashboard():
     conn = get_db()
     user_id = session['usuario_id']
 
-    # Mis productos
     mis_productos = conn.execute(
         'SELECT COUNT(*) FROM productos WHERE usuario_id = ?',
         (user_id,)
     ).fetchone()[0]
 
-    # Mis ventas
     mis_ventas = conn.execute('''
         SELECT COUNT(*) FROM pedido_items pi
         JOIN productos p ON pi.producto_id = p.id
         WHERE p.usuario_id = ?
     ''', (user_id,)).fetchone()[0]
 
-    # Ingresos totales
     ingresos = conn.execute('''
         SELECT COALESCE(SUM(pi.precio * pi.cantidad), 0) FROM pedido_items pi
         JOIN productos p ON pi.producto_id = p.id
         WHERE p.usuario_id = ?
     ''', (user_id,)).fetchone()[0]
 
-    # Reseñas recibidas
     resenas = conn.execute('''
         SELECT COUNT(*) FROM resenas r
         JOIN productos p ON r.producto_id = p.id
         WHERE p.usuario_id = ?
     ''', (user_id,)).fetchone()[0]
 
-    # Ventas por mes (últimos 6)
+    seguidores = conn.execute(
+        'SELECT COUNT(*) FROM seguidores WHERE seguido_id = ?',
+        (user_id,)
+    ).fetchone()[0]
+
+    siguiendo = conn.execute(
+        'SELECT COUNT(*) FROM seguidores WHERE seguidor_id = ?',
+        (user_id,)
+    ).fetchone()[0]
+
     ventas_mes = []
     for i in range(5, -1, -1):
         mes = (datetime.now() - timedelta(days=30 * i)).strftime('%Y-%m')
@@ -709,6 +948,8 @@ def api_dashboard():
         'mis_ventas': mis_ventas,
         'ingresos': ingresos,
         'resenas': resenas,
+        'seguidores': seguidores,
+        'siguiendo': siguiendo,
         'ventas_mes': ventas_mes
     })
 
@@ -726,12 +967,10 @@ def api_admin_dashboard():
     total_visitas = conn.execute('SELECT COUNT(*) FROM visitas').fetchone()[0]
     total_resenas = conn.execute('SELECT COUNT(*) FROM resenas').fetchone()[0]
 
-    # Productos por categoría
     categorias = conn.execute(
         'SELECT categoria, COUNT(*) as count FROM productos GROUP BY categoria ORDER BY count DESC'
     ).fetchall()
 
-    # Visitas por día (últimos 7)
     visitas_dia = []
     for i in range(6, -1, -1):
         dia = (datetime.now() - timedelta(days=i)).strftime('%Y-%m-%d')
@@ -755,6 +994,110 @@ def api_admin_dashboard():
     })
 
 
+# ── API Cupones ──────────────────────────────────────────────────────────────
+
+@app.route('/api/cupon/validar', methods=['POST'])
+@login_required
+def validar_cupon():
+    data = request.get_json()
+    codigo = data.get('codigo', '').strip().upper()
+    total = float(data.get('total', 0))
+
+    conn = get_db()
+    cupon = conn.execute(
+        'SELECT * FROM cupones WHERE codigo = ? AND activo = 1 AND usos_actuales < usos_maximos',
+        (codigo,)
+    ).fetchone()
+
+    if not cupon:
+        conn.close()
+        return jsonify({'valido': False, 'error': 'Cupón inválido o expirado'})
+
+    if cupon['expira']:
+        expira = datetime.strptime(cupon['expira'], '%Y-%m-%d')
+        if expira < datetime.now():
+            conn.close()
+            return jsonify({'valido': False, 'error': 'Cupón expirado'})
+
+    if total < cupon['minimo']:
+        conn.close()
+        return jsonify({'valido': False, 'error': f'Mínimo S/.{cupon["minimo"]:.2f}'})
+
+    descuento = 0
+    if cupon['tipo'] == '%':
+        descuento = total * cupon['descuento'] / 100
+    elif cupon['tipo'] == 'fixed':
+        descuento = cupon['descuento']
+    elif cupon['tipo'] == 'shipping':
+        descuento = cupon['descuento']
+
+    conn.close()
+    return jsonify({
+        'valido': True,
+        'descuento': round(descuento, 2),
+        'total_final': round(total - descuento, 2),
+        'codigo': cupon['codigo'],
+        'label': cupon['codigo']
+    })
+
+
+# ── API Búsqueda ─────────────────────────────────────────────────────────────
+
+@app.route('/api/buscar')
+def api_buscar():
+    q = request.args.get('q', '').strip()
+    if not q:
+        return jsonify([])
+
+    conn = get_db()
+    resultados = conn.execute('''
+        SELECT id, nombre, precio, imagen, categoria
+        FROM productos
+        WHERE nombre LIKE ? OR descripcion LIKE ?
+        LIMIT 10
+    ''', (f'%{q}%', f'%{q}%')).fetchall()
+
+    if 'usuario_id' in session:
+        conn.execute(
+            'INSERT INTO historial_busquedas (usuario_id, termino) VALUES (?,?)',
+            (session['usuario_id'], q)
+        )
+        conn.commit()
+
+    conn.close()
+    return jsonify([dict(r) for r in resultados])
+
+
+# ── API Seguidores ───────────────────────────────────────────────────────────
+
+@app.route('/api/usuario/<int:usuario_id>/seguir', methods=['POST'])
+@login_required
+def seguir_usuario(usuario_id):
+    if usuario_id == session['usuario_id']:
+        return jsonify({'error': 'No puedes seguirte a ti mismo'}), 400
+
+    conn = get_db()
+    existe = conn.execute(
+        'SELECT id FROM seguidores WHERE seguidor_id = ? AND seguido_id = ?',
+        (session['usuario_id'], usuario_id)
+    ).fetchone()
+
+    if existe:
+        conn.execute('DELETE FROM seguidores WHERE id = ?', (existe['id'],))
+        conn.commit()
+        conn.close()
+        return jsonify({'siguiendo': False})
+
+    conn.execute(
+        'INSERT INTO seguidores (seguidor_id, seguido_id) VALUES (?,?)',
+        (session['usuario_id'], usuario_id)
+    )
+    conn.commit()
+    conn.close()
+    add_xp(session['usuario_id'], 5)
+    return jsonify({'siguiendo': True})
+
+
 # ── Auth ─────────────────────────────────────────────────────────────────────
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -765,13 +1108,13 @@ def login():
         email = request.form.get('email', '').strip()
         password = request.form.get('password', '').strip()
         conn = get_db()
-        usuario = conn.execute('SELECT * FROM usuarios WHERE email = ? AND password = ?',
-                               (email, password)).fetchone()
+        usuario = conn.execute('SELECT * FROM usuarios WHERE email = ?', (email,)).fetchone()
         conn.close()
-        if usuario:
+        if usuario and check_password_hash(usuario['password'], password):
             session['usuario_id'] = usuario['id']
             session['nombre'] = usuario['nombre']
             session['email'] = usuario['email']
+            session['rol'] = usuario['rol']
             flash(f'¡Bienvenido, {usuario["nombre"]}!', 'success')
             return redirect(url_for('index'))
         flash('Correo o contraseña incorrectos.', 'danger')
@@ -805,8 +1148,9 @@ def registro():
             conn.close()
             return redirect(url_for('registro'))
 
+        hashed_password = generate_password_hash(password)
         conn.execute('INSERT INTO usuarios (nombre, email, password) VALUES (?,?,?)',
-                     (nombre, email, password))
+                     (nombre, email, hashed_password))
         conn.commit()
         usuario = conn.execute('SELECT * FROM usuarios WHERE email = ?', (email,)).fetchone()
         conn.close()
@@ -830,6 +1174,8 @@ def logout():
 @login_required
 def perfil():
     conn = get_db()
+
+    usuario = conn.execute('SELECT * FROM usuarios WHERE id = ?', (session['usuario_id'],)).fetchone()
 
     mis_productos = conn.execute('''
         SELECT p.*,
@@ -869,6 +1215,22 @@ def perfil():
         (session['usuario_id'],)
     ).fetchall()
 
+    seguidores = conn.execute(
+        'SELECT COUNT(*) FROM seguidores WHERE seguido_id = ?',
+        (session['usuario_id'],)
+    ).fetchone()[0]
+
+    siguiendo = conn.execute(
+        'SELECT COUNT(*) FROM seguidores WHERE seguidor_id = ?',
+        (session['usuario_id'],)
+    ).fetchone()[0]
+
+    logros = conn.execute(
+        'SELECT logro_id FROM logros WHERE usuario_id = ?',
+        (session['usuario_id'],)
+    ).fetchall()
+    logros_lista = [l['logro_id'] for l in logros]
+
     total_publicaciones = len(mis_productos)
     total_favoritos = len(favoritos)
     total_resenas_recibidas = conn.execute(
@@ -884,16 +1246,72 @@ def perfil():
     conn.close()
 
     return render_template('perfil.html',
+                           usuario=usuario,
                            mis_productos=mis_productos,
                            favoritos=favoritos,
                            resenas=resenas,
                            pedidos=pedidos,
                            notificaciones=notificaciones,
+                           seguidores=seguidores,
+                           siguiendo=siguiendo,
+                           logros=logros_lista,
                            total_publicaciones=total_publicaciones,
                            total_favoritos=total_favoritos,
                            total_resenas_recibidas=total_resenas_recibidas,
                            total_ventas=total_ventas,
                            valor_total=valor_total)
+
+
+@app.route('/perfil/actualizar', methods=['POST'])
+@login_required
+def actualizar_perfil():
+    nombre = request.form.get('nombre', '').strip()
+    bio = request.form.get('bio', '').strip()
+
+    conn = get_db()
+    if nombre:
+        conn.execute('UPDATE usuarios SET nombre = ?, bio = ? WHERE id = ?',
+                     (nombre, bio, session['usuario_id']))
+        session['nombre'] = nombre
+        conn.commit()
+        flash('Perfil actualizado.', 'success')
+    conn.close()
+    return redirect(url_for('perfil'))
+
+
+@app.route('/perfil/cambiar_password', methods=['POST'])
+@login_required
+def cambiar_password():
+    actual = request.form.get('password_actual', '')
+    nueva = request.form.get('password_nueva', '')
+    confirmar = request.form.get('password_confirmar', '')
+
+    if not all([actual, nueva, confirmar]):
+        flash('Completa todos los campos.', 'danger')
+        return redirect(url_for('perfil'))
+
+    if nueva != confirmar:
+        flash('Las contraseñas no coinciden.', 'danger')
+        return redirect(url_for('perfil'))
+
+    if len(nueva) < 6:
+        flash('La contraseña debe tener al menos 6 caracteres.', 'danger')
+        return redirect(url_for('perfil'))
+
+    conn = get_db()
+    usuario = conn.execute('SELECT * FROM usuarios WHERE id = ?', (session['usuario_id'],)).fetchone()
+    if not usuario or not check_password_hash(usuario['password'], actual):
+        flash('Contraseña actual incorrecta.', 'danger')
+        conn.close()
+        return redirect(url_for('perfil'))
+
+    hashed_password = generate_password_hash(nueva)
+    conn.execute('UPDATE usuarios SET password = ? WHERE id = ?',
+                 (hashed_password, session['usuario_id']))
+    conn.commit()
+    conn.close()
+    flash('Contraseña actualizada correctamente.', 'success')
+    return redirect(url_for('perfil'))
 
 
 @app.route('/notificaciones/leer/<int:notif_id>', methods=['POST'])
@@ -902,6 +1320,17 @@ def marcar_notificacion_leida(notif_id):
     conn = get_db()
     conn.execute('UPDATE notificaciones SET leida = 1 WHERE id = ? AND usuario_id = ?',
                  (notif_id, session['usuario_id']))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
+
+
+@app.route('/notificaciones/leer-todas', methods=['POST'])
+@login_required
+def marcar_todas_leidas():
+    conn = get_db()
+    conn.execute('UPDATE notificaciones SET leida = 1 WHERE usuario_id = ?',
+                 (session['usuario_id'],))
     conn.commit()
     conn.close()
     return jsonify({'success': True})
@@ -932,6 +1361,7 @@ def admin():
         'total_usuarios': conn.execute('SELECT COUNT(*) FROM usuarios').fetchone()[0],
         'total_resenas': conn.execute('SELECT COUNT(*) FROM resenas').fetchone()[0],
         'total_pedidos': conn.execute('SELECT COUNT(*) FROM pedidos').fetchone()[0],
+        'total_visitas': conn.execute('SELECT COUNT(*) FROM visitas').fetchone()[0],
     }
     conn.close()
     return render_template('admin.html', productos=productos, usuarios=usuarios, stats=stats)
@@ -949,8 +1379,65 @@ def eliminar_producto_admin(producto_id):
     return redirect(url_for('admin'))
 
 
+@app.route('/admin/usuario/<int:usuario_id>/eliminar', methods=['POST'])
+@login_required
+@admin_required
+def eliminar_usuario_admin(usuario_id):
+    conn = get_db()
+    conn.execute('DELETE FROM usuarios WHERE id = ? AND email != "admin@ecomarket.com"', (usuario_id,))
+    conn.commit()
+    conn.close()
+    flash('Usuario eliminado.', 'success')
+    return redirect(url_for('admin'))
+
+
+# ── API Exportar ─────────────────────────────────────────────────────────────
+
+@app.route('/api/exportar/productos')
+@login_required
+def exportar_productos():
+    conn = get_db()
+    productos = conn.execute('''
+        SELECT p.*, u.nombre as vendedor
+        FROM productos p
+        LEFT JOIN usuarios u ON p.usuario_id = u.id
+        ORDER BY p.id
+    ''').fetchall()
+    conn.close()
+    return jsonify([dict(p) for p in productos])
+
+
+# ── Static files ─────────────────────────────────────────────────────────────
+
+@app.route('/static/manifest.json')
+def manifest():
+    return jsonify({
+        "name": "EcoMarket",
+        "short_name": "EcoMarket",
+        "description": "Marketplace ecológico",
+        "start_url": "/",
+        "display": "standalone",
+        "background_color": "#2e7d32",
+        "theme_color": "#2e7d32",
+        "icons": [{"src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>", "sizes": "192x192", "type": "image/svg+xml"}]
+    })
+
+
+# ── Error handlers ───────────────────────────────────────────────────────────
+
+@app.errorhandler(404)
+def not_found(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def server_error(e):
+    return render_template('500.html'), 500
+
+
 # ── Inicio ────────────────────────────────────────────────────────────────────
 
+# Inicializar la base de datos al importar el módulo
+init_db()
+
 if __name__ == '__main__':
-    init_db()
     app.run(debug=True, host='0.0.0.0', port=5000)

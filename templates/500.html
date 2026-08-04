@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}EcoMarket - Error del servidor{% endblock %}
+
+{% block content %}
+<section class="section" style="min-height:70vh;display:flex;align-items:center">
+    <div class="container" style="text-align:center">
+        <div style="font-size:8rem;line-height:1;margin-bottom:16px;opacity:0.8">🔄</div>
+        <h1 style="font-size:clamp(3rem,6vw,5rem);font-weight:800;color:var(--verde);line-height:1;margin-bottom:8px">500</h1>
+        <h2 style="font-size:1.5rem;font-weight:700;margin-bottom:12px">Error del servidor</h2>
+        <p style="color:var(--texto-sec);max-width:480px;margin:0 auto 28px;line-height:1.8">
+            Algo salió mal en nuestro servidor. 
+            <br>Estamos trabajando para solucionarlo. ¡Vuelve a intentarlo!
+        </p>
+        <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+            <a href="{{ url_for('index') }}" class="btn-principal" style="padding:14px 32px">
+                <i class="bi bi-house"></i> Volver al inicio
+            </a>
+            <a href="{{ url_for('contacto') }}" class="btn-secundario" style="padding:14px 32px">
+                <i class="bi bi-envelope"></i> Contactar soporte
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -16,17 +16,206 @@
                 <div class="resumen-card">
                     <h3>Resumen</h3>
                     <p class="resumen-line">Productos: <span id="cartItemCount">0</span></p>
-                    <p class="resumen-line">Total: <strong id="cartTotal">S/. 0.00</strong></p>
+                    <p class="resumen-line">Subtotal: <span id="cartSubtotal">S/. 0.00</span></p>
+                    <p class="resumen-line">Envío: <span id="cartShipping">S/. 0.00</span></p>
+                    <p class="resumen-line">Descuento: <span id="cartDiscount" style="color:#2e7d32">-S/. 0.00</span></p>
+                    <p class="resumen-line resumen-total">Total: <strong id="cartTotal">S/. 0.00</strong></p>
                     <button class="btn-principal" id="checkoutButton" disabled>Proceder al pago</button>
                     <p class="cart-note">El carrito se guarda localmente en tu navegador.</p>
                 </div>
             </aside>
         </div>
         <div id="emptyCartMessage" class="no-results" hidden>
-            <img src="{{ url_for('static', filename='assets/empty-cart.svg') }}" alt="Carrito vacío" class="empty-cart-image">
+            <i class="bi bi-cart-x" style="font-size:3rem;display:block;margin-bottom:16px;color:rgba(46,125,50,0.3)"></i>
             <p>Aún no has agregado productos al carrito.</p>
+            <a href="{{ url_for('productos_view') }}" class="btn-principal" style="margin-top:16px;display:inline-block">Explorar productos</a>
         </div>
         <script id="cartProductsData" type="application/json">{{ productos_json | tojson }}</script>
     </div>
 </section>
+
+<style>
+.carrito-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 24px;
+    align-items: start;
+}
+.carrito-items {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+.carrito-item {
+    background: var(--blanco);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: var(--sombra);
+    border: 1px solid rgba(46,125,50,0.08);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.carrito-item img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 12px;
+}
+.carrito-item h3 {
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+}
+.carrito-item .categoria {
+    font-size: 0.75rem;
+    color: var(--texto-sec);
+    margin-bottom: 4px;
+}
+.carrito-item .precio {
+    font-weight: 700;
+    color: var(--verde);
+}
+.carrito-item .qty-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+.carrito-item .qty-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: 1px solid rgba(46,125,50,0.2);
+    background: var(--blanco);
+    cursor: pointer;
+    font-weight: 700;
+    color: var(--verde);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.carrito-item .remove-btn {
+    background: none;
+    border: none;
+    color: #e53935;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 4px;
+}
+.resumen-card {
+    background: var(--blanco);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: var(--sombra);
+    border: 1px solid rgba(46,125,50,0.08);
+    position: sticky;
+    top: 100px;
+}
+.resumen-card h3 {
+    color: var(--verde);
+    margin-bottom: 16px;
+}
+.resumen-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    color: var(--texto-sec);
+}
+.resumen-total {
+    border-top: 1px solid rgba(46,125,50,0.1);
+    padding-top: 12px;
+    margin-top: 12px;
+    font-size: 1.1rem;
+    color: var(--texto);
+}
+.resumen-total strong {
+    color: var(--verde);
+    font-size: 1.3rem;
+}
+.resumen-card .btn-principal {
+    width: 100%;
+    margin-top: 16px;
+}
+.cart-note {
+    font-size: 0.75rem;
+    color: var(--texto-sec);
+    text-align: center;
+    margin-top: 12px;
+}
+@media (max-width: 768px) {
+    .carrito-grid {
+        grid-template-columns: 1fr;
+    }
+    .resumen-card {
+        position: static;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const cartItems = document.getElementById('cartItems');
+    const cartTotal = document.getElementById('cartTotal');
+    const cartSubtotal = document.getElementById('cartSubtotal');
+    const cartShipping = document.getElementById('cartShipping');
+    const cartDiscount = document.getElementById('cartDiscount');
+    const cartItemCount = document.getElementById('cartItemCount');
+    const emptyCartMessage = document.getElementById('emptyCartMessage');
+    const checkoutButton = document.getElementById('checkoutButton');
+
+    function renderCart() {
+        if (!window.EcoCart) return;
+        const summary = EcoCart.getSummary();
+        const items = summary.items;
+
+        if (items.length === 0) {
+            cartItems.innerHTML = '';
+            emptyCartMessage.hidden = false;
+            checkoutButton.disabled = true;
+            cartItemCount.textContent = '0';
+            cartTotal.textContent = 'S/. 0.00';
+            cartSubtotal.textContent = 'S/. 0.00';
+            cartShipping.textContent = 'S/. 0.00';
+            cartDiscount.textContent = '-S/. 0.00';
+            return;
+        }
+
+        emptyCartMessage.hidden = true;
+        checkoutButton.disabled = false;
+        cartItemCount.textContent = summary.count;
+        cartSubtotal.textContent = 'S/. ' + summary.subtotal.toFixed(2);
+        cartShipping.textContent = summary.shipping === 0 ? 'Gratis' : 'S/. ' + summary.shipping.toFixed(2);
+        cartDiscount.textContent = summary.discount > 0 ? '-S/. ' + summary.discount.toFixed(2) : '-S/. 0.00';
+        cartTotal.textContent = 'S/. ' + summary.total.toFixed(2);
+
+        cartItems.innerHTML = items.map(item => {
+            const imgSrc = item.image ? (item.image.startsWith('http') || item.image.startsWith('/') ? item.image : '/static/' + item.image) : '';
+            return `
+                <article class="carrito-item">
+                    ${imgSrc ? `<img src="${imgSrc}" alt="${item.name}" onerror="this.style.display='none'">` : '<div style="width:80px;height:80px;border-radius:12px;background:var(--verde-suave);display:flex;align-items:center;justify-content:center;font-size:2rem">📦</div>'}
+                    <div style="flex:1">
+                        <h3>${item.name}</h3>
+                        <p class="categoria">${item.category || ''}</p>
+                        <p class="precio">S/. ${item.price.toFixed(2)}</p>
+                    </div>
+                    <div class="qty-controls">
+                        <button class="qty-btn" onclick="EcoCart.updateQty('${item.id}', ${item.qty - 1})">−</button>
+                        <span style="font-weight:700;min-width:24px;text-align:center">${item.qty}</span>
+                        <button class="qty-btn" onclick="EcoCart.updateQty('${item.id}', ${item.qty + 1})">+</button>
+                    </div>
+                    <button class="remove-btn" onclick="EcoCart.removeItem('${item.id}')" title="Eliminar">×</button>
+                </article>
+            `;
+        }).join('');
+    }
+
+    window.addEventListener('ecocart:update', renderCart);
+    renderCart();
+
+    checkoutButton.addEventListener('click', function() {
+        window.location.href = '/checkout';
+    });
+});
+</script>
 {% endblock %}

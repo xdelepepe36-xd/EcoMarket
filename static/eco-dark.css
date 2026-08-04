@@ -1,0 +1,380 @@
+/**
+ * eco-dark.css - Modo oscuro completo para EcoMarket
+ * Tema oscuro premium con todos los componentes cubiertos
+ */
+
+/* ── Base ──────────────────────────────────────────────── */
+[data-theme='dark'] {
+    --texto: #edf5ea;
+    --texto-sec: #babfb6;
+    --fondo: #0c1210;
+    --fondo-alt: #141b17;
+    --surface: rgba(16, 28, 20, 0.92);
+    --surface-strong: rgba(20, 34, 26, 0.97);
+    --blanco: #f8faf5;
+    --verde: #7ed957;
+    --verde-claro: #a8ff80;
+    --verde-suave: rgba(126, 217, 87, 0.18);
+    --sombra: 0 8px 24px rgba(0,0,0,0.44);
+    --sombra-md: 0 8px 24px rgba(0,0,0,0.4);
+    --sombra-lg: 0 16px 40px rgba(0,0,0,0.5);
+}
+
+[data-theme='dark'] body {
+    background: radial-gradient(circle at top left, rgba(126,217,87,0.08), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(0,0,0,0.35), transparent 18%),
+                linear-gradient(145deg, #0c1210 0%, #101814 45%, #121d13 100%);
+}
+
+/* ── Header ────────────────────────────────────────────── */
+[data-theme='dark'] .header {
+    background: rgba(18, 30, 21, 0.96);
+    border-color: rgba(126,217,87,0.12);
+}
+
+[data-theme='dark'] .header.scrolled {
+    background: rgba(8, 16, 12, 0.98);
+    box-shadow: 0 14px 28px rgba(0,0,0,0.3);
+}
+
+/* ── Logo ──────────────────────────────────────────────── */
+[data-theme='dark'] .logo {
+    color: var(--verde);
+}
+
+/* ── Cards ─────────────────────────────────────────────── */
+[data-theme='dark'] .card,
+[data-theme='dark'] .producto-card,
+[data-theme='dark'] .feature-card,
+[data-theme='dark'] .mini-card,
+[data-theme='dark'] .form-card,
+[data-theme='dark'] .detalle-info,
+[data-theme='dark'] .contact-card,
+[data-theme='dark'] .stat-card,
+[data-theme='dark'] .admin-stat-card,
+[data-theme='dark'] .impacto-card-item,
+[data-theme='dark'] .testimonio-card,
+[data-theme='dark'] .categoria-card {
+    background: var(--surface);
+    border-color: rgba(255,255,255,0.08);
+}
+
+[data-theme='dark'] .producto-card:hover,
+[data-theme='dark'] .feature-card:hover,
+[data-theme='dark'] .mini-card:hover {
+    box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+}
+
+/* ── Forms ─────────────────────────────────────────────── */
+[data-theme='dark'] .form-input,
+[data-theme='dark'] input,
+[data-theme='dark'] textarea,
+[data-theme='dark'] select {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.14);
+    color: var(--blanco);
+}
+
+[data-theme='dark'] .form-input::placeholder,
+[data-theme='dark'] input::placeholder,
+[data-theme='dark'] textarea::placeholder {
+    color: rgba(255,255,255,0.4);
+}
+
+[data-theme='dark'] .form-input:focus {
+    border-color: var(--verde);
+    box-shadow: 0 0 0 3px rgba(126,217,87,0.15);
+}
+
+/* ── Buttons ───────────────────────────────────────────── */
+[data-theme='dark'] .btn-principal {
+    background: linear-gradient(135deg, var(--verde-claro), var(--verde));
+    color: #0b110b;
+}
+
+[data-theme='dark'] .btn-secundario {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(126,217,87,0.22);
+    color: var(--blanco);
+}
+
+[data-theme='dark'] .btn-secundario:hover {
+    background: rgba(126,217,87,0.15);
+}
+
+[data-theme='dark'] .btn-danger {
+    background: rgba(185,28,28,0.2);
+    color: #ff6b6b;
+}
+
+[data-theme='dark'] .btn-danger:hover {
+    background: #b91c1c;
+    color: #fff;
+}
+
+/* ── Hero Section ──────────────────────────────────────── */
+[data-theme='dark'] .hero-section {
+    background: linear-gradient(135deg, #0a1a0e 0%, #1b5e20 45%, #0d1f10 100%);
+}
+
+/* ── Sections ──────────────────────────────────────────── */
+[data-theme='dark'] .section-alt {
+    background: rgba(126,217,87,0.06);
+}
+
+[data-theme='dark'] .impacto-section {
+    background: rgba(126,217,87,0.08);
+}
+
+[data-theme='dark'] .cta-section {
+    background: linear-gradient(135deg, #0a1a0e, #1b5e20);
+}
+
+/* ── Testimonials ──────────────────────────────────────── */
+[data-theme='dark'] .testimonio-card {
+    background: var(--surface);
+}
+
+[data-theme='dark'] .testimonio-card.featured {
+    background: linear-gradient(135deg, #0a1a0e, #1b5e20);
+}
+
+[data-theme='dark'] .testimonio-card p {
+    color: var(--texto-sec);
+}
+
+/* ── Footer ────────────────────────────────────────────── */
+[data-theme='dark'] .footer {
+    background: rgba(8,16,12,0.96);
+    border-top-color: rgba(126,217,87,0.12);
+}
+
+[data-theme='dark'] .footer-col a,
+[data-theme='dark'] .footer-col p {
+    color: var(--texto-sec);
+}
+
+[data-theme='dark'] .footer-social a {
+    background: rgba(126,217,87,0.12);
+    color: var(--verde);
+}
+
+[data-theme='dark'] .footer-social a:hover {
+    background: var(--verde);
+    color: #0b110b;
+}
+
+/* ── Tables ────────────────────────────────────────────── */
+[data-theme='dark'] .admin-table {
+    background: var(--surface);
+}
+
+[data-theme='dark'] .admin-table td {
+    border-color: rgba(255,255,255,0.06);
+    color: var(--texto);
+}
+
+[data-theme='dark'] .admin-table tr:hover td {
+    background: rgba(126,217,87,0.06);
+}
+
+/* ── Badges ────────────────────────────────────────────── */
+[data-theme='dark'] .badge-success {
+    background: rgba(126,217,87,0.15);
+    color: var(--verde);
+}
+
+[data-theme='dark'] .badge-warning {
+    background: rgba(245,158,11,0.15);
+    color: #fbbf24;
+}
+
+[data-theme='dark'] .badge-danger {
+    background: rgba(229,57,53,0.15);
+    color: #ff6b6b;
+}
+
+/* ── Flash Messages ────────────────────────────────────── */
+[data-theme='dark'] .flash-success {
+    background: rgba(126,217,87,0.12);
+    color: var(--verde);
+}
+
+[data-theme='dark'] .flash-danger {
+    background: rgba(229,57,53,0.12);
+    color: #ff6b6b;
+}
+
+[data-theme='dark'] .flash-warning {
+    background: rgba(245,158,11,0.12);
+    color: #fbbf24;
+}
+
+/* ── Pagination ────────────────────────────────────────── */
+[data-theme='dark'] .pagination a {
+    background: var(--surface);
+    border-color: rgba(255,255,255,0.1);
+    color: var(--texto);
+}
+
+[data-theme='dark'] .pagination a:hover {
+    background: rgba(126,217,87,0.15);
+}
+
+/* ── Chat Widget ───────────────────────────────────────── */
+[data-theme='dark'] #ecoChatWidget {
+    background: var(--surface-strong);
+    border-color: rgba(126,217,87,0.15);
+}
+
+[data-theme='dark'] #ecoChatMessages {
+    background: rgba(0,0,0,0.2);
+}
+
+[data-theme='dark'] #ecoChatInput {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(126,217,87,0.2);
+    color: var(--blanco);
+}
+
+[data-theme='dark'] #ecoChatInput::placeholder {
+    color: rgba(255,255,255,0.4);
+}
+
+/* ── Search Autocomplete ───────────────────────────────── */
+[data-theme='dark'] #ecoSearchResults {
+    background: var(--surface-strong);
+    border-color: rgba(126,217,87,0.15);
+}
+
+[data-theme='dark'] #ecoSearchResults a {
+    color: var(--texto);
+    border-color: rgba(255,255,255,0.05);
+}
+
+[data-theme='dark'] #ecoSearchResults a:hover {
+    background: rgba(126,217,87,0.1);
+}
+
+/* ── Cookie Banner ─────────────────────────────────────── */
+[data-theme='dark'] #ecoCookieBanner {
+    background: var(--surface-strong);
+    border-top-color: var(--verde);
+}
+
+[data-theme='dark'] #ecoCookieBanner span {
+    color: var(--texto-sec);
+}
+
+/* ── Tooltips ──────────────────────────────────────────── */
+[data-theme='dark'] #eco-tooltip {
+    background: #1f2a21;
+    color: #fff;
+}
+
+/* ── Scrollbar ─────────────────────────────────────────── */
+[data-theme='dark'] ::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.05);
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb {
+    background: rgba(126,217,87,0.3);
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
+    background: rgba(126,217,87,0.5);
+}
+
+/* ── Selection ─────────────────────────────────────────── */
+[data-theme='dark'] ::selection {
+    background: rgba(126,217,87,0.3);
+    color: #fff;
+}
+
+/* ── Product Detail ────────────────────────────────────── */
+[data-theme='dark'] .detalle-benefits .benefit-item {
+    background: rgba(126,217,87,0.1);
+    color: var(--verde);
+}
+
+[data-theme='dark'] .categoria {
+    color: var(--verde);
+}
+
+/* ── Profile ───────────────────────────────────────────── */
+[data-theme='dark'] .perfil-stat {
+    background: rgba(126,217,87,0.1);
+}
+
+[data-theme='dark'] .perfil-stat strong {
+    color: var(--verde);
+}
+
+/* ── No Results ────────────────────────────────────────── */
+[data-theme='dark'] .no-results {
+    background: rgba(255,255,255,0.04);
+}
+
+/* ── Image Placeholder ─────────────────────────────────── */
+[data-theme='dark'] .producto-img-container {
+    background: linear-gradient(135deg, rgba(126,217,87,0.1), rgba(76,175,80,0.05));
+}
+
+/* ── Filters ───────────────────────────────────────────── */
+[data-theme='dark'] .btn-filtro {
+    background: var(--surface);
+    border-color: rgba(255,255,255,0.12);
+    color: var(--texto);
+}
+
+[data-theme='dark'] .btn-filtro:hover {
+    background: rgba(126,217,87,0.12);
+}
+
+[data-theme='dark'] .btn-filtro.active {
+    background: var(--verde) !important;
+    color: #0b110b !important;
+    border-color: var(--verde) !important;
+}
+
+/* ── Select ────────────────────────────────────────────── */
+[data-theme='dark'] select {
+    background: var(--surface);
+    color: var(--texto);
+    border-color: rgba(255,255,255,0.12);
+}
+
+[data-theme='dark'] select option {
+    background: #141b17;
+    color: var(--texto);
+}
+
+/* ── Stars ─────────────────────────────────────────────── */
+[data-theme='dark'] .producto-rating span {
+    color: var(--texto-sec);
+}
+
+/* ── Price ─────────────────────────────────────────────── */
+[data-theme='dark'] .producto-precio,
+[data-theme='dark'] .detalle-precio {
+    color: var(--verde);
+}
+
+[data-theme='dark'] .producto-precio-original {
+    color: var(--texto-sec);
+}
+
+/* ── Vendedor ──────────────────────────────────────────── */
+[data-theme='dark'] .vendedor-info {
+    background: rgba(126,217,87,0.08);
+}
+
+/* ── Splash Screen ─────────────────────────────────────── */
+[data-theme='dark'] #splashScreen {
+    background: linear-gradient(135deg, #0a1a0e, #1b5e20) !important;
+}
+
+/* ── Particles Canvas ──────────────────────────────────── */
+[data-theme='dark'] #ecoParticles {
+    opacity: 0.15 !important;
+}

@@ -7,7 +7,7 @@
     <div class="container">
         <div class="section-head">
             <div>
-                <h2 class="section-title">Contacto</h2>
+                <h2 class="section-title"><i class="bi bi-envelope"></i> Contacto</h2>
                 <p>¿Tienes dudas o quieres publicar en EcoMarket? Escríbenos y te responderemos pronto.</p>
             </div>
         </div>
@@ -15,18 +15,47 @@
             <div class="contact-card">
                 <h3><i class="bi bi-headset"></i> Estamos disponibles</h3>
                 <p>Envía tu mensaje y un agente de soporte te contactará dentro de las siguientes 24 horas.</p>
-                <p><i class="bi bi-envelope"></i> <strong>Email:</strong> hola@ecomarket.com</p>
-                <p><i class="bi bi-telephone"></i> <strong>Teléfono:</strong> +51 999 888 777</p>
+                <div style="display:grid;gap:16px;margin-top:20px">
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--verde-suave);border-radius:12px">
+                        <div style="width:40px;height:40px;border-radius:10px;background:var(--verde);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem"><i class="bi bi-envelope"></i></div>
+                        <div>
+                            <strong style="font-size:0.88rem;display:block">Email</strong>
+                            <span style="font-size:0.82rem;color:var(--texto-sec)">hola@ecomarket.com</span>
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--verde-suave);border-radius:12px">
+                        <div style="width:40px;height:40px;border-radius:10px;background:var(--verde);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem"><i class="bi bi-telephone"></i></div>
+                        <div>
+                            <strong style="font-size:0.88rem;display:block">Teléfono</strong>
+                            <span style="font-size:0.82rem;color:var(--texto-sec)">+51 999 888 777</span>
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--verde-suave);border-radius:12px">
+                        <div style="width:40px;height:40px;border-radius:10px;background:var(--verde);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem"><i class="bi bi-clock"></i></div>
+                        <div>
+                            <strong style="font-size:0.88rem;display:block">Horario</strong>
+                            <span style="font-size:0.82rem;color:var(--texto-sec)">Lun - Sáb: 9am - 6pm</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             <form id="contactForm" class="form-card">
-                <label><i class="bi bi-person"></i> Nombre</label>
-                <input type="text" name="nombre" placeholder="Tu nombre" required>
-                <label><i class="bi bi-envelope"></i> Email</label>
-                <input type="email" name="email" placeholder="tu@email.com" required>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                    <div>
+                        <label><i class="bi bi-person"></i> Nombre</label>
+                        <input type="text" name="nombre" placeholder="Tu nombre" required>
+                    </div>
+                    <div>
+                        <label><i class="bi bi-envelope"></i> Email</label>
+                        <input type="email" name="email" placeholder="tu@email.com" required>
+                    </div>
+                </div>
                 <label><i class="bi bi-chat-dots"></i> Mensaje</label>
                 <textarea name="mensaje" rows="5" placeholder="Cuéntanos cómo podemos ayudarte" required></textarea>
-                <button class="btn-principal" type="submit">Enviar mensaje</button>
-                <div id="contactSuccess" class="flash flash-success" hidden>Mensaje enviado. Nos pondremos en contacto pronto.</div>
+                <button class="btn-principal" type="submit" style="width:100%">Enviar mensaje</button>
+                <div id="contactSuccess" class="flash flash-success" hidden>
+                    <i class="bi bi-check-circle"></i> Mensaje enviado. Nos pondremos en contacto pronto.
+                </div>
             </form>
         </div>
     </div>

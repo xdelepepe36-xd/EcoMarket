@@ -6,11 +6,11 @@
     <div class="container">
         <div class="section-head" style="flex-wrap:wrap">
             <div>
-                <h2 class="section-title"><i class="bi bi-grid"></i> Catálogo de productos</h2>
-                <p>Descubre artículos ecológicos. {{ total_productos }} producto(s) disponible(s).</p>
+                <h2 class="section-title"><i class="bi bi-grid"></i> <span data-i18n="products.title">Catálogo de productos</span></h2>
+                <p><span data-i18n="products.desc">Descubre artículos ecológicos.</span> <span data-i18n="products.count">{{ total_productos }} producto(s) disponible(s).</span></p>
             </div>
             <div style="display:flex;gap:10px;flex-wrap:wrap">
-                <a class="btn-principal" href="{{ url_for('publicar') }}"><i class="bi bi-plus-circle"></i> Publicar</a>
+                <a class="btn-principal" href="{{ url_for('publicar') }}"><i class="bi bi-plus-circle"></i> <span data-i18n="products.publish">Publicar</span></a>
             </div>
         </div>
 
@@ -18,15 +18,15 @@
         <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:20px">
             <div style="flex:1;min-width:200px;position:relative">
                 <i class="bi bi-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--texto-sec)"></i>
-                <input id="searchInput" type="text" placeholder="Buscar productos..." autocomplete="off" style="width:100%;padding:12px 12px 12px 38px;border:1.5px solid rgba(46,125,50,0.18);border-radius:12px;font-family:inherit;font-size:0.9rem;outline:none">
+                <input id="searchInput" type="text" placeholder="Buscar productos..." data-i18n-placeholder="products.search_placeholder" autocomplete="off" style="width:100%;padding:12px 12px 12px 38px;border:1.5px solid rgba(46,125,50,0.18);border-radius:12px;font-family:inherit;font-size:0.9rem;outline:none">
                 <div id="searchSuggestions" class="search-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--blanco);border:1px solid rgba(46,125,50,0.12);border-radius:12px;box-shadow:var(--sombra-lg);z-index:100;max-height:300px;overflow-y:auto;margin-top:4px"></div>
             </div>
             <select id="ordenSelect" onchange="window.location='{{ url_for('productos_view') }}?orden='+this.value" style="padding:12px 16px;border:1.5px solid rgba(46,125,50,0.18);border-radius:12px;font-family:inherit;font-size:0.9rem;outline:none;cursor:pointer">
-                <option value="nuevos" {{ 'selected' if orden_sel == 'nuevos' else '' }}>📅 Más nuevos</option>
-                <option value="populares" {{ 'selected' if orden_sel == 'populares' else '' }}>🔥 Más populares</option>
-                <option value="baratos" {{ 'selected' if orden_sel == 'baratos' else '' }}>💰 Menor precio</option>
-                <option value="caros" {{ 'selected' if orden_sel == 'caros' else '' }}>💎 Mayor precio</option>
-                <option value="mejor_valorados" {{ 'selected' if orden_sel == 'mejor_valorados' else '' }}>⭐ Mejor valorados</option>
+                <option value="nuevos" {{ 'selected' if orden_sel == 'nuevos' else '' }} data-i18n="products.order.new">📅 Más nuevos</option>
+                <option value="populares" {{ 'selected' if orden_sel == 'populares' else '' }} data-i18n="products.order.popular">🔥 Más populares</option>
+                <option value="baratos" {{ 'selected' if orden_sel == 'baratos' else '' }} data-i18n="products.order.cheap">💰 Menor precio</option>
+                <option value="caros" {{ 'selected' if orden_sel == 'caros' else '' }} data-i18n="products.order.expensive">💎 Mayor precio</option>
+                <option value="mejor_valorados" {{ 'selected' if orden_sel == 'mejor_valorados' else '' }} data-i18n="products.order.rated">⭐ Mejor valorados</option>
             </select>
         </div>
 
@@ -36,21 +36,21 @@
             <input type="number" id="precioMin" placeholder="Mín" min="0" step="0.01" value="{{ request.args.get('precio_min', '') }}" style="width:90px;padding:8px 10px;border:1.5px solid rgba(46,125,50,0.18);border-radius:8px;font-family:inherit;font-size:0.85rem;outline:none">
             <span style="color:var(--texto-sec)">—</span>
             <input type="number" id="precioMax" placeholder="Máx" min="0" step="0.01" value="{{ request.args.get('precio_max', '') }}" style="width:90px;padding:8px 10px;border:1.5px solid rgba(46,125,50,0.18);border-radius:8px;font-family:inherit;font-size:0.85rem;outline:none">
-            <button onclick="aplicarFiltroPrecio()" class="btn-principal" style="padding:8px 16px;font-size:0.82rem;border:none;cursor:pointer"><i class="bi bi-funnel"></i> Filtrar</button>
+            <button onclick="aplicarFiltroPrecio()" class="btn-principal" style="padding:8px 16px;font-size:0.82rem;border:none;cursor:pointer"><i class="bi bi-funnel"></i> <span data-i18n="products.filter">Filtrar</span></button>
             {% if request.args.get('precio_min') or request.args.get('precio_max') %}
-            <a href="{{ url_for('productos_view', categoria=categoria_sel, orden=orden_sel) }}" style="font-size:0.8rem;color:var(--texto-sec);text-decoration:underline">Limpiar</a>
+            <a href="{{ url_for('productos_view', categoria=categoria_sel, orden=orden_sel) }}" style="font-size:0.8rem;color:var(--texto-sec);text-decoration:underline" data-i18n="products.clear">Limpiar</a>
             {% endif %}
         </div>
 
         <!-- Categorías -->
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px">
-            <a href="{{ url_for('productos_view') }}" class="btn-filtro {{ 'active' if not categoria_sel }}" style="padding:8px 16px;border-radius:999px;border:1.5px solid rgba(46,125,50,0.18);background:var(--blanco);text-decoration:none;font-size:0.85rem;font-weight:600;color:var(--texto);transition:all 0.2s">Todas</a>
+            <a href="{{ url_for('productos_view') }}" class="btn-filtro {{ 'active' if not categoria_sel }}" style="padding:8px 16px;border-radius:999px;border:1.5px solid rgba(46,125,50,0.18);background:var(--blanco);text-decoration:none;font-size:0.85rem;font-weight:600;color:var(--texto);transition:all 0.2s"><span data-i18n="products.filter.all">Todas</span></a>
             {% for cat in categorias %}
             <a href="{{ url_for('productos_view', categoria=cat) }}" class="btn-filtro {{ 'active' if categoria_sel == cat }}" style="padding:8px 16px;border-radius:999px;border:1.5px solid rgba(46,125,50,0.18);background:var(--blanco);text-decoration:none;font-size:0.85rem;font-weight:600;color:var(--texto);transition:all 0.2s">{{ cat }}</a>
             {% endfor %}
         </div>
 
-            <p style="font-size:0.85rem;color:var(--texto-sec);margin-bottom:16px"><i class="bi bi-box"></i> Mostrando {{ productos|length }} producto(s)</p>
+            <p style="font-size:0.85rem;color:var(--texto-sec);margin-bottom:16px"><i class="bi bi-box"></i> <span data-i18n="products.showing">Mostrando</span> {{ productos|length }} <span data-i18n="products.items">producto(s)</span></p>
 
         <!-- Grid -->
         <div class="productos-grid" id="productosGrid">
@@ -108,14 +108,14 @@
                 
                 <!-- Botones de acción -->
                 <div style="padding:0 16px 16px;display:flex;gap:8px">
-                    <a href="{{ url_for('producto_detalle', producto_id=producto.id) }}" class="btn-secundario" style="flex:1;padding:8px;font-size:0.82rem;text-align:center;text-decoration:none">Ver más</a>
+                    <a href="{{ url_for('producto_detalle', producto_id=producto.id) }}" class="btn-secundario" style="flex:1;padding:8px;font-size:0.82rem;text-align:center;text-decoration:none"><span data-i18n="products.view_more">Ver más</span></a>
                     <button class="btn-principal add-cart" style="flex:1;padding:8px;font-size:0.82rem;border:none;cursor:pointer" 
                         data-producto-id="{{ producto.id }}" 
                         data-producto-nombre="{{ producto.nombre }}" 
                         data-producto-categoria="{{ producto.categoria }}" 
                         data-producto-precio="{{ '%.2f'|format(producto.precio) }}" 
                         data-producto-imagen="{{ producto.imagen }}">
-                        <i class="bi bi-bag-plus"></i> Carrito
+                        <i class="bi bi-bag-plus"></i> <span data-i18n="products.add_to_cart">Carrito</span>
                     </button>
                 </div>
             </article>
@@ -124,8 +124,8 @@
 
         <div id="noResultsMessage" class="no-results" hidden style="text-align:center;padding:60px 20px">
             <i class="bi bi-search" style="font-size:3rem;display:block;margin-bottom:16px;color:rgba(46,125,50,0.3)"></i>
-            <h3 style="margin-bottom:8px">Sin resultados</h3>
-            <p style="color:var(--texto-sec)">Intenta con otros filtros o términos de búsqueda.</p>
+        <h3 style="margin-bottom:8px" data-i18n="products.no_results_title">Sin resultados</h3>
+        <p style="color:var(--texto-sec)" data-i18n="products.no_results_desc">Intenta con otros filtros o términos de búsqueda.</p>
         </div>
 
         <!-- Paginación -->
@@ -133,7 +133,7 @@
         <div style="display:flex;justify-content:center;align-items:center;gap:8px;margin-top:32px;flex-wrap:wrap">
             {% if pagina > 1 %}
             <a href="{{ url_for('productos_view', pagina=pagina-1, categoria=categoria_sel, orden=orden_sel, q=busqueda) }}" class="btn-secundario" style="padding:10px 18px;font-size:0.85rem">
-                <i class="bi bi-chevron-left"></i> Anterior
+            <i class="bi bi-chevron-left"></i> <span data-i18n="pagination.prev">Anterior</span>
             </a>
             {% endif %}
             
@@ -150,12 +150,12 @@
 
             {% if pagina < total_paginas %}
             <a href="{{ url_for('productos_view', pagina=pagina+1, categoria=categoria_sel, orden=orden_sel, q=busqueda) }}" class="btn-secundario" style="padding:10px 18px;font-size:0.85rem">
-                Siguiente <i class="bi bi-chevron-right"></i>
+            <span data-i18n="pagination.next">Siguiente</span> <i class="bi bi-chevron-right"></i>
             </a>
             {% endif %}
         </div>
         <div style="text-align:center;margin-top:12px;font-size:0.82rem;color:var(--texto-sec)">
-            Página {{ pagina }} de {{ total_paginas }} ({{ total_productos }} productos)
+        <span data-i18n="pagination.page_info">Página</span> {{ pagina }} <span data-i18n="pagination.of">de</span> {{ total_paginas }} ({{ total_productos }} <span data-i18n="products.items">productos</span>)
         </div>
         {% endif %}
     </div>

@@ -7,20 +7,20 @@
         <div class="auth-card form-card">
             <div class="auth-header">
                 <span class="auth-icon">🌿</span>
-                <h2 class="section-title">Crear Cuenta</h2>
-                <p>Únete a la comunidad ecológica más grande del Perú.</p>
+                <h2 class="section-title" data-i18n="auth.register_title">Crear Cuenta</h2>
+                <p data-i18n="auth.register_desc">Únete a la comunidad ecológica más grande del Perú.</p>
             </div>
             <form method="POST" action="{{ url_for('registro') }}">
-                <label for="nombre"><i class="bi bi-person"></i> Nombre completo</label>
-                <input type="text" id="nombre" name="nombre" placeholder="Tu nombre completo" required autofocus>
-                <label for="email"><i class="bi bi-envelope"></i> Correo electrónico</label>
-                <input type="email" id="email" name="email" placeholder="tu@correo.com" required>
-                <label for="password"><i class="bi bi-lock"></i> Contraseña</label>
-                <input type="password" id="password" name="password" placeholder="Mínimo 6 caracteres" required>
-                <label for="password2"><i class="bi bi-lock-fill"></i> Confirmar contraseña</label>
-                <input type="password" id="password2" name="password2" placeholder="Repite tu contraseña" required>
+                <label for="nombre"><i class="bi bi-person"></i> <span data-i18n="auth.fullname">Nombre completo</span></label>
+                <input type="text" id="nombre" name="nombre" placeholder="Tu nombre completo" data-i18n-placeholder="auth.fullname_placeholder" required autofocus>
+                <label for="email"><i class="bi bi-envelope"></i> <span data-i18n="auth.email">Correo electrónico</span></label>
+                <input type="email" id="email" name="email" placeholder="tu@correo.com" data-i18n-placeholder="auth.email_placeholder" required>
+                <label for="password"><i class="bi bi-lock"></i> <span data-i18n="auth.password">Contraseña</span></label>
+                <input type="password" id="password" name="password" placeholder="Mínimo 6 caracteres" data-i18n-placeholder="auth.password_hint" required>
+                <label for="password2"><i class="bi bi-lock-fill"></i> <span data-i18n="auth.password_confirm">Confirmar contraseña</span></label>
+                <input type="password" id="password2" name="password2" placeholder="Repite tu contraseña" data-i18n-placeholder="auth.password_confirm_placeholder" required>
                 <button class="btn-principal" type="submit" style="width:100%; margin-top:8px;">
-                    <i class="bi bi-person-check"></i> Crear cuenta
+                    <i class="bi bi-person-check"></i> <span data-i18n="auth.register_button">Crear cuenta</span>
                 </button>
             </form>
             <div class="auth-divider"><span>¿Ya tienes cuenta?</span></div>

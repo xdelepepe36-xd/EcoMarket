@@ -5,19 +5,19 @@
 {% block content %}
 <section class="section">
     <div class="container form-container">
-        <h2 class="section-title">{{ '✏️ Editar producto' if editando else '📦 Publicar producto' }}</h2>
+        <h2 class="section-title"><span data-i18n="{{ 'publicar.edit_title' if editando else 'publicar.title' }}">{{ '✏️ Editar producto' if editando else '📦 Publicar producto' }}</span></h2>
         <p style="color:var(--texto-sec);margin-bottom:24px">
-            {{ 'Modifica los datos de tu producto.' if editando else 'Completa el formulario para publicar tu producto ecológico.' }}
+                    <span data-i18n="{{ 'publicar.edit_subtitle' if editando else 'publicar.subtitle' }}">{{ 'Modifica los datos de tu producto.' if editando else 'Completa el formulario para publicar tu producto ecológico.' }}</span>
         </p>
 
         <form method="post" class="form-card" enctype="multipart/form-data" action="{{ url_for('editar_producto', producto_id=producto.id) if editando else url_for('publicar') }}">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
                 <div>
-                    <label>Nombre del producto <span style="color:#b91c1c">*</span></label>
-                    <input type="text" name="nombre" required value="{{ producto.nombre if producto else '' }}" placeholder="Ej: Botella reutilizable de acero">
+                    <label><span data-i18n="publicar.name_label">Nombre del producto</span> <span style="color:#b91c1c">*</span></label>
+                                        <input type="text" name="nombre" required value="{{ producto.nombre if producto else '' }}" placeholder="Ej: Botella reutilizable de acero" data-i18n-placeholder="publicar.placeholder_name">
                 </div>
                 <div>
-                    <label>Categoría <span style="color:#b91c1c">*</span></label>
+                    <label><span data-i18n="publicar.category_label">Categoría</span> <span style="color:#b91c1c">*</span></label>
                     <select name="categoria" required>
                         <option value="">Seleccionar...</option>
                         {% for cat in categorias %}
@@ -29,15 +29,15 @@
 
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
                 <div>
-                    <label>Precio (S/.) <span style="color:#b91c1c">*</span></label>
-                    <input type="number" step="0.01" name="precio" required value="{{ producto.precio if producto else '' }}" placeholder="0.00">
+                    <label><span data-i18n="publicar.price_label">Precio (S/.)</span> <span style="color:#b91c1c">*</span></label>
+                                        <input type="number" step="0.01" name="precio" required value="{{ producto.precio if producto else '' }}" placeholder="0.00" data-i18n-placeholder="publicar.placeholder_price">
                 </div>
                 <div>
-                    <label>Stock</label>
+                    <label><span data-i18n="publicar.stock_label">Stock</span></label>
                     <input type="number" name="stock" min="1" value="{{ producto.stock if producto else 10 }}">
                 </div>
                 <div>
-                    <label>Condición</label>
+                    <label><span data-i18n="publicar.condition_label">Condición</span></label>
                     <select name="condicion">
                         <option value="nuevo" {{ 'selected' if not producto or producto.condicion == 'nuevo' else '' }}>🆕 Nuevo</option>
                         <option value="usado" {{ 'selected' if producto and producto.condicion == 'usado' else '' }}>♻️ Usado</option>
@@ -46,23 +46,23 @@
             </div>
 
             <div>
-                <label>Descripción <span style="color:#b91c1c">*</span></label>
+                <label><span data-i18n="publicar.description_label">Descripción</span> <span style="color:#b91c1c">*</span></label>
                 <textarea name="descripcion" rows="4" required placeholder="Describe tu producto: materiales, beneficios, impacto ambiental...">{{ producto.descripcion if producto else '' }}</textarea>
             </div>
 
             <div>
-                <label>Especificaciones técnicas</label>
+                <label><span data-i18n="publicar.specs_label">Especificaciones técnicas</span></label>
                 <textarea name="especificaciones" rows="4" placeholder="Formato: clave: valor (una por línea)&#10;Ej:&#10;Material: Acero inoxidable&#10;Capacidad: 750ml&#10;Peso: 300g">{% if producto and producto.especificaciones %}{% set specs = producto.especificaciones|fromjson %}{% for k, v in specs.items() %}{{ k }}: {{ v }}
 {% endfor %}{% endif %}</textarea>
                 <small style="color:var(--texto-sec);font-size:0.78rem">Escribe cada especificación en una línea con formato "clave: valor"</small>
             </div>
 
             <div>
-                <label>Imagen principal del producto</label>
+                            <label><span data-i18n="publicar.main_image">Imagen principal del producto</span></label>
                 <div style="border:2px dashed rgba(46,125,50,0.3);border-radius:16px;padding:24px;text-align:center;cursor:pointer;background:#fafffe" onclick="document.getElementById('fileInput').click()">
                     <i class="bi bi-cloud-upload" style="font-size:2rem;color:var(--verde-claro);display:block;margin-bottom:8px"></i>
-                    <p style="font-size:0.88rem;color:var(--texto-sec)">Haz clic para subir una imagen</p>
-                    <span style="font-size:0.75rem;color:var(--texto-sec)">PNG, JPG, WebP hasta 5MB</span>
+                                <p style="font-size:0.88rem;color:var(--texto-sec)"><span data-i18n="publicar.click_to_upload">Haz clic para subir una imagen</span></p>
+                                <span style="font-size:0.75rem;color:var(--texto-sec)"><span data-i18n="publicar.upload_hint">PNG, JPG, WebP hasta 5MB</span></span>
                     <input type="file" id="fileInput" name="imagen" accept="image/*" style="display:none" onchange="previewFile(this)">
                 </div>
                 <div id="previewContainer" style="margin-top:12px;{% if not producto %}display:none{% endif %}">
@@ -71,10 +71,10 @@
             </div>
 
             <div>
-                <label>Imágenes adicionales (galería)</label>
+                            <label><span data-i18n="publicar.gallery">Imágenes adicionales (galería)</span></label>
                 <div style="border:2px dashed rgba(46,125,50,0.3);border-radius:16px;padding:24px;text-align:center;cursor:pointer;background:#fafffe" onclick="document.getElementById('extraFilesInput').click()">
                     <i class="bi bi-images" style="font-size:2rem;color:var(--verde-claro);display:block;margin-bottom:8px"></i>
-                    <p style="font-size:0.88rem;color:var(--texto-sec)">Haz clic para subir varias imágenes</p>
+                                <p style="font-size:0.88rem;color:var(--texto-sec)"><span data-i18n="publicar.click_to_upload_multiple">Haz clic para subir varias imágenes</span></p>
                     <span style="font-size:0.75rem;color:var(--texto-sec)">Puedes seleccionar múltiples archivos</span>
                     <input type="file" id="extraFilesInput" name="imagenes_extra" accept="image/*" multiple style="display:none" onchange="previewExtraFiles(this)">
                 </div>
@@ -82,11 +82,10 @@
             </div>
 
             <div style="display:flex;gap:12px;margin-top:8px">
-                <button type="submit" class="btn-principal" style="flex:1">
-                    <i class="bi bi-check-lg"></i> {{ 'Guardar cambios' if editando else 'Publicar producto' }}
-                </button>
-                <a href="{{ url_for('perfil') if editando else url_for('productos_view') }}" class="btn-secundario" style="flex:0.3;text-align:center">Cancelar</a>
-            </div>
+                            <button type="submit" class="btn-principal" style="flex:1"><i class="bi bi-check-lg"></i> <span data-i18n="{{ 'publicar.save_btn' if editando else 'publicar.publish_btn' }}">{{ 'Guardar cambios' if editando else 'Publicar producto' }}</span>
+                            </button>
+                            <a href="{{ url_for('perfil') if editando else url_for('productos_view') }}" class="btn-secundario" style="flex:0.3;text-align:center"><span data-i18n="publicar.cancel">Cancelar</span></a>
+                        </div>
         </form>
     </div>
 </section>

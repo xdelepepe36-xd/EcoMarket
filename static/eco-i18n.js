@@ -187,6 +187,30 @@ const EcoI18n = (() => {
       'footer.made_with': 'Hecho con',
       'footer.for_planet': 'para el planeta',
       'footer.schedule': 'Lun - Sáb: 9am - 6pm',
+
+      // Publicar (formulario)
+      'publicar.title': '📦 Publicar producto',
+      'publicar.edit_title': '✏️ Editar producto',
+      'publicar.subtitle': 'Completa el formulario para publicar tu producto ecológico.',
+      'publicar.edit_subtitle': 'Modifica los datos de tu producto.',
+      'publicar.name_label': 'Nombre del producto',
+      'publicar.category_label': 'Categoría',
+      'publicar.price_label': 'Precio (S/.)',
+      'publicar.stock_label': 'Stock',
+      'publicar.condition_label': 'Condición',
+      'publicar.description_label': 'Descripción',
+      'publicar.specs_label': 'Especificaciones técnicas',
+      'publicar.main_image': 'Imagen principal del producto',
+      'publicar.gallery': 'Imágenes adicionales (galería)',
+      'publicar.publish_btn': 'Publicar producto',
+      'publicar.save_btn': 'Guardar cambios',
+      'publicar.cancel': 'Cancelar',
+      'publicar.upload_hint': 'PNG, JPG, WebP hasta 5MB',
+      'publicar.click_to_upload': 'Haz clic para subir una imagen',
+      'publicar.click_to_upload_multiple': 'Haz clic para subir varias imágenes',
+      'publicar.placeholder_name': 'Ej: Botella reutilizable de acero',
+      'publicar.placeholder_price': '0.00',
+      'publicar.placeholder_specs': 'Formato:\nClave: Valor (una por línea)'}
       
       // Errors
       'error.404_title': 'Página no encontrada',
@@ -408,6 +432,30 @@ const EcoI18n = (() => {
       'footer.made_with': 'Made with',
       'footer.for_planet': 'for the planet',
       'footer.schedule': 'Mon - Sat: 9am - 6pm',
+
+      // Publish (form)
+      'publicar.title': '📦 Publish product',
+      'publicar.edit_title': '✏️ Edit product',
+      'publicar.subtitle': 'Fill the form to publish your eco-friendly product.',
+      'publicar.edit_subtitle': 'Edit your product details.',
+      'publicar.name_label': 'Product name',
+      'publicar.category_label': 'Category',
+      'publicar.price_label': 'Price',
+      'publicar.stock_label': 'Stock',
+      'publicar.condition_label': 'Condition',
+      'publicar.description_label': 'Description',
+      'publicar.specs_label': 'Technical specifications',
+      'publicar.main_image': 'Main product image',
+      'publicar.gallery': 'Additional images (gallery)',
+      'publicar.publish_btn': 'Publish product',
+      'publicar.save_btn': 'Save changes',
+      'publicar.cancel': 'Cancel',
+      'publicar.upload_hint': 'PNG, JPG, WebP up to 5MB',
+      'publicar.click_to_upload': 'Click to upload an image',
+      'publicar.click_to_upload_multiple': 'Click to upload multiple images',
+      'publicar.placeholder_name': 'Eg: Reusable steel bottle',
+      'publicar.placeholder_price': '0.00',
+      'publicar.placeholder_specs': 'Format:\nKey: Value (one per line)'}
       
       // Errors
       'error.404_title': 'Page not found',
@@ -450,8 +498,10 @@ const EcoI18n = (() => {
   };
 
   const getLang = () => {
-    return localStorage.getItem(STORAGE_KEY) || navigator.language?.startsWith('en') ? 'en' : 'es';
-  };
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) return stored;
+      return (navigator.language && navigator.language.startsWith('en')) ? 'en' : 'es';
+    };
 
   const setLang = (lang) => {
     localStorage.setItem(STORAGE_KEY, lang);

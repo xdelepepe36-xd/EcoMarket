@@ -7,34 +7,34 @@
     <div class="container">
         <div class="section-head">
             <div>
-                <h2 class="section-title"><i class="bi bi-envelope"></i> Contacto</h2>
-                <p>¿Tienes dudas o quieres publicar en EcoMarket? Escríbenos y te responderemos pronto.</p>
+                <h2 class="section-title"><i class="bi bi-envelope"></i> <span data-i18n="contact.title">Contacto</span></h2>
+                <p data-i18n="contact.desc">¿Tienes dudas o quieres publicar en EcoMarket? Escríbenos y te responderemos pronto.</p>
             </div>
         </div>
         <div class="contact-grid">
             <div class="contact-card">
-                <h3><i class="bi bi-headset"></i> Estamos disponibles</h3>
-                <p>Envía tu mensaje y un agente de soporte te contactará dentro de las siguientes 24 horas.</p>
+                <h3><i class="bi bi-headset"></i> <span data-i18n="contact.available">Estamos disponibles</span></h3>
+                <p data-i18n="contact.available_desc">Envía tu mensaje y un agente de soporte te contactará dentro de las siguientes 24 horas.</p>
                 <div style="display:grid;gap:16px;margin-top:20px">
                     <div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--verde-suave);border-radius:12px">
                         <div style="width:40px;height:40px;border-radius:10px;background:var(--verde);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem"><i class="bi bi-envelope"></i></div>
                         <div>
-                            <strong style="font-size:0.88rem;display:block">Email</strong>
-                            <span style="font-size:0.82rem;color:var(--texto-sec)">hola@ecomarket.com</span>
+                            <strong style="font-size:0.88rem;display:block" data-i18n="contact.card_email">Email</strong>
+                            <span style="font-size:0.82rem;color:var(--texto-sec)" data-i18n="contact.card_email_value">hola@ecomarket.com</span>
                         </div>
                     </div>
                     <div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--verde-suave);border-radius:12px">
                         <div style="width:40px;height:40px;border-radius:10px;background:var(--verde);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem"><i class="bi bi-telephone"></i></div>
                         <div>
-                            <strong style="font-size:0.88rem;display:block">Teléfono</strong>
-                            <span style="font-size:0.82rem;color:var(--texto-sec)">+51 999 888 777</span>
+                            <strong style="font-size:0.88rem;display:block" data-i18n="contact.card_phone">Teléfono</strong>
+                            <span style="font-size:0.82rem;color:var(--texto-sec)" data-i18n="contact.card_phone_value">+51 999 888 777</span>
                         </div>
                     </div>
                     <div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--verde-suave);border-radius:12px">
                         <div style="width:40px;height:40px;border-radius:10px;background:var(--verde);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem"><i class="bi bi-clock"></i></div>
                         <div>
-                            <strong style="font-size:0.88rem;display:block">Horario</strong>
-                            <span style="font-size:0.82rem;color:var(--texto-sec)">Lun - Sáb: 9am - 6pm</span>
+                            <strong style="font-size:0.88rem;display:block" data-i18n="contact.card_hours">Horario</strong>
+                            <span style="font-size:0.82rem;color:var(--texto-sec)" data-i18n="contact.card_hours_value">Lun - Sáb: 9am - 6pm</span>
                         </div>
                     </div>
                 </div>
@@ -42,19 +42,19 @@
             <form id="contactForm" class="form-card">
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
                     <div>
-                        <label><i class="bi bi-person"></i> Nombre</label>
-                        <input type="text" name="nombre" placeholder="Tu nombre" required>
+                        <label><i class="bi bi-person"></i> <span data-i18n="contact.form_name">Nombre</span></label>
+                        <input type="text" name="nombre" placeholder="Tu nombre" data-i18n-placeholder="contact.form_name_placeholder" required>
                     </div>
                     <div>
-                        <label><i class="bi bi-envelope"></i> Email</label>
-                        <input type="email" name="email" placeholder="tu@email.com" required>
+                        <label><i class="bi bi-envelope"></i> <span data-i18n="contact.form_email">Email</span></label>
+                        <input type="email" name="email" placeholder="tu@email.com" data-i18n-placeholder="contact.form_email_placeholder" required>
                     </div>
                 </div>
-                <label><i class="bi bi-chat-dots"></i> Mensaje</label>
-                <textarea name="mensaje" rows="5" placeholder="Cuéntanos cómo podemos ayudarte" required></textarea>
-                <button class="btn-principal" type="submit" style="width:100%">Enviar mensaje</button>
+                <label><i class="bi bi-chat-dots"></i> <span data-i18n="contact.form_message">Mensaje</span></label>
+                <textarea name="mensaje" rows="5" placeholder="Cuéntanos cómo podemos ayudarte" data-i18n-placeholder="contact.form_message_placeholder" required></textarea>
+                <button class="btn-principal" type="submit" style="width:100%" data-i18n="contact.send_button">Enviar mensaje</button>
                 <div id="contactSuccess" class="flash flash-success" hidden>
-                    <i class="bi bi-check-circle"></i> Mensaje enviado. Nos pondremos en contacto pronto.
+                    <i class="bi bi-check-circle"></i> <span data-i18n="contact.success">Mensaje enviado. Nos pondremos en contacto pronto.</span>
                 </div>
             </form>
         </div>

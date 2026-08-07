@@ -6,12 +6,12 @@
     <div class="container">
         <div class="section-head">
             <div>
-                <h2 class="section-title"><i class="bi bi-person-circle"></i> Mi Panel</h2>
-                <p>Bienvenido, <strong>{{ session.get('nombre') }}</strong>. Gestiona tus productos, reseñas y más.</p>
+                <h2 class="section-title"><i class="bi bi-person-circle"></i> <span data-i18n="profile.title">Mi Panel</span></h2>
+                <p data-i18n="profile.welcome">Bienvenido, <strong>{{ session.get('nombre') }}</strong>. Gestiona tus productos, reseñas y más.</p>
             </div>
             <div style="display:flex;gap:12px;flex-wrap:wrap">
-                <a href="{{ url_for('publicar') }}" class="btn-principal"><i class="bi bi-plus-circle"></i> Publicar producto</a>
-                <a href="{{ url_for('logout') }}" class="btn-secundario" style="color:#b91c1c;border-color:#b91c1c;"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
+                <a href="{{ url_for('publicar') }}" class="btn-principal"><i class="bi bi-plus-circle"></i> <span data-i18n="profile.publish">Publicar producto</span></a>
+                <a href="{{ url_for('logout') }}" class="btn-secundario" style="color:#b91c1c;border-color:#b91c1c;"><i class="bi bi-box-arrow-right"></i> <span data-i18n="profile.logout">Cerrar sesión</span></a>
             </div>
         </div>
 
@@ -51,33 +51,33 @@
         <div class="stats-grid" style="margin-bottom:28px">
             <div class="stat-card" style="text-align:center;padding:20px;border-radius:20px;background:var(--blanco);box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
                 <div style="font-size:2rem;font-weight:800;color:var(--verde)">{{ total_publicaciones }}</div>
-                <div style="font-size:0.85rem;color:var(--texto-sec)"><i class="bi bi-box-seam"></i> Publicaciones</div>
+                <div style="font-size:0.85rem;color:var(--texto-sec)"><i class="bi bi-box-seam"></i> <span data-i18n="profile.stats.publications">Publicaciones</span></div>
             </div>
             <div class="stat-card" style="text-align:center;padding:20px;border-radius:20px;background:var(--blanco);box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
                 <div style="font-size:2rem;font-weight:800;color:var(--verde)">{{ total_favoritos }}</div>
-                <div style="font-size:0.85rem;color:var(--texto-sec)"><i class="bi bi-heart"></i> Favoritos</div>
+                <div style="font-size:0.85rem;color:var(--texto-sec)"><i class="bi bi-heart"></i> <span data-i18n="profile.stats.favorites">Favoritos</span></div>
             </div>
             <div class="stat-card" style="text-align:center;padding:20px;border-radius:20px;background:var(--blanco);box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
                 <div style="font-size:2rem;font-weight:800;color:var(--verde)">{{ total_resenas_recibidas }}</div>
-                <div style="font-size:0.85rem;color:var(--texto-sec)"><i class="bi bi-star"></i> Reseñas recibidas</div>
+                <div style="font-size:0.85rem;color:var(--texto-sec)"><i class="bi bi-star"></i> <span data-i18n="profile.stats.reviews">Reseñas recibidas</span></div>
             </div>
             <div class="stat-card" style="text-align:center;padding:20px;border-radius:20px;background:var(--blanco);box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
                 <div style="font-size:2rem;font-weight:800;color:var(--verde)">{{ total_ventas }}</div>
-                <div style="font-size:0.85rem;color:var(--texto-sec)"><i class="bi bi-cart"></i> Ventas</div>
+                <div style="font-size:0.85rem;color:var(--texto-sec)"><i class="bi bi-cart"></i> <span data-i18n="profile.stats.sales">Ventas</span></div>
             </div>
             <div class="stat-card" style="text-align:center;padding:20px;border-radius:20px;background:var(--blanco);box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
                 <div style="font-size:1.5rem;font-weight:800;color:var(--verde)">S/. {{ '%.0f'|format(valor_total) }}</div>
-                <div style="font-size:0.85rem;color:var(--texto-sec)"><i class="bi bi-currency-dollar"></i> Valor productos</div>
+                <div style="font-size:0.85rem;color:var(--texto-sec)"><i class="bi bi-currency-dollar"></i> <span data-i18n="profile.stats.value">Valor productos</span></div>
             </div>
         </div>
 
         <!-- Tabs -->
         <div style="display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;border-bottom:2px solid rgba(46,125,50,0.1);padding-bottom:0">
-            <button class="tab-btn active" onclick="setTab(event,'productos')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-box-seam"></i> Mis productos ({{ mis_productos|length }})</button>
-            <button class="tab-btn" onclick="setTab(event,'favoritos')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-heart"></i> Favoritos ({{ favoritos|length }})</button>
-            <button class="tab-btn" onclick="setTab(event,'resenas')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-star"></i> Mis reseñas ({{ resenas|length }})</button>
-            <button class="tab-btn" onclick="setTab(event,'pedidos')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-bag-check"></i> Pedidos ({{ pedidos|length }})</button>
-            <button class="tab-btn" onclick="setTab(event,'config')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-gear"></i> Configuración</button>
+            <button class="tab-btn active" onclick="setTab(event,'productos')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-box-seam"></i> <span data-i18n="profile.tab_products">Mis productos</span> ({{ mis_productos|length }})</button>
+            <button class="tab-btn" onclick="setTab(event,'favoritos')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-heart"></i> <span data-i18n="profile.tab_favorites">Favoritos</span> ({{ favoritos|length }})</button>
+            <button class="tab-btn" onclick="setTab(event,'resenas')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-star"></i> <span data-i18n="profile.tab_reviews">Mis reseñas</span> ({{ resenas|length }})</button>
+            <button class="tab-btn" onclick="setTab(event,'pedidos')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-bag-check"></i> <span data-i18n="profile.tab_orders">Pedidos</span> ({{ pedidos|length }})</button>
+            <button class="tab-btn" onclick="setTab(event,'config')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-gear"></i> <span data-i18n="profile.tab_settings">Configuración</span></button>
         </div>
 
         <!-- TAB: MIS PRODUCTOS -->

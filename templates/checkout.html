@@ -8,17 +8,17 @@
         <div class="checkout-steps">
             <div class="checkout-step completed">
                 <div class="checkout-step-circle"><i class="bi bi-check"></i></div>
-                <span class="checkout-step-label">Carrito</span>
+                <span class="checkout-step-label" data-i18n="checkout.step_cart">Carrito</span>
             </div>
             <div class="checkout-step-line completed"></div>
             <div class="checkout-step active">
                 <div class="checkout-step-circle">2</div>
-                <span class="checkout-step-label">Pago</span>
+                <span class="checkout-step-label" data-i18n="checkout.step_payment">Pago</span>
             </div>
             <div class="checkout-step-line"></div>
             <div class="checkout-step">
                 <div class="checkout-step-circle">3</div>
-                <span class="checkout-step-label">Confirmación</span>
+                <span class="checkout-step-label" data-i18n="checkout.step_confirm">Confirmación</span>
             </div>
         </div>
 
@@ -26,76 +26,76 @@
             <!-- Formulario -->
             <div class="checkout-form-card">
                 <h3 class="checkout-section-title">
-                    <i class="bi bi-person"></i> Datos de envío
+                    <i class="bi bi-person"></i> <span data-i18n="checkout.shipping_info">Datos de envío</span>
                 </h3>
                 <form id="checkoutForm">
                     <div class="checkout-row">
                         <div class="form-group">
-                            <label class="form-label">Nombre</label>
-                            <input type="text" id="nombre" class="form-input" placeholder="María" required>
+                            <label class="form-label" data-i18n="checkout.first_name">Nombre</label>
+                            <input type="text" id="nombre" class="form-input" placeholder="María" data-i18n-placeholder="checkout.first_name_placeholder" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Apellido</label>
-                            <input type="text" id="apellido" class="form-input" placeholder="García" required>
+                            <label class="form-label" data-i18n="checkout.last_name">Apellido</label>
+                            <input type="text" id="apellido" class="form-input" placeholder="García" data-i18n-placeholder="checkout.last_name_placeholder" required>
                         </div>
                     </div>
                     <div class="checkout-row">
                         <div class="form-group">
-                            <label class="form-label">Email</label>
-                            <input type="email" id="email" class="form-input" placeholder="maria@email.com" required>
+                            <label class="form-label" data-i18n="checkout.email">Email</label>
+                            <input type="email" id="email" class="form-input" placeholder="maria@email.com" data-i18n-placeholder="checkout.email_placeholder" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Teléfono</label>
-                            <input type="tel" id="telefono" class="form-input" placeholder="+51 999 999 999">
+                            <label class="form-label" data-i18n="checkout.phone">Teléfono</label>
+                            <input type="tel" id="telefono" class="form-input" placeholder="+51 999 999 999" data-i18n-placeholder="checkout.phone_placeholder">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Dirección</label>
-                        <input type="text" id="direccion" class="form-input" placeholder="Av. Los Álamos 123, Lima" required>
+                        <label class="form-label" data-i18n="checkout.address">Dirección</label>
+                        <input type="text" id="direccion" class="form-input" placeholder="Av. Los Álamos 123, Lima" data-i18n-placeholder="checkout.address_placeholder" required>
                     </div>
                     <div class="checkout-row">
                         <div class="form-group">
-                            <label class="form-label">Ciudad</label>
-                            <input type="text" id="ciudad" class="form-input" placeholder="Lima" required>
+                            <label class="form-label" data-i18n="checkout.city">Ciudad</label>
+                            <input type="text" id="ciudad" class="form-input" placeholder="Lima" data-i18n-placeholder="checkout.city_placeholder" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Código postal</label>
-                            <input type="text" id="codigo_postal" class="form-input" placeholder="15046">
+                            <label class="form-label" data-i18n="checkout.postal_code">Código postal</label>
+                            <input type="text" id="codigo_postal" class="form-input" placeholder="15046" data-i18n-placeholder="checkout.postal_placeholder">
                         </div>
                     </div>
 
                     <h3 class="checkout-section-title">
-                        <i class="bi bi-credit-card"></i> Método de pago
+                        <i class="bi bi-credit-card"></i> <span data-i18n="checkout.payment_methods">Método de pago</span>
                     </h3>
                     <div class="checkout-payment-methods">
                         <label class="payment-option selected">
                             <input type="radio" name="pago" value="card" checked>
                             <i class="bi bi-credit-card"></i>
                             <div>
-                                <strong>Tarjeta crédito/débito</strong>
-                                <span>Visa, Mastercard, Amex</span>
+                                <strong data-i18n="payment.card">Tarjeta crédito/débito</strong>
+                                <span data-i18n="payment.card_brands">Visa, Mastercard, Amex</span>
                             </div>
                         </label>
                         <label class="payment-option">
                             <input type="radio" name="pago" value="yape">
                             <i class="bi bi-phone"></i>
                             <div>
-                                <strong>Yape / Plin</strong>
-                                <span>Pago instantáneo</span>
+                                <strong data-i18n="payment.yape">Yape / Plin</strong>
+                                <span data-i18n="payment.instant">Pago instantáneo</span>
                             </div>
                         </label>
                         <label class="payment-option">
                             <input type="radio" name="pago" value="transferencia">
                             <i class="bi bi-bank"></i>
                             <div>
-                                <strong>Transferencia bancaria</strong>
-                                <span>BCP, Interbank, BBVA</span>
+                                <strong data-i18n="payment.bank">Transferencia bancaria</strong>
+                                <span data-i18n="payment.bank_list">BCP, Interbank, BBVA</span>
                             </div>
                         </label>
                     </div>
 
                     <button type="submit" class="btn-principal checkout-submit-btn">
-                        <i class="bi bi-lock-fill"></i> Pagar S/. <span id="totalPagar">0.00</span>
+                        <i class="bi bi-lock-fill"></i> <span data-i18n="checkout.pay">Pagar S/. </span><span id="totalPagar">0.00</span>
                     </button>
                 </form>
             </div>
@@ -105,32 +105,32 @@
                 <div class="checkout-summary-card">
                     <div class="checkout-summary-header">
                         <i class="bi bi-bag-check"></i>
-                        <h3>Tu pedido</h3>
+                        <h3 data-i18n="checkout.your_order">Tu pedido</h3>
                     </div>
                     <div id="checkoutItems" class="checkout-items-list"></div>
                     <div class="checkout-divider"></div>
                     <div class="checkout-summary-line">
-                        <span>Subtotal</span>
+                        <span data-i18n="checkout.subtotal">Subtotal</span>
                         <span id="subtotalText">S/. 0.00</span>
                     </div>
                     <div class="checkout-summary-line">
-                        <span>Envío</span>
+                        <span data-i18n="checkout.shipping">Envío</span>
                         <span id="envioText" class="envio-gratis">Gratis 🎉</span>
                     </div>
                     {% if session.get('usuario_id') %}
                     <div class="checkout-coupon-section">
-                        <input type="text" id="couponInput" class="form-input" placeholder="Código de cupón">
-                        <button type="button" class="btn-secondary btn-sm" id="applyCouponBtn">Aplicar</button>
+                        <input type="text" id="couponInput" class="form-input" placeholder="Código de cupón" data-i18n-placeholder="checkout.coupon_placeholder">
+                        <button type="button" class="btn-secondary btn-sm" id="applyCouponBtn" data-i18n="checkout.apply_coupon">Aplicar</button>
                     </div>
                     <div class="coupon-status"></div>
                     {% endif %}
                     <div class="checkout-total-line">
-                        <span>Total</span>
+                        <span data-i18n="checkout.total">Total</span>
                         <span id="totalText">S/. 0.00</span>
                     </div>
                     <div class="checkout-eco-note">
                         <i class="bi bi-leaf-fill"></i>
-                        <p>Esta compra evita plástico y ahorra agua. 🌱</p>
+                        <p data-i18n="checkout.eco_note">Esta compra evita plástico y ahorra agua. 🌱</p>
                     </div>
                 </div>
             </aside>

@@ -50,34 +50,34 @@
                 <i class="bi bi-flower2"></i> EcoMarket
             </a>
             <nav class="navbar" id="navbar">
-                <a href="{{ url_for('index') }}" class="nav-link"><i class="bi bi-house"></i> Inicio</a>
-                <a href="{{ url_for('productos_view') }}" class="nav-link"><i class="bi bi-grid"></i> Productos</a>
-                <a href="{{ url_for('favoritos_view') }}" class="nav-link"><i class="bi bi-heart"></i> Favoritos</a>
+                            <a href="{{ url_for('index') }}" class="nav-link"><i class="bi bi-house"></i> <span data-i18n="nav.home">Inicio</span></a>
+                            <a href="{{ url_for('productos_view') }}" class="nav-link"><i class="bi bi-grid"></i> <span data-i18n="nav.products">Productos</span></a>
+                            <a href="{{ url_for('favoritos_view') }}" class="nav-link"><i class="bi bi-heart"></i> <span data-i18n="nav.favorites">Favoritos</span></a>
                 <a href="{{ url_for('carrito_view') }}" class="nav-link">
-                    <i class="bi bi-cart3"></i> Carrito
+                                <i class="bi bi-cart3"></i> <span data-i18n="nav.cart">Carrito</span>
                     <span class="cart-badge" id="cartCount">0</span>
                 </a>
-                <a href="{{ url_for('impacto') }}" class="nav-link"><i class="bi bi-globe-americas"></i> Impacto</a>
-                <a href="{{ url_for('contacto') }}" class="nav-link"><i class="bi bi-envelope"></i> Contacto</a>
+                            <a href="{{ url_for('impacto') }}" class="nav-link"><i class="bi bi-globe-americas"></i> <span data-i18n="nav.impact">Impacto</span></a>
+                            <a href="{{ url_for('contacto') }}" class="nav-link"><i class="bi bi-envelope"></i> <span data-i18n="nav.contact">Contacto</span></a>
                 {% if session.get('usuario_id') %}
-                    <a href="{{ url_for('publicar') }}" class="btn-principal nav-publish"><i class="bi bi-plus-circle"></i> Publicar</a>
+                                <a href="{{ url_for('publicar') }}" class="btn-principal nav-publish"><i class="bi bi-plus-circle"></i> <span data-i18n="nav.publish">Publicar</span></a>
                     <div class="nav-user-menu">
                         <button class="nav-user-btn"><i class="bi bi-person-circle"></i> {{ session.get('nombre', 'Usuario') }}</button>
                         <div class="nav-user-dropdown">
-                            <a href="{{ url_for('perfil') }}"><i class="bi bi-person"></i> Mi perfil</a>
+                                        <a href="{{ url_for('perfil') }}"><i class="bi bi-person"></i> <span data-i18n="nav.profile">Mi perfil</span></a>
                             {% if session.get('rol') == 'admin' %}
-                            <a href="{{ url_for('admin') }}"><i class="bi bi-shield-check"></i> Admin</a>
+                                        <a href="{{ url_for('admin') }}"><i class="bi bi-shield-check"></i> <span data-i18n="nav.admin">Admin</span></a>
                             {% endif %}
-                            <a href="{{ url_for('logout') }}" class="logout-link"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
+                                        <a href="{{ url_for('logout') }}" class="logout-link"><i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">Cerrar sesión</span></a>
                         </div>
                     </div>
                 {% else %}
-                    <a href="{{ url_for('login') }}" class="btn-secundario nav-login"><i class="bi bi-person"></i> Ingresar</a>
-                    <a href="{{ url_for('registro') }}" class="btn-principal nav-publish"><i class="bi bi-person-plus"></i> Registrarse</a>
+                                <a href="{{ url_for('login') }}" class="btn-secundario nav-login"><i class="bi bi-person"></i> <span data-i18n="nav.login">Ingresar</span></a>
+                                <a href="{{ url_for('registro') }}" class="btn-principal nav-publish"><i class="bi bi-person-plus"></i> <span data-i18n="nav.register">Registrarse</span></a>
                 {% endif %}
             </nav>
             <div class="header-actions">
-                <button class="theme-toggle" id="themeToggle" aria-label="Cambiar modo">
+                            <button class="theme-toggle" id="themeToggle" data-eco-theme-btn aria-label="Cambiar modo">
                     <i class="bi bi-moon-stars"></i>
                 </button>
                 <button class="nav-toggle" id="navToggle" aria-label="Abrir menú">
@@ -107,58 +107,58 @@
             <div class="footer-grid">
                 <div class="footer-brand">
                     <a class="logo footer-logo" href="{{ url_for('index') }}"><i class="bi bi-flower2"></i> EcoMarket</a>
-                    <p>Marketplace ecológico donde puedes comprar, vender y dar una segunda vida a productos reciclados y sostenibles.</p>
+                    <p data-i18n="footer.description">Marketplace ecológico donde puedes comprar, vender y dar una segunda vida a productos reciclados y sostenibles.</p>
                     <div class="footer-social">
-                        <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
-                        <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
-                        <a href="#" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
-                        <a href="#" aria-label="WhatsApp"><i class="bi bi-whatsapp"></i></a>
-                        <a href="#" aria-label="TikTok"><i class="bi bi-tiktok"></i></a>
+                        <a href="#" aria-label="Facebook" title="Facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="#" aria-label="Instagram" title="Instagram"><i class="bi bi-instagram"></i></a>
+                        <a href="#" aria-label="Twitter" title="Twitter"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" aria-label="WhatsApp" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+                        <a href="#" aria-label="TikTok" title="TikTok"><i class="bi bi-tiktok"></i></a>
                     </div>
                 </div>
                 <div class="footer-col">
-                    <h4><i class="bi bi-compass"></i> Navegación</h4>
-                    <a href="{{ url_for('index') }}"><i class="bi bi-chevron-right"></i> Inicio</a>
-                    <a href="{{ url_for('productos_view') }}"><i class="bi bi-chevron-right"></i> Catálogo</a>
-                    <a href="{{ url_for('favoritos_view') }}"><i class="bi bi-chevron-right"></i> Favoritos</a>
-                    <a href="{{ url_for('impacto') }}"><i class="bi bi-chevron-right"></i> Impacto</a>
-                    <a href="{{ url_for('contacto') }}"><i class="bi bi-chevron-right"></i> Contacto</a>
+                    <h4><i class="bi bi-compass"></i> <span data-i18n="footer.navigation">Navegación</span></h4>
+                    <a href="{{ url_for('index') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="nav.home">Inicio</span></a>
+                    <a href="{{ url_for('productos_view') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="nav.catalog">Catálogo</span></a>
+                    <a href="{{ url_for('favoritos_view') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="nav.favorites">Favoritos</span></a>
+                    <a href="{{ url_for('impacto') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="nav.impact">Impacto</span></a>
+                    <a href="{{ url_for('contacto') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="nav.contact">Contacto</span></a>
                 </div>
                 <div class="footer-col">
-                    <h4><i class="bi bi-person"></i> Cuenta</h4>
+                    <h4><i class="bi bi-person"></i> <span data-i18n="footer.account">Cuenta</span></h4>
                     {% if session.get('usuario_id') %}
-                        <a href="{{ url_for('perfil') }}"><i class="bi bi-chevron-right"></i> Mi perfil</a>
-                        <a href="{{ url_for('publicar') }}"><i class="bi bi-chevron-right"></i> Publicar producto</a>
-                        <a href="{{ url_for('logout') }}"><i class="bi bi-chevron-right"></i> Cerrar sesión</a>
+                        <a href="{{ url_for('perfil') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="footer.profile">Mi perfil</span></a>
+                        <a href="{{ url_for('publicar') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="footer.publish">Publicar producto</span></a>
+                        <a href="{{ url_for('logout') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="footer.logout">Cerrar sesión</span></a>
                     {% else %}
-                        <a href="{{ url_for('login') }}"><i class="bi bi-chevron-right"></i> Iniciar sesión</a>
-                        <a href="{{ url_for('registro') }}"><i class="bi bi-chevron-right"></i> Registrarse</a>
+                        <a href="{{ url_for('login') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="footer.login">Iniciar sesión</span></a>
+                        <a href="{{ url_for('registro') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="footer.register">Registrarse</span></a>
                     {% endif %}
-                    <a href="{{ url_for('carrito_view') }}"><i class="bi bi-chevron-right"></i> Mi carrito</a>
+                    <a href="{{ url_for('carrito_view') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="footer.cart">Mi carrito</span></a>
                 </div>
                 <div class="footer-col">
-                    <h4><i class="bi bi-shield-check"></i> Legal</h4>
-                    <a href="{{ url_for('terminos') }}"><i class="bi bi-chevron-right"></i> Términos y condiciones</a>
-                    <a href="{{ url_for('privacidad') }}"><i class="bi bi-chevron-right"></i> Política de privacidad</a>
-                    <a href="{{ url_for('contacto') }}"><i class="bi bi-chevron-right"></i> Contacto</a>
+                    <h4><i class="bi bi-shield-check"></i> <span data-i18n="footer.legal">Legal</span></h4>
+                    <a href="{{ url_for('terminos') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="footer.terms">Términos y condiciones</span></a>
+                    <a href="{{ url_for('privacidad') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="footer.privacy">Política de privacidad</span></a>
+                    <a href="{{ url_for('contacto') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="nav.contact">Contacto</span></a>
                 </div>
                 <div class="footer-col">
-                    <h4><i class="bi bi-headset"></i> Contacto</h4>
-                    <p><i class="bi bi-envelope"></i> hola@ecomarket.com</p>
-                    <p><i class="bi bi-telephone"></i> +51 999 888 777</p>
-                    <p><i class="bi bi-geo-alt"></i> Lima, Perú</p>
-                    <p><i class="bi bi-clock"></i> Lun - Sáb: 9am - 6pm</p>
+                    <h4><i class="bi bi-headset"></i> <span data-i18n="footer.contact">Contacto</span></h4>
+                    <p><i class="bi bi-envelope"></i> <span data-i18n="footer.email">hola@ecomarket.com</span></p>
+                    <p><i class="bi bi-telephone"></i> <span data-i18n="footer.phone">+51 999 888 777</span></p>
+                    <p><i class="bi bi-geo-alt"></i> <span data-i18n="footer.location">Lima, Perú</span></p>
+                    <p><i class="bi bi-clock"></i> <span data-i18n="footer.hours">Lun - Sáb: 9am - 6pm</span></p>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>© 2026 EcoMarket — Todos los derechos reservados.</p>
-                <p>Hecho con <i class="bi bi-heart-fill footer-heart"></i> para el planeta</p>
+                <p data-i18n="footer.copyright">© 2026 EcoMarket — Todos los derechos reservados.</p>
+                <p data-i18n="footer.made_with">Hecho con <i class="bi bi-heart-fill footer-heart"></i> para el planeta</p>
             </div>
         </div>
     </footer>
 
     <!-- Botón volver arriba -->
-    <button id="backToTop" class="back-to-top" aria-label="Volver arriba">
+    <button id="backToTop" class="back-to-top" aria-label="Volver arriba" title="Volver arriba" data-i18n-title="back_to_top">
         <i class="bi bi-arrow-up"></i>
     </button>
 

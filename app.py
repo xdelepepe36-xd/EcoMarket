@@ -13,6 +13,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
 import hashlib
 import secrets
+from PIL import Image
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
@@ -60,6 +61,30 @@ def allowed_file(filename):
 
 def get_product_image(categoria):
     return PRODUCT_IMAGES.get(categoria, PRODUCT_IMAGES['default'])
+
+
+def _create_thumbnail(saved_path, thumb_path, max_size=800):
+    """Genera una miniatura del archivo guardado en saved_path y la escribe en thumb_path.
+    No procesa SVGs; en caso de error, elimina cualquier intento parcial.
+    """
+    try:
+        ext = os.path.splitext(saved_path)[1].lower().lstrip('.')
+        if ext == 'svg':
+            return False
+        with Image.open(saved_path) as img:
+            img.convert('RGB')
+            img.thumbnail((max_size, max_size), Image.LANCZOS)
+            # Asegurar carpeta
+            os.makedirs(os.path.dirname(thumb_path), exist_ok=True)
+            img.save(thumb_path, optimize=True, quality=85)
+        return True
+    except Exception:
+        try:
+            if os.path.exists(thumb_path):
+                os.remove(thumb_path)
+        except Exception:
+            pass
+        return False
 
 
 # ── DB ──────────────────────────────────────────────────────────────────────
@@ -116,6 +141,7 @@ def init_db():
              precio_original REAL,
              descripcion TEXT NOT NULL,
              imagen TEXT DEFAULT '',
+             imagen_thumb TEXT DEFAULT '',
              stock INTEGER DEFAULT 10,
              condicion TEXT DEFAULT 'nuevo',
              etiquetas TEXT DEFAULT '',
@@ -131,6 +157,7 @@ def init_db():
              id INTEGER PRIMARY KEY AUTOINCREMENT,
              producto_id INTEGER NOT NULL,
              imagen TEXT NOT NULL,
+             imagen_thumb TEXT DEFAULT '',
              titulo TEXT DEFAULT '',
              orden INTEGER DEFAULT 0,
              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -293,6 +320,20 @@ def init_db():
     except sqlite3.OperationalError:
         pass  # La columna ya existe
 
+    # Agregar columna imagen_thumb a productos si no existe
+    try:
+        conn.execute('ALTER TABLE productos ADD COLUMN imagen_thumb TEXT DEFAULT ""')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
+    # Agregar columna imagen_thumb a producto_imagenes si no existe
+    try:
+        conn.execute('ALTER TABLE producto_imagenes ADD COLUMN imagen_thumb TEXT DEFAULT ""')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
     # ── Índices para optimizar búsquedas ──────────────────────
     conn.execute('CREATE INDEX IF NOT EXISTS idx_productos_categoria ON productos(categoria)')
     conn.execute('CREATE INDEX IF NOT EXISTS idx_productos_precio ON productos(precio)')
@@ -303,6 +344,8 @@ def init_db():
     conn.execute('CREATE INDEX IF NOT EXISTS idx_pedidos_usuario ON pedidos(usuario_id)')
     conn.execute('CREATE INDEX IF NOT EXISTS idx_notificaciones_usuario ON notificaciones(usuario_id)')
     conn.execute('CREATE INDEX IF NOT EXISTS idx_producto_imagenes_producto ON producto_imagenes(producto_id)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_productos_imagen_thumb ON productos(imagen_thumb)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_producto_imagenes_imagen_thumb ON producto_imagenes(imagen_thumb)')
 
     conn.commit()
     conn.close()
@@ -410,6 +453,17 @@ def get_producto_detalle(producto_id):
             'SELECT * FROM producto_imagenes WHERE producto_id = ? ORDER BY orden ASC, id ASC',
             (producto_id,)
         ).fetchall()
+
+        # If producto.imagen_thumb exists use it for main image prefer thumb
+        if producto.get('imagen_thumb'):
+            producto = dict(producto)
+            producto['imagen_pref'] = producto.get('imagen_thumb') or producto.get('imagen')
+        else:
+            producto = dict(producto)
+            producto['imagen_pref'] = producto.get('imagen')
+
+        # Normalize imagenes_extra to dicts
+        imagenes_extra = [dict(i) for i in imagenes_extra]
 
         # Especificaciones del producto (JSON)
         especificaciones = {}
@@ -764,8 +818,21 @@ def publicar():
             if file and file.filename and allowed_file(file.filename):
                 ext = file.filename.rsplit('.', 1)[1].lower()
                 filename = f"{uuid.uuid4().hex}.{ext}"
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                saved_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(saved_path)
                 imagen = f'uploads/{filename}'
+
+                # Generar miniatura (thumb)
+                thumb_name = f"{uuid.uuid4().hex}_thumb.jpg"
+                thumb_path = os.path.join(app.config['UPLOAD_FOLDER'], thumb_name)
+                if _create_thumbnail(saved_path, thumb_path, max_size=800):
+                    imagen_thumb = f'uploads/{thumb_name}'
+                else:
+                    imagen_thumb = ''
+            else:
+                imagen_thumb = ''
+        else:
+            imagen_thumb = ''
 
         if not all([nombre, categoria, precio, descripcion]):
             flash('Completa todos los campos obligatorios.', 'danger')
@@ -791,8 +858,8 @@ def publicar():
 
         conn = get_db()
         cursor = conn.execute(
-            'INSERT INTO productos (nombre, categoria, precio, descripcion, imagen, stock, condicion, especificaciones, usuario_id) VALUES (?,?,?,?,?,?,?,?,?)',
-            (nombre, categoria, precio_valor, descripcion, imagen, stock_valor, condicion, especificaciones_json, session['usuario_id'])
+            'INSERT INTO productos (nombre, categoria, precio, descripcion, imagen, imagen_thumb, stock, condicion, especificaciones, usuario_id) VALUES (?,?,?,?,?,?,?,?,?,?)',
+            (nombre, categoria, precio_valor, descripcion, imagen, imagen_thumb, stock_valor, condicion, especificaciones_json, session['usuario_id'])
         )
         producto_id = cursor.lastrowid
 
@@ -804,10 +871,20 @@ def publicar():
                 if file and file.filename and allowed_file(file.filename):
                     ext = file.filename.rsplit('.', 1)[1].lower()
                     filename = f"{uuid.uuid4().hex}.{ext}"
-                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    saved_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    file.save(saved_path)
+                    imagen_rel = f'uploads/{filename}'
+
+                    # Generar miniatura para la imagen de la galería
+                    thumb_name = f"{uuid.uuid4().hex}_thumb.jpg"
+                    thumb_path = os.path.join(app.config['UPLOAD_FOLDER'], thumb_name)
+                    imagen_thumb_rel = ''
+                    if _create_thumbnail(saved_path, thumb_path, max_size=800):
+                        imagen_thumb_rel = f'uploads/{thumb_name}'
+
                     conn.execute(
-                        'INSERT INTO producto_imagenes (producto_id, imagen, titulo, orden) VALUES (?,?,?,?)',
-                        (producto_id, f'uploads/{filename}', '', orden)
+                        'INSERT INTO producto_imagenes (producto_id, imagen, imagen_thumb, titulo, orden) VALUES (?,?,?,?,?)',
+                        (producto_id, imagen_rel, imagen_thumb_rel, '', orden)
                     )
                     orden += 1
 

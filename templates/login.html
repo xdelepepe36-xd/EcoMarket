@@ -7,16 +7,16 @@
         <div class="auth-card form-card">
             <div class="auth-header">
                 <span class="auth-icon">🌱</span>
-                <h2 class="section-title">Iniciar Sesión</h2>
-                <p>Accede a tu cuenta para comprar y vender productos ecológicos.</p>
+                <h2 class="section-title" data-i18n="auth.login_title">Iniciar Sesión</h2>
+                <p data-i18n="auth.login_desc">Accede a tu cuenta para comprar y vender productos ecológicos.</p>
             </div>
             <form method="POST" action="{{ url_for('login') }}">
-                <label for="email"><i class="bi bi-envelope"></i> Correo electrónico</label>
-                <input type="email" id="email" name="email" placeholder="tu@correo.com" required autofocus>
-                <label for="password"><i class="bi bi-lock"></i> Contraseña</label>
-                <input type="password" id="password" name="password" placeholder="Tu contraseña" required>
+                <label for="email"><i class="bi bi-envelope"></i> <span data-i18n="auth.email">Correo electrónico</span></label>
+                <input type="email" id="email" name="email" placeholder="tu@correo.com" data-i18n-placeholder="auth.email_placeholder" required autofocus>
+                <label for="password"><i class="bi bi-lock"></i> <span data-i18n="auth.password">Contraseña</span></label>
+                <input type="password" id="password" name="password" placeholder="Tu contraseña" data-i18n-placeholder="auth.password_placeholder" required>
                 <button class="btn-principal" type="submit" style="width:100%; margin-top:8px;">
-                    <i class="bi bi-box-arrow-in-right"></i> Ingresar
+                    <i class="bi bi-box-arrow-in-right"></i> <span data-i18n="auth.login_button">Ingresar</span>
                 </button>
             </form>
             <div class="auth-divider"><span>¿No tienes cuenta?</span></div>

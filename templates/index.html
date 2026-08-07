@@ -50,10 +50,10 @@
     <div class="container">
         <div class="section-head-flex">
             <div>
-                <span class="section-tag"><i class="bi bi-compass"></i> Explora</span>
-                <h2 class="section-title">Categorías populares</h2>
+            <span class="section-tag"><i class="bi bi-compass"></i> <span data-i18n="explore.tag">Explora</span></span>
+            <h2 class="section-title"><span data-i18n="categories.title">Categorías populares</span></h2>
             </div>
-            <a href="{{ url_for('productos_view') }}" class="section-link">Ver todos <i class="bi bi-arrow-right"></i></a>
+            <a href="{{ url_for('productos_view') }}" class="section-link"><span data-i18n="categories.view_all">Ver todos</span> <i class="bi bi-arrow-right"></i></a>
         </div>
         <div class="categorias-grid">
             {% for cat in categorias %}
@@ -79,10 +79,10 @@
     <div class="container">
         <div class="section-head-flex">
             <div>
-                <span class="section-tag"><i class="bi bi-star"></i> Destacados</span>
-                <h2 class="section-title">Más vendidos esta semana</h2>
+                <span class="section-tag"><i class="bi bi-star"></i> <span data-i18n="featured.tag">Destacados</span></span>
+                <h2 class="section-title"><span data-i18n="featured.title">Más vendidos esta semana</span></h2>
             </div>
-            <a href="{{ url_for('productos_view') }}" class="section-link">Ver catálogo completo <i class="bi bi-arrow-right"></i></a>
+            <a href="{{ url_for('productos_view') }}" class="section-link"><span data-i18n="featured.view_catalog">Ver catálogo completo</span> <i class="bi bi-arrow-right"></i></a>
         </div>
         <div class="productos-grid">
             {% for producto in productos %}
@@ -176,14 +176,14 @@
     <div class="container">
         <div class="cta-grid">
             <div class="cta-content">
-                <h2 class="cta-title">¿Tienes productos ecológicos?</h2>
-                <p class="cta-desc">Publica gratis y llega a miles de compradores comprometidos con el planeta.</p>
+                <h2 class="cta-title"><span data-i18n="cta.title">¿Tienes productos ecológicos?</span></h2>
+                <p class="cta-desc"><span data-i18n="cta.desc">Publica gratis y llega a miles de compradores comprometidos con el planeta.</span></p>
                 <div class="cta-actions">
                     <a href="{{ url_for('publicar') }}" class="btn-hero-main" style="background:#fff;color:var(--verde);box-shadow:0 8px 24px rgba(0,0,0,0.15)">
-                        <i class="bi bi-plus-lg"></i> Publicar ahora
+                        <i class="bi bi-plus-lg"></i> <span data-i18n="cta.publish_now">Publicar ahora</span>
                     </a>
                     <a href="{{ url_for('registro') }}" class="btn-hero-sec" style="border-color:rgba(255,255,255,0.4);color:#fff">
-                        <i class="bi bi-person-plus"></i> Crear cuenta gratis
+                        <i class="bi bi-person-plus"></i> <span data-i18n="cta.create_account">Crear cuenta gratis</span>
                     </a>
                 </div>
             </div>

@@ -153,7 +153,7 @@ function renderCheckout() {
     let subtotal = 0;
 
     if (items.length === 0) {
-        container.innerHTML = '<div class="checkout-empty-msg">Tu carrito está vacío</div>';
+        container.innerHTML = '<div class="checkout-empty-msg" data-i18n="auto.checkout.156">Tu carrito está vacío</div>';
         const btn = document.querySelector('#checkoutForm button[type="submit"]');
         if (btn) btn.disabled = true;
         return;

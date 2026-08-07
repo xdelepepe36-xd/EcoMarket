@@ -27,7 +27,7 @@
             <div class="admin-stat-card">
                 <i class="bi bi-star"></i>
                 <strong>{{ stats.total_resenas }}</strong>
-                <span>Reseñas</span>
+                <span data-i18n="auto.admin.30">Reseñas</span>
             </div>
             <div class="admin-stat-card">
                 <i class="bi bi-bag-check"></i>
@@ -66,7 +66,7 @@
                         <td><strong>{{ producto.nombre[:40] }}{% if producto.nombre|length > 40 %}...{% endif %}</strong></td>
                         <td><span class="badge badge-success">{{ producto.categoria }}</span></td>
                         <td><strong>S/. {{ '%.2f'|format(producto.precio) }}</strong></td>
-                        <td>{{ producto.vendedor_nombre or 'Anónimo' }}</td>
+                        <td data-i18n="auto.admin.69">{{ producto.vendedor_nombre or 'Anónimo' }}</td>
                         <td>
                             <div style="display:flex;align-items:center;gap:4px;color:#f59e0b">
                                 <i class="bi bi-star-fill" style="font-size:0.8rem"></i>

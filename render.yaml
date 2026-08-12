@@ -14,11 +14,13 @@ services:
         value: production
       - key: FLASK_DEBUG
         value: "0"
+      - key: PORT
+        value: "10000"
       - key: DATABASE_URL
         value: /var/data/ecomarket.db
       - key: UPLOADS_DIR
         value: /var/data/uploads
-    healthCheckPath: /
+    healthCheckPath: /health
     autoDeploy: true
     disk:
       name: ecomarket-data

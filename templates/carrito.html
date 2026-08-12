@@ -14,7 +14,10 @@
             <div class="carrito-items" id="cartItems"></div>
             <aside class="carrito-resumen">
                 <div class="resumen-card">
-                    <h3 data-i18n="cart.summary">Resumen</h3>
+                    <div class="resumen-header">
+                        <i class="bi bi-bag-check"></i>
+                        <h3 data-i18n="cart.summary">Resumen</h3>
+                    </div>
                     <p class="resumen-line"><span data-i18n="cart.items">Productos</span>: <span id="cartItemCount">0</span></p>
                     <p class="resumen-line"><span data-i18n="cart.subtotal">Subtotal</span>: <span id="cartSubtotal">S/. 0.00</span></p>
                     <p class="resumen-line"><span data-i18n="cart.shipping">Envío</span>: <span id="cartShipping">S/. 0.00</span></p>
@@ -37,55 +40,68 @@
 <style>
 .carrito-grid {
     display: grid;
-    grid-template-columns: 1fr 320px;
+    grid-template-columns: 1.2fr 360px;
     gap: 24px;
     align-items: start;
 }
 .carrito-items {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 16px;
 }
 .carrito-item {
-    background: var(--blanco);
-    border-radius: 16px;
-    padding: 16px;
-    box-shadow: var(--sombra);
+    background: linear-gradient(180deg, #ffffff 0%, #f7fff8 100%);
+    border-radius: 22px;
+    padding: 18px;
+    box-shadow: 0 16px 36px rgba(15, 92, 44, 0.08);
     border: 1px solid rgba(46,125,50,0.08);
     display: flex;
     align-items: center;
     gap: 16px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.carrito-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 42px rgba(15, 92, 44, 0.12);
 }
 .carrito-item img {
-    width: 80px;
-    height: 80px;
+    width: 86px;
+    height: 86px;
     object-fit: cover;
-    border-radius: 12px;
+    border-radius: 14px;
 }
 .carrito-item h3 {
-    font-size: 0.95rem;
+    font-size: 1rem;
     margin-bottom: 4px;
+    line-height: 1.45;
 }
 .carrito-item .categoria {
     font-size: 0.75rem;
     color: var(--texto-sec);
-    margin-bottom: 4px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 .carrito-item .precio {
-    font-weight: 700;
+    font-weight: 800;
     color: var(--verde);
+    font-size: 1rem;
 }
 .carrito-item .qty-controls {
     display: flex;
     align-items: center;
     gap: 8px;
     margin-left: auto;
+    background: rgba(46,125,50,0.05);
+    border: 1px solid rgba(46,125,50,0.1);
+    border-radius: 999px;
+    padding: 4px 8px;
 }
 .carrito-item .qty-btn {
     width: 30px;
     height: 30px;
-    border-radius: 8px;
-    border: 1px solid rgba(46,125,50,0.2);
+    border-radius: 50%;
+    border: none;
     background: var(--blanco);
     cursor: pointer;
     font-weight: 700;
@@ -93,45 +109,63 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 4px 14px rgba(46,125,50,0.1);
 }
 .carrito-item .remove-btn {
-    background: none;
+    background: rgba(229,57,53,0.08);
     border: none;
     color: #e53935;
     cursor: pointer;
     font-size: 1.1rem;
-    padding: 4px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .resumen-card {
-    background: var(--blanco);
-    border-radius: 20px;
+    background: linear-gradient(180deg, #ffffff 0%, #f9fff9 100%);
+    border-radius: 22px;
     padding: 24px;
-    box-shadow: var(--sombra);
+    box-shadow: 0 20px 44px rgba(15, 92, 44, 0.1);
     border: 1px solid rgba(46,125,50,0.08);
     position: sticky;
     top: 100px;
 }
+.resumen-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    color: var(--verde);
+}
+.resumen-header i {
+    font-size: 1.2rem;
+}
 .resumen-card h3 {
     color: var(--verde);
-    margin-bottom: 16px;
+    margin: 0;
+    font-size: 1.3rem;
 }
 .resumen-line {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     font-size: 0.9rem;
     color: var(--texto-sec);
 }
 .resumen-total {
-    border-top: 1px solid rgba(46,125,50,0.1);
-    padding-top: 12px;
-    margin-top: 12px;
-    font-size: 1.1rem;
+    border-top: 1px solid rgba(46,125,50,0.12);
+    padding-top: 14px;
+    margin-top: 14px;
+    font-size: 1.05rem;
     color: var(--texto);
 }
 .resumen-total strong {
     color: var(--verde);
-    font-size: 1.3rem;
+    font-size: 1.35rem;
 }
 .resumen-card .btn-principal {
     width: 100%;
@@ -142,6 +176,7 @@
     color: var(--texto-sec);
     text-align: center;
     margin-top: 12px;
+    line-height: 1.6;
 }
 @media (max-width: 768px) {
     .carrito-grid {
@@ -149,6 +184,9 @@
     }
     .resumen-card {
         position: static;
+    }
+    .carrito-item {
+        flex-wrap: wrap;
     }
 }
 </style>

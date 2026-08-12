@@ -456,11 +456,10 @@ def get_producto_detalle(producto_id):
         ).fetchall()
 
         # If producto.imagen_thumb exists use it for main image prefer thumb
+        producto = dict(producto)
         if producto.get('imagen_thumb'):
-            producto = dict(producto)
             producto['imagen_pref'] = producto.get('imagen_thumb') or producto.get('imagen')
         else:
-            producto = dict(producto)
             producto['imagen_pref'] = producto.get('imagen')
 
         # Normalize imagenes_extra to dicts
@@ -468,7 +467,7 @@ def get_producto_detalle(producto_id):
 
         # Especificaciones del producto (JSON)
         especificaciones = {}
-        if producto['especificaciones']:
+        if producto.get('especificaciones'):
             try:
                 especificaciones = json.loads(producto['especificaciones'])
             except (json.JSONDecodeError, TypeError):

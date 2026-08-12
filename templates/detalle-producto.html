@@ -69,32 +69,37 @@
 
         <!-- INFO -->
         <div class="detalle-info">
-            <span class="categoria">{{ producto.categoria }}</span>
+            <div class="detalle-info-header">
+                <span class="categoria">{{ producto.categoria }}</span>
+                <button class="share-btn" onclick="compartir('copy')" title="Copiar enlace" aria-label="Copiar enlace"><i class="bi bi-share"></i></button>
+            </div>
             <h2>{{ producto.nombre }}</h2>
 
-            <!-- Rating -->
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-                <div style="display:flex;gap:2px;font-size:1.1rem;color:#f59e0b">
+            <div class="detalle-rating-row">
+                <div class="detalle-rating-stars">
                     {% for i in range(5) %}
                     <span>{% if i < (producto.rating_promedio|round) %}★{% else %}☆{% endif %}</span>
                     {% endfor %}
                 </div>
-                <strong style="font-size:1rem">{{ '%.1f'|format(producto.rating_promedio) }}</strong>
-                <span style="color:var(--texto-sec);font-size:0.85rem">({{ producto.total_resenas }} reseñas)</span>
-                <span style="color:var(--texto-sec);font-size:0.85rem">· 👁️ {{ producto.vistas }} vistas</span>
+                <strong>{{ '%.1f'|format(producto.rating_promedio) }}</strong>
+                <span>({{ producto.total_resenas }} reseñas)</span>
+                <span>· 👁️ {{ producto.vistas }} vistas</span>
             </div>
 
-            <!-- Precio -->
-            <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:16px">
-                <strong class="detalle-precio">S/. {{ '%.2f'|format(producto.precio) }}</strong>
-                {% if producto.precio_original and producto.precio_original > producto.precio %}
-                <span style="text-decoration:line-through;color:var(--texto-sec);font-size:1rem">S/. {{ '%.2f'|format(producto.precio_original) }}</span>
-                <span style="background:#fdecea;color:#b91c1c;padding:3px 10px;border-radius:999px;font-size:0.78rem;font-weight:700">-{{ ((1 - producto.precio / producto.precio_original) * 100)|round }}%</span>
-                {% endif %}
+            <div class="detalle-price-box">
+                <div class="detalle-price-stack">
+                    <strong class="detalle-precio">S/. {{ '%.2f'|format(producto.precio) }}</strong>
+                    {% if producto.precio_original and producto.precio_original > producto.precio %}
+                    <div class="detalle-price-strike-row">
+                        <span class="detalle-precio-original">S/. {{ '%.2f'|format(producto.precio_original) }}</span>
+                        <span class="detalle-discount">-{{ ((1 - producto.precio / producto.precio_original) * 100)|round }}%</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="detalle-delivery-pill"><i class="bi bi-truck"></i> Envío gratis en Lima</div>
             </div>
 
-            <!-- Stock y condición -->
-            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+            <div class="detalle-pills">
                 <span class="badge" style="background:{% if producto.stock > 0 %}#e8f5e9;color:#2e7d32{% else %}#fdecea;color:#b91c1c{% endif %}">
                     {% if producto.stock > 0 %}✅ {{ producto.stock }} en stock{% else %}❌ Agotado{% endif %}
                 </span>
@@ -109,27 +114,24 @@
                 {% endif %}
             </div>
 
-            <!-- Descripción -->
-            <p style="line-height:1.8;color:var(--texto-sec);margin-bottom:20px">{{ producto.descripcion }}</p>
+            <p class="detalle-description">{{ producto.descripcion }}</p>
 
-            <!-- Vendedor -->
             {% if producto.vendedor_nombre %}
-            <div style="background:var(--verde-suave);border-radius:16px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px">
-                <div style="width:44px;height:44px;border-radius:50%;background:var(--verde);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem">{{ producto.vendedor_nombre[0] }}</div>
+            <div class="detalle-seller-box">
+                <div class="detalle-seller-avatar">{{ producto.vendedor_nombre[0] }}</div>
                 <div>
-                    <strong style="font-size:0.9rem">Vendido por {{ producto.vendedor_nombre }}</strong>
-                    <div style="font-size:0.78rem;color:var(--texto-sec)">{{ producto.total_vendedor_productos }} producto(s) publicado(s)</div>
+                    <strong>Vendido por {{ producto.vendedor_nombre }}</strong>
+                    <div>{{ producto.total_vendedor_productos }} producto(s) publicado(s)</div>
                 </div>
             </div>
             {% endif %}
 
-            <!-- Botones -->
-            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+            <div class="detalle-actions">
                 <button class="btn-principal add-cart" data-producto-id="{{ producto.id }}" data-producto-nombre="{{ producto.nombre }}" data-producto-categoria="{{ producto.categoria }}" data-producto-precio="{{ '%.2f'|format(producto.precio) }}" data-producto-imagen="{{ producto.imagen }}" style="flex:1">
-                                <i class="bi bi-bag-plus"></i> <span data-i18n="add_cart">Agregar al carrito</span>
+                    <i class="bi bi-bag-plus"></i> <span data-i18n="add_cart">Agregar al carrito</span>
                 </button>
                 {% if session.get('usuario_id') %}
-                <button id="favBtn" onclick="toggleFavorito({{ producto.id }})" class="btn-secundario" style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;{% if es_favorito %}background:#fdecea;border-color:#e53935;color:#e53935{% endif %}">
+                <button id="favBtn" onclick="toggleFavorito({{ producto.id }})" class="btn-secundario detalle-fav-btn" style="{% if es_favorito %}background:#fdecea;border-color:#e53935;color:#e53935{% endif %}">
                     <i class="bi {% if es_favorito %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
                 </button>
                 {% endif %}
@@ -141,9 +143,8 @@
                 <div class="benefit-item">🔄 Devoluciones gratis</div>
             </div>
 
-            <!-- Compartir -->
-            <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
-                            <span style="font-size:0.82rem;color:var(--texto-sec);font-weight:600"><i class="bi bi-share"></i> <span data-i18n="share">Compartir</span>:</span>
+            <div class="detalle-share-row">
+                <span><i class="bi bi-share"></i> <span data-i18n="share">Compartir</span>:</span>
                 <button class="share-btn" onclick="compartir('facebook')" title="Compartir en Facebook" aria-label="Compartir en Facebook"><i class="bi bi-facebook"></i></button>
                 <button class="share-btn" onclick="compartir('twitter')" title="Compartir en Twitter" aria-label="Compartir en Twitter"><i class="bi bi-twitter-x"></i></button>
                 <button class="share-btn" onclick="compartir('whatsapp')" title="Compartir en WhatsApp" aria-label="Compartir en WhatsApp"><i class="bi bi-whatsapp"></i></button>

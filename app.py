@@ -17,7 +17,9 @@ from PIL import Image
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
-DB_PATH = os.environ.get('DATABASE_URL', os.path.join(os.path.dirname(__file__), 'data', 'ecomarket.db'))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.environ.get('DATABASE_URL', os.path.join(BASE_DIR, 'data', 'ecomarket.db'))
+UPLOAD_FOLDER = os.environ.get('UPLOADS_DIR', os.path.join(BASE_DIR, 'static', 'uploads'))
 
 
 # ── Filtros Jinja2 personalizados ────────────────────────────────────────────
@@ -33,7 +35,6 @@ def fromjson_filter(value):
         return {}
 
 # Configuración de subida de imágenes
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'}
 MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5MB
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER

@@ -17,10 +17,26 @@ const EcoTheme = (() => {
   };
 
   // ── Gestión ────────────────────────────────────────────
-  const get = () => localStorage.getItem(KEY) || 'light';
+  const readStorage = (fallback = 'light') => {
+    try {
+      return localStorage.getItem(KEY) || fallback;
+    } catch (error) {
+      return fallback;
+    }
+  };
+
+  const writeStorage = theme => {
+    try {
+      localStorage.setItem(KEY, theme);
+    } catch (error) {
+      // Storage may be unavailable in some browser contexts.
+    }
+  };
+
+  const get = () => readStorage('light');
   const set = theme => {
     if (!THEMES[theme]) return;
-    localStorage.setItem(KEY, theme);
+    writeStorage(theme);
     _apply(theme);
     _updateUI();
     window.dispatchEvent(new CustomEvent('eco-theme:change', { detail: { theme } }));
@@ -98,11 +114,11 @@ const EcoTheme = (() => {
   // ── Inicialización ────────────────────────────────────
   const init = () => {
     // Detectar preferencia del sistema
-    const saved = localStorage.getItem(KEY);
-    if (!saved) {
+    const saved = readStorage();
+    if (!saved || !THEMES[saved]) {
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       if (prefersDark) {
-        localStorage.setItem(KEY, 'dark');
+        writeStorage('dark');
       }
     }
 

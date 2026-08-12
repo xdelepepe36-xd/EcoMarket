@@ -265,8 +265,8 @@ const EcoImprovements = (() => {
 
   let currentLang = localStorage.getItem('eco_lang') || 'es';
 
-  const t = (key) => {
-    return translations[currentLang]?.[key] || translations['es']?.[key] || key;
+  const t = (key, fallback = '') => {
+    return translations[currentLang]?.[key] || translations['es']?.[key] || fallback || key;
   };
 
   const setLanguage = (lang) => {
@@ -278,13 +278,15 @@ const EcoImprovements = (() => {
     // Actualizar elementos con data-i18n
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.dataset.i18n;
-      el.textContent = t(key);
+      const fallback = el.textContent?.trim() || key;
+      el.textContent = t(key, fallback);
     });
 
     // Actualizar placeholders
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
       const key = el.dataset.i18nPlaceholder;
-      el.placeholder = t(key);
+      const fallback = el.getAttribute('placeholder') || '';
+      el.placeholder = t(key, fallback);
     });
 
     window.dispatchEvent(new CustomEvent('eco-lang:change', { detail: { lang } }));

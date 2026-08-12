@@ -29,6 +29,7 @@ const EcoI18n = (() => {
       // Navbar
       'nav.home': 'Inicio',
       'nav.products': 'Productos',
+      'nav.catalog': 'Catálogo',
       'nav.favorites': 'Favoritos',
       'nav.cart': 'Carrito',
       'nav.impact': 'Impacto',
@@ -39,6 +40,7 @@ const EcoI18n = (() => {
       'nav.profile': 'Mi perfil',
       'nav.admin': 'Admin',
       'nav.logout': 'Cerrar sesión',
+      'back_to_top': 'Volver arriba',
       
       // Hero
       'hero.badge': 'Marketplace 100% ecológico',
@@ -53,6 +55,15 @@ const EcoI18n = (() => {
       // Categories
       'categories.title': 'Categorías populares',
       'categories.explore': 'Explora',
+      'categories.view_all': 'Ver todas',
+      'explore.tag': 'Explora',
+      'featured.tag': 'Destacados',
+      'featured.title': 'Más vendidos esta semana',
+      'featured.view_catalog': 'Ver catálogo',
+      'cta.title': '¿Tienes productos ecológicos?',
+      'cta.desc': 'Publica gratis y llega a miles de compradores comprometidos con el planeta.',
+      'cta.publish_now': 'Publicar ahora',
+      'cta.create_account': 'Crear cuenta gratis',
       
       // Products
       'products.title': 'Catálogo de productos',
@@ -183,6 +194,20 @@ const EcoI18n = (() => {
       'footer.account': 'Cuenta',
       'footer.legal': 'Legal',
       'footer.contact': 'Contacto',
+      'footer.description': 'Marketplace ecológico donde puedes comprar, vender y dar una segunda vida a productos reciclados y sostenibles.',
+      'footer.cart': 'Mi carrito',
+      'footer.profile': 'Mi perfil',
+      'footer.publish': 'Publicar producto',
+      'footer.logout': 'Cerrar sesión',
+      'footer.login': 'Iniciar sesión',
+      'footer.register': 'Registrarse',
+      'footer.terms': 'Términos y condiciones',
+      'footer.privacy': 'Política de privacidad',
+      'footer.email': 'hola@ecomarket.com',
+      'footer.phone': '+51 999 888 777',
+      'footer.location': 'Lima, Perú',
+      'footer.hours': 'Lun - Sáb: 9am - 6pm',
+      'footer.copyright': '© 2026 EcoMarket — Todos los derechos reservados.',
       'footer.rights': 'Todos los derechos reservados.',
       'footer.made_with': 'Hecho con',
       'footer.for_planet': 'para el planeta',
@@ -210,7 +235,7 @@ const EcoI18n = (() => {
       'publicar.click_to_upload_multiple': 'Haz clic para subir varias imágenes',
       'publicar.placeholder_name': 'Ej: Botella reutilizable de acero',
       'publicar.placeholder_price': '0.00',
-      'publicar.placeholder_specs': 'Formato:\nClave: Valor (una por línea)'}
+      'publicar.placeholder_specs': 'Formato:\nClave: Valor (una por línea)',
       
       // Errors
       'error.404_title': 'Página no encontrada',
@@ -274,6 +299,7 @@ const EcoI18n = (() => {
       // Navbar
       'nav.home': 'Home',
       'nav.products': 'Products',
+      'nav.catalog': 'Catalog',
       'nav.favorites': 'Favorites',
       'nav.cart': 'Cart',
       'nav.impact': 'Impact',
@@ -284,6 +310,7 @@ const EcoI18n = (() => {
       'nav.profile': 'My profile',
       'nav.admin': 'Admin',
       'nav.logout': 'Logout',
+      'back_to_top': 'Back to top',
       
       // Hero
       'hero.badge': '100% eco-friendly Marketplace',
@@ -298,6 +325,15 @@ const EcoI18n = (() => {
       // Categories
       'categories.title': 'Popular categories',
       'categories.explore': 'Explore',
+      'categories.view_all': 'View all',
+      'explore.tag': 'Explore',
+      'featured.tag': 'Featured',
+      'featured.title': 'Best sellers this week',
+      'featured.view_catalog': 'View catalog',
+      'cta.title': 'Do you have eco products?',
+      'cta.desc': 'Publish for free and reach thousands of buyers committed to the planet.',
+      'cta.publish_now': 'Publish now',
+      'cta.create_account': 'Create free account',
       
       // Products
       'products.title': 'Product catalog',
@@ -428,6 +464,20 @@ const EcoI18n = (() => {
       'footer.account': 'Account',
       'footer.legal': 'Legal',
       'footer.contact': 'Contact',
+      'footer.description': 'Eco-marketplace where you can buy, sell and give a second life to recycled and sustainable products.',
+      'footer.cart': 'My cart',
+      'footer.profile': 'My profile',
+      'footer.publish': 'Publish product',
+      'footer.logout': 'Log out',
+      'footer.login': 'Log in',
+      'footer.register': 'Sign up',
+      'footer.terms': 'Terms and conditions',
+      'footer.privacy': 'Privacy policy',
+      'footer.email': 'hola@ecomarket.com',
+      'footer.phone': '+51 999 888 777',
+      'footer.location': 'Lima, Peru',
+      'footer.hours': 'Mon - Sat: 9am - 6pm',
+      'footer.copyright': '© 2026 EcoMarket — All rights reserved.',
       'footer.rights': 'All rights reserved.',
       'footer.made_with': 'Made with',
       'footer.for_planet': 'for the planet',
@@ -455,7 +505,7 @@ const EcoI18n = (() => {
       'publicar.click_to_upload_multiple': 'Click to upload multiple images',
       'publicar.placeholder_name': 'Eg: Reusable steel bottle',
       'publicar.placeholder_price': '0.00',
-      'publicar.placeholder_specs': 'Format:\nKey: Value (one per line)'}
+      'publicar.placeholder_specs': 'Format:\nKey: Value (one per line)',
       
       // Errors
       'error.404_title': 'Page not found',
@@ -497,22 +547,48 @@ const EcoI18n = (() => {
     }
   };
 
+  const readStorage = (key, fallback) => {
+    try {
+      const value = localStorage.getItem(key);
+      return value ?? fallback;
+    } catch (error) {
+      return fallback;
+    }
+  };
+
+  const writeStorage = (key, value) => {
+    try {
+      localStorage.setItem(key, value);
+    } catch (error) {
+      // Ignore storage issues in restricted contexts.
+    }
+  };
+
   const getLang = () => {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) return stored;
+      const stored = readStorage(STORAGE_KEY, '');
+      if (stored === 'en' || stored === 'es') return stored;
       return (navigator.language && navigator.language.startsWith('en')) ? 'en' : 'es';
     };
 
   const setLang = (lang) => {
-    localStorage.setItem(STORAGE_KEY, lang);
-    document.documentElement.lang = lang === 'en' ? 'en' : 'es';
+    const nextLang = (lang === 'en' || lang === 'es') ? lang : 'es';
+    writeStorage(STORAGE_KEY, nextLang);
+    document.documentElement.lang = nextLang;
+    document.documentElement.dataset.lang = nextLang;
     applyTranslations();
-    window.dispatchEvent(new CustomEvent('eco:langchange', { detail: lang }));
+    document.querySelectorAll('[data-eco-lang-btn]').forEach(btn => {
+      const active = btn.dataset.lang === nextLang;
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      btn.style.background = active ? 'var(--verde)' : 'transparent';
+      btn.style.color = active ? '#fff' : 'var(--texto)';
+    });
+    window.dispatchEvent(new CustomEvent('eco:langchange', { detail: nextLang }));
   };
 
-  const t = (key, params = {}) => {
+  const t = (key, params = {}, fallback = '') => {
     const lang = getLang();
-    let text = TRANSLATIONS[lang]?.[key] || TRANSLATIONS['es']?.[key] || key;
+    let text = TRANSLATIONS[lang]?.[key] || TRANSLATIONS['es']?.[key] || fallback || key;
     Object.entries(params).forEach(([k, v]) => {
       text = text.replace(`{${k}}`, v);
     });
@@ -522,36 +598,44 @@ const EcoI18n = (() => {
   const applyTranslations = () => {
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.dataset.i18n;
-      el.textContent = t(key);
+      const fallback = el.textContent?.trim() || key;
+      el.textContent = t(key, {}, fallback);
     });
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-      el.placeholder = t(el.dataset.i18nPlaceholder);
+      const fallback = el.getAttribute('placeholder') || '';
+      el.placeholder = t(el.dataset.i18nPlaceholder, {}, fallback);
     });
     document.querySelectorAll('[data-i18n-title]').forEach(el => {
-      el.title = t(el.dataset.i18nTitle);
+      const fallback = el.getAttribute('title') || '';
+      el.title = t(el.dataset.i18nTitle, {}, fallback);
     });
     document.querySelectorAll('[data-i18n-value]').forEach(el => {
-      el.value = t(el.dataset.i18nValue);
+      const fallback = el.value || '';
+      el.value = t(el.dataset.i18nValue, {}, fallback);
     });
   };
 
   const init = () => {
     const lang = getLang();
     document.documentElement.lang = lang === 'en' ? 'en' : 'es';
-    
+    document.documentElement.dataset.lang = lang;
+
     // Add language switcher to navbar
     const header = document.querySelector('.header-actions');
-    if (header && !document.getElementById('langSwitcher')) {
+    if (header && !header.querySelector('[data-eco-lang-btn]')) {
       const switcher = document.createElement('div');
       switcher.id = 'langSwitcher';
-      switcher.style.cssText = 'position:relative;display:inline-block';
+      switcher.style.cssText = 'display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid rgba(46,125,50,0.15);background:var(--surface);';
       switcher.innerHTML = `
-        <button onclick="EcoI18n.toggleLang()" style="width:44px;height:44px;border-radius:999px;border:1px solid rgba(46,125,50,0.18);background:var(--surface);color:var(--texto);cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;transition:all 0.2s" title="${t('lang.select')}">
-          ${getLang() === 'en' ? 'EN' : 'ES'}
-        </button>
+        <button type="button" data-eco-lang-btn data-lang="es" aria-label="Español" aria-pressed="${lang === 'es'}" style="width:34px;height:34px;border:none;border-radius:999px;background:${lang === 'es' ? 'var(--verde)' : 'transparent'};color:${lang === 'es' ? '#fff' : 'var(--texto)'};cursor:pointer;font-weight:700;">ES</button>
+        <button type="button" data-eco-lang-btn data-lang="en" aria-label="English" aria-pressed="${lang === 'en'}" style="width:34px;height:34px;border:none;border-radius:999px;background:${lang === 'en' ? 'var(--verde)' : 'transparent'};color:${lang === 'en' ? '#fff' : 'var(--texto)'};cursor:pointer;font-weight:700;">EN</button>
       `;
       header.insertBefore(switcher, header.firstChild);
     }
+
+    document.querySelectorAll('[data-eco-lang-btn]').forEach(btn => {
+      btn.addEventListener('click', () => setLang(btn.dataset.lang));
+    });
 
     applyTranslations();
   };
@@ -559,9 +643,6 @@ const EcoI18n = (() => {
   const toggleLang = () => {
     const current = getLang();
     setLang(current === 'es' ? 'en' : 'es');
-    // Update button text
-    const btn = document.querySelector('#langSwitcher button');
-    if (btn) btn.textContent = getLang() === 'en' ? 'EN' : 'ES';
   };
 
   if (document.readyState === 'loading') {

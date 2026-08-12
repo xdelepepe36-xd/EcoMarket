@@ -293,23 +293,10 @@ const EcoImprovements = (() => {
   };
 
   const initI18n = () => {
-    // Crear selector de idioma
-    if (!document.getElementById('langSelector')) {
-      const selector = document.createElement('div');
-      selector.id = 'langSelector';
-      selector.style.cssText = 'position:fixed;bottom:80px;right:20px;z-index:9999;display:flex;gap:4px';
-      selector.innerHTML = ['es', 'en', 'pt'].map(l => `
-        <button onclick="EcoImprovements.setLanguage('${l}')" style="
-          width:36px;height:36px;border-radius:50%;border:2px solid rgba(46,125,50,0.2);
-          background:${currentLang === l ? '#2e7d32' : '#fff'};
-          color:${currentLang === l ? '#fff' : '#1f2a21'};
-          font-size:0.85rem;font-weight:700;cursor:pointer;
-          transition:all 0.2s;display:flex;align-items:center;justify-content:center
-        " title="${l === 'es' ? 'Español' : l === 'en' ? 'English' : 'Português'}">
-          ${l === 'es' ? '🇪🇸' : l === 'en' ? '🇬🇧' : '🇧🇷'}
-        </button>
-      `).join('');
-      document.body.appendChild(selector);
+    // Solo respetar el selector de idioma del header; no crear duplicados flotantes.
+    if (document.querySelector('[data-eco-lang-btn]') || document.getElementById('langSelector')) {
+      setLanguage(currentLang);
+      return;
     }
 
     setLanguage(currentLang);

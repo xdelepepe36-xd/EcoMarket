@@ -14,14 +14,13 @@
             </div>
         </div>
 
-        <!-- Filtros rápidos -->
-        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:20px">
-            <div style="flex:1;min-width:200px;position:relative">
-                <i class="bi bi-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--texto-sec)"></i>
-                <input id="searchInput" type="text" placeholder="Buscar productos..." data-i18n-placeholder="products.search_placeholder" autocomplete="off" style="width:100%;padding:12px 12px 12px 38px;border:1.5px solid rgba(46,125,50,0.18);border-radius:12px;font-family:inherit;font-size:0.9rem;outline:none">
-                <div id="searchSuggestions" class="search-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--blanco);border:1px solid rgba(46,125,50,0.12);border-radius:12px;box-shadow:var(--sombra-lg);z-index:100;max-height:300px;overflow-y:auto;margin-top:4px"></div>
+        <div class="catalog-toolbar">
+            <div class="catalog-search-wrap">
+                <i class="bi bi-search"></i>
+                <input id="searchInput" type="text" placeholder="Buscar productos..." data-i18n-placeholder="products.search_placeholder" autocomplete="off">
+                <div id="searchSuggestions" class="search-suggestions"></div>
             </div>
-            <select id="ordenSelect" onchange="window.location='{{ url_for('productos_view') }}?orden='+this.value" style="padding:12px 16px;border:1.5px solid rgba(46,125,50,0.18);border-radius:12px;font-family:inherit;font-size:0.9rem;outline:none;cursor:pointer">
+            <select id="ordenSelect" onchange="window.location='{{ url_for('productos_view') }}?orden='+this.value">
                 <option value="nuevos" {{ 'selected' if orden_sel == 'nuevos' else '' }} data-i18n="products.order.new">📅 Más nuevos</option>
                 <option value="populares" {{ 'selected' if orden_sel == 'populares' else '' }} data-i18n="products.order.popular">🔥 Más populares</option>
                 <option value="baratos" {{ 'selected' if orden_sel == 'baratos' else '' }} data-i18n="products.order.cheap">💰 Menor precio</option>
@@ -30,23 +29,21 @@
             </select>
         </div>
 
-        <!-- Filtro de precio -->
-        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px;padding:12px 16px;background:var(--blanco);border-radius:12px;border:1px solid rgba(46,125,50,0.08)">
-            <span style="font-size:0.85rem;font-weight:600;color:var(--texto-sec)"><i class="bi bi-currency-dollar"></i> Precio:</span>
-            <input type="number" id="precioMin" placeholder="Mín" min="0" step="0.01" value="{{ request.args.get('precio_min', '') }}" style="width:90px;padding:8px 10px;border:1.5px solid rgba(46,125,50,0.18);border-radius:8px;font-family:inherit;font-size:0.85rem;outline:none">
-            <span style="color:var(--texto-sec)">—</span>
-            <input type="number" id="precioMax" placeholder="Máx" min="0" step="0.01" value="{{ request.args.get('precio_max', '') }}" style="width:90px;padding:8px 10px;border:1.5px solid rgba(46,125,50,0.18);border-radius:8px;font-family:inherit;font-size:0.85rem;outline:none">
-            <button onclick="aplicarFiltroPrecio()" class="btn-principal" style="padding:8px 16px;font-size:0.82rem;border:none;cursor:pointer"><i class="bi bi-funnel"></i> <span data-i18n="products.filter">Filtrar</span></button>
+        <div class="catalog-filter-panel">
+            <span class="catalog-filter-label"><i class="bi bi-currency-dollar"></i> Precio:</span>
+            <input type="number" id="precioMin" placeholder="Mín" min="0" step="0.01" value="{{ request.args.get('precio_min', '') }}">
+            <span class="catalog-filter-range">—</span>
+            <input type="number" id="precioMax" placeholder="Máx" min="0" step="0.01" value="{{ request.args.get('precio_max', '') }}">
+            <button onclick="aplicarFiltroPrecio()" class="btn-principal catalog-filter-btn"><i class="bi bi-funnel"></i> <span data-i18n="products.filter">Filtrar</span></button>
             {% if request.args.get('precio_min') or request.args.get('precio_max') %}
-            <a href="{{ url_for('productos_view', categoria=categoria_sel, orden=orden_sel) }}" style="font-size:0.8rem;color:var(--texto-sec);text-decoration:underline" data-i18n="products.clear">Limpiar</a>
+            <a href="{{ url_for('productos_view', categoria=categoria_sel, orden=orden_sel) }}" class="catalog-clear-link" data-i18n="products.clear">Limpiar</a>
             {% endif %}
         </div>
 
-        <!-- Categorías -->
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px">
-            <a href="{{ url_for('productos_view') }}" class="btn-filtro {{ 'active' if not categoria_sel }}" style="padding:8px 16px;border-radius:999px;border:1.5px solid rgba(46,125,50,0.18);background:var(--blanco);text-decoration:none;font-size:0.85rem;font-weight:600;color:var(--texto);transition:all 0.2s"><span data-i18n="products.filter.all">Todas</span></a>
+        <div class="filter-pills">
+            <a href="{{ url_for('productos_view') }}" class="filter-pill {{ 'active' if not categoria_sel }}"><span data-i18n="products.filter.all">Todas</span></a>
             {% for cat in categorias %}
-            <a href="{{ url_for('productos_view', categoria=cat) }}" class="btn-filtro {{ 'active' if categoria_sel == cat }}" style="padding:8px 16px;border-radius:999px;border:1.5px solid rgba(46,125,50,0.18);background:var(--blanco);text-decoration:none;font-size:0.85rem;font-weight:600;color:var(--texto);transition:all 0.2s">{{ cat }}</a>
+            <a href="{{ url_for('productos_view', categoria=cat) }}" class="filter-pill {{ 'active' if categoria_sel == cat }}">{{ cat }}</a>
             {% endfor %}
         </div>
 

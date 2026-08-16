@@ -1237,6 +1237,7 @@ const EcoI18n = (() => {
 
     // Add language switcher to navbar
     const header = document.querySelector('.header-actions');
+    // Solo crear botones si no existen
     if (header && !header.querySelector('[data-eco-lang-btn]')) {
       const switcher = document.createElement('div');
       switcher.id = 'langSwitcher';
@@ -1248,8 +1249,13 @@ const EcoI18n = (() => {
       header.insertBefore(switcher, header.firstChild);
     }
 
+    // Agregar event listeners a todos los botones de idioma
     document.querySelectorAll('[data-eco-lang-btn]').forEach(btn => {
-      btn.addEventListener('click', () => setLang(btn.dataset.lang));
+      // Remover listeners existentes para evitar duplicados
+      const newBtn = btn.cloneNode(true);
+      btn.parentNode.replaceChild(newBtn, btn);
+      
+      newBtn.addEventListener('click', () => setLang(newBtn.dataset.lang));
     });
 
     applyTranslations();

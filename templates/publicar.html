@@ -11,6 +11,7 @@
         </p>
 
         <form method="post" class="form-card" enctype="multipart/form-data" action="{{ url_for('editar_producto', producto_id=producto.id) if editando else url_for('publicar') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
                 <div>
                     <label><span data-i18n="publicar.name_label">Nombre del producto</span> <span style="color:#b91c1c">*</span></label>
@@ -19,7 +20,7 @@
                 <div>
                     <label><span data-i18n="publicar.category_label">Categoría</span> <span style="color:#b91c1c">*</span></label>
                     <select name="categoria" required>
-                        <option value="">Seleccionar...</option>
+                        <option value="" data-i18n="publicar.select_category">Seleccionar...</option>
                         {% for cat in categorias %}
                         <option value="{{ cat }}" {{ 'selected' if producto and producto.categoria == cat else '' }}>{{ cat }}</option>
                         {% endfor %}
@@ -39,22 +40,22 @@
                 <div>
                     <label><span data-i18n="publicar.condition_label">Condición</span></label>
                     <select name="condicion">
-                        <option value="nuevo" {{ 'selected' if not producto or producto.condicion == 'nuevo' else '' }}>🆕 Nuevo</option>
-                        <option value="usado" {{ 'selected' if producto and producto.condicion == 'usado' else '' }}>♻️ Usado</option>
+                        <option value="nuevo" {{ 'selected' if not producto or producto.condicion == 'nuevo' else '' }} data-i18n="publicar.condition_new">🆕 Nuevo</option>
+                        <option value="usado" {{ 'selected' if producto and producto.condicion == 'usado' else '' }} data-i18n="publicar.condition_used">♻️ Usado</option>
                     </select>
                 </div>
             </div>
 
             <div>
                 <label><span data-i18n="publicar.description_label">Descripción</span> <span style="color:#b91c1c">*</span></label>
-                <textarea name="descripcion" rows="4" required placeholder="Describe tu producto: materiales, beneficios, impacto ambiental...">{{ producto.descripcion if producto else '' }}</textarea>
+                <textarea name="descripcion" rows="4" required placeholder="Describe tu producto: materiales, beneficios, impacto ambiental..." data-i18n-placeholder="publicar.description_placeholder">{{ producto.descripcion if producto else '' }}</textarea>
             </div>
 
             <div>
                 <label><span data-i18n="publicar.specs_label">Especificaciones técnicas</span></label>
-                <textarea name="especificaciones" rows="4" placeholder="Formato: clave: valor (una por línea)&#10;Ej:&#10;Material: Acero inoxidable&#10;Capacidad: 750ml&#10;Peso: 300g">{% if producto and producto.especificaciones %}{% set specs = producto.especificaciones|fromjson %}{% for k, v in specs.items() %}{{ k }}: {{ v }}
+<textarea name="especificaciones" rows="4" data-i18n-placeholder="publicar.specs_placeholder" placeholder="Formato: clave: valor (una por línea)&#10;Ej:&#10;Material: Acero inoxidable&#10;Capacidad: 750ml&#10;Peso: 300g">{% if producto and producto.especificaciones %}{% set specs = producto.especificaciones|fromjson %}{% for k, v in specs.items() %}{{ k }}: {{ v }}
 {% endfor %}{% endif %}</textarea>
-                <small style="color:var(--texto-sec);font-size:0.78rem">Escribe cada especificación en una línea con formato "clave: valor"</small>
+<small style="color:var(--texto-sec);font-size:0.78rem" data-i18n="publicar.specs_hint">Escribe cada especificación en una línea con formato "clave: valor"</small>
             </div>
 
             <div>
@@ -75,7 +76,7 @@
                 <div style="border:2px dashed rgba(46,125,50,0.3);border-radius:16px;padding:24px;text-align:center;cursor:pointer;background:#fafffe" onclick="document.getElementById('extraFilesInput').click()">
                     <i class="bi bi-images" style="font-size:2rem;color:var(--verde-claro);display:block;margin-bottom:8px"></i>
                                 <p style="font-size:0.88rem;color:var(--texto-sec)"><span data-i18n="publicar.click_to_upload_multiple">Haz clic para subir varias imágenes</span></p>
-                    <span style="font-size:0.75rem;color:var(--texto-sec)">Puedes seleccionar múltiples archivos</span>
+                    <span style="font-size:0.75rem;color:var(--texto-sec)" data-i18n="publicar.choose_multiple">You can select multiple files</span>
                     <input type="file" id="extraFilesInput" name="imagenes_extra" accept="image/*" multiple style="display:none" onchange="previewExtraFiles(this)">
                 </div>
                 <div id="extraPreviewContainer" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"></div>

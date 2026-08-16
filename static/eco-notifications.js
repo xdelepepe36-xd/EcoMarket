@@ -7,6 +7,7 @@
 const EcoNotifications = (() => {
   const KEY = 'eco_notifications';
   const MAX_VISIBLE = 5;
+  const t = (key, params = {}) => (window.EcoI18n && typeof window.EcoI18n.t === 'function') ? window.EcoI18n.t(key, params) : key;
 
   // ── Datos ──────────────────────────────────────────────
   const get = () => JSON.parse(localStorage.getItem(KEY) || '[]');
@@ -126,17 +127,17 @@ const EcoNotifications = (() => {
     container.innerHTML = `
       <div style="padding:18px 20px;border-bottom:1px solid rgba(46,125,50,0.08);display:flex;align-items:center;justify-content:space-between">
         <strong style="font-size:0.95rem;display:flex;align-items:center;gap:8px">
-          <span>🔔</span> Notificaciones
+          <span>🔔</span> ${t('notifications.title')}
           <span id="ecoNotifCount" style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:999px;font-size:0.72rem;font-weight:700">0</span>
         </strong>
         <div style="display:flex;gap:6px">
-          <button id="ecoNotifMarkAll" style="background:none;border:none;color:#2e7d32;font-size:0.72rem;font-weight:600;cursor:pointer;padding:4px 8px;border-radius:8px">Leer todo</button>
-          <button id="ecoNotifClear" style="background:none;border:none;color:#e53935;font-size:0.72rem;font-weight:600;cursor:pointer;padding:4px 8px;border-radius:8px">Limpiar</button>
+          <button id="ecoNotifMarkAll" style="background:none;border:none;color:#2e7d32;font-size:0.72rem;font-weight:600;cursor:pointer;padding:4px 8px;border-radius:8px">${t('notifications.read_all')}</button>
+          <button id="ecoNotifClear" style="background:none;border:none;color:#e53935;font-size:0.72rem;font-weight:600;cursor:pointer;padding:4px 8px;border-radius:8px">${t('notifications.clear')}</button>
         </div>
       </div>
       <div id="ecoNotifList" style="flex:1;overflow-y:auto;padding:8px 12px;min-height:80px"></div>
       <div style="padding:12px 20px;border-top:1px solid rgba(46,125,50,0.08);text-align:center">
-        <span style="font-size:0.75rem;color:#5d6a5f">🌱 EcoMarket - Notificaciones</span>
+        <span style="font-size:0.75rem;color:#5d6a5f">🌱 ${t('notifications.footer')}</span>
       </div>
     `;
     document.body.appendChild(container);
@@ -162,8 +163,8 @@ const EcoNotifications = (() => {
       list.innerHTML = `
         <div style="text-align:center;padding:32px 16px;color:#5d6a5f">
           <div style="font-size:2.5rem;margin-bottom:12px">🔔</div>
-          <p style="font-size:0.88rem;font-weight:600">Sin notificaciones</p>
-          <p style="font-size:0.78rem;margin-top:4px">Aquí aparecerán tus notificaciones</p>
+          <p style="font-size:0.88rem;font-weight:600">${t('notifications.empty')}</p>
+          <p style="font-size:0.78rem;margin-top:4px">${t('notifications.empty_desc')}</p>
         </div>
       `;
       return;
@@ -196,7 +197,7 @@ const EcoNotifications = (() => {
     if (items.length > MAX_VISIBLE) {
       list.innerHTML += `
         <div style="text-align:center;padding:10px;font-size:0.78rem;color:#5d6a5f">
-          +${items.length - MAX_VISIBLE} notificaciones más
+          ${t('notifications.more', { count: items.length - MAX_VISIBLE })}
         </div>
       `;
     }
@@ -205,13 +206,14 @@ const EcoNotifications = (() => {
   const _timeAgo = timestamp => {
     const diff = Date.now() - timestamp;
     const mins = Math.floor(diff / 60000);
-    if (mins < 1) return 'Ahora';
-    if (mins < 60) return `Hace ${mins} min`;
+    const isEn = window.EcoI18n && window.EcoI18n.getLang ? window.EcoI18n.getLang() === 'en' : false;
+    if (mins < 1) return isEn ? 'Now' : 'Ahora';
+    if (mins < 60) return isEn ? `${mins} min ago` : `Hace ${mins} min`;
     const hrs = Math.floor(mins / 60);
-    if (hrs < 24) return `Hace ${hrs}h`;
+    if (hrs < 24) return isEn ? `${hrs}h ago` : `Hace ${hrs}h`;
     const days = Math.floor(hrs / 24);
-    if (days < 7) return `Hace ${days}d`;
-    return new Date(timestamp).toLocaleDateString('es');
+    if (days < 7) return isEn ? `${days}d ago` : `Hace ${days}d`;
+    return new Date(timestamp).toLocaleDateString(isEn ? 'en-US' : 'es-ES');
   };
 
   const _toggleDropdown = show => {
@@ -233,6 +235,12 @@ const EcoNotifications = (() => {
   const init = () => {
     _buildDropdown();
     _updateBadge();
+    window.addEventListener('eco:langchange', () => {
+      if (document.getElementById('ecoNotifDropdown')) {
+        _buildDropdown();
+        _renderDropdown();
+      }
+    });
 
     // Vincular al botón de campanita
     document.querySelectorAll('[data-eco-notif]').forEach(el => {

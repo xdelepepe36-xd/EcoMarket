@@ -10,22 +10,46 @@
                 <h2 class="section-title" data-i18n="auth.register_title">Crear Cuenta</h2>
                 <p data-i18n="auth.register_desc">Únete a la comunidad ecológica más grande del Perú.</p>
             </div>
-            <form method="POST" action="{{ url_for('registro') }}">
-                <label for="nombre"><i class="bi bi-person"></i> <span data-i18n="auth.fullname">Nombre completo</span></label>
-                <input type="text" id="nombre" name="nombre" placeholder="Tu nombre completo" data-i18n-placeholder="auth.fullname_placeholder" required autofocus>
+            <form method="POST" action="{{ url_for('registro') }}" id="registroForm" novalidate>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="google-login-wrap" data-eco-google-btn></div>
+                <div class="auth-divider"><span data-i18n="auth.or">o</span></div>
+                <label for="nombre"><i class="bi bi-person"></i> <span data-i18n="auth.first_name">Nombre</span></label>
+                <input type="text" id="nombre" name="nombre" placeholder="María" data-i18n-placeholder="auth.first_name_placeholder" data-validate="nombre" required autofocus>
+                <label for="apellidos"><i class="bi bi-people"></i> <span data-i18n="auth.last_name">Apellidos</span></label>
+                <input type="text" id="apellidos" name="apellidos" placeholder="García López" data-i18n-placeholder="auth.last_name_placeholder" data-validate="nombre">
                 <label for="email"><i class="bi bi-envelope"></i> <span data-i18n="auth.email">Correo electrónico</span></label>
-                <input type="email" id="email" name="email" placeholder="tu@correo.com" data-i18n-placeholder="auth.email_placeholder" required>
+                <input type="email" id="email" name="email" placeholder="tu@correo.com" data-i18n-placeholder="auth.email_placeholder" data-validate="email" required>
+                <label for="telefono"><i class="bi bi-telephone"></i> <span data-i18n="auth.phone">Teléfono</span></label>
+                <input type="tel" id="telefono" name="telefono" placeholder="+51 999 999 999" data-i18n-placeholder="auth.phone_placeholder" data-validate="telefono">
+                <label for="ciudad"><i class="bi bi-geo-alt"></i> <span data-i18n="auth.city">Ciudad</span></label>
+                <input type="text" id="ciudad" name="ciudad" placeholder="Lima" data-i18n-placeholder="auth.city_placeholder" data-validate="ciudad">
                 <label for="password"><i class="bi bi-lock"></i> <span data-i18n="auth.password">Contraseña</span></label>
-                <input type="password" id="password" name="password" placeholder="Mínimo 6 caracteres" data-i18n-placeholder="auth.password_hint" required>
+                <input type="password" id="password" name="password" placeholder="Mínimo 8 caracteres, letras y números" data-i18n-placeholder="auth.password_strength_hint" required>
+                <div class="password-meter">
+                    <div class="password-meter-bar"><div data-password-bar></div></div>
+                    <small data-password-label></small>
+                </div>
                 <label for="password2"><i class="bi bi-lock-fill"></i> <span data-i18n="auth.password_confirm">Confirmar contraseña</span></label>
                 <input type="password" id="password2" name="password2" placeholder="Repite tu contraseña" data-i18n-placeholder="auth.password_confirm_placeholder" required>
                 <button class="btn-principal" type="submit" style="width:100%; margin-top:8px;">
                     <i class="bi bi-person-check"></i> <span data-i18n="auth.register_button">Crear cuenta</span>
                 </button>
             </form>
-            <div class="auth-divider"><span>¿Ya tienes cuenta?</span></div>
+            <script>
+              (function () {
+                const pw = document.getElementById('password');
+                if (pw && window.EcoValidation) {
+                  EcoValidation.attachPasswordMeter(pw);
+                }
+                if (window.EcoValidation) {
+                  EcoValidation.enableLiveValidation(document.getElementById('registroForm'));
+                }
+              })();
+            </script>
+            <div class="auth-divider"><span data-i18n="auth.have_account">¿Ya tienes cuenta?</span></div>
             <a href="{{ url_for('login') }}" class="btn-secundario" style="width:100%; text-align:center;">
-                <i class="bi bi-box-arrow-in-right"></i> Iniciar sesión
+                <i class="bi bi-box-arrow-in-right"></i> <span data-i18n="auth.login_button">Iniciar sesión</span>
             </a>
         </div>
     </div>

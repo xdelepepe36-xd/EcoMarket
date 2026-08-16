@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Comparar productos - EcoMarket{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">Comparar productos</h2>
+    <p>Selecciona hasta 4 productos para comparar lado a lado o por puntuación.</p>
+
+    <div style="display:flex;gap:12px;margin-bottom:12px;align-items:center">
+      <select id="compareSelect" style="flex:1;padding:8px;border-radius:8px;border:1px solid #e6e6e6"></select>
+      <button id="addCompareBtn" class="btn-principal">Añadir</button>
+      <button id="clearCompareBtn" class="btn-secundario">Limpiar</button>
+      <select id="compareMode" style="padding:8px;border-radius:8px;border:1px solid #e6e6e6">
+        <option value="side">Lado a lado</option>
+        <option value="score">Por puntuación</option>
+      </select>
+    </div>
+
+    <div id="compareContainer" style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px"></div>
+  </div>
+</section>
+<script>window.productos_json = {{ productos_json|tojson }};</script>
+<script src="{{ url_for('static', filename='eco-compare.js') }}"></script>
+{% endblock %}

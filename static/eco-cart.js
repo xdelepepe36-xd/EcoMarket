@@ -12,6 +12,7 @@
 const EcoCart = (() => {
     const KEY = 'ecomarket_cart';
     const COUPON_KEY = 'ecomarket_coupon';
+    const t = (key, params = {}) => (window.EcoI18n && typeof window.EcoI18n.t === 'function') ? window.EcoI18n.t(key, params) : key;
 
     // ── Cupones disponibles ─────────────────────────────────
     const COUPONS = {
@@ -230,16 +231,16 @@ const EcoCart = (() => {
         `;
         mc.innerHTML = `
             <div style="padding:18px 20px;border-bottom:1px solid rgba(46,125,50,0.08);display:flex;align-items:center;justify-content:space-between">
-                <strong style="font-size:0.95rem">🛍️ Mi carrito</strong>
+                <strong style="font-size:0.95rem">🛍️ ${t('cart.mini_title')}</strong>
                 <span id="mcCount" style="background:#e8f5e9;color:#2e7d32;padding:3px 10px;border-radius:999px;font-size:0.78rem;font-weight:700">0</span>
             </div>
             <div id="mcItems" style="max-height:260px;overflow-y:auto;padding:12px 16px"></div>
             <div style="padding:14px 20px;border-top:1px solid rgba(46,125,50,0.08)">
                 <div style="display:flex;justify-content:space-between;font-weight:800;font-size:1rem;margin-bottom:12px">
-                    <span>Total</span>
+                    <span>${t('cart.total')}</span>
                     <span id="mcTotal" style="color:#2e7d32">S/. 0.00</span>
                 </div>
-                <a href="/carrito" style="display:block;text-align:center;background:linear-gradient(135deg,#4caf50,#2e7d32);color:#fff;padding:11px;border-radius:12px;font-weight:700;text-decoration:none;font-size:0.9rem">Ver carrito completo</a>
+                <a href="/carrito" style="display:block;text-align:center;background:linear-gradient(135deg,#4caf50,#2e7d32);color:#fff;padding:11px;border-radius:12px;font-weight:700;text-decoration:none;font-size:0.9rem">${t('cart.view_full')}</a>
             </div>
         `;
         document.body.appendChild(mc);
@@ -256,7 +257,7 @@ const EcoCart = (() => {
         mcTotal.textContent = `S/. ${getTotal().toFixed(2)}`;
 
         if (items.length === 0) {
-            mcItems.innerHTML = `<div style="text-align:center;padding:24px;color:#5d6a5f;font-size:0.88rem">Tu carrito está vacío 🌱</div>`;
+            mcItems.innerHTML = `<div style="text-align:center;padding:24px;color:#5d6a5f;font-size:0.88rem">${t('cart.empty_state')} 🌱</div>`;
             return;
         }
         mcItems.innerHTML = items.map(item => `
@@ -343,6 +344,13 @@ const EcoCart = (() => {
         _buildMiniCart();
         _updateBadges();
         _bindButtons();
+        window.addEventListener('eco:langchange', () => {
+            const mc = document.getElementById('ecoMiniCart');
+            if (mc) {
+                _buildMiniCart();
+                _renderMiniCart();
+            }
+        });
 
         // Hover en iconos de carrito del nav
         document.querySelectorAll('a[href*="/carrito"], .nav-icon[href*="/carrito"]').forEach(el => {

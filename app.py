@@ -13,6 +13,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
 import hashlib
 import secrets
+import re
+import unicodedata
+import hmac
+import time
 from PIL import Image
 
 app = Flask(__name__)
@@ -35,11 +39,21 @@ def fromjson_filter(value):
         return {}
 
 # Configuración de subida de imágenes
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}  # SVG excluido (riesgo XSS)
 MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5MB
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
 ITEMS_PER_PAGE = 12
+
+
+@app.context_processor
+def inject_globals():
+    """Variables disponibles en todas las plantillas."""
+    return {
+        'google_client_id': os.environ.get('GOOGLE_CLIENT_ID', ''),
+        'SITIO_NOMBRE': 'EcoMarket',
+        'ANIO_ACTUAL': datetime.now().year,
+    }
 
 # Imágenes por defecto para productos (Unsplash)
 PRODUCT_IMAGES = {
@@ -63,6 +77,188 @@ def allowed_file(filename):
 def get_product_image(categoria):
     return PRODUCT_IMAGES.get(categoria, PRODUCT_IMAGES['default'])
 
+
+# ── Validaciones reutilizables ──────────────────────────────────────────────
+
+EMAIL_RE = re.compile(r'^[^@\s]+@[^@\s]+\.[^@\s]{2,}$')
+
+
+def is_valid_email(email):
+    return bool(EMAIL_RE.match(email or ''))
+
+
+def is_valid_nombre(nombre):
+    """Valida un nombre: 2-80 caracteres, solo letras, espacios y apóstrofes."""
+    if not nombre or len(nombre) < 2 or len(nombre) > 80:
+        return False
+    return bool(re.match(r"^[A-Za-zÁÉÍÓÚáéíóúÑñÜü' ]+$", nombre or ''))
+
+
+def password_strength(password):
+    """Devuelve (valida, puntuacion 0-4, lista de errores)."""
+    errores = []
+    if not password:
+        errores.append('La contraseña es obligatoria.')
+    else:
+        if len(password) < 8:
+            errores.append('Debe tener al menos 8 caracteres.')
+        if not re.search(r'[A-Za-z]', password):
+            errores.append('Debe contener letras.')
+        if not re.search(r'\d', password):
+            errores.append('Debe contener al menos un número.')
+        if re.search(r'\s', password):
+            errores.append('No debe contener espacios.')
+    fuerte = len(errores) == 0 and password
+    score = 0
+    if password:
+        score += min(len(password) >= 8, True)
+        score += bool(re.search(r'[A-Z]', password) and re.search(r'[a-z]', password))
+        score += bool(re.search(r'\d', password))
+        score += bool(re.search(r'[^A-Za-z0-9]', password))
+    return fuerte, score, errores
+
+
+def is_valid_direccion(direccion):
+    """Dirección válida: 8-120 caracteres, debe incluir un número y letras (calle)."""
+    if not direccion or len(direccion) < 8 or len(direccion) > 120:
+        return False
+    if not re.search(r'\d', direccion):
+        return False
+    if not re.search(r'[A-Za-zÁÉÍÓÚáéíóúÑñ]', direccion):
+        return False
+    return True
+
+
+def is_valid_telefono(telefono):
+    """Teléfono válido: 7-15 dígitos con separadores opcionales (+ - espacio)."""
+    if not telefono:
+        return True  # opcional
+    limpio = re.sub(r'[\s\-()+]', '', telefono)
+    return 7 <= len(limpio) <= 15 and limpio.isdigit()
+
+
+def normalizar_telefono(telefono):
+    if not telefono:
+        return ''
+    return re.sub(r'[\s\-()]', '', telefono).strip()
+
+
+# ── Traducción server-side (mensajes flash y errores API) ──────────────────
+
+FLASH_MSGS = {
+    'correo_invalido': {'es': 'Ingresa un correo electrónico válido.', 'en': 'Enter a valid email address.'},
+    'credenciales_invalidas': {'es': 'Correo o contraseña incorrectos.', 'en': 'Incorrect email or password.'},
+    'bienvenido': {'es': '¡Bienvenido de nuevo, {nombre}!', 'en': 'Welcome back, {nombre}!'},
+    'cuenta_creada': {'es': '¡Cuenta creada! Bienvenido, {nombre}.', 'en': 'Account created! Welcome, {nombre}.'},
+    'google_bienvenido': {'es': '¡Bienvenido, {nombre}! (cuenta de Google)', 'en': 'Welcome, {nombre}! (Google account)'},
+    'sesion_cerrada': {'es': 'Sesión cerrada correctamente.', 'en': 'Logged out successfully.'},
+    'correo_existe': {'es': 'Ya existe una cuenta con ese correo.', 'en': 'An account with that email already exists.'},
+    'nombre_invalido': {'es': 'El nombre debe tener al menos 2 caracteres y solo letras.', 'en': 'Name must be at least 2 characters and contain only letters.'},
+    'apellidos_invalido': {'es': 'Los apellidos solo pueden contener letras y espacios.', 'en': 'Last name may only contain letters and spaces.'},
+    'telefono_invalido': {'es': 'Ingresa un teléfono válido (7 a 15 dígitos).', 'en': 'Enter a valid phone number (7 to 15 digits).'},
+    'ciudad_invalida': {'es': 'Ingresa una ciudad válida.', 'en': 'Enter a valid city.'},
+    'password_no_coincide': {'es': 'Las contraseñas no coinciden.', 'en': 'Passwords do not match.'},
+    'pw_reqs': {'es': 'La contraseña debe tener al menos 8 caracteres, incluir letras y números.', 'en': 'Password must be at least 8 characters and include letters and numbers.'},
+    'err_nombre': {'es': 'Ingresa un nombre válido (solo letras, mínimo 2 caracteres).', 'en': 'Enter a valid name (letters only, min 2 chars).'},
+    'err_apellido': {'es': 'Ingresa un apellido válido (solo letras).', 'en': 'Enter a valid last name (letters only).'},
+    'err_email': {'es': 'Ingresa un correo electrónico válido.', 'en': 'Enter a valid email address.'},
+    'err_direccion': {'es': 'Ingresa una dirección completa (calle y número, mínimo 8 caracteres).', 'en': 'Enter a full address (street and number, min 8 chars).'},
+    'err_telefono': {'es': 'Ingresa un teléfono válido (7 a 15 dígitos).', 'en': 'Enter a valid phone number (7 to 15 digits).'},
+    'err_ciudad': {'es': 'Ingresa tu ciudad.', 'en': 'Enter your city.'},
+    'err_metodo_pago': {'es': 'Selecciona un método de pago válido.', 'en': 'Select a valid payment method.'},
+    'err_items': {'es': 'Tu carrito está vacío.', 'en': 'Your cart is empty.'},
+    'err_datos': {'es': 'Los datos del carrito son inválidos.', 'en': 'Cart data is invalid.'},
+    'err_revisar': {'es': 'Revisa los datos ingresados.', 'en': 'Please review the entered data.'},
+    'debes_iniciar_sesion': {'es': 'Debes iniciar sesión', 'en': 'You must be logged in'},
+    'mensaje_enviado': {'es': 'Mensaje enviado. Te responderemos pronto.', 'en': 'Message sent. We will reply soon.'},
+    'producto_no_encontrado': {'es': 'Producto no encontrado.', 'en': 'Product not found.'},
+    'acceso_restringido': {'es': 'Acceso restringido. Se requieren permisos de administrador.', 'en': 'Restricted access. Administrator permissions required.'},
+    'google_invalido': {'es': 'Token de Google inválido o expirado.', 'en': 'Invalid or expired Google token.'},
+    'google_sin_email': {'es': 'No se pudo obtener el correo de Google.', 'en': 'Could not obtain email from Google.'},
+    'google_error': {'es': 'No se pudo verificar la credencial en este momento.', 'en': 'Could not verify the credential right now.'},
+    'espera_minutos': {'es': 'Demasiados intentos fallidos. Espera {minutos} minuto(s).', 'en': 'Too many failed attempts. Wait {minutos} minute(s).'},
+    'bloqueado_15': {'es': 'Demasiados intentos fallidos. Acceso bloqueado por 15 minutos.', 'en': 'Too many failed attempts. Access blocked for 15 minutes.'},
+    'login_restantes': {'es': 'Correo o contraseña incorrectos. Te quedan {restantes} intento(s).', 'en': 'Incorrect email or password. You have {restantes} attempt(s) left.'},
+    'perfil_actualizado': {'es': 'Perfil actualizado.', 'en': 'Profile updated.'},
+    'contrasena_actualizada': {'es': 'Contraseña actualizada correctamente.', 'en': 'Password updated successfully.'},
+    'contrasena_actual_incorrecta': {'es': 'Contraseña actual incorrecta.', 'en': 'Current password is incorrect.'},
+    'campos_incompletos': {'es': 'Completa todos los campos.', 'en': 'Complete all the fields.'},
+    'producto_publicado': {'es': '¡Producto publicado con éxito!', 'en': 'Product published successfully!'},
+    'producto_actualizado': {'es': 'Producto actualizado.', 'en': 'Product updated.'},
+    'producto_eliminado': {'es': 'Producto eliminado.', 'en': 'Product deleted.'},
+    'usuario_eliminado': {'es': 'Usuario eliminado.', 'en': 'User deleted.'},
+    'datos_invalidos_pub': {'es': 'Precio o stock inválido.', 'en': 'Invalid price or stock.'},
+    'campos_obligatorios': {'es': 'Completa todos los campos obligatorios.', 'en': 'Complete all required fields.'},
+}
+
+
+def tr(key, **kwargs):
+    """Traduce una clave según el idioma de la sesión."""
+    lang = session.get('lang', 'es')
+    msg = FLASH_MSGS.get(key, {}).get(lang, FLASH_MSGS.get(key, {}).get('es', key))
+    try:
+        return msg.format(**kwargs)
+    except (KeyError, IndexError):
+        return msg
+
+
+def flash_t(key, category='success', **kwargs):
+    flash(tr(key, **kwargs), category)
+
+
+# ── Seguridad global ─────────────────────────────────────────────────────────
+
+# Cabeceras de seguridad en todas las respuestas
+@app.after_request
+def set_security_headers(resp):
+    resp.headers['X-Content-Type-Options'] = 'nosniff'
+    resp.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    resp.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    return resp
+
+
+# Token CSRF por sesión (disponible en plantillas como {{ csrf_token() }})
+@app.context_processor
+def inject_csrf_token():
+    def csrf_token():
+        if '_csrf_token' not in session:
+            session['_csrf_token'] = secrets.token_hex(32)
+        return session['_csrf_token']
+    return {'csrf_token': csrf_token}
+
+
+# Validación CSRF para POST de formularios HTML (no para endpoints JSON ni body vacío)
+@app.before_request
+def csrf_protect():
+    if request.method == 'POST' and request.form:
+        token = session.get('_csrf_token', '')
+        sent = request.form.get('csrf_token', '')
+        if not token or not sent or not hmac.compare_digest(token, sent):
+            flash('Error de seguridad (CSRF). Vuelve a intentarlo.', 'danger')
+            return redirect(request.referrer or url_for('index'))
+
+
+# Rate limiting de credenciales por IP (en memoria; mejor protección en multi-worker con Redis)
+_login_ip_attempts = {}
+
+
+def _tb_cuenta_ip(ip):
+    ahora = time.time()
+    _login_ip_attempts[ip] = [t for t in _login_ip_attempts.get(ip, []) if t > ahora - 900]
+    return _login_ip_attempts[ip]
+
+
+def _limpiar_intentos_caducados():
+    ahora = time.time()
+    expirados = [ip for ip, t in _login_ip_attempts.items()
+                 if not t or max(t) < ahora - 900]
+    for ip in expirados:
+        _login_ip_attempts.pop(ip, None)
+
+
+
+
+>>>>>>> 8c30a56ee182f4baf94c9d99dead2515a750181e
 
 def _create_thumbnail(saved_path, thumb_path, max_size=800):
     """Genera una miniatura del archivo guardado en saved_path y la escribe en thumb_path.
@@ -196,6 +392,8 @@ def init_db():
             total REAL NOT NULL,
             estado TEXT DEFAULT 'confirmado',
             metodo_pago TEXT DEFAULT '',
+            ciudad TEXT DEFAULT '',
+            telefono TEXT DEFAULT '',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
         );
@@ -299,6 +497,35 @@ def init_db():
                 except json.JSONDecodeError:
                     pass
 
+    # ── Seed aditivo: agregar productos nuevos a BD existentes ──
+    # Permite ampliar el catálogo sin borrar productos creados por usuarios.
+    seed_path = os.path.join(os.path.dirname(__file__), 'data', 'products.json')
+    if os.path.exists(seed_path):
+        try:
+            with open(seed_path, 'r', encoding='utf-8') as f:
+                productos = json.load(f)
+            # Nombres ya presentes
+            existentes = {row[0] for row in conn.execute('SELECT nombre FROM productos').fetchall()}
+            añadidos = 0
+            for p in productos:
+                if p['nombre'] in existentes:
+                    continue
+                imagen = p.get('imagen', '')
+                if not imagen or imagen == 'uploads/placeholder.svg':
+                    imagen = get_product_image(p.get('categoria', 'default'))
+                conn.execute(
+                    'INSERT INTO productos (nombre, categoria, precio, precio_original, descripcion, imagen, stock, condicion, vistas) VALUES (?,?,?,?,?,?,?,?,?)',
+                    (p['nombre'], p['categoria'], p['precio'], p.get('precio_original', p['precio']),
+                     p['descripcion'], imagen,
+                     p.get('stock', 10), p.get('condicion', 'nuevo'), p.get('vistas', 0))
+                )
+                existentes.add(p['nombre'])
+                añadidos += 1
+            if añadidos:
+                conn.commit()
+        except (json.JSONDecodeError, OSError, sqlite3.Error):
+            pass
+
     # Seed cupones si la tabla está vacía
     if conn.execute('SELECT COUNT(*) FROM cupones').fetchone()[0] == 0:
         cupones = [
@@ -335,6 +562,39 @@ def init_db():
     except sqlite3.OperationalError:
         pass
 
+    # ── Migraciones para campos de usuario ──────────────────
+    for col, ddl in [
+        ('apellidos', 'TEXT DEFAULT ""'),
+        ('telefono', 'TEXT DEFAULT ""'),
+        ('ciudad', 'TEXT DEFAULT ""'),
+        ('google_id', 'TEXT DEFAULT ""'),
+        ('email_verificado', 'INTEGER DEFAULT 0'),
+    ]:
+        try:
+            conn.execute(f'ALTER TABLE usuarios ADD COLUMN {col} {ddl}')
+            conn.commit()
+        except sqlite3.OperationalError:
+            pass  # La columna ya existe
+
+    # Google ID debe ser único (si está presente) para evitar cuentas duplicadas
+    try:
+        conn.execute('CREATE UNIQUE INDEX IF NOT EXISTS idx_usuarios_google_id ON usuarios(google_id)')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
+    # Migraciones para columnas de pedidos (ciudad, telefono)
+    try:
+        conn.execute('ALTER TABLE pedidos ADD COLUMN ciudad TEXT DEFAULT ""')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+    try:
+        conn.execute('ALTER TABLE pedidos ADD COLUMN telefono TEXT DEFAULT ""')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
     # ── Índices para optimizar búsquedas ──────────────────────
     conn.execute('CREATE INDEX IF NOT EXISTS idx_productos_categoria ON productos(categoria)')
     conn.execute('CREATE INDEX IF NOT EXISTS idx_productos_precio ON productos(precio)')
@@ -359,8 +619,8 @@ def login_required(f):
     def decorated(*args, **kwargs):
         if 'usuario_id' not in session:
             if request.is_json:
-                return jsonify({'error': 'No autorizado'}), 401
-            flash('Debes iniciar sesión para acceder.', 'warning')
+                return jsonify({'error': tr('debes_iniciar_sesion')}), 401
+            flash_t('debes_iniciar_sesion', 'warning')
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated
@@ -370,7 +630,7 @@ def admin_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if session.get('rol') != 'admin':
-            flash('Acceso restringido. Se requieren permisos de administrador.', 'danger')
+            flash_t('acceso_restringido', 'danger')
             return redirect(url_for('index'))
         return f(*args, **kwargs)
     return decorated
@@ -604,7 +864,7 @@ def productos_view():
     query += ' ' + ordenes.get(orden, 'ORDER BY p.created_at DESC')
     query += f' LIMIT {ITEMS_PER_PAGE} OFFSET {offset}'
 
-    productos = conn.execute(query, params).fetchall()
+    productos = [dict(row) for row in conn.execute(query, params).fetchall()]
     categorias = [r['categoria'] for r in
                   conn.execute('SELECT DISTINCT categoria FROM productos ORDER BY categoria').fetchall()]
     conn.close()
@@ -625,7 +885,7 @@ def producto_detalle(producto_id):
     registrar_visita(f'producto_{producto_id}')
     data = get_producto_detalle(producto_id)
     if data is None:
-        flash('Producto no encontrado.', 'warning')
+        flash_t('producto_no_encontrado', 'warning')
         return redirect(url_for('productos_view'))
 
     es_favorito = False
@@ -752,27 +1012,87 @@ def checkout():
 
         data = request.get_json()
         nombre = data.get('nombre', '').strip()
+        apellido = data.get('apellido', '').strip()
         email = data.get('email', '').strip()
+        telefono = data.get('telefono', '').strip()
         direccion = data.get('direccion', '').strip()
+        ciudad = data.get('ciudad', '').strip()
         items = data.get('items', [])
         metodo_pago = data.get('metodo_pago', '')
 
-        if not all([nombre, email, direccion]):
-            return jsonify({'error': 'Completa todos los campos'}), 400
+        # ── Validación robusta de datos de envío ──
+        nombre_comp = f"{nombre} {apellido}".strip()
+        errores = {}
+        if not is_valid_nombre(nombre):
+            errores['nombre'] = tr('err_nombre')
+        if apellido and not is_valid_nombre(apellido):
+            errores['apellido'] = tr('err_apellido')
+        if not is_valid_email(email):
+            errores['email'] = tr('err_email')
+        if not is_valid_direccion(direccion):
+            errores['direccion'] = tr('err_direccion')
+        if not is_valid_telefono(telefono):
+            errores['telefono'] = tr('err_telefono')
+        if not ciudad or len(ciudad) < 2:
+            errores['ciudad'] = tr('err_ciudad')
+        if metodo_pago not in ('card', 'yape', 'transferencia', 'contrareembolso'):
+            errores['metodo_pago'] = tr('err_metodo_pago')
+        if not items or not isinstance(items, list) or len(items) == 0:
+            errores['items'] = tr('err_items')
+        if errores:
+            return jsonify({'error': tr('err_revisar'), 'campos': errores}), 400
 
-        total = sum(item['precio'] * item['cantidad'] for item in items)
+        if telefono:
+            telefono = normalizar_telefono(telefono)
+
+        if not isinstance(items, list) or not items:
+            return jsonify({'error': 'El carrito está vacío'}), 400
+
+        # ── Validación en servidor: recalcular precios desde la BD ──
+        conn = get_db()
+        items_validados = []
+        ids = set()
+        total = 0.0
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            try:
+                pid = int(item.get('id') or item.get('producto_id') or 0)
+                cantidad = int(item.get('cantidad') or item.get('qty') or 0)
+            except (TypeError, ValueError):
+                continue
+            if pid <= 0 or cantidad <= 0 or pid in ids:
+                continue
+            ids.add(pid)
+            fila = conn.execute(
+                'SELECT id, nombre, precio, stock FROM productos WHERE id = ?', (pid,)
+            ).fetchone()
+            if not fila:
+                continue
+            if cantidad > fila['stock']:
+                conn.close()
+                return jsonify({'error': f'Stock insuficiente de "{fila["nombre"]}"'}), 400
+            items_validados.append((pid, fila['nombre'], fila['precio'], cantidad))
+            total += fila['precio'] * cantidad
+        conn.close()
+
+        if not items_validados:
+            return jsonify({'error': 'No hay productos válidos en el pedido'}), 400
+
+        total = round(total, 2)
+>>>>>>> 8c30a56ee182f4baf94c9d99dead2515a750181e
 
         conn = get_db()
         cursor = conn.execute(
-            'INSERT INTO pedidos (usuario_id, nombre, email, direccion, total, metodo_pago) VALUES (?,?,?,?,?,?)',
-            (session['usuario_id'], nombre, email, direccion, total, metodo_pago)
+            'INSERT INTO pedidos (usuario_id, nombre, email, direccion, total, metodo_pago, ciudad, telefono) VALUES (?,?,?,?,?,?,?,?)',
+            (session['usuario_id'], nombre_comp or nombre, email, direccion, total, metodo_pago, ciudad, telefono)
         )
         pedido_id = cursor.lastrowid
 
-        for item in items:
+        for pid, pnombre, pp, cant in items_validados:
             conn.execute(
                 'INSERT INTO pedido_items (pedido_id, producto_id, nombre, precio, cantidad) VALUES (?,?,?,?,?)',
-                (pedido_id, item.get('id'), item['nombre'], item['precio'], item['cantidad'])
+                (pedido_id, pid, pnombre, pp, cant)
             )
 
         conn.commit()
@@ -835,14 +1155,14 @@ def publicar():
             imagen_thumb = ''
 
         if not all([nombre, categoria, precio, descripcion]):
-            flash('Completa todos los campos obligatorios.', 'danger')
+            flash_t('campos_obligatorios', 'danger')
             return redirect(url_for('publicar'))
 
         try:
             precio_valor = float(precio)
             stock_valor = int(stock)
         except ValueError:
-            flash('Precio o stock inválido.', 'danger')
+            flash_t('datos_invalidos_pub', 'danger')
             return redirect(url_for('publicar'))
 
         # Procesar especificaciones (formato: "clave: valor" por línea)
@@ -892,7 +1212,7 @@ def publicar():
         conn.close()
 
         add_xp(session['usuario_id'], 15)
-        flash('¡Producto publicado con éxito!', 'success')
+        flash_t('producto_publicado', 'success')
         return redirect(url_for('producto_detalle', producto_id=producto_id))
 
     return render_template('publicar.html', categorias=categorias)
@@ -911,7 +1231,7 @@ def editar_producto(producto_id):
                             (producto_id, session['usuario_id'])).fetchone()
     if not producto:
         conn.close()
-        flash('Producto no encontrado.', 'danger')
+        flash_t('producto_no_encontrado', 'danger')
         return redirect(url_for('perfil'))
 
     if request.method == 'POST':
@@ -939,7 +1259,7 @@ def editar_producto(producto_id):
                 (nombre, categoria, float(precio), descripcion, int(stock), especificaciones_json, producto_id)
             )
             conn.commit()
-            flash('Producto actualizado.', 'success')
+            flash_t('producto_actualizado', 'success')
         conn.close()
         return redirect(url_for('perfil'))
 
@@ -955,7 +1275,7 @@ def eliminar_producto(producto_id):
                  (producto_id, session['usuario_id']))
     conn.commit()
     conn.close()
-    flash('Producto eliminado.', 'success')
+    flash_t('producto_eliminado', 'success')
     return redirect(url_for('perfil'))
 
 
@@ -970,7 +1290,7 @@ def privacidad():
 @app.route('/contacto', methods=['GET', 'POST'])
 def contacto():
     if request.method == 'POST':
-        flash('Mensaje enviado. Te responderemos pronto.', 'success')
+        flash_t('mensaje_enviado', 'success')
         return redirect(url_for('contacto'))
     return render_template('contacto.html')
 
@@ -1208,40 +1528,55 @@ def login():
     if 'usuario_id' in session:
         return redirect(url_for('index'))
 
-    # ── Rate limiting: máximo 5 intentos por 15 minutos ──
+    # ── Rate limiting ──
+    _limpiar_intentos_caducados()
+    ip = request.remote_addr or '0.0.0.0'
+    intentos_ip = _tb_cuenta_ip(ip)
+
+    # Bloqueo por sesión (15 min)
     intentos = session.get('login_intentos', 0)
     bloqueo_hasta = session.get('login_bloqueo_hasta', 0)
     if bloqueo_hasta and datetime.now().timestamp() < bloqueo_hasta:
         restante = int(bloqueo_hasta - datetime.now().timestamp())
-        flash(f'Demasiados intentos fallidos. Espera {restante // 60} minuto(s).', 'danger')
+        flash_t('espera_minutos', 'danger', minutos=restante // 60)
+        return render_template('login.html')
+
+    # Bloqueo por IP (10 intentos / 15 min)
+    if len(intentos_ip) >= 10:
+        flash('Demasiados intentos desde esta IP. Intenta más tarde.', 'danger')
         return render_template('login.html')
 
     if request.method == 'POST':
-        email = request.form.get('email', '').strip()
+        email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '').strip()
+        if not is_valid_email(email):
+            flash_t('correo_invalido', 'danger')
+            return render_template('login.html')
         conn = get_db()
         usuario = conn.execute('SELECT * FROM usuarios WHERE email = ?', (email,)).fetchone()
         conn.close()
         if usuario and check_password_hash(usuario['password'], password):
-            # Login exitoso: limpiar intentos
+            # Login exitoso: limpiar intentos (sesión e IP)
             session.pop('login_intentos', None)
             session.pop('login_bloqueo_hasta', None)
+            _login_ip_attempts.pop(ip, None)
             session['usuario_id'] = usuario['id']
             session['nombre'] = usuario['nombre']
             session['email'] = usuario['email']
             session['rol'] = usuario['rol']
-            flash(f'¡Bienvenido, {usuario["nombre"]}!', 'success')
+            flash_t('bienvenido', 'success', nombre=usuario['nombre'])
             return redirect(url_for('index'))
 
-        # Login fallido: incrementar intentos
+        # Login fallido: incrementar intentos (sesión e IP)
+        intentos_ip.append(time.time())
         session['login_intentos'] = intentos + 1
         if session['login_intentos'] >= 5:
             session['login_bloqueo_hasta'] = datetime.now().timestamp() + 15 * 60  # 15 min
             session['login_intentos'] = 0
-            flash('Demasiados intentos fallidos. Acceso bloqueado por 15 minutos.', 'danger')
+            flash_t('bloqueado_15', 'danger')
         else:
             restantes = 5 - session['login_intentos']
-            flash(f'Correo o contraseña incorrectos. {restantes} intento(s) restante(s).', 'danger')
+            flash_t('login_restantes', 'danger', restantes=restantes)
     return render_template('login.html')
 
 
@@ -1251,54 +1586,355 @@ def registro():
         return redirect(url_for('index'))
     if request.method == 'POST':
         nombre = request.form.get('nombre', '').strip()
-        email = request.form.get('email', '').strip()
-        password = request.form.get('password', '').strip()
-        password2 = request.form.get('password2', '').strip()
+        apellidos = request.form.get('apellidos', '').strip()
+        email = request.form.get('email', '').strip().lower()
+        password = request.form.get('password', '')
+        password2 = request.form.get('password2', '')
+        telefono = request.form.get('telefono', '').strip()
+        ciudad = request.form.get('ciudad', '').strip()
 
-        if not all([nombre, email, password]):
-            flash('Completa todos los campos.', 'danger')
-            return redirect(url_for('registro'))
+        # ── Validación robusta de registro ──
+        errores = []
+        if not is_valid_nombre(nombre):
+            errores.append(tr('nombre_invalido'))
+        if apellidos and not is_valid_nombre(apellidos):
+            errores.append(tr('apellidos_invalido'))
+        if not is_valid_email(email):
+            errores.append(tr('correo_invalido'))
+        if telefono and not is_valid_telefono(telefono):
+            errores.append(tr('telefono_invalido'))
+        if ciudad and len(ciudad) < 2:
+            errores.append(tr('ciudad_invalida'))
+
+        fuerte, _score, pw_errores = password_strength(password)
+        if pw_errores:
+            errores.append(tr('pw_reqs'))
         if password != password2:
-            flash('Las contraseñas no coinciden.', 'danger')
-            return redirect(url_for('registro'))
-        if len(password) < 6:
-            flash('La contraseña debe tener al menos 6 caracteres.', 'danger')
+            errores.append(tr('password_no_coincide'))
+
+        if errores:
+            for err in errores:
+                flash(err, 'danger')
             return redirect(url_for('registro'))
 
         conn = get_db()
         existe = conn.execute('SELECT id FROM usuarios WHERE email = ?', (email,)).fetchone()
         if existe:
-            flash('Ya existe una cuenta con ese correo.', 'danger')
+            flash_t('correo_existe', 'danger')
             conn.close()
             return redirect(url_for('registro'))
 
         hashed_password = generate_password_hash(password)
-        conn.execute('INSERT INTO usuarios (nombre, email, password) VALUES (?,?,?)',
-                     (nombre, email, hashed_password))
-        conn.commit()
+        # El primer usuario registrado en la plataforma se convierte en admin (bootstrap)
+        es_primer_usuario = conn.execute('SELECT COUNT(*) FROM usuarios').fetchone()[0] == 0
+        rol = 'admin' if es_primer_usuario else 'comprador'
+        conn.execute(
+            'INSERT INTO usuarios (nombre, apellidos, email, password, telefono, ciudad, rol) VALUES (?,?,?,?,?,?,?)',
+            (nombre, apellidos or '', email, hashed_password, normalizar_telefono(telefono), ciudad or '', rol)
+        )
         usuario = conn.execute('SELECT * FROM usuarios WHERE email = ?', (email,)).fetchone()
         conn.close()
 
         session['usuario_id'] = usuario['id']
         session['nombre'] = usuario['nombre']
         session['email'] = usuario['email']
-        flash(f'¡Cuenta creada! Bienvenido, {nombre}.', 'success')
+        session['rol'] = usuario['rol']
+        flash_t('cuenta_creada', 'success', nombre=nombre)
         return redirect(url_for('index'))
     return render_template('registro.html')
 
 
+@app.route('/auth/google', methods=['POST'])
+def auth_google():
+    """Inicia sesión o crea una cuenta usando una credencial (ID token) de Google.
+
+    El frontend envía el JWT emitido por Google Identity Services (credential).
+    El token se verifica contra el endpoint público `https://oauth2.googleapis.com/tokeninfo`
+    para garantizar que es válido y emitido por Google.
+    """
+    data = request.get_json(silent=True) or {}
+    credential = (data.get('credential') or data.get('id_token') or '').strip()
+
+    if not credential:
+        return jsonify({'error': 'Credencial de Google no proporcionada.'}), 400
+
+    # Verificar el token contra Google (requiere librería 'requests')
+    try:
+        import requests as _requests
+        resp = _requests.post(
+            'https://oauth2.googleapis.com/tokeninfo',
+            data={'id_token': credential},
+            timeout=8
+        )
+        if resp.status_code != 200:
+            return jsonify({'error': 'Token de Google inválido o expirado.'}), 401
+        info = resp.json()
+    except Exception:
+        return jsonify({'error': 'No se pudo verificar la credencial en este momento.'}), 502
+
+    if not info.get('email'):
+        return jsonify({'error': 'No se pudo obtener el correo de Google.'}), 400
+
+    google_id = str(info.get('sub', ''))
+    email = info.get('email', '').lower()
+    nombre = info.get('name', '') or email.split('@')[0]
+    avatar = info.get('picture', '')
+
+    if not is_valid_email(email):
+        return jsonify({'error': 'El correo de Google no es válido.'}), 400
+
+    conn = get_db()
+    usuario = conn.execute(
+        'SELECT * FROM usuarios WHERE email = ? OR (google_id != "" AND google_id = ?)',
+        (email, google_id)
+    ).fetchone()
+
+    if usuario:
+        # Actualizar google_id/avatar si aún no están vinculados
+        if google_id and usuario['google_id'] != google_id:
+            conn.execute('UPDATE usuarios SET google_id = ?, email_verificado = 1 WHERE id = ?',
+                         (google_id, usuario['id']))
+        if avatar and not usuario['avatar']:
+            conn.execute('UPDATE usuarios SET avatar = ? WHERE id = ?', (avatar, usuario['id']))
+        conn.commit()
+        usuario_id = usuario['id']
+        rol = usuario['rol']
+        nombre_uso = usuario['nombre']
+    else:
+        cursor = conn.execute(
+            'INSERT INTO usuarios (nombre, email, password, avatar, google_id, email_verificado) VALUES (?,?,?,?,?,1)',
+            (nombre[:80], email, generate_password_hash(secrets.token_hex(16)), avatar, google_id)
+        )
+        conn.commit()
+        usuario_id = cursor.lastrowid
+        rol = 'comprador'
+        nombre_uso = nombre[:80]
+
+    conn.close()
+
+    session['usuario_id'] = usuario_id
+    session['nombre'] = nombre_uso
+    session['email'] = email
+    session['rol'] = rol
+    flash_t('google_bienvenido', 'success', nombre=nombre_uso)
+    return jsonify({'success': True, 'redirigir': url_for('index')})
+
+
 @app.route('/logout')
 def logout():
+    lang = session.get('lang', 'es')
     session.clear()
-    flash('Sesión cerrada correctamente.', 'success')
+    session['lang'] = lang  # preservar idioma
+    flash_t('sesion_cerrada', 'success')
     return redirect(url_for('index'))
+
+
+@app.route('/api/set_lang', methods=['POST'])
+def api_set_lang():
+    """Sincroniza el idioma elegido en el cliente con la sesión del servidor."""
+    data = request.get_json(silent=True) or {}
+    lang = data.get('lang', 'es')
+    if lang in ('es', 'en'):
+        session['lang'] = lang
+        return jsonify({'success': True, 'lang': lang})
+    return jsonify({'error': 'Idioma no soportado.'}), 400
+
+
+# ── Asistente de IA (estilo ChatGPT) ────────────────────────────────────────
+
+CHAT_TEXTS = {
+    'saludo': {
+        'es': '¡Hola! 🌱 Soy **EcoBot IA**, el asistente inteligente de EcoMarket. Puedo ayudarte a buscar productos reales, resolver dudas de envíos, cupones o tu cuenta. ¿Qué necesitas?',
+        'en': 'Hi! 🌱 I am **EcoBot AI**, the intelligent assistant of EcoMarket. I can help you find real products, answer shipping questions, coupons or your account. What do you need?'
+    },
+    'ayuda': {
+        'es': 'Puedo ayudarte con:\n• 🔎 **Buscar y recomendar productos** (ej: "dame 3 productos de jardín" o "productos baratos")\n• 🚚 Envíos y entregas\n• 🎫 Cupones y descuentos\n• 💳 Métodos de pago\n• 👤 Tu cuenta, XP y niveles\n• ♻️ Consejos ecológicos',
+        'en': 'I can help you with:\n• 🔎 **Find and recommend products** (e.g., "give me 3 garden products" or "cheap products")\n• 🚚 Shipping and delivery\n• 🎫 Coupons and discounts\n• 💳 Payment methods\n• 👤 Your account, XP and levels\n• ♻️ Eco tips'
+    },
+    'envio': {
+        'es': '🚚 **Envíos en todo Perú**\n• Tiempo estimado: **3-7 días hábiles**\n• **GRATIS** en compras mayores a S/.150 (o con cupón ENVIOFREE)\n• Costo estándar: **S/.12**',
+        'en': '🚚 **Nationwide shipping**\n• Estimated time: **3-7 business days**\n• **FREE** on orders over S/.150 (or with ENVIOFREE coupon)\n• Standard cost: **S/.12**'
+    },
+    'pago': {
+        'es': '💳 **Métodos de pago**\n• Tarjeta de crédito/débito\n• Yape / Plin\n• Transferencia bancaria (BCP, Interbank, BBVA)\nTodos los pagos son 100% seguros.',
+        'en': '💳 **Payment methods**\n• Credit/debit card\n• Yape / Plin\n• Bank transfer (BCP, Interbank, BBVA)\nAll payments are 100% secure.'
+    },
+    'devolucion': {
+        'es': '🔄 **Devoluciones**\nTienes **30 días** para devolver un producto. Debe estar en su estado original. Contacta a soporte para iniciar el proceso.',
+        'en': '🔄 **Returns**\nYou have **30 days** to return a product. It must be in original condition. Contact support to start the process.'
+    },
+    'contacto': {
+        'es': '📧 **Contacto**\n• Email: hola@ecomarket.com\n• Tel: +51 999 888 777\n• Horario: Lun-Sáb 9am a 6pm',
+        'en': '📧 **Contact**\n• Email: hola@ecomarket.com\n• Phone: +51 999 888 777\n• Hours: Mon-Sat 9am-6pm'
+    },
+'cuenta': {
+        'es': '👤 Tu cuenta incluye: perfil con avatar y banner, seguidores, **XP y 50 niveles** (de Semilla 🌱 a Bosque 🌳), historial de compras/ventas, favoritos y configuración. Accede desde el menú de usuario.',
+        'en': '👤 Your account includes: profile with avatar and banner, followers, **XP and 50 levels** (from Seed 🌱 to Forest 🌳), purchase/sales history, favorites and settings. Access it from the user menu.'
+    },
+    'ecofriendly': {
+        'es': '♻️ **Consejos eco**\n• Usa bolsas de tela y botellas reutilizables\n• Composta residuos orgánicos\n• Compra a granel sin plásticos\n• Prefiere segunda mano\nCada compra en EcoMarket calcula tu ahorro de CO₂.',
+        'en': '♻️ **Eco tips**\n• Use cloth bags and reusable bottles\n• Compost organic waste\n• Buy bulk without plastics\n• Prefer second-hand\nEvery EcoMarket purchase calculates your CO₂ savings.'
+    },
+    'ecoscore': {
+        'es': '🌿 **EcoScore**: del 0 al 100 valora la sostenibilidad de un producto (materiales, empaque y origen). Un EcoScore alto muestra la insignia "Eco" y da más puntos.',
+        'en': '🌿 **EcoScore**: from 0 to 100 rates a product sustainability (materials, packaging and origin). A high EcoScore shows the "Eco" badge and gives more points.'
+    },
+    'publicar': {
+        'es': '📦 **Para publicar:**\n1. Crea una cuenta\n2. Ve a "Publicar"\n3. Completa nombre, precio, categoría, descripción e imágenes (jpg, png o webp)\n4. ¡Listo! Ganas **+15 XP**\nCualquier usuario registrado puede publicar gratis.',
+        'en': '📦 **To publish:**\n1. Create an account\n2. Go to "Publish"\n3. Fill in name, price, category, description and images (jpg, png or webp)\n4. Done! You earn **+15 XP**\nAny registered user can publish for free.'
+    },
+    'default': {
+        'es': 'No encontré una respuesta exacta. 😅 Puedes preguntarme por:\n• "productos baratos"\n• "dame 3 productos de accesorios"\n• "envíos", "cupones", "pagos"\n• "consejos ecológicos" o "mi cuenta"',
+        'en': 'I could not find an exact answer. 😅 You can ask about:\n• "cheap products"\n• "give me 3 accessories products"\n• "shipping", "coupons", "payments"\n• "eco tips" or "my account"'
+    }
+};
+
+CHAT_INTENTS = [
+    {'id': 'saludo', 'es': ['hola', 'buenas', 'hey', 'buenos dias', 'whatsapp'], 'en': ['hi', 'hello', 'hey', 'good morning']},
+    {'id': 'ayuda', 'es': ['ayuda', 'puedes', 'que haces', 'help'], 'en': ['help', 'what can you do']},
+    {'id': 'envio', 'es': ['envio', 'entrega', 'demora', 'domicilio', 'cuanto tarda', 'costo de envio'], 'en': ['shipping', 'delivery', 'ship', 'arrive', 'shipping cost']},
+    {'id': 'publicar', 'es': ['publicar', 'vender', 'publicacion', 'subir producto'], 'en': ['publish', 'sell', 'listing', 'list a product']},
+    {'id': 'pago', 'es': ['pago', 'tarjeta', 'yape', 'paypal', 'transferencia', 'pagar'], 'en': ['payment', 'card', 'yape', 'paypal', 'transfer', 'pay']},
+    {'id': 'devolucion', 'es': ['devolucion', 'reembolso', 'cambio', 'devolver'], 'en': ['return', 'refund', 'change']},
+    {'id': 'contacto', 'es': ['contacto', 'soporte', 'telefono', 'correo', 'email'], 'en': ['contact', 'support', 'phone', 'email']},
+    {'id': 'cuenta', 'es': ['cuenta', 'perfil', 'contrasena', 'sesion', 'login'], 'en': ['account', 'profile', 'password', 'login']},
+    {'id': 'ecofriendly', 'es': ['reciclar', 'reciclaje', 'consejo', 'sostenible', 'ecolog'], 'en': ['recycle', 'recycling', 'tips', 'sustainable', 'eco']},
+    {'id': 'ecoscore', 'es': ['ecoscore', 'puntaje eco'], 'en': ['ecoscore']}
+];
+
+
+def _chat_products(conn, categoria=None, limite=4, baratos=False):
+    """Obtiene productos reales de la BD (opcionalmente filtrados y baratos)."""
+    if categoria:
+        filas = conn.execute(
+            'SELECT nombre, precio, categoria FROM productos WHERE categoria = ? ORDER BY precio ASC LIMIT ?',
+            (categoria, limite)).fetchall()
+    elif baratos:
+        filas = conn.execute(
+            'SELECT nombre, precio, categoria FROM productos ORDER BY precio ASC LIMIT ?', (limite,)).fetchall()
+    else:
+        filas = conn.execute(
+            'SELECT nombre, precio, categoria FROM productos ORDER BY vistas DESC LIMIT ?', (limite,)).fetchall()
+    return [dict(r) for r in filas]
+
+
+def _normalizar(s):
+    """Quita acentos y minúsculas para facilitar el matching de intenciones."""
+    s = unicodedata.normalize('NFKD', s)
+    s = s.encode('ascii', 'ignore').decode('ascii')
+    return ' ' + s.lower() + ' '
+
+
+def _kwhit(texto_normalizado, claves):
+    """True si alguna clave aparece como palabra (tolera plurales, s/es, con límites)."""
+    for k in claves:
+        k = k.strip()
+        if ' ' in k:
+            if k in texto_normalizado:
+                return True
+        else:
+            if re.search(r'\b' + re.escape(k) + r'(?:es|s)?\b', texto_normalizado):
+                return True
+    return False
+
+
+def _chat_respuesta(msg, lang, conn):
+    """Genera la respuesta de la IA según la intención y datos reales de la BD."""
+    msg_l = ' ' + msg.lower() + ' '
+    msg_n = _normalizar(msg_l)
+
+    # 1) "dame N productos de Categoria" / "give me N products from category"
+    m_es = re.search(r'(?:dame|muestra|busca|quiero)\s*(\d{1,2})?\s*(?:productos?|ofertas?)?\s*(?:de|en)?\s*(accesorios|hogar|higiene|jardin|alimentacion|ropa)', msg_n)
+    m_en = re.search(r'(give me|show me|find|gimme)\s*(\d{1,2})?\s*(accessories|home|hygiene|garden|food|clothing)\s*(products|items)?', msg_n)
+    m = m_es or m_en
+    if m:
+        if m_es:
+            num = int(m_es.group(1)) if m_es.group(1) else 3
+            cat_raw = m_es.group(2)
+        else:
+            num = int(m_en.group(2)) if m_en.group(2) else 3
+            cat_raw = m_en.group(3)
+        ref = {'accesorios': 'Accesorios', 'accessories': 'Accesorios', 'hogar': 'Hogar', 'home': 'Hogar',
+               'higiene': 'Higiene', 'hygiene': 'Higiene', 'jardin': 'Jardín', 'garden': 'Jardín',
+               'alimentacion': 'Alimentación', 'food': 'Alimentación',
+               'ropa': 'Ropa', 'clothing': 'Ropa'}
+        cat = ref.get(cat_raw.lower()) if cat_raw else None
+        prods = _chat_products(conn, categoria=cat, limite=min(num, 5)) if cat else _chat_products(conn, baratos=True, limite=min(num, 5))
+        if prods:
+            if lang == 'en':
+                cab = f"🛒 **{len(prods)} products from '{cat or 'the store'}':**"
+            else:
+                cab = f"🛒 **{len(prods)} productos de {cat or 'la tienda'}:**"
+            lineas = '\n'.join(f'• {p["nombre"]} — S/.{p["precio"]:.2f}' for p in prods)
+            continuacion = '\n\n¿Quieres ver alguno en detalle? 🙂' if lang == 'es' else '\n\nWant to see one in detail? 🙂'
+            return cab + '\n' + lineas + continuacion
+
+    # 2) Productos baratos / recomendaciones
+    if _kwhit(msg_n, ['barato', 'cheap', 'economico', 'affordable', 'presupuesto', 'budget']):
+        prods = _chat_products(conn, baratos=True, limite=5)
+        if lang == 'en':
+            cab = '💰 **Cheapest products in the store:**'
+        else:
+            cab = '💰 **Los productos más baratos de la tienda:**'
+        lineas = '\n'.join(f'• {p["nombre"]} — S/.{p["precio"]:.2f} · {p["categoria"]}' for p in prods)
+        fin = '\n\n¿Te interesa alguno? Te ayudo a agregarlo al carrito 💚' if lang == 'es' else '\n\nInterested in one? I can help you add it to the cart 💚'
+        return cab + '\n' + lineas + fin
+
+    # 3) Cupones (reales)
+    if _kwhit(msg_n, ['cupon', 'coupon', 'descuento', 'discount', 'oferta', 'promo']):
+        if lang == 'en':
+            return ('🎫 **Active coupons:**\n• ECO10 → 10% OFF (min. S/.30)\n• ECO20 → 20% OFF (min. S/.80)\n'
+                    '• ENVIOFREE → Free shipping\n• BIENVENIDO → S/.15 OFF\nUse them at the cart or checkout.')
+        return ('🎫 **Cupones activos:**\n• ECO10 → 10% OFF (mín. S/.30)\n• ECO20 → 20% OFF (mín. S/.80)\n'
+                '• ENVIOFREE → Envío gratis\n• BIENVENIDO → S/.15 OFF\nÚsalos en el carrito o durante el pago.')
+
+    # 4) Intenciones fijas
+    for intent in CHAT_INTENTS:
+        claves = intent['es'] + intent['en']
+        if _kwhit(msg_n, claves):
+            return CHAT_TEXTS[intent['id']][lang]
+
+    # 5) Agradecimiento / despedida
+    if _kwhit(msg_n, ['gracias', 'thanks', 'thank']):
+        return ('¡De nada! 🌿 ¿Necesitas algo más?' if lang == 'es' else 'You are welcome! 🌿 Anything else?')
+    if _kwhit(msg_n, ['adios', 'bye', 'chao', 'hasta luego']):
+        return ('¡Hasta luego! 🌱 Recuerda que cada compra cuenta para el planeta.' if lang == 'es' else 'Goodbye! 🌱 Remember every purchase counts for the planet.')
+
+    # 6) Respuesta por defecto con menú
+    return CHAT_TEXTS['default'][lang]
+
+
+@app.route('/api/chat', methods=['POST'])
+def api_chat():
+    """Asistente de IA tipo ChatGPT: responde con contexto real de la tienda."""
+    data = request.get_json(silent=True) or {}
+    msg = (data.get('message') or '').strip()
+    if not msg:
+        return jsonify({'error': 'Mensaje vacío.'}), 400
+
+    lang = session.get('lang', 'es')
+    # Detección simple de idioma si el texto es claramente inglés
+    if lang == 'es' and any(w in msg.lower() for w in ('shipping', 'cheap ', 'give me', ' hello', ' please', ' the ', ' products')):
+        lang = 'en'
+
+    conn = get_db()
+    try:
+        respuesta = _chat_respuesta(msg, lang, conn)
+    finally:
+        conn.close()
+
+    if lang == 'en':
+        quick = ['Cheap products', 'Shipping', 'Coupons', 'Eco tips', 'My account']
+    else:
+        quick = ['productos baratos', 'Envíos', 'Cupones', 'Consejos eco', 'Mi cuenta']
+
+    return jsonify({'reply': respuesta, 'lang': lang, 'quick_replies': quick})
 
 
 @app.route('/perfil')
 @login_required
 def perfil():
     conn = get_db()
-
     usuario = conn.execute('SELECT * FROM usuarios WHERE id = ?', (session['usuario_id'],)).fetchone()
 
     mis_productos = conn.execute('''
@@ -1398,7 +2034,7 @@ def actualizar_perfil():
                      (nombre, bio, session['usuario_id']))
         session['nombre'] = nombre
         conn.commit()
-        flash('Perfil actualizado.', 'success')
+        flash_t('perfil_actualizado', 'success')
     conn.close()
     return redirect(url_for('perfil'))
 
@@ -1411,21 +2047,21 @@ def cambiar_password():
     confirmar = request.form.get('password_confirmar', '')
 
     if not all([actual, nueva, confirmar]):
-        flash('Completa todos los campos.', 'danger')
+        flash_t('campos_incompletos', 'danger')
         return redirect(url_for('perfil'))
 
     if nueva != confirmar:
-        flash('Las contraseñas no coinciden.', 'danger')
+        flash_t('password_no_coincide', 'danger')
         return redirect(url_for('perfil'))
 
     if len(nueva) < 6:
-        flash('La contraseña debe tener al menos 6 caracteres.', 'danger')
+        flash_t('pw_reqs', 'danger')
         return redirect(url_for('perfil'))
 
     conn = get_db()
     usuario = conn.execute('SELECT * FROM usuarios WHERE id = ?', (session['usuario_id'],)).fetchone()
     if not usuario or not check_password_hash(usuario['password'], actual):
-        flash('Contraseña actual incorrecta.', 'danger')
+        flash_t('contrasena_actual_incorrecta', 'danger')
         conn.close()
         return redirect(url_for('perfil'))
 
@@ -1434,7 +2070,7 @@ def cambiar_password():
                  (hashed_password, session['usuario_id']))
     conn.commit()
     conn.close()
-    flash('Contraseña actualizada correctamente.', 'success')
+    flash_t('contrasena_actualizada', 'success')
     return redirect(url_for('perfil'))
 
 
@@ -1499,7 +2135,7 @@ def eliminar_producto_admin(producto_id):
     conn.execute('DELETE FROM productos WHERE id = ?', (producto_id,))
     conn.commit()
     conn.close()
-    flash('Producto eliminado.', 'success')
+    flash_t('producto_eliminado', 'success')
     return redirect(url_for('admin'))
 
 
@@ -1508,10 +2144,15 @@ def eliminar_producto_admin(producto_id):
 @admin_required
 def eliminar_usuario_admin(usuario_id):
     conn = get_db()
-    conn.execute('DELETE FROM usuarios WHERE id = ? AND email != "admin@ecomarket.com"', (usuario_id,))
+    fila = conn.execute('SELECT rol FROM usuarios WHERE id = ?', (usuario_id,)).fetchone()
+    if fila and fila['rol'] == 'admin':
+        conn.close()
+        flash('No se puede eliminar a un administrador.', 'danger')
+        return redirect(url_for('admin'))
+    conn.execute('DELETE FROM usuarios WHERE id = ? AND rol != "admin"', (usuario_id,))
     conn.commit()
     conn.close()
-    flash('Usuario eliminado.', 'success')
+    flash_t('usuario_eliminado', 'success')
     return redirect(url_for('admin'))
 
 

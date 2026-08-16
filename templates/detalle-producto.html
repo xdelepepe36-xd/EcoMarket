@@ -31,7 +31,7 @@
 {% endblock %}
 
 {% block content %}
-{% set imagen_principal = producto.imagen_pref if producto.get('imagen_pref') and producto.get('imagen_pref').startswith('http') else (producto.imagen_pref if producto.get('imagen_pref') and producto.get('imagen_pref').startswith('http') else (url_for('static', filename=producto.imagen_pref) if producto.get('imagen_pref') and not producto.get('imagen_pref').startswith('http') else (producto.imagen if producto.imagen.startswith('http') else url_for('static', filename=producto.imagen)))) %}
+{% set imagen_principal = producto.imagen_pref if (producto.imagen_pref and producto.imagen_pref.startswith('http')) else url_for('static', filename=producto.imagen_pref if producto.imagen_pref else producto.imagen) %}
 <section class="section detalle-section">
     <div class="container">
         <!-- Breadcrumbs -->

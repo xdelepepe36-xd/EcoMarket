@@ -1,4 +1,4 @@
-x{% extends 'base.html' %}
+{% extends 'base.html' %}
 {% block title %}EcoMarket - Página no encontrada{% endblock %}
 
 {% block content %}
@@ -6,24 +6,25 @@ x{% extends 'base.html' %}
     <div class="container" style="text-align:center">
         <div style="font-size:8rem;line-height:1;margin-bottom:16px;opacity:0.8;animation:pulse 2s infinite">🌱</div>
         <h1 style="font-size:clamp(3rem,6vw,5rem);font-weight:800;color:var(--verde);line-height:1;margin-bottom:8px">404</h1>
-        <h2 style="font-size:1.5rem;font-weight:700;margin-bottom:12px" data-i18n="auto.404.9">Página no encontrada</h2>
+        <h2 style="font-size:1.5rem;font-weight:700;margin-bottom:12px" data-i18n="error.404_title">Página no encontrada</h2>
         <p style="color:var(--texto-sec);max-width:480px;margin:0 auto 28px;line-height:1.8">
-            La página que buscas no existe o ha sido movida. 
-            <br>¡No te preocupes, vuelve al inicio y sigue explorando!
+            <span data-i18n="error.404_desc">La página que buscas no existe o ha sido movida.</span>
+            <br>
+            <span data-i18n="error.404_tip">¡No te preocupes, vuelve al inicio y sigue explorando!</span>
         </p>
         <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
             <a href="{{ url_for('index') }}" class="btn-principal" style="padding:14px 32px">
-                <i class="bi bi-house"></i> Volver al inicio
+                <i class="bi bi-house"></i> <span data-i18n="error.go_home">Volver al inicio</span>
             </a>
             <a href="{{ url_for('productos_view') }}" class="btn-secundario" style="padding:14px 32px">
-                <i class="bi bi-grid"></i> Ver productos
+                <i class="bi bi-grid"></i> <span data-i18n="error.view_products">Ver productos</span>
             </a>
             <a href="{{ url_for('contacto') }}" class="btn-secundario" style="padding:14px 32px">
-                <i class="bi bi-envelope"></i> Contactar soporte
+                <i class="bi bi-envelope"></i> <span data-i18n="error.contact_support">Contactar soporte</span>
             </a>
         </div>
         <div style="margin-top:32px;font-size:0.85rem;color:var(--texto-sec)">
-            <i class="bi bi-lightbulb"></i> Consejo: Usa la búsqueda para encontrar lo que necesitas
+            <i class="bi bi-lightbulb"></i> <span data-i18n="error.tip">Tip: use search to find what you need.</span>
         </div>
     </div>
 </section>

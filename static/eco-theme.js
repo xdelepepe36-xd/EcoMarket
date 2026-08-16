@@ -13,7 +13,59 @@ const EcoTheme = (() => {
   const THEMES = {
     light: 'Claro',
     dark: 'Oscuro',
+    night: 'Noche AMOLED',
+    sepia: 'Sepia',
     highcontrast: 'Alto contraste'
+  };
+
+  // Paleta personalizada por tema especial (sobrescribe variables CSS)
+  const PALETTES = {
+    night: {
+      '--verde': '#9cef6b',
+      '--verde-claro': '#c8ffad',
+      '--texto': '#eef6ea',
+      '--texto-sec': '#9fb4a3',
+      '--fondo': '#00050a',
+      '--fondo-alt': '#050b12',
+      '--surface': 'rgba(6, 16, 22, 0.95)',
+      '--surface-strong': 'rgba(8, 20, 28, 0.99)',
+      '--blanco': '#eef6ea',
+      '--sombra': '0 8px 24px rgba(0,0,0,0.7)',
+      '--sombra-lg': '0 16px 48px rgba(0,0,0,0.8)'
+    },
+    dark: {
+      '--verde': '#7ed957',
+      '--verde-claro': '#a8ff80',
+      '--texto': '#edf5ea',
+      '--texto-sec': '#babfb6',
+      '--fondo': '#0c1210',
+      '--fondo-alt': '#141b17',
+      '--surface': 'rgba(16, 28, 20, 0.92)',
+      '--surface-strong': 'rgba(20, 34, 26, 0.97)',
+      '--blanco': '#f8faf5'
+    },
+    sepia: {
+      '--texto': '#4a3b2a',
+      '--texto-sec': '#7a6a55',
+      '--fondo': '#f7f1e5',
+      '--fondo-alt': '#efe5d2',
+      '--surface': 'rgba(255, 252, 246, 0.94)',
+      '--surface-strong': 'rgba(255, 252, 246, 0.98)',
+      '--blanco': '#4a3b2a',
+      '--verde': '#5b7a3a',
+      '--verde-claro': '#7e9c5b',
+      '--sombra': '0 8px 24px rgba(90, 70, 40, 0.14)'
+    },
+    highcontrast: {
+      '--verde': '#006400',
+      '--verde-claro': '#228b22',
+      '--texto': '#000000',
+      '--texto-sec': '#333333',
+      '--fondo': '#ffffff',
+      '--fondo-alt': '#f2f2f2',
+      '--surface': '#ffffff',
+      '--blanco': '#000000'
+    }
   };
 
   // ── Gestión ────────────────────────────────────────────
@@ -44,32 +96,30 @@ const EcoTheme = (() => {
 
   const toggle = () => {
     const current = get();
-    const order = ['light', 'dark', 'highcontrast'];
+    const order = ['light', 'dark', 'night', 'sepia', 'highcontrast'];
     const idx = order.indexOf(current);
     set(order[(idx + 1) % order.length]);
   };
 
-  const isDark = () => get() === 'dark';
+  const isDark = () => get() === 'dark' || get() === 'night';
   const isHighContrast = () => get() === 'highcontrast';
+  const isSepia = () => get() === 'sepia';
 
   // ── Aplicar tema ───────────────────────────────────────
   const _apply = theme => {
     const html = document.documentElement;
     html.setAttribute('data-theme', theme);
 
-    // Alto contraste: forzar colores
-    if (theme === 'highcontrast') {
-      html.style.setProperty('--verde', '#006400');
-      html.style.setProperty('--verde-claro', '#228b22');
-      html.style.setProperty('--texto', '#000000');
-      html.style.setProperty('--texto-sec', '#333333');
-      html.style.setProperty('--fondo', '#ffffff');
+    // Temas especiales: aplicar paleta de variables en línea
+    const palette = PALETTES[theme];
+    const defaultProps = ['--verde', '--verde-claro', '--texto', '--texto-sec', '--fondo', '--fondo-alt', '--surface', '--surface-strong', '--blanco', '--sombra', '--sombra-md', '--sombra-lg'];
+    if (palette) {
+      defaultProps.forEach((prop) => html.style.setProperty(prop, palette[prop] || ''));
+      // Marcar tema oscuro para selectores auxiliares
+      html.classList.toggle('is-dark', theme === 'dark' || theme === 'night');
     } else {
-      html.style.removeProperty('--verde');
-      html.style.removeProperty('--verde-claro');
-      html.style.removeProperty('--texto');
-      html.style.removeProperty('--texto-sec');
-      html.style.removeProperty('--fondo');
+      defaultProps.forEach((prop) => html.style.removeProperty(prop));
+      html.classList.remove('is-dark');
     }
   };
 
@@ -107,7 +157,7 @@ const EcoTheme = (() => {
   };
 
   const _getIcon = theme => {
-    const icons = { light: '☀️', dark: '🌙', highcontrast: '♿' };
+    const icons = { light: '☀️', dark: '🌙', night: '🌃', sepia: '🕯️', highcontrast: '♿' };
     return icons[theme] || '☀️';
   };
 

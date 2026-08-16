@@ -28,10 +28,10 @@
                 </a>
             </div>
             <div class="hero-trust-bar" aria-label="Ventajas de EcoMarket">
-                <div class="trust-pill"><i class="bi bi-truck"></i> Envío gratis</div>
-                <div class="trust-pill"><i class="bi bi-shield-check"></i> Pago seguro</div>
-                <div class="trust-pill"><i class="bi bi-arrow-repeat"></i> Devoluciones fáciles</div>
-                <div class="trust-pill"><i class="bi bi-clock-history"></i> Entrega rápida</div>
+                <div class="trust-pill"><i class="bi bi-truck"></i> <span data-i18n="hero.trust.shipping">Envío gratis</span></div>
+                <div class="trust-pill"><i class="bi bi-shield-check"></i> <span data-i18n="hero.trust.payment">Pago seguro</span></div>
+                <div class="trust-pill"><i class="bi bi-arrow-repeat"></i> <span data-i18n="hero.trust.returns">Devoluciones fáciles</span></div>
+                <div class="trust-pill"><i class="bi bi-clock-history"></i> <span data-i18n="hero.trust.delivery">Entrega rápida</span></div>
             </div>
             <div class="hero-stats">
                 <div class="hero-stat">
@@ -138,10 +138,10 @@
     <div class="container">
         <div class="impacto-grid-2cols">
             <div class="impacto-content">
-                <span class="section-tag" style="background:var(--blanco);color:var(--verde)"><i class="bi bi-globe-americas"></i> Impacto real</span>
-                <h2 class="impacto-title">Cada compra cuenta</h2>
-                <p class="impacto-desc">En EcoMarket medimos el impacto ambiental de cada transacción. Juntos estamos construyendo un futuro más sostenible.</p>
-                <a href="{{ url_for('impacto') }}" class="section-link">Ver nuestro impacto completo <i class="bi bi-arrow-right"></i></a>
+                <span class="section-tag" style="background:var(--blanco);color:var(--verde)"><i class="bi bi-globe-americas"></i> <span data-i18n="impact.real">Impacto real</span></span>
+                <h2 class="impacto-title" data-i18n="impact.title_main">Cada compra cuenta</h2>
+                <p class="impacto-desc" data-i18n="impact.desc_full">En EcoMarket medimos el impacto ambiental de cada transacción. Juntos estamos construyendo un futuro más sostenible.</p>
+                <a href="{{ url_for('impacto') }}" class="section-link"><span data-i18n="impact.view_full">Ver nuestro impacto completo</span> <i class="bi bi-arrow-right"></i></a>
             </div>
             <div class="impacto-cards">
                 <div class="impacto-card-item">
@@ -149,28 +149,28 @@
                         <i class="bi bi-tree"></i>
                     </div>
                     <strong>1,240</strong>
-                    <span>Árboles equivalentes salvados</span>
+                    <span data-i18n="impact.trees">Árboles equivalentes salvados</span>
                 </div>
                 <div class="impacto-card-item">
                     <div class="impacto-card-icon" style="background:#e3f2fd;color:#1565c0">
                         <i class="bi bi-droplet"></i>
                     </div>
                     <strong>85,600</strong>
-                    <span>Litros de agua ahorrados</span>
+                    <span data-i18n="impact.water">Litros de agua ahorrados</span>
                 </div>
                 <div class="impacto-card-item">
                     <div class="impacto-card-icon" style="background:#fff3e0;color:#e65100">
                         <i class="bi bi-recycle"></i>
                     </div>
                     <strong>3,200</strong>
-                    <span>Kg de plástico evitados</span>
+                    <span data-i18n="impact.plastic">Kg de plástico evitados</span>
                 </div>
                 <div class="impacto-card-item">
                     <div class="impacto-card-icon" style="background:#f3e5f5;color:#6a1b9a">
                         <i class="bi bi-people"></i>
                     </div>
                     <strong>4,800</strong>
-                    <span>Familias impactadas</span>
+                    <span data-i18n="impact.families">Familias impactadas</span>
                 </div>
             </div>
         </div>
@@ -194,10 +194,10 @@
                 </div>
             </div>
             <div class="cta-features">
-                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> Sin comisión los primeros 3 meses</div>
-                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> Panel de vendedor completo</div>
-                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> Pagos seguros y rápidos</div>
-                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> Soporte 7 días a la semana</div>
+                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> <span data-i18n="cta.feature.no_commission">Sin comisión los primeros 3 meses</span></div>
+                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> <span data-i18n="cta.feature.dashboard">Panel de vendedor completo</span></div>
+                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> <span data-i18n="cta.feature.payments">Pagos seguros y rápidos</span></div>
+                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> <span data-i18n="cta.feature.support">Soporte 7 días a la semana</span></div>
             </div>
         </div>
     </div>
@@ -207,35 +207,35 @@
 <section class="section" style="background:var(--blanco)">
     <div class="container">
         <div style="text-align:center;margin-bottom:40px">
-            <span class="section-tag" style="margin:0 auto 8px"><i class="bi bi-people"></i> Comunidad</span>
-            <h2 class="section-title">Lo que dice nuestra comunidad</h2>
+            <span class="section-tag" style="margin:0 auto 8px"><i class="bi bi-people"></i> <span data-i18n="community.tag">Comunidad</span></span>
+            <h2 class="section-title" data-i18n="community.title">Lo que dice nuestra comunidad</h2>
         </div>
         <div class="testimonios-grid">
             <div class="testimonio-card">
                 <div class="testimonio-quote"><i class="bi bi-quote"></i></div>
-                <p>"Desde que compro en EcoMarket siento que mis decisiones de consumo realmente importan. Los productos son increíbles."</p>
+                <p data-i18n="community.review_1">"Desde que compro en EcoMarket siento que mis decisiones de consumo realmente importan. Los productos son increíbles."</p>
                 <div class="testimonio-stars">★★★★★</div>
                 <div class="testimonio-author">
                     <div class="testimonio-avatar" style="background:#2e7d32;color:#fff">M</div>
-                    <div><strong>María García</strong><span>Lima, Perú</span></div>
+                    <div><strong data-i18n="community.name_1">María García</strong><span data-i18n="community.city_1">Lima, Perú</span></div>
                 </div>
             </div>
             <div class="testimonio-card featured">
                 <div class="testimonio-quote" style="color:rgba(255,255,255,0.5)"><i class="bi bi-quote"></i></div>
-                <p>"Publiqué mis productos artesanales y en un mes ya tenía 20 ventas. La plataforma es muy fácil de usar."</p>
+                <p data-i18n="community.review_2">"Publiqué mis productos artesanales y en un mes ya tenía 20 ventas. La plataforma es muy fácil de usar."</p>
                 <div class="testimonio-stars">★★★★★</div>
                 <div class="testimonio-author">
                     <div class="testimonio-avatar" style="background:rgba(255,255,255,0.2);color:#fff">C</div>
-                    <div><strong style="color:#fff">Carlos López</strong><span style="color:rgba(255,255,255,0.6)">Bogotá, Colombia</span></div>
+                    <div><strong style="color:#fff" data-i18n="community.name_2">Carlos López</strong><span style="color:rgba(255,255,255,0.6)" data-i18n="community.city_2">Bogotá, Colombia</span></div>
                 </div>
             </div>
             <div class="testimonio-card">
                 <div class="testimonio-quote"><i class="bi bi-quote"></i></div>
-                <p>"Me encanta que puedo ver el impacto real de cada compra. Es motivador saber que estoy ayudando al planeta."</p>
+                <p data-i18n="community.review_3">"Me encanta que puedo ver el impacto real de cada compra. Es motivador saber que estoy ayudando al planeta."</p>
                 <div class="testimonio-stars">★★★★★</div>
                 <div class="testimonio-author">
                     <div class="testimonio-avatar" style="background:#6a1b9a;color:#fff">A</div>
-                    <div><strong>Ana Torres</strong><span>Santiago, Chile</span></div>
+                    <div><strong data-i18n="community.name_3">Ana Torres</strong><span data-i18n="community.city_3">Santiago, Chile</span></div>
                 </div>
             </div>
         </div>

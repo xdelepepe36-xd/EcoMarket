@@ -30,10 +30,10 @@
         </div>
 
         <div class="catalog-filter-panel">
-            <span class="catalog-filter-label"><i class="bi bi-currency-dollar"></i> Precio:</span>
-            <input type="number" id="precioMin" placeholder="Mín" min="0" step="0.01" value="{{ request.args.get('precio_min', '') }}">
+            <span class="catalog-filter-label"><i class="bi bi-currency-dollar"></i> <span data-i18n="products.price_label">Precio:</span></span>
+            <input type="number" id="precioMin" placeholder="Mín" min="0" step="0.01" value="{{ request.args.get('precio_min', '') }}" data-i18n-placeholder="products.price_min">
             <span class="catalog-filter-range">—</span>
-            <input type="number" id="precioMax" placeholder="Máx" min="0" step="0.01" value="{{ request.args.get('precio_max', '') }}">
+            <input type="number" id="precioMax" placeholder="Máx" min="0" step="0.01" value="{{ request.args.get('precio_max', '') }}" data-i18n-placeholder="products.price_max">
             <button onclick="aplicarFiltroPrecio()" class="btn-principal catalog-filter-btn"><i class="bi bi-funnel"></i> <span data-i18n="products.filter">Filtrar</span></button>
             {% if request.args.get('precio_min') or request.args.get('precio_max') %}
             <a href="{{ url_for('productos_view', categoria=categoria_sel, orden=orden_sel) }}" class="catalog-clear-link" data-i18n="products.clear">Limpiar</a>
@@ -41,7 +41,7 @@
         </div>
 
         <div class="filter-pills">
-            <a href="{{ url_for('productos_view') }}" class="filter-pill {{ 'active' if not categoria_sel }}"><span data-i18n="products.filter.all">Todas</span></a>
+            <a href="{{ url_for('productos_view') }}" class="filter-pill {{ 'active' if not categoria_sel }}"><span data-i18n="products.filter_all">Todas</span></a>
             {% for cat in categorias %}
             <a href="{{ url_for('productos_view', categoria=cat) }}" class="filter-pill {{ 'active' if categoria_sel == cat }}">{{ cat }}</a>
             {% endfor %}
@@ -52,7 +52,7 @@
         <!-- Grid -->
         <div class="productos-grid" id="productosGrid">
             {% for producto in productos %}
-            {% set img_src = producto.imagen_pref if producto.get('imagen_pref') and producto.get('imagen_pref').startswith('http') else (producto.imagen_pref if producto.get('imagen_pref') and producto.get('imagen_pref').startswith('http') else (url_for('static', filename=producto.imagen_pref) if producto.get('imagen_pref') and not producto.get('imagen_pref').startswith('http') else (producto.imagen if producto.imagen.startswith('http') else url_for('static', filename=producto.imagen)))) %}
+            {% set img_src = producto.imagen if producto.imagen.startswith('http') else url_for('static', filename=producto.imagen) %}
             <article class="producto-card" style="position:relative;display:flex;flex-direction:column">
                 <!-- Badge condición -->
                 <div style="position:absolute;top:10px;left:10px;z-index:2;background:{% if producto.condicion == 'nuevo' %}#2e7d32{% else %}#f59e0b{% endif %};color:#fff;padding:4px 10px;border-radius:999px;font-size:0.72rem;font-weight:700">

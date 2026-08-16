@@ -3,6 +3,7 @@
  * Scroll animations, back to top, autocomplete, skeleton loading, etc.
  */
 const EcoUX = (() => {
+  const t = (key, params = {}) => (window.EcoI18n && typeof window.EcoI18n.t === 'function') ? window.EcoI18n.t(key, params) : key;
   // ============================================================
   // 1. SCROLL ANIMATIONS (Intersection Observer)
   // ============================================================
@@ -182,11 +183,11 @@ const EcoUX = (() => {
     banner.innerHTML = `
       <div style="display:flex;align-items:center;gap:12px;flex:1">
         <i class="bi bi-cookie" style="font-size:1.5rem;color:#2e7d32"></i>
-        <span style="font-size:0.85rem;color:var(--texto-sec)">Usamos cookies para mejorar tu experiencia. Al continuar, aceptas nuestra política de cookies.</span>
+        <span style="font-size:0.85rem;color:var(--texto-sec)">${t('cookie.text')}</span>
       </div>
       <div style="display:flex;gap:8px">
-        <button onclick="EcoUX.acceptCookies()" style="padding:8px 20px;border-radius:999px;background:linear-gradient(135deg,#4caf50,#2e7d32);color:#fff;border:none;font-weight:700;font-size:0.85rem;cursor:pointer">Aceptar</button>
-        <button onclick="EcoUX.acceptCookies()" style="padding:8px 20px;border-radius:999px;background:#f0f7f0;color:#2e7d32;border:1px solid rgba(46,125,50,0.2);font-weight:600;font-size:0.85rem;cursor:pointer">Cerrar</button>
+        <button onclick="EcoUX.acceptCookies()" style="padding:8px 20px;border-radius:999px;background:linear-gradient(135deg,#4caf50,#2e7d32);color:#fff;border:none;font-weight:700;font-size:0.85rem;cursor:pointer">${t('cookie.accept')}</button>
+        <button onclick="EcoUX.acceptCookies()" style="padding:8px 20px;border-radius:999px;background:#f0f7f0;color:#2e7d32;border:1px solid rgba(46,125,50,0.2);font-weight:600;font-size:0.85rem;cursor:pointer">${t('close')}</button>
       </div>
     `;
     document.body.appendChild(banner);
@@ -246,6 +247,21 @@ const EcoUX = (() => {
     initCookieConsent();
     initLazyLoading();
     updateNotificationBadge();
+    window.addEventListener('eco:langchange', () => {
+      const banner = document.getElementById('ecoCookieBanner');
+      if (banner) {
+        banner.innerHTML = `
+          <div style="display:flex;align-items:center;gap:12px;flex:1">
+            <i class="bi bi-cookie" style="font-size:1.5rem;color:#2e7d32"></i>
+            <span style="font-size:0.85rem;color:var(--texto-sec)">${t('cookie.text')}</span>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button onclick="EcoUX.acceptCookies()" style="padding:8px 20px;border-radius:999px;background:linear-gradient(135deg,#4caf50,#2e7d32);color:#fff;border:none;font-weight:700;font-size:0.85rem;cursor:pointer">${t('cookie.accept')}</button>
+            <button onclick="EcoUX.acceptCookies()" style="padding:8px 20px;border-radius:999px;background:#f0f7f0;color:#2e7d32;border:1px solid rgba(46,125,50,0.2);font-weight:600;font-size:0.85rem;cursor:pointer">${t('close')}</button>
+          </div>
+        `;
+      }
+    });
     
     // Auto-refresh badge periodically
     setInterval(updateNotificationBadge, 10000);

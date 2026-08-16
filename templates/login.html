@@ -11,6 +11,7 @@
                 <p data-i18n="auth.login_desc">Accede a tu cuenta para comprar y vender productos ecológicos.</p>
             </div>
             <form method="POST" action="{{ url_for('login') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <label for="email"><i class="bi bi-envelope"></i> <span data-i18n="auth.email">Correo electrónico</span></label>
                 <input type="email" id="email" name="email" placeholder="tu@correo.com" data-i18n-placeholder="auth.email_placeholder" required autofocus>
                 <label for="password"><i class="bi bi-lock"></i> <span data-i18n="auth.password">Contraseña</span></label>
@@ -19,9 +20,11 @@
                     <i class="bi bi-box-arrow-in-right"></i> <span data-i18n="auth.login_button">Ingresar</span>
                 </button>
             </form>
-            <div class="auth-divider"><span>¿No tienes cuenta?</span></div>
+            <div class="auth-divider"><span data-i18n="auth.or">o</span></div>
+            <div class="google-login-wrap" data-eco-google-btn></div>
+            <div class="auth-divider"><span data-i18n="auth.no_account">¿No tienes cuenta?</span></div>
             <a href="{{ url_for('registro') }}" class="btn-secundario" style="width:100%; text-align:center;">
-                <i class="bi bi-person-plus"></i> Crear cuenta gratis
+                <i class="bi bi-person-plus"></i> <span data-i18n="auth.register_button">Crear cuenta</span>
             </a>
         </div>
     </div>

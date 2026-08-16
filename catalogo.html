@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Catálogo | EcoMarket</title>
+
+    <meta name="description" content="Catálogo de productos ecológicos">
+
+    <meta name="keywords" content="catálogo, productos, ecomarket">
+
+    <meta name="author" content="Joseph Alessandro">
+
+    <link rel="icon" href="img/logo.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <link rel="stylesheet" href="css/catalogo.css">
+
+</head>
+
+<body>
+
+    <div id="scrollProgress"></div>
+    <div id="loader">
+
+    <div class="loader-circle"></div>
+
+</div>
+
+<!--=====================================================
+    HEADER
+======================================================-->
+
+<header class="header">
+
+    <div class="logo">
+
+        <a href="index.html">
+
+            <img src="img/logo.png" alt="EcoMarket">
+
+        </a>
+
+    </div>
+
+    <nav class="navbar">
+
+        <ul>
+
+            <li><a href="index.html">Inicio</a></li>
+
+            <li><a href="catalogo.html" class="activo">Catálogo</a></li>
+
+            <li><a href="publicar.html">Publicar</a></li>
+
+            <li><a href="contacto.html">Contacto</a></li>
+
+        </ul>
+
+    </nav>
+
+</header>
+<!--=====================================================
+    CATÁLOGO
+======================================================-->
+
+<main class="catalogo2">
+
+    <section class="catalogo2-contenedor">
+
+        <h1>
+
+            Catálogo de Productos
+
+        </h1>
+
+        <p>
+
+            Descubre productos ecológicos publicados por nuestra comunidad.
+
+        </p>
+
+        <div
+
+            class="catalogo2-grid"
+
+            id="lista-productos">
+
+        </div>
+
+    </section>
+
+</main>
+<!--=====================================================
+    PLANTILLA DE PRODUCTO
+======================================================-->
+
+<template id="template-producto">
+
+    <article class="producto-card">
+
+        <img
+            class="producto-imagen"
+            src=""
+            alt="Producto">
+
+        <div class="producto-info">
+
+            <h3 class="producto-nombre">
+
+            </h3>
+
+            <p class="producto-categoria">
+
+            </p>
+
+            <p class="producto-precio">
+
+            </p>
+
+            <div class="producto-botones">
+
+                <a class="btn-detalles" href="#">
+
+                Ver detalles
+
+                </a>
+
+                <button
+                    class="btn-carrito">
+
+                    Agregar al carrito
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </article>
+
+</template>
+<!--=====================================================
+    FOOTER Y SCRIPTS
+======================================================-->
+
+<footer class="footer">
+
+    <div class="footer-contenido">
+
+        <h2>
+
+            🌱 EcoMarket
+
+        </h2>
+
+        <p>
+
+            Compra y vende productos ecológicos mientras ayudas al planeta.
+
+        </p>
+
+        <p>
+
+            © 2026 EcoMarket. Todos los derechos reservados.
+
+        </p>
+
+    </div>
+
+</footer>
+
+<link rel="stylesheet" href="css/catalogo.css">
+
+<script src="js/catalogo.js"></script>
+
+</body>
+
+</html>

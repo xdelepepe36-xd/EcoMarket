@@ -158,7 +158,7 @@ function renderCheckout() {
     let subtotal = 0;
 
     if (items.length === 0) {
-        container.innerHTML = '<div class="checkout-empty-msg" data-i18n="auto.checkout.156">Tu carrito está vacío</div>';
+        container.innerHTML = '<div class="checkout-empty-msg">' + (window.EcoI18n ? EcoI18n.t('cart.empty') : 'Tu carrito está vacío') + '</div>';
         const btn = document.querySelector('#checkoutForm button[type="submit"]');
         if (btn) btn.disabled = true;
         return;
@@ -193,11 +193,33 @@ function renderCheckout() {
 document.getElementById('checkoutForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const nombre = document.getElementById('nombre').value.trim();
+    const apellido = document.getElementById('apellido').value.trim();
     const email = document.getElementById('email').value.trim();
+    const telefono = document.getElementById('telefono').value.trim();
     const direccion = document.getElementById('direccion').value.trim();
+    const ciudad = document.getElementById('ciudad').value.trim();
 
-    if (!nombre || !email || !direccion) {
-        alert('Completa todos los campos obligatorios');
+    // Validación en el cliente
+    const erroresUI = {};
+    if (window.EcoValidation) {
+        const V = EcoValidation;
+        if (!V.validators.nombre(nombre)) erroresUI.nombre = 'Nombre inválido';
+        if (apellido && !V.validators.nombre(apellido)) erroresUI.apellido = 'Apellido inválido';
+        if (!V.validators.email(email)) erroresUI.email = 'Email inválido';
+        if (!V.validators.direccion(direccion)) erroresUI.direccion = 'Dirección inválida';
+        if (!V.validators.telefono(telefono)) erroresUI.telefono = 'Teléfono inválido';
+        if (!V.validators.ciudad(ciudad)) erroresUI.ciudad = 'Ciudad inválida';
+        Object.keys(erroresUI).forEach(k => {
+            const el = document.getElementById(k === 'apellido' ? 'apellido' : k);
+            if (el) V.setError(el, erroresUI[k]);
+        });
+    } else if (!nombre || !email || !direccion) {
+        alert(window.EcoI18n ? EcoI18n.t('checkout.required_fields', {}, 'Complete all required fields') : 'Completa todos los campos obligatorios');
+        return;
+    }
+    if (Object.keys(erroresUI).length > 0) {
+        if (window.EcoToast) EcoToast.show('Revisa los campos resaltados en rojo.', 'error');
+        else alert('Revisa los campos resaltados en rojo.');
         return;
     }
 
@@ -218,8 +240,11 @@ document.getElementById('checkoutForm').addEventListener('submit', function(e) {
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
             nombre: nombre,
+            apellido: apellido,
             email: email,
+            telefono: telefono,
             direccion: direccion,
+            ciudad: ciudad,
             items: items,
             metodo_pago: metodoPago ? metodoPago.value : ''
         })
@@ -231,7 +256,15 @@ document.getElementById('checkoutForm').addEventListener('submit', function(e) {
             localStorage.removeItem('ecomarket_coupon');
             window.location.href = '/confirmacion?pedido_id=' + d.pedido_id;
         } else {
-            alert(d.error || 'Error al procesar el pedido');
+            // Mostrar errores por campo si el backend los devuelve
+            if (d.campos && window.EcoValidation) {
+                Object.keys(d.campos).forEach(k => {
+                    const el = document.getElementById(k);
+                    if (el) EcoValidation.setError(el, d.campos[k]);
+                });
+            }
+            if (window.EcoToast) EcoToast.show(d.error || 'Error al procesar el pedido', 'error');
+            else alert(d.error || 'Error al procesar el pedido');
             submitBtn.disabled = false;
             submitBtn.innerHTML = '<i class="bi bi-lock-fill"></i> Pagar S/. ' + document.getElementById('totalPagar').textContent;
         }

@@ -28,20 +28,20 @@
                 </div>
                 <div style="flex:1">
                     <h3 style="font-size:1.3rem;font-weight:800;margin-bottom:2px">{{ session.get('nombre') }}</h3>
-                    <p style="font-size:0.85rem;color:var(--texto-sec)">{{ usuario.bio if usuario and usuario.bio else '🌱 Amante del planeta' }}</p>
+                    <p style="font-size:0.85rem;color:var(--texto-sec)">{{ usuario.bio if usuario and usuario.bio else '🌱 Eco warrior' }}</p>
                 </div>
                 <div style="display:flex;gap:16px;flex-wrap:wrap">
                     <div style="text-align:center">
                         <div style="font-size:1.1rem;font-weight:800;color:var(--verde)">{{ seguidores }}</div>
-                        <div style="font-size:0.72rem;color:var(--texto-sec)">Seguidores</div>
+                        <div style="font-size:0.72rem;color:var(--texto-sec)" data-i18n="profile.followers">Followers</div>
                     </div>
                     <div style="text-align:center">
                         <div style="font-size:1.1rem;font-weight:800;color:var(--verde)">{{ siguiendo }}</div>
-                        <div style="font-size:0.72rem;color:var(--texto-sec)">Siguiendo</div>
+                        <div style="font-size:0.72rem;color:var(--texto-sec)" data-i18n="profile.following">Following</div>
                     </div>
                     <div style="text-align:center">
                         <div style="font-size:1.1rem;font-weight:800;color:var(--verde)">{{ usuario.xp if usuario else 0 }}</div>
-                        <div style="font-size:0.72rem;color:var(--texto-sec)">XP</div>
+                        <div style="font-size:0.72rem;color:var(--texto-sec)" data-i18n="profile.xp">XP</div>
                     </div>
                 </div>
             </div>
@@ -107,6 +107,7 @@
                             <div style="display:flex;gap:6px">
                                 <a href="{{ url_for('producto_detalle', producto_id=p.id) }}" class="btn-secundario" style="padding:6px 14px;font-size:0.82rem"><i class="bi bi-eye"></i></a>
                                 <form method="POST" action="{{ url_for('eliminar_producto', producto_id=p.id) }}" style="display:inline" onsubmit="return confirm('¿Eliminar este producto?')">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button type="submit" class="btn-danger" style="padding:6px 14px;font-size:0.82rem"><i class="bi bi-trash"></i></button>
                                 </form>
                             </div>
@@ -118,9 +119,9 @@
             {% else %}
             <div class="no-results" style="padding:60px 20px;text-align:center;background:var(--blanco);border-radius:24px;box-shadow:var(--sombra)">
                 <i class="bi bi-box-seam" style="font-size:3rem;display:block;margin-bottom:16px;color:rgba(46,125,50,0.3)"></i>
-                <h3 style="margin-bottom:8px">No has publicado productos</h3>
-                <p style="color:var(--texto-sec);margin-bottom:20px">Publica tu primer producto y empieza a vender.</p>
-                <a href="{{ url_for('publicar') }}" class="btn-principal"><i class="bi bi-plus-circle"></i> Publicar ahora</a>
+                <h3 style="margin-bottom:8px" data-i18n="profile.no_products">No products published yet</h3>
+                <p style="color:var(--texto-sec);margin-bottom:20px" data-i18n="profile.no_products_desc">Publish your first product and start selling.</p>
+                <a href="{{ url_for('publicar') }}" class="btn-principal"><i class="bi bi-plus-circle"></i> <span data-i18n="publicar.publish_btn">Publish product</span></a>
             </div>
             {% endif %}
         </div>
@@ -150,9 +151,9 @@
             {% else %}
             <div class="no-results" style="padding:60px 20px;text-align:center;background:var(--blanco);border-radius:24px;box-shadow:var(--sombra)">
                 <i class="bi bi-heart" style="font-size:3rem;display:block;margin-bottom:16px;color:rgba(46,125,50,0.3)"></i>
-                <h3 style="margin-bottom:8px">No tienes favoritos</h3>
-                <p style="color:var(--texto-sec);margin-bottom:20px">Explora productos y guarda tus favoritos.</p>
-                <a href="{{ url_for('productos_view') }}" class="btn-principal">Explorar productos</a>
+                <h3 style="margin-bottom:8px" data-i18n="profile.no_favorites">No favorites yet</h3>
+                <p style="color:var(--texto-sec);margin-bottom:20px" data-i18n="profile.no_favorites_desc">Explore products and save your favorites.</p>
+                <a href="{{ url_for('productos_view') }}" class="btn-principal" data-i18n="hero.explore">Explore products</a>
             </div>
             {% endif %}
         </div>
@@ -181,8 +182,8 @@
             {% else %}
             <div class="no-results" style="padding:60px 20px;text-align:center;background:var(--blanco);border-radius:24px;box-shadow:var(--sombra)">
                 <i class="bi bi-star" style="font-size:3rem;display:block;margin-bottom:16px;color:rgba(46,125,50,0.3)"></i>
-                <h3 style="margin-bottom:8px">No has escrito reseñas</h3>
-                <p style="color:var(--texto-sec)">Compra productos y comparte tu experiencia.</p>
+                <h3 style="margin-bottom:8px" data-i18n="profile.no_reviews">No reviews written yet</h3>
+                <p style="color:var(--texto-sec)" data-i18n="profile.no_reviews_desc">Buy products and share your experience.</p>
             </div>
             {% endif %}
         </div>
@@ -212,9 +213,9 @@
             {% else %}
             <div class="no-results" style="padding:60px 20px;text-align:center;background:var(--blanco);border-radius:24px;box-shadow:var(--sombra)">
                 <i class="bi bi-bag-check" style="font-size:3rem;display:block;margin-bottom:16px;color:rgba(46,125,50,0.3)"></i>
-                <h3 style="margin-bottom:8px">Sin pedidos aún</h3>
-                <p style="color:var(--texto-sec);margin-bottom:20px">Tus compras aparecerán aquí.</p>
-                <a href="{{ url_for('productos_view') }}" class="btn-principal">Ver productos</a>
+                <h3 style="margin-bottom:8px" data-i18n="profile.no_orders">No orders yet</h3>
+                <p style="color:var(--texto-sec);margin-bottom:20px" data-i18n="profile.no_orders_desc">Your purchases will appear here.</p>
+                <a href="{{ url_for('productos_view') }}" class="btn-principal" data-i18n="hero.explore">Explore products</a>
             </div>
             {% endif %}
         </div>
@@ -225,13 +226,14 @@
                 <div style="background:var(--blanco);border-radius:20px;padding:24px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
                     <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:16px"><i class="bi bi-person"></i> Actualizar perfil</h3>
                     <form method="POST" action="{{ url_for('actualizar_perfil') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="form-group">
                             <label class="form-label">Nombre</label>
                             <input type="text" name="nombre" class="form-input" value="{{ session.get('nombre', '') }}" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Biografía</label>
-                            <textarea name="bio" class="form-input" rows="3" placeholder="Cuéntanos sobre ti...">{{ usuario.bio if usuario else '' }}</textarea>
+                            <textarea name="bio" class="form-input" rows="3" placeholder="Cuéntanos sobre ti..." data-i18n-placeholder="profile.bio_placeholder">{{ usuario.bio if usuario else '' }}</textarea>
                         </div>
                         <button type="submit" class="btn-principal"><i class="bi bi-check-lg"></i> Guardar cambios</button>
                     </form>
@@ -239,6 +241,7 @@
                 <div style="background:var(--blanco);border-radius:20px;padding:24px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
                     <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:16px"><i class="bi bi-shield-lock"></i> Cambiar contraseña</h3>
                     <form method="POST" action="{{ url_for('cambiar_password') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="form-group">
                             <label class="form-label">Contraseña actual</label>
                             <input type="password" name="password_actual" class="form-input" required>

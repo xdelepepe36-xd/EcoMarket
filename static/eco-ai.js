@@ -141,13 +141,46 @@ const EcoAI = (() => {
   // 4. IA PARA DESCRIBIR PRODUCTOS
   // ============================================================
   const generateDescription = (product) => {
-    const templates = [
-      `🌿 ${product.nombre} — El producto ecológico perfecto para tu hogar. Fabricado con materiales sostenibles y libre de químicos dañinos.`,
-      `♻️ Descubre ${product.nombre}, una alternativa ecológica que cuida del planeta mientras disfrutas de la mejor calidad.`,
-      `🌱 ${product.nombre} es parte de nuestra selección eco-friendly. Cada compra ayuda a reducir tu huella de carbono.`,
-      `💚 ${product.nombre}: calidad, sostenibilidad y diseño en un solo producto. Ideal para quienes buscan un estilo de vida verde.`
-    ];
-    return templates[Math.floor(Math.random() * templates.length)];
+    // Genera una descripción rápida y local usando metadatos del producto.
+    try {
+      const parts = [];
+      if (product.nombre) {
+        parts.push(`🌿 ${product.nombre}`);
+      }
+      if (product.categoria) {
+        parts.push(`Categoría: ${product.categoria}`);
+      }
+      if (product.precio) {
+        parts.push(`Precio: S/. ${Number(product.precio).toFixed(2)}`);
+      }
+      if (product.descripcion) {
+        // tomar la primera frase para el resumen
+        const firstSentence = product.descripcion.split(/[\.\!\?]\s/)[0];
+        if (firstSentence && firstSentence.length > 20) {
+          parts.push(firstSentence);
+        }
+      }
+      // Añadir beneficios/llamado a la acción
+      parts.push('Hecho con materiales sostenibles y pensado para reducir tu huella ambiental.');
+      parts.push('Compra responsable — apoya a productores comprometidos con el planeta.');
+
+      return parts.join(' • ');
+    } catch (e) {
+      return `🌿 ${product.nombre || 'Producto ecológico'} — Calidad y sostenibilidad.`;
+    }
+  };
+
+  // Fetch richer description from server-side "AI" endpoint when available
+  const fetchDescription = async (productId) => {
+    try {
+      const res = await fetch(`/api/describe/${productId}`);
+      if (!res.ok) return null;
+      const json = await res.json();
+      if (json && json.description) return json.description;
+      return null;
+    } catch (e) {
+      return null;
+    }
   };
 
   // ============================================================
@@ -174,6 +207,21 @@ const EcoAI = (() => {
       const history = JSON.parse(localStorage.getItem('eco_view_history') || '[]');
       const products = JSON.parse(localStorage.getItem('eco_products_cache') || '[]');
       const viewedIds = history.map(h => h.id);
+
+      // Actualizar cache desde el servidor en background cuando sea posible
+      try {
+        const exclude = viewedIds.join(',');
+        if (window.fetch) {
+          fetch('/api/recommendations?exclude=' + encodeURIComponent(exclude))
+            .then(r => r.json())
+            .then(j => {
+              if (j && j.products && Array.isArray(j.products)) {
+                localStorage.setItem('eco_products_cache', JSON.stringify(j.products));
+              }
+            }).catch(()=>{});
+        }
+      } catch(e) {}
+
       return products.filter(p => !viewedIds.includes(p.id)).slice(0, 4);
     } catch { return []; }
   };
@@ -306,10 +354,9 @@ const EcoAI = (() => {
 
   return {
     getWeather, calculateDelivery, renderDelivery,
-    ecoCalculator, generateDescription, translator,
+    ecoCalculator,     generateDescription, fetchDescription, translator,
     getRecommendations, getStats,
     extraAchievements, getActiveEvent, renderEvent, renderEcoCalendar
-  };
-})();
+  };})();
 
 window.EcoAI = EcoAI;

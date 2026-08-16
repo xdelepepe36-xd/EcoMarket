@@ -1150,6 +1150,99 @@ const EcoI18n = (() => {
       'lang.es': 'Spanish',
       'lang.en': 'English',
       'lang.select': 'Language',
+      
+      // Payment System (v12.0)
+      'payment.wallet': 'Digital Wallet',
+      'payment.balance': 'Balance',
+      'payment.topup': 'Top Up',
+      'payment.transfer': 'Transfer',
+      'payment.history': 'Transaction History',
+      'payment.methods': 'Payment Methods',
+      'payment.stripe': 'Stripe',
+      'payment.paypal': 'PayPal',
+      'payment.yapeplin': 'Yape/Plin',
+      'payment.installments': 'Installments',
+      'payment.installments.title': 'Pay in Installments',
+      'payment.installments.interest': '0% Interest',
+      'payment.oneclick': 'One-Click Payment',
+      'payment.oneclick.title': 'Express Checkout',
+      'payment.save.card': 'Save Card',
+      'payment.pay.now': 'Pay Now',
+      
+      // Search Advanced (v13.0)
+      'search.advanced': 'Advanced Search',
+      'search.suggestions': 'Suggestions',
+      'search.history': 'Search History',
+      'search.trending': 'Trending',
+      'search.by.image': 'Search by Image',
+      'search.by.voice': 'Voice Search',
+      'search.filters': 'Filters',
+      'search.results': 'Results',
+      
+      // Push Notifications (v13.0)
+      'notifications.push': 'Push Notifications',
+      'notifications.enable': 'Enable Notifications',
+      'notifications.stock.alerts': 'Stock Alerts',
+      'notifications.promotions': 'Promotions',
+      'notifications.reminders': 'Reminders',
+      'notifications.history': 'Notification History',
+      
+      // Returns System (v13.0)
+      'returns.title': 'Returns System',
+      'returns.request': 'Request Return',
+      'returns.policy': 'Return Policy',
+      'returns.period': 'Return Period',
+      'returns.refund': 'Refund',
+      'returns.exchange': 'Exchange',
+      'returns.history': 'Return History',
+      
+      // Reviews Verified (v13.0)
+      'reviews.verified': 'Verified Reviews',
+      'reviews.verified.badge': 'Verified Purchase',
+      'reviews.write': 'Write Review',
+      'reviews.photos': 'Photos',
+      'reviews.rating': 'Rating',
+      'reviews.pros': 'Pros',
+      'reviews.cons': 'Cons',
+      'reviews.likes': 'Likes',
+      'reviews.report': 'Report',
+      
+      // Referral System (v14.0)
+      'referral.title': 'Referral System',
+      'referral.code': 'Referral Code',
+      'referral.copy': 'Copy',
+      'referral.share': 'Share',
+      'referral.stats': 'Referral Stats',
+      'referral.earnings': 'Earnings',
+      'referral.available': 'Available',
+      'referral.withdraw': 'Withdraw',
+      'referral.history': 'Referral History',
+      
+      // Achievements (v14.0)
+      'achievements.title': 'Achievements & Badges',
+      'achievements.unlocked': 'Unlocked',
+      'achievements.locked': 'Locked',
+      'achievements.progress': 'Progress',
+      'achievements.badges': 'My Badges',
+      'achievements.achievement.unlocked': 'Achievement Unlocked!',
+      
+      // Visual Decorations (v14.0)
+      'decorations.title': 'Visual Decorations',
+      'decorations.particles': 'Background Particles',
+      'decorations.floating': 'Floating Elements',
+      'decorations.effects': 'Background Effects',
+      
+      // Themes (v14.0)
+      'themes.title': 'Themes',
+      'themes.light': 'Light',
+      'themes.dark': 'Dark',
+      'themes.eco': 'Eco',
+      'themes.ocean': 'Ocean',
+      'themes.sunset': 'Sunset',
+      'themes.forest': 'Forest',
+      'themes.high.contrast': 'High Contrast',
+      'themes.sepia': 'Sepia',
+      'themes.city': 'City',
     }
   };
 

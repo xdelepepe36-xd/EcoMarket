@@ -1,0 +1,253 @@
+/**
+ * eco-themes-advanced.css - Estilos para el sistema de temas avanzado
+ */
+
+.eco-theme-switcher {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: var(--blanco, #ffffff);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    padding: 16px;
+    z-index: 1000;
+    width: 220px;
+    transition: all 0.3s ease;
+}
+
+.eco-theme-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--gris-medio, #e0e0e0);
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: var(--texto, #333);
+}
+
+.eco-theme-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.eco-theme-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 8px;
+    border: 2px solid var(--gris-medio, #e0e0e0);
+    border-radius: 8px;
+    background: var(--gris-claro, #f5f5f5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+    color: var(--texto, #333);
+}
+
+.eco-theme-btn:hover {
+    border-color: var(--verde, #2e7d32);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(46, 125, 50, 0.2);
+}
+
+.eco-theme-btn.active {
+    border-color: var(--verde, #2e7d32);
+    background: var(--verde, #2e7d32);
+    color: white;
+}
+
+.eco-theme-btn i {
+    font-size: 1.5rem;
+}
+
+.eco-theme-footer {
+    padding-top: 12px;
+    border-top: 1px solid var(--gris-medio, #e0e0e0);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.eco-theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: var(--texto, #333);
+    cursor: pointer;
+}
+
+.eco-theme-toggle input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--verde, #2e7d32);
+}
+
+/* Tema específico - Eco */
+.theme-eco {
+    --blanco: #e8f5e9;
+    --texto: #1b5e20;
+    --verde: #2e7d32;
+    --verde-claro: #4caf50;
+    --verde-oscuro: #1b5e20;
+    --accent: #8bc34a;
+    --gris-claro: #c8e6c9;
+    --gris-oscuro: #a5d6a7;
+    --gris-medio: #81c784;
+    --fondo-oscuro: #1b5e20;
+    --texto-claro: #ffffff;
+    --texto-secundario: #388e3c;
+    --texto-secundario-claro: #66bb6a;
+}
+
+/* Tema específico - Ocean */
+.theme-ocean {
+    --blanco: #e3f2fd;
+    --texto: #0d47a1;
+    --verde: #1976d2;
+    --verde-claro: #2196f3;
+    --verde-oscuro: #0d47a1;
+    --accent: #03a9f4;
+    --gris-claro: #bbdefb;
+    --gris-oscuro: #90caf9;
+    --gris-medio: #64b5f6;
+    --fondo-oscuro: #0d47a1;
+    --texto-claro: #ffffff;
+    --texto-secundario: #1565c0;
+    --texto-secundario-claro: #42a5f5;
+}
+
+/* Tema específico - Sunset */
+.theme-sunset {
+    --blanco: #fff3e0;
+    --texto: #e65100;
+    --verde: #ff5722;
+    --verde-claro: #ff9800;
+    --verde-oscuro: #bf360c;
+    --accent: #ffc107;
+    --gris-claro: #ffe0b2;
+    --gris-oscuro: #ffcc80;
+    --gris-medio: #ffb74d;
+    --fondo-oscuro: #e65100;
+    --texto-claro: #ffffff;
+    --texto-secundario: #f57c00;
+    --texto-secundario-claro: #ffa726;
+}
+
+/* Tema específico - Alto Contraste */
+.theme-high_contrast {
+    --blanco: #000000;
+    --texto: #ffffff;
+    --verde: #ffff00;
+    --verde-claro: #ffffff;
+    --verde-oscuro: #cccc00;
+    --accent: #00ffff;
+    --gris-claro: #000000;
+    --gris-oscuro: #1a1a1a;
+    --gris-medio: #333333;
+    --fondo-oscuro: #000000;
+    --texto-claro: #ffffff;
+    --texto-secundario: #e0e0e0;
+    --texto-secundario-claro: #b0b0b0;
+}
+
+.theme-high_contrast .eco-theme-btn {
+    border: 2px solid #ffffff;
+    background: #000000;
+    color: #ffffff;
+}
+
+.theme-high_contrast .eco-theme-btn:hover {
+    background: #ffff00;
+    color: #000000;
+}
+
+.theme-high_contrast .eco-theme-btn.active {
+    background: #ffff00;
+    color: #000000;
+}
+
+/* Animaciones de transición */
+[data-theme] {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+[data-theme] * {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .eco-theme-switcher {
+        top: 70px;
+        right: 10px;
+        width: 180px;
+        padding: 12px;
+    }
+    
+    .eco-theme-list {
+        grid-template-columns: 1fr;
+    }
+    
+    .eco-theme-btn {
+        flex-direction: row;
+        justify-content: flex-start;
+        padding: 8px 12px;
+    }
+    
+    .eco-theme-btn i {
+        font-size: 1.2rem;
+    }
+}
+
+/* Accesibilidad */
+.eco-theme-btn:focus,
+.eco-theme-toggle:focus-within {
+    outline: 2px solid var(--verde, #2e7d32);
+    outline-offset: 2px;
+}
+
+/* Prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+    [data-theme],
+    [data-theme] * {
+        transition: none;
+    }
+    
+    .eco-theme-btn {
+        transition: none;
+    }
+}
+
+/* Modo oscuro específico */
+.theme-dark .eco-theme-switcher {
+    background: var(--fondo-oscuro, #1a1a1a);
+    border: 1px solid var(--gris-medio, #404040);
+}
+
+.theme-dark .eco-theme-header {
+    border-bottom-color: var(--gris-medio, #404040);
+    color: var(--texto-claro, #fff);
+}
+
+.theme-dark .eco-theme-footer {
+    border-top-color: var(--gris-medio, #404040);
+}
+
+.theme-dark .eco-theme-toggle {
+    color: var(--texto-claro, #fff);
+}
+
+.theme-dark .eco-theme-btn {
+    background: var(--gris-oscuro, #2a2a2a);
+    border-color: var(--gris-medio, #404040);
+    color: var(--texto-claro, #fff);
+}
+
+.theme-dark .eco-theme-btn:hover {
+    border-color: var(--verde-claro, #4caf50);
+}

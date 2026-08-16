@@ -579,6 +579,11 @@ const EcoI18n = (() => {
       'reviews.no_reviews': 'No reviews yet. Be the first to review!',
       'reviews.rating': 'rating',
       'reviews.comment_placeholder': 'Share your experience...',
+      'reviews.stars': 'stars',
+      'reviews.helpful': 'Helpful',
+      'reviews.not_helpful': 'Not helpful',
+      'reviews.report': 'Report',
+      'reviews.verified': 'Verified purchase',
       
       // Cart
       'cart.title': 'Shopping cart',
@@ -587,6 +592,257 @@ const EcoI18n = (() => {
       'cart.items': 'Products',
       'cart.subtotal': 'Subtotal',
       'cart.shipping': 'Shipping',
+      'cart.total': 'Total',
+      'cart.checkout': 'Proceed to checkout',
+      'cart.empty': 'Your cart is empty',
+      'cart.empty_desc': 'Add products to start shopping',
+      'cart.continue_shopping': 'Continue shopping',
+      'cart.remove': 'Remove',
+      'cart.quantity': 'Quantity',
+      'cart.update': 'Update',
+      'cart.save': 'Save for later',
+      'cart.coupon': 'Coupon code',
+      'cart.apply_coupon': 'Apply coupon',
+      'cart.remove_coupon': 'Remove coupon',
+      'cart.savings': 'You save',
+      
+      // Checkout
+      'checkout.title': 'Checkout',
+      'checkout.shipping_info': 'Shipping information',
+      'checkout.payment_info': 'Payment information',
+      'checkout.order_summary': 'Order summary',
+      'checkout.complete_order': 'Complete order',
+      'checkout.first_name': 'First name',
+      'checkout.last_name': 'Last name',
+      'checkout.email': 'Email',
+      'checkout.phone': 'Phone',
+      'checkout.address': 'Address',
+      'checkout.city': 'City',
+      'checkout.country': 'Country',
+      'checkout.payment_method': 'Payment method',
+      'checkout.card': 'Credit/Debit card',
+      'checkout.yape': 'Yape/Plin',
+      'checkout.transfer': 'Bank transfer',
+      'checkout.terms': 'I agree to the terms and conditions',
+      'checkout.privacy': 'Privacy policy',
+      
+      // Auth
+      'auth.login_title': 'Sign in',
+      'auth.register_title': 'Create account',
+      'auth.email': 'Email',
+      'auth.password': 'Password',
+      'auth.remember': 'Remember me',
+      'auth.forgot_password': 'Forgot password?',
+      'auth.no_account': "Don't have an account?",
+      'auth.have_account': 'Already have an account?',
+      'auth.create_account': 'Create account',
+      'auth.sign_in': 'Sign in',
+      'auth.google_login': 'Sign in with Google',
+      'auth.google_register': 'Register with Google',
+      
+      // Profile
+      'profile.title': 'My profile',
+      'profile.edit': 'Edit profile',
+      'profile.settings': 'Settings',
+      'profile.orders': 'My orders',
+      'profile.sales': 'My sales',
+      'profile.favorites': 'My favorites',
+      'profile.reviews': 'My reviews',
+      'profile.xp': 'XP',
+      'profile.level': 'Level',
+      'profile.logout': 'Logout',
+      'profile.save_changes': 'Save changes',
+      'profile.change_password': 'Change password',
+      'profile.current_password': 'Current password',
+      'profile.new_password': 'New password',
+      'profile.confirm_password': 'Confirm password',
+      
+      // Publish
+      'publish.title': 'Publish product',
+      'publish.product_name': 'Product name',
+      'publish.description': 'Description',
+      'publish.price': 'Price',
+      'publish.category': 'Category',
+      'publish.condition': 'Condition',
+      'publish.condition_new': 'New',
+      'publish.condition_used': 'Used',
+      'publish.images': 'Images',
+      'publish.upload': 'Upload images',
+      'publish.max_images': 'Maximum 5 images',
+      'publish.stock': 'Stock',
+      'publish.publish': 'Publish',
+      'publish.success': 'Product published successfully!',
+      'publish.required': 'Required field',
+      
+      // Contact
+      'contact.title': 'Contact us',
+      'contact.name': 'Your name',
+      'contact.email': 'Your email',
+      'contact.message': 'Message',
+      'contact.send': 'Send message',
+      'contact.subject': 'Subject',
+      'contact.success': 'Message sent successfully!',
+      
+      // Footer
+      'footer.about': 'About us',
+      'footer.help': 'Help',
+      'footer.privacy': 'Privacy policy',
+      'footer.terms': 'Terms of service',
+      'footer.contact': 'Contact',
+      'footer.copyright': '© 2024 EcoMarket. All rights reserved.',
+      
+      // Errors
+      'error.404_title': 'Page not found',
+      'error.404_desc': 'The page you are looking for does not exist or has been moved.',
+      'error.404_tip': 'Don\'t worry, go back to home and keep exploring!',
+      'error.500_title': 'Server error',
+      'error.500_desc': 'Something went wrong on our server.',
+      'error.go_home': 'Go to home',
+      'error.view_products': 'View products',
+      'error.contact_support': 'Contact support',
+      'error.tip': 'Tip: use the search to find what you need',
+      
+      // EcoScore
+      'ecoscore.title': 'EcoScore',
+      'ecoscore.excellent': 'Excellent',
+      'ecoscore.good': 'Good',
+      'ecoscore.regular': 'Regular',
+      'ecoscore.desc': 'Environmental impact of the product',
+      
+      // Tags
+      'tag.new': 'NEW',
+      'tag.offer': 'OFFER',
+      'tag.popular': 'POPULAR',
+      'tag.eco': 'ECO',
+      'tag.last_units': 'LAST UNITS',
+      
+      // Chat
+      'chat.title': 'EcoBot',
+      'chat.subtitle': 'Eco assistant',
+      'chat.placeholder': 'Type a message...',
+      'chat.greeting': '🌱 Hi! I am EcoBot, your eco assistant. How can I help you?',
+      
+      // Cookie consent
+      'cookie.text': 'We use cookies to improve your experience. By continuing, you accept our cookie policy.',
+      'cookie.accept': 'Accept',
+      
+      // Community
+      'community.tag': 'Community',
+      'community.title': 'What our community says',
+      'community.review_1': '"Since I shop at EcoMarket I feel that my consumption decisions really matter. The products are amazing."',
+      'community.review_2': '"I published my artisan products and in a month I already had 20 sales. The platform is very easy to use."',
+      'community.review_3': '"I love that I can see the real impact of each purchase. It\'s motivating to know I\'m helping the planet."',
+      'community.name_1': 'María García',
+      'community.name_2': 'Carlos López',
+      'community.name_3': 'Ana Torres',
+      'community.city_1': 'Lima, Peru',
+      'community.city_2': 'Bogotá, Colombia',
+      'community.city_3': 'Santiago, Chile',
+
+      // Language
+      'lang.es': 'Español',
+      'lang.en': 'English',
+      'lang.select': 'Language',
+      
+      // Product Categories
+      'category.all': 'All',
+      'category.home': 'Home',
+      'category.accessories': 'Accessories',
+      'category.hygiene': 'Hygiene',
+      'category.garden': 'Garden',
+      'category.food': 'Food',
+      'category.clothing': 'Clothing',
+      
+      // Impact
+      'impact.title': 'Your environmental impact',
+      'impact.co2_saved': 'CO₂ saved',
+      'impact.plastic_avoided': 'Plastic avoided',
+      'impact.trees_planted': 'Trees planted',
+      'impact.water_saved': 'Water saved',
+      
+      // Comparison
+      'compare.title': 'Compare products',
+      'compare.add': 'Add to compare',
+      'compare.remove': 'Remove',
+      'compare.clear': 'Clear all',
+      'compare.similar': 'Similar',
+      'compare.different': 'Different',
+      'compare.best': 'Best option',
+      
+      // Notifications
+      'notification.new_order': 'New order',
+      'notification.order_shipped': 'Order shipped',
+      'notification.order_delivered': 'Order delivered',
+      'notification.new_review': 'New review',
+      'notification.promotion': 'New promotion',
+      'notification.message': 'New message',
+      
+      // Wishlist
+      'wishlist.title': 'My wishlist',
+      'wishlist.add': 'Add to wishlist',
+      'wishlist.remove': 'Remove from wishlist',
+      'wishlist.empty': 'Your wishlist is empty',
+      'wishlist.share': 'Share wishlist',
+      
+      // Search
+      'search.title': 'Search results',
+      'search.no_results': 'No results found',
+      'search.suggestions': 'Suggestions',
+      'search.recent': 'Recent searches',
+      'search.clear_history': 'Clear history',
+      
+      // Filters
+      'filter.title': 'Filters',
+      'filter.price_range': 'Price range',
+      'filter.category': 'Category',
+      'filter.condition': 'Condition',
+      'filter.rating': 'Rating',
+      'filter.availability': 'Availability',
+      'filter.in_stock': 'In stock',
+      'filter.out_of_stock': 'Out of stock',
+      'filter.apply': 'Apply filters',
+      'filter.reset': 'Reset filters',
+      
+      // Loading
+      'loading.products': 'Loading products...',
+      'loading.profile': 'Loading profile...',
+      'loading.orders': 'Loading orders...',
+      'loading.cart': 'Loading cart...',
+      
+      // Success messages
+      'success.added_to_cart': 'Added to cart',
+      'success.added_to_favorites': 'Added to favorites',
+      'success.removed_from_favorites': 'Removed from favorites',
+      'success.product_published': 'Product published',
+      'success.profile_updated': 'Profile updated',
+      'success.order_placed': 'Order placed successfully',
+      
+      // Warning messages
+      'warning.stock_low': 'Low stock',
+      'warning.stock_out': 'Out of stock',
+      'warning.login_required': 'Login required',
+      
+      // Info messages
+      'info.free_shipping': 'Free shipping',
+      'info.shipping_info': 'Shipping information',
+      'info.return_policy': 'Return policy',
+      
+      // Social
+      'social.facebook': 'Facebook',
+      'social.instagram': 'Instagram',
+      'social.twitter': 'Twitter',
+      'social.youtube': 'YouTube',
+      'social.tiktok': 'TikTok',
+      
+      // Accessibility
+      'a11y.skip_to_content': 'Skip to content',
+      'a11y.open_menu': 'Open menu',
+      'a11y.close_menu': 'Close menu',
+      'a11y.search': 'Search',
+      'a11y.open_cart': 'Open cart',
+      'a11y.open_notifications': 'Open notifications',
+      'a11y.open_profile': 'Open profile',
+    }
       'cart.discount': 'Discount',
       'cart.empty': 'Your cart is empty',
       'cart.empty_desc': 'Add eco-friendly products to start shopping.',

@@ -78,6 +78,23 @@ def get_product_image(categoria):
     return PRODUCT_IMAGES.get(categoria, PRODUCT_IMAGES['default'])
 
 
+def create_thumbnail(image_path, size=(300, 300)):
+    """Crea un thumbnail de una imagen."""
+    try:
+        img = Image.open(image_path)
+        img.thumbnail(size, Image.Resampling.LANCZOS)
+        
+        # Generar nombre del thumbnail
+        base, ext = os.path.splitext(image_path)
+        thumb_path = f"{base}_thumb{ext}"
+        
+        img.save(thumb_path, optimize=True, quality=85)
+        return thumb_path
+    except Exception as e:
+        print(f"Error creando thumbnail: {e}")
+        return image_path
+
+
 # ── Validaciones reutilizables ──────────────────────────────────────────────
 
 EMAIL_RE = re.compile(r'^[^@\s]+@[^@\s]+\.[^@\s]{2,}$')
@@ -257,8 +274,6 @@ def _limpiar_intentos_caducados():
 
 
 
-
->>>>>>> 8c30a56ee182f4baf94c9d99dead2515a750181e
 
 def _create_thumbnail(saved_path, thumb_path, max_size=800):
     """Genera una miniatura del archivo guardado en saved_path y la escribe en thumb_path.
@@ -561,6 +576,19 @@ def init_db():
         conn.commit()
     except sqlite3.OperationalError:
         pass
+
+    # Crear tabla producto_imagenes si no existe
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS producto_imagenes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            producto_id INTEGER NOT NULL,
+            imagen TEXT NOT NULL,
+            imagen_thumb TEXT DEFAULT "",
+            orden INTEGER DEFAULT 0,
+            FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE CASCADE
+        )
+    ''')
+    conn.commit()
 
     # ── Migraciones para campos de usuario ──────────────────
     for col, ddl in [
@@ -1080,7 +1108,6 @@ def checkout():
             return jsonify({'error': 'No hay productos válidos en el pedido'}), 400
 
         total = round(total, 2)
->>>>>>> 8c30a56ee182f4baf94c9d99dead2515a750181e
 
         conn = get_db()
         cursor = conn.execute(

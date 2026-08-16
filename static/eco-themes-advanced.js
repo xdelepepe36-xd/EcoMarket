@@ -2,12 +2,13 @@
  * eco-themes-advanced.js - Sistema de temas avanzado para EcoMarket
  * 
  * Funcionalidades:
- * - 5 temas: Claro, Oscuro, Eco (verde), Ocean (azul), Sunset (naranja)
+ * - 7 temas: Claro, Oscuro, Eco (verde), Ocean (azul), Sunset (naranja), Forest (bosque), Alto Contraste
  * - Transiciones suaves entre temas
  * - Persistencia de preferencias
  * - Tema automático según hora del día
  * - Integración con sistema operativo
  * - Accesibilidad con modo alto contraste
+ * - Variables sepia y ciudad en todos los temas
  */
 
 class EcoThemesAdvanced {
@@ -85,6 +86,19 @@ class EcoThemesAdvanced {
                     accent: '#ffc107',
                     surface: '#ffe0b2',
                     border: '#ffcc80'
+                }
+            },
+            forest: {
+                name: 'Forest',
+                icon: 'bi-tree-fill',
+                colors: {
+                    background: '#e8f5e9',
+                    text: '#1b5e20',
+                    primary: '#2e7d32',
+                    secondary: '#66bb6a',
+                    accent: '#81c784',
+                    surface: '#c8e6c9',
+                    border: '#a5d6a7'
                 }
             },
             high_contrast: {

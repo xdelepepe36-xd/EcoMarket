@@ -2,6 +2,25 @@
  * eco-themes-advanced.css - Estilos para el sistema de temas avanzado
  */
 
+/* Tema específico - Light (Claro) */
+.theme-light {
+    --blanco: #ffffff;
+    --texto: #333333;
+    --verde: #2e7d32;
+    --verde-claro: #4caf50;
+    --verde-oscuro: #1b5e20;
+    --accent: #ff9800;
+    --gris-claro: #f5f5f5;
+    --gris-oscuro: #e0e0e0;
+    --gris-medio: #bdbdbd;
+    --fondo-oscuro: #f5f5f5;
+    --texto-claro: #ffffff;
+    --texto-secundario: #666666;
+    --texto-secundario-claro: #999999;
+    --sepia: #d4c4a8;
+    --ciudad: #546e7a;
+}
+
 .eco-theme-switcher {
     position: fixed;
     top: 80px;
@@ -102,6 +121,8 @@
     --texto-claro: #ffffff;
     --texto-secundario: #388e3c;
     --texto-secundario-claro: #66bb6a;
+    --sepia: #d4c4a8;
+    --ciudad: #546e7a;
 }
 
 /* Tema específico - Ocean */
@@ -119,6 +140,8 @@
     --texto-claro: #ffffff;
     --texto-secundario: #1565c0;
     --texto-secundario-claro: #42a5f5;
+    --sepia: #b39ddb;
+    --ciudad: #3949ab;
 }
 
 /* Tema específico - Sunset */
@@ -136,6 +159,8 @@
     --texto-claro: #ffffff;
     --texto-secundario: #f57c00;
     --texto-secundario-claro: #ffa726;
+    --sepia: #ffcc80;
+    --ciudad: #ff7043;
 }
 
 /* Tema específico - Alto Contraste */
@@ -153,6 +178,8 @@
     --texto-claro: #ffffff;
     --texto-secundario: #e0e0e0;
     --texto-secundario-claro: #b0b0b0;
+    --sepia: #808080;
+    --ciudad: #a0a0a0;
 }
 
 .theme-high_contrast .eco-theme-btn {
@@ -240,6 +267,8 @@
     --accent: #ff9800;
     --surface: #2a2a2a;
     --border: #404040;
+    --sepia: #8d6e63;
+    --ciudad: #546e7a;
 }
 
 .theme-dark .eco-theme-switcher {
@@ -273,5 +302,58 @@
 
 .theme-dark .eco-theme-btn.active {
     background: var(--verde, #4caf50);
+    color: var(--texto-claro, #ffffff);
+}
+
+/* Tema específico - Forest (Bosque) - NUEVO TEMA */
+.theme-forest {
+    --blanco: #e8f5e9;
+    --texto: #1b5e20;
+    --verde: #2e7d32;
+    --verde-claro: #66bb6a;
+    --verde-oscuro: #1b5e20;
+    --accent: #81c784;
+    --gris-claro: #c8e6c9;
+    --gris-oscuro: #a5d6a7;
+    --gris-medio: #81c784;
+    --fondo-oscuro: #1b5e20;
+    --texto-claro: #ffffff;
+    --texto-secundario: #4caf50;
+    --texto-secundario-claro: #66bb6a;
+    --sepia: #8d6e63;
+    --ciudad: #546e7a;
+}
+
+.theme-forest .eco-theme-switcher {
+    background: var(--fondo-oscuro, #1b5e20);
+    border: 1px solid var(--gris-medio, #81c784);
+}
+
+.theme-forest .eco-theme-header {
+    border-bottom-color: var(--gris-medio, #81c784);
+    color: var(--texto, #1b5e20);
+}
+
+.theme-forest .eco-theme-footer {
+    border-top-color: var(--gris-medio, #81c784);
+}
+
+.theme-forest .eco-theme-toggle {
+    color: var(--texto, #1b5e20);
+}
+
+.theme-forest .eco-theme-btn {
+    background: var(--gris-claro, #c8e6c9);
+    border-color: var(--gris-medio, #81c784);
+    color: var(--texto, #1b5e20);
+}
+
+.theme-forest .eco-theme-btn:hover {
+    border-color: var(--verde-claro, #66bb6a);
+    background: var(--gris-oscuro, #a5d6a7);
+}
+
+.theme-forest .eco-theme-btn.active {
+    background: var(--verde, #2e7d32);
     color: var(--texto-claro, #ffffff);
 }

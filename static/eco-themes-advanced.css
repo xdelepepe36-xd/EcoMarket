@@ -224,14 +224,32 @@
 }
 
 /* Modo oscuro específico */
+.theme-dark {
+    --blanco: #1a1a1a;
+    --texto: #e0e0e0;
+    --texto-claro: #ffffff;
+    --texto-secundario: #b0b0b0;
+    --texto-secundario-claro: #d0d0d0;
+    --gris-claro: #2a2a2a;
+    --gris-oscuro: #1a1a1a;
+    --gris-medio: #404040;
+    --fondo-oscuro: #0d0d0d;
+    --verde: #4caf50;
+    --verde-claro: #66bb6a;
+    --verde-oscuro: #2e7d32;
+    --accent: #ff9800;
+    --surface: #2a2a2a;
+    --border: #404040;
+}
+
 .theme-dark .eco-theme-switcher {
-    background: var(--fondo-oscuro, #1a1a1a);
+    background: var(--fondo-oscuro, #0d0d0d);
     border: 1px solid var(--gris-medio, #404040);
 }
 
 .theme-dark .eco-theme-header {
     border-bottom-color: var(--gris-medio, #404040);
-    color: var(--texto-claro, #fff);
+    color: var(--texto, #e0e0e0);
 }
 
 .theme-dark .eco-theme-footer {
@@ -239,15 +257,21 @@
 }
 
 .theme-dark .eco-theme-toggle {
-    color: var(--texto-claro, #fff);
+    color: var(--texto, #e0e0e0);
 }
 
 .theme-dark .eco-theme-btn {
-    background: var(--gris-oscuro, #2a2a2a);
+    background: var(--gris-claro, #2a2a2a);
     border-color: var(--gris-medio, #404040);
-    color: var(--texto-claro, #fff);
+    color: var(--texto, #e0e0e0);
 }
 
 .theme-dark .eco-theme-btn:hover {
-    border-color: var(--verde-claro, #4caf50);
+    border-color: var(--verde-claro, #66bb6a);
+    background: var(--gris-medio, #404040);
+}
+
+.theme-dark .eco-theme-btn.active {
+    background: var(--verde, #4caf50);
+    color: var(--texto-claro, #ffffff);
 }

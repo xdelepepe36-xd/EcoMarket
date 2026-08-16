@@ -1330,25 +1330,17 @@ const EcoI18n = (() => {
 
     // Add language switcher to navbar
     const header = document.querySelector('.header-actions');
-    // Solo crear botones si no existen
-    if (header && !header.querySelector('[data-eco-lang-btn]')) {
-      const switcher = document.createElement('div');
-      switcher.id = 'langSwitcher';
-      switcher.style.cssText = 'display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid rgba(46,125,50,0.15);background:var(--surface);';
-      switcher.innerHTML = `
-        <button type="button" data-eco-lang-btn data-lang="es" aria-label="Español" aria-pressed="${lang === 'es'}" style="width:34px;height:34px;border:none;border-radius:999px;background:${lang === 'es' ? 'var(--verde)' : 'transparent'};color:${lang === 'es' ? '#fff' : 'var(--texto)'};cursor:pointer;font-weight:700;">ES</button>
-        <button type="button" data-eco-lang-btn data-lang="en" aria-label="English" aria-pressed="${lang === 'en'}" style="width:34px;height:34px;border:none;border-radius:999px;background:${lang === 'en' ? 'var(--verde)' : 'transparent'};color:${lang === 'en' ? '#fff' : 'var(--texto)'};cursor:pointer;font-weight:700;">EN</button>
-      `;
-      header.insertBefore(switcher, header.firstChild);
-    }
-
     // Agregar event listeners a todos los botones de idioma
     document.querySelectorAll('[data-eco-lang-btn]').forEach(btn => {
-      // Remover listeners existentes para evitar duplicados
+      // Remover listeners existentes
       const newBtn = btn.cloneNode(true);
       btn.parentNode.replaceChild(newBtn, btn);
       
-      newBtn.addEventListener('click', () => setLang(newBtn.dataset.lang));
+      newBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setLang(newBtn.dataset.lang);
+      });
     });
 
     applyTranslations();

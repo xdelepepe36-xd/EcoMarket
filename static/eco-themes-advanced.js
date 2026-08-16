@@ -145,31 +145,15 @@ class EcoThemesAdvanced {
         const themesList = Object.entries(this.themes).map(([key, theme]) => `
             <button class="eco-theme-btn ${key === this.currentTheme ? 'active' : ''}" 
                     data-theme="${key}" 
-                    title="${theme.name}">
+                    title="${theme.name}"
+                    style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid transparent; background: var(--gris-claro, #f5f5f5); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--texto, #333); transition: all 0.2s;">
                 <i class="bi ${theme.icon}"></i>
-                <span>${theme.name}</span>
             </button>
         `).join('');
         
         container.innerHTML = `
-            <div class="eco-theme-switcher">
-                <div class="eco-theme-header">
-                    <i class="bi bi-palette"></i>
-                    <span>Temas</span>
-                </div>
-                <div class="eco-theme-list">
-                    ${themesList}
-                </div>
-                <div class="eco-theme-footer">
-                    <label class="eco-theme-toggle">
-                        <input type="checkbox" id="auto-theme" ${this.isAutoThemeEnabled() ? 'checked' : ''}>
-                        <span>Auto (hora del día)</span>
-                    </label>
-                    <label class="eco-theme-toggle">
-                        <input type="checkbox" id="system-theme" ${this.isSystemThemeEnabled() ? 'checked' : ''}>
-                        <span>Sistema</span>
-                    </label>
-                </div>
+            <div class="eco-theme-switcher" style="position: fixed; top: 80px; right: 20px; background: var(--blanco, #ffffff); border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); padding: 12px; z-index: 1000; display: flex; gap: 8px; align-items: center;">
+                ${themesList}
             </div>
         `;
     }

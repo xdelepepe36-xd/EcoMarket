@@ -9,6 +9,7 @@
  * - Integración con sistema operativo
  * - Accesibilidad con modo alto contraste
  * - Variables sepia y ciudad en todos los temas
+ * - Switcher completo con todos los temas
  */
 
 class EcoThemesAdvanced {

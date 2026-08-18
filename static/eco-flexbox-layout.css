@@ -1,0 +1,56 @@
+/* Flexbox Layout Styles */
+.flexbox-layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 50px auto;
+    padding: 20px;
+    justify-content: center;
+}
+
+.flex-item {
+    flex: 1 1 250px;
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    border-radius: 15px;
+    padding: 30px;
+    color: white;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+}
+
+.flex-item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(46, 204, 113, 0.4);
+}
+
+.flex-content h3 {
+    margin: 0 0 10px;
+    font-size: 1.5rem;
+}
+
+.flex-content p {
+    margin: 0;
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+    .flexbox-layout {
+        gap: 15px;
+    }
+    
+    .flex-item {
+        flex: 1 1 200px;
+        padding: 20px;
+    }
+    
+    .flex-content h3 {
+        font-size: 1.2rem;
+    }
+    
+    .flex-content p {
+        font-size: 0.9rem;
+    }
+}

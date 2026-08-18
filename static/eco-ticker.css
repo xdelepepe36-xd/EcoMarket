@@ -1,0 +1,57 @@
+/* Ticker Styles */
+.eco-ticker {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+}
+
+.ticker-label {
+    font-weight: bold;
+    white-space: nowrap;
+    font-size: 1rem;
+}
+
+.ticker-content {
+    flex: 1;
+    position: relative;
+    height: 25px;
+    overflow: hidden;
+}
+
+.ticker-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    transition: opacity 0.5s ease;
+    opacity: 0;
+}
+
+.ticker-item:first-child {
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .eco-ticker {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px 15px;
+    }
+    
+    .ticker-label {
+        font-size: 0.9rem;
+    }
+    
+    .ticker-content {
+        height: 20px;
+    }
+}

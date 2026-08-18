@@ -1,0 +1,62 @@
+/* Countdown Timer Styles */
+.countdown-timer {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    margin: 30px auto;
+    max-width: 600px;
+    box-shadow: 0 10px 30px rgba(231, 76, 60, 0.3);
+}
+
+.countdown-timer h3 {
+    margin: 0 0 20px;
+    font-size: 1.5rem;
+}
+
+.timer-display {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.time-unit {
+    background: rgba(255,255,255,0.2);
+    padding: 15px 20px;
+    border-radius: 10px;
+    min-width: 80px;
+}
+
+.time-value {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.time-label {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+@media (max-width: 768px) {
+    .timer-display {
+        gap: 10px;
+    }
+    
+    .time-unit {
+        min-width: 60px;
+        padding: 10px 15px;
+    }
+    
+    .time-value {
+        font-size: 1.8rem;
+    }
+    
+    .time-label {
+        font-size: 0.8rem;
+    }
+}

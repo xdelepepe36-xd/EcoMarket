@@ -25,6 +25,9 @@ RUN mkdir -p /app/static/uploads /app/data
 ENV UPLOADS_DIR=/app/static/uploads \
     DATABASE_URL=/app/data/ecomarket.db
 
-EXPOSE ${PORT}
+EXPOSE 8000
 
-CMD sh -c "gunicorn -w \${WORKERS:-2} -b 0.0.0.0:\${PORT} -t 120 app:app"
+COPY start.sh .
+RUN chmod +x start.sh
+
+CMD ["./start.sh"]

@@ -19,7 +19,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     window.addEventListener('scroll', function () {
-        if (window.scrollY > 420) {
+        var y = (typeof window.scrollY === 'number' && window.scrollY !== null)
+            ? window.scrollY
+            : (document.documentElement ? document.documentElement.scrollTop : 0);
+        if (y > 420) {
             backToTop.classList.add('visible');
         } else {
             backToTop.classList.remove('visible');

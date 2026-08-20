@@ -397,6 +397,17 @@ def init_db():
             FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE CASCADE,
             FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
         );
+
+        CREATE TABLE IF NOT EXISTS resena_votos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            resena_id INTEGER NOT NULL,
+            usuario_id INTEGER NOT NULL,
+            voto INTEGER NOT NULL DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(resena_id, usuario_id),
+            FOREIGN KEY (resena_id) REFERENCES resenas(id) ON DELETE CASCADE,
+            FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
+        );
         
         CREATE TABLE IF NOT EXISTS pedidos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -541,19 +552,20 @@ def init_db():
         except (json.JSONDecodeError, OSError, sqlite3.Error):
             pass
 
-    # Seed cupones si la tabla está vacía
-    if conn.execute('SELECT COUNT(*) FROM cupones').fetchone()[0] == 0:
-        cupones = [
-            ('ECO10', 10, '%', 30, 100, '2026-12-31'),
-            ('ECO20', 20, '%', 80, 100, '2026-12-31'),
-            ('ENVIOFREE', 100, 'shipping', 0, 100, '2026-12-31'),
-            ('BIENVENIDO', 15, 'fixed', 0, 200, '2026-12-31'),
-        ]
-        for c in cupones:
-            conn.execute(
-                'INSERT INTO cupones (codigo, descuento, tipo, minimo, usos_maximos, expira) VALUES (?,?,?,?,?,?)',
-                c
-            )
+    # Seed cupones (idempotente: INSERT OR IGNORE para no duplicar códigos existentes)
+    cupones = [
+        ('ECO10', 10, '%', 30, 100, '2026-12-31'),
+        ('ECO20', 20, '%', 80, 100, '2026-12-31'),
+        ('ECO50', 50, 'fixed', 200, 100, '2026-12-31'),
+        ('ENVIOFREE', 100, 'shipping', 0, 100, '2026-12-31'),
+        ('BIENVENIDO', 15, 'fixed', 0, 200, '2026-12-31'),
+    ]
+    for c in cupones:
+        conn.execute(
+            'INSERT OR IGNORE INTO cupones (codigo, descuento, tipo, minimo, usos_maximos, expira) VALUES (?,?,?,?,?,?)',
+            c
+        )
+    conn.commit()
 
     # ── Migraciones para BD existentes ─────────────────────────
     # Agregar columna especificaciones si no existe
@@ -1109,6 +1121,37 @@ def checkout():
 
         total = round(total, 2)
 
+        # ── Aplicar cupón en el servidor (consistente con el frente) ──
+        coupon_code = (data.get('coupon') or '').strip().upper()
+        descuento = 0.0
+        if coupon_code:
+            cupon_conn = get_db()
+            cupon = cupon_conn.execute(
+                'SELECT * FROM cupones WHERE codigo = ? AND activo = 1 AND usos_actuales < usos_maximos',
+                (coupon_code,)
+            ).fetchone()
+            if cupon:
+                valido = True
+                if cupon['expira']:
+                    try:
+                        valido = datetime.strptime(cupon['expira'], '%Y-%m-%d') >= datetime.now()
+                    except (TypeError, ValueError):
+                        valido = False
+                if valido and total >= cupon['minimo']:
+                    if cupon['tipo'] == '%':
+                        descuento = total * cupon['descuento'] / 100
+                    elif cupon['tipo'] == 'fixed':
+                        descuento = float(cupon['descuento'])
+                    # 'shipping' no descuenta el total de productos (el envío es del cliente)
+                    if descuento > 0:
+                        cupon_conn.execute(
+                            'UPDATE cupones SET usos_actuales = usos_actuales + 1 WHERE id = ?',
+                            (cupon['id'],)
+                        )
+                        cupon_conn.commit()
+            cupon_conn.close()
+            total = round(max(total - descuento, 0), 2)
+
         conn = get_db()
         cursor = conn.execute(
             'INSERT INTO pedidos (usuario_id, nombre, email, direccion, total, metodo_pago, ciudad, telefono) VALUES (?,?,?,?,?,?,?,?)',
@@ -1516,6 +1559,197 @@ def api_buscar():
 
     conn.close()
     return jsonify([dict(r) for r in resultados])
+
+
+# ── API Recomendaciones, comparador, banners, cupones disponibles ─────────────
+
+def _producto_api_json(row):
+    """Convierte una fila de producto (sqlite3.Row/dict) al formato JSON de las APIs."""
+    d = dict(row) if hasattr(row, 'keys') else dict(row)
+    return {
+        'id': d.get('id'),
+        'nombre': d.get('nombre'),
+        'precio': d.get('precio', 0) or 0,
+        'precio_original': d.get('precio_original'),
+        'categoria': d.get('categoria'),
+        'descripcion': d.get('descripcion', ''),
+        'imagen': d.get('imagen', ''),
+        'imagen_thumb': d.get('imagen_thumb') or d.get('imagen', ''),
+        'eco_score': d.get('eco_score', 0) or 0,
+        'stock': d.get('stock', 0),
+    }
+
+
+def _productos_api_json(limit=12, exclude=()):
+    conn = get_db()
+    rows = conn.execute(
+        'SELECT * FROM productos ORDER BY eco_score DESC, vistas DESC, id DESC LIMIT ?',
+        (limit,)
+    ).fetchall()
+    conn.close()
+    excl = set(int(x) for x in exclude if str(x).isdigit())
+    return [_producto_api_json(r) for r in rows if r['id'] not in excl]
+
+
+@app.route('/api/recommendations')
+def api_recommendations():
+    excl = request.args.get('exclude', '')
+    return jsonify({'products': _productos_api_json(limit=12, exclude=excl.split(','))})
+
+
+@app.route('/api/compare', methods=['POST'])
+def api_compare():
+    data = request.get_json() or {}
+    ids = [int(x) for x in (data.get('ids') or []) if str(x).isdigit()]
+    if not ids:
+        return jsonify({'products': []})
+    placeholders = ','.join('?' * len(ids))
+    conn = get_db()
+    filas = conn.execute(f'SELECT * FROM productos WHERE id IN ({placeholders})', ids).fetchall()
+    conn.close()
+    return jsonify({'products': [_producto_api_json(r) for r in filas]})
+
+
+@app.route('/api/banners/activos')
+def api_banners_activos():
+    banners = [
+        {
+            'id': 1,
+            'titulo': '¡Bienvenido a EcoMarket!',
+            'descripcion': 'Descubre productos ecológicos de calidad.',
+            'imagen': 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22300%22%3E%3Crect width=%22800%22 height=%22300%22 fill=%22%232e7d32%22/%3E%3Ctext x=%2240%22 y=%2240%22 fill=%22%23fff%22 font-size=%2236%22 font-family=%22Arial%22%3EBienvenido a EcoMarket%3C/text%3E%3C/svg%3E',
+            'enlace': '/productos',
+            'tipo': 'info',
+            'descuento': None,
+            'fecha_inicio': '2024-01-01',
+            'fecha_fin': '2030-12-31',
+            'activo': True,
+        },
+        {
+            'id': 2,
+            'titulo': 'Envío gratis',
+            'descripcion': 'En pedidos mayores a S/. 50',
+            'imagen': 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22300%22%3E%3Crect width=%22800%22 height=%22300%22 fill=%22%234caf50%22/%3E%3Ctext x=%2240%22 y=%2240%22 fill=%22%23fff%22 font-size=%2236%22 font-family=%22Arial%22%3EEnvio gratis%3C/text%3E%3C/svg%3E',
+            'enlace': '/productos',
+            'tipo': 'promo',
+            'descuento': {'codigo': 'ENVIOFREE', 'valor': 'Envío gratis'},
+            'fecha_inicio': '2024-01-01',
+            'fecha_fin': '2030-12-31',
+            'activo': True,
+        },
+        {
+            'id': 3,
+            'titulo': '10% de descuento',
+            'descripcion': 'Usa el código ECO10',
+            'imagen': 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22300%22%3E%3Crect width=%22800%22 height=%22300%22 fill=%22%23f59e0b%22/%3E%3Ctext x=%2240%22 y=%2240%22 fill=%22%23fff%22 font-size=%2236%22 font-family=%22Arial%22%3E10%% dto. con ECO10%3C/text%3E%3C/svg%3E',
+            'enlace': '/productos?orden=baratos',
+            'tipo': 'promo',
+            'descuento': {'codigo': 'ECO10', 'valor': '10%'},
+            'fecha_inicio': '2024-01-01',
+            'fecha_fin': '2030-12-31',
+            'activo': True,
+        },
+    ]
+    return jsonify(banners)
+
+
+@app.route('/api/cupones/disponibles')
+def api_cupones_disponibles():
+    conn = get_db()
+    rows = conn.execute(
+        'SELECT codigo, descuento, tipo, minimo FROM cupones WHERE activo = 1 AND usos_actuales < usos_maximos ORDER BY codigo'
+    ).fetchall()
+    conn.close()
+    return jsonify([
+        {
+            'codigo': r['codigo'],
+            'tipo': r['tipo'] if r['tipo'] == '%' else 'fixed',
+            'descuento': r['descuento'],
+            'minimo': r['minimo'],
+        }
+        for r in rows
+    ])
+
+
+@app.route('/api/recomendaciones/wishlist')
+def api_recomendaciones_wishlist():
+    conn = get_db()
+    rows = conn.execute(
+        'SELECT id, nombre, imagen, precio FROM productos ORDER BY eco_score DESC, vistas DESC LIMIT 6'
+    ).fetchall()
+    conn.close()
+    return jsonify([
+        {'id': r['id'], 'name': r['nombre'], 'price': r['precio'] or 0, 'image': r['imagen'] or ''}
+        for r in rows
+    ])
+
+
+@app.route('/api/reviews/vote', methods=['POST'])
+@login_required
+def api_reviews_vote():
+    data = request.get_json() or {}
+    try:
+        resena_id = int(data.get('review_id') or 0)
+    except (TypeError, ValueError):
+        resena_id = 0
+    voto = 1 if data.get('vote_type') == 'up' else (-1 if data.get('vote_type') == 'down' else 0)
+    if resena_id <= 0 or voto not in (1, -1):
+        return jsonify({'error': 'Datos inválidos'}), 400
+
+    conn = get_db()
+    fila = conn.execute(
+        'SELECT id, voto FROM resena_votos WHERE resena_id = ? AND usuario_id = ?',
+        (resena_id, session['usuario_id'])
+    ).fetchone()
+    if fila:
+        if fila['voto'] == voto:
+            conn.execute('DELETE FROM resena_votos WHERE id = ?', (fila['id'],))
+        else:
+            conn.execute('UPDATE resena_votos SET voto = ? WHERE id = ?', (voto, fila['id']))
+    else:
+        conn.execute(
+            'INSERT INTO resena_votos (resena_id, usuario_id, voto) VALUES (?,?,?)',
+            (resena_id, session['usuario_id'], voto)
+        )
+    conn.commit()
+    nuevo = conn.execute(
+        'SELECT COALESCE(SUM(voto), 0) as n FROM resena_votos WHERE resena_id = ?',
+        (resena_id,)
+    ).fetchone()['n']
+    conn.close()
+    return jsonify({'success': True, 'new_count': nuevo})
+
+
+@app.route('/api/reviews', methods=['POST'])
+def api_reviews_sync():
+    """Recibe reseñas pendientes (sincronización offline del PWA)."""
+    data = request.get_json() or {}
+    try:
+        producto_id = int(data.get('producto_id') or data.get('productId') or 0)
+        rating = int(data.get('rating') or 5)
+    except (TypeError, ValueError):
+        producto_id, rating = 0, 5
+    nombre = (data.get('nombre') or data.get('name') or 'Anónimo').strip()
+    comentario = (data.get('comentario') or data.get('comment') or '').strip()
+    if producto_id <= 0 or rating < 1 or rating > 5:
+        return jsonify({'error': 'Datos inválidos'}), 400
+    conn = get_db()
+    conn.execute(
+        'INSERT INTO resenas (producto_id, usuario_id, nombre, rating, comentario) VALUES (?,?,?,?,?)',
+        (producto_id, session.get('usuario_id'), nombre, rating, comentario)
+    )
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
+
+
+@app.route('/api/cart/sync', methods=['POST'])
+def api_cart_sync():
+    """Sincronización del carrito offline del PWA (el carrito vive en el cliente)."""
+    data = request.get_json() or {}
+    items = data.get('items') if isinstance(data.get('items'), list) else []
+    registrar_visita('cart_sync')
+    return jsonify({'success': True, 'synced': len(items)})
 
 
 # ── API Seguidores ───────────────────────────────────────────────────────────

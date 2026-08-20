@@ -29,7 +29,13 @@ const EcoUX = (() => {
   // ============================================================
   // 2. BACK TO TOP BUTTON
   // ============================================================
+  const getScrollY = () => {
+    return (typeof window.scrollY === 'number' && window.scrollY !== null)
+      ? window.scrollY
+      : (document.documentElement ? document.documentElement.scrollTop : 0);
+  };
   const initBackToTop = () => {
+    if (document.getElementById('backToTop') || document.getElementById('ecoBackToTop')) return; // evita duplicados
     const btn = document.createElement('button');
     btn.id = 'ecoBackToTop';
     btn.innerHTML = '<i class="bi bi-arrow-up"></i>';
@@ -44,7 +50,7 @@ const EcoUX = (() => {
     document.body.appendChild(btn);
 
     window.addEventListener('scroll', () => {
-      if (window.scrollY > 400) {
+      if (getScrollY() > 400) {
         btn.style.display = 'flex';
         setTimeout(() => { btn.style.opacity = '1'; }, 10);
       } else {

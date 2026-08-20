@@ -246,7 +246,8 @@ document.getElementById('checkoutForm').addEventListener('submit', function(e) {
             direccion: direccion,
             ciudad: ciudad,
             items: items,
-            metodo_pago: metodoPago ? metodoPago.value : ''
+            metodo_pago: metodoPago ? metodoPago.value : '',
+            coupon: window.EcoCart ? (window.EcoCart.getAppliedCoupon ? (EcoCart.getAppliedCoupon() || '') : '') : ''
         })
     })
     .then(r => r.json())

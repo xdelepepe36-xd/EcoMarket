@@ -113,7 +113,7 @@ if(formulario){
 
         setTimeout(function(){
 
-            window.location.href = "perfil.html";
+            window.location.href = "/perfil";
 
         },1500);
 

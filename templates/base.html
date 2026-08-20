@@ -121,7 +121,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-vertical-timeline.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-horizontal-timeline.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-process-bar.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='eco-mini-cart.css') }}">
+    <!-- eco-mini-cart.css retirado: widget falso con productos hardcodeados y total ficticio -->
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-quick-view.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-product-filters.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-wishlist.css') }}">
@@ -418,7 +418,7 @@
     <script src="{{ url_for('static', filename='eco-vertical-timeline.js') }}"></script>
     <script src="{{ url_for('static', filename='eco-horizontal-timeline.js') }}"></script>
     <script src="{{ url_for('static', filename='eco-process-bar.js') }}"></script>
-    <script src="{{ url_for('static', filename='eco-mini-cart.js') }}"></script>
+    <!-- eco-mini-cart.js retirado: creaba un carrito flotante falso (3 items ficticios, total $44.99) -->
     <script src="{{ url_for('static', filename='eco-quick-view.js') }}"></script>
     <script src="{{ url_for('static', filename='eco-product-filters.js') }}"></script>
     <script src="{{ url_for('static', filename='eco-wishlist.js') }}"></script>
@@ -451,18 +451,20 @@
       });
     </script>
     <script>
-      // Back to top
+      // Back to top (con detección de scroll válida y guard de null)
       var backToTop = document.getElementById('backToTop');
-      window.addEventListener('scroll', function() {
-        if (window.scrollY > 400) {
-          backToTop.classList.add('visible');
-        } else {
-          backToTop.classList.remove('visible');
-        }
-      });
-      backToTop.addEventListener('click', function() {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
+      if (backToTop) {
+        window.addEventListener('scroll', function() {
+          var y = (typeof window.scrollY === 'number' && window.scrollY !== null)
+            ? window.scrollY
+            : (document.documentElement ? document.documentElement.scrollTop : 0);
+          if (y > 400) backToTop.classList.add('visible');
+          else backToTop.classList.remove('visible');
+        });
+        backToTop.addEventListener('click', function() {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
     </script>
     <script src="{{ url_for('static', filename='main.js') }}"></script>
 </body>

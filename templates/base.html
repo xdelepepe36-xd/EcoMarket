@@ -115,6 +115,16 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-toast-notification.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-alert-box.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-notification-badge.css') }}">
+    
+    <!-- CSS adicionales extra -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='eco-breadcrumb-navigation.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='eco-vertical-timeline.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='eco-horizontal-timeline.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='eco-process-bar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='eco-mini-cart.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='eco-quick-view.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='eco-product-filters.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='eco-wishlist.css') }}">
     <link rel="manifest" href="/static/manifest.json">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
     {% block head %}{% endblock %}
@@ -392,6 +402,16 @@
     <script src="{{ url_for('static', filename='eco-toast-notification.js') }}"></script>
     <script src="{{ url_for('static', filename='eco-alert-box.js') }}"></script>
     <script src="{{ url_for('static', filename='eco-notification-badge.js') }}"></script>
+    
+    <!-- Scripts adicionales extra -->
+    <script src="{{ url_for('static', filename='eco-breadcrumb-navigation.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-vertical-timeline.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-horizontal-timeline.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-process-bar.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-mini-cart.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-quick-view.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-product-filters.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-wishlist.js') }}"></script>
     <script>
       window.ECOMARKET_GOOGLE_CLIENT_ID = '{{ google_client_id }}';
     </script>

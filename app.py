@@ -616,9 +616,16 @@ def init_db():
         except sqlite3.OperationalError:
             pass  # La columna ya existe
 
-    # Google ID debe ser único (si está presente) para evitar cuentas duplicadas
+        # Google ID debe ser único (si está presente) para evitar cuentas duplicadas
     try:
         conn.execute('CREATE UNIQUE INDEX IF NOT EXISTS idx_usuarios_google_id ON usuarios(google_id)')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+    # Normalizar google_id vacio ('') a NULL: los usuarios registrados con email no
+    # usan Google, y con el DEFAULT '' el UNIQUE index colisionaria en el 2.º registro.
+    try:
+        conn.execute("UPDATE usuarios SET google_id = NULL WHERE google_id = ''")
         conn.commit()
     except sqlite3.OperationalError:
         pass
@@ -1939,8 +1946,8 @@ def registro():
         es_primer_usuario = conn.execute('SELECT COUNT(*) FROM usuarios').fetchone()[0] == 0
         rol = 'admin' if es_primer_usuario else 'comprador'
         conn.execute(
-            'INSERT INTO usuarios (nombre, apellidos, email, password, telefono, ciudad, rol) VALUES (?,?,?,?,?,?,?)',
-            (nombre, apellidos or '', email, hashed_password, normalizar_telefono(telefono), ciudad or '', rol)
+            'INSERT INTO usuarios (nombre, apellidos, email, password, telefono, ciudad, rol, google_id) VALUES (?,?,?,?,?,?,?,?)',
+            (nombre, apellidos or '', email, hashed_password, normalizar_telefono(telefono), ciudad or '', rol, None)
         )
         usuario = conn.execute('SELECT * FROM usuarios WHERE email = ?', (email,)).fetchone()
         conn.commit()

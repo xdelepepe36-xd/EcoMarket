@@ -125,6 +125,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-quick-view.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-product-filters.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-wishlist.css') }}">
+    
+    <!-- CSS animaciones adicionales -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='eco-card-flip.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='eco-pulse-animation.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='eco-rotate-animation.css') }}">
     <link rel="manifest" href="/static/manifest.json">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
     {% block head %}{% endblock %}
@@ -412,6 +417,11 @@
     <script src="{{ url_for('static', filename='eco-quick-view.js') }}"></script>
     <script src="{{ url_for('static', filename='eco-product-filters.js') }}"></script>
     <script src="{{ url_for('static', filename='eco-wishlist.js') }}"></script>
+    
+    <!-- Scripts animaciones adicionales -->
+    <script src="{{ url_for('static', filename='eco-card-flip.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-pulse-animation.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-rotate-animation.js') }}"></script>
     <script>
       window.ECOMARKET_GOOGLE_CLIENT_ID = '{{ google_client_id }}';
     </script>

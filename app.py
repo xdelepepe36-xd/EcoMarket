@@ -1011,10 +1011,11 @@ def agregar_resena_api(producto_id):
     ''', (producto_id, session['usuario_id'])).fetchone()
     if ya_compro:
         compra_verificada = 1
-    conn.execute(
+    cur = conn.execute(
         'INSERT INTO resenas (producto_id, usuario_id, nombre, rating, comentario, compra_verificada) VALUES (?,?,?,?,?,?)',
         (producto_id, session['usuario_id'], session['nombre'], rating, comentario, compra_verificada)
     )
+    resena_id = cur.lastrowid
     conn.commit()
 
     vendedor = conn.execute(
@@ -1030,7 +1031,7 @@ def agregar_resena_api(producto_id):
         )
     conn.close()
     add_xp(session['usuario_id'], 10)
-    return jsonify({'success': True})
+    return jsonify({'success': True, 'resena_id': resena_id})
 
 
 @app.route('/favoritos')
@@ -1753,6 +1754,10 @@ def api_reviews_vote():
         return jsonify({'error': 'Datos inválidos'}), 400
 
     conn = get_db()
+    existe = conn.execute('SELECT id FROM resenas WHERE id = ?', (resena_id,)).fetchone()
+    if not existe:
+        conn.close()
+        return jsonify({'error': 'Reseña no encontrada'}), 404
     fila = conn.execute(
         'SELECT id, voto FROM resena_votos WHERE resena_id = ? AND usuario_id = ?',
         (resena_id, session['usuario_id'])
@@ -1776,27 +1781,88 @@ def api_reviews_vote():
     return jsonify({'success': True, 'new_count': nuevo})
 
 
-@app.route('/api/reviews', methods=['POST'])
+@app.route('/api/reviews', methods=['GET', 'POST'])
 def api_reviews_sync():
-    """Recibe reseñas pendientes (sincronización offline del PWA)."""
-    data = request.get_json() or {}
+    """Lista reseñas de un producto (GET) o recibe reseña nueva / sincroniza offline (POST)."""
+    if request.method == 'GET':
+        try:
+            producto_id = int(request.args.get('producto_id') or request.args.get('productId') or 0)
+        except (TypeError, ValueError):
+            producto_id = 0
+        if producto_id <= 0:
+            return jsonify({'reviews': [], 'average_rating': 0, 'rating_distribution': {}, 'user_review': None})
+        conn = get_db()
+        rows = conn.execute(
+            "SELECT r.id, r.usuario_id, r.nombre, r.rating, r.comentario, r.compra_verificada, r.created_at, "
+            "COALESCE(SUM(CASE WHEN rv.voto = 1 THEN 1 ELSE 0 END), 0) AS votes_helpful, "
+            "COALESCE(SUM(CASE WHEN rv.voto = -1 THEN 1 ELSE 0 END), 0) AS votes_not_helpful "
+            "FROM resenas r LEFT JOIN resena_votos rv ON rv.resena_id = r.id "
+            "WHERE r.producto_id = ? GROUP BY r.id ORDER BY r.id DESC",
+            (producto_id,)
+        ).fetchall()
+        reviews = []
+        dist = {}
+        total = 0
+        for row in rows:
+            rating = row['rating'] or 0
+            dist[rating] = dist.get(rating, 0) + 1
+            total += rating
+            nombre = row['nombre'] or ('Usuario ' + str(row['usuario_id']) if row['usuario_id'] else 'Anónimo')
+            reviews.append({
+                'id': row['id'],
+                'producto_id': producto_id,
+                'usuario_id': row['usuario_id'],
+                'nombre': nombre,
+                'usuario_nombre': nombre,
+                'usuario_avatar': '',
+                'rating': rating,
+                'titulo': None,
+                'texto': row['comentario'] or '',
+                'comentario': row['comentario'] or '',
+                'compra_verificada': bool(row['compra_verificada']),
+                'recomienda': None,
+                'fotos': [],
+                'video': None,
+                'respuesta': None,
+                'votes_helpful': row['votes_helpful'] or 0,
+                'votes_not_helpful': row['votes_not_helpful'] or 0,
+                'created_at': row['created_at'] or '',
+            })
+        avg = round(total / len(reviews), 2) if reviews else 0
+        uid = session.get('usuario_id')
+        user_review = None
+        if uid:
+            ur = conn.execute(
+                'SELECT id, rating FROM resenas WHERE producto_id = ? AND usuario_id = ? ORDER BY id DESC LIMIT 1',
+                (producto_id, uid)
+            ).fetchone()
+            if ur:
+                user_review = {'id': ur['id'], 'rating': ur['rating']}
+        conn.close()
+        return jsonify({'reviews': reviews, 'average_rating': avg, 'rating_distribution': dist, 'user_review': user_review})
+    # POST: formulario (FormData) o sincronización offline (JSON)
+    data = request.form if request.form else (request.get_json(silent=True) or {})
     try:
         producto_id = int(data.get('producto_id') or data.get('productId') or 0)
-        rating = int(data.get('rating') or 5)
     except (TypeError, ValueError):
-        producto_id, rating = 0, 5
-    nombre = (data.get('nombre') or data.get('name') or 'Anónimo').strip()
-    comentario = (data.get('comentario') or data.get('comment') or '').strip()
+        producto_id = 0
+    try:
+        rating = int(data.get('rating') or data.get('calificacion') or data.get('calification') or 5)
+    except (TypeError, ValueError):
+        rating = 5
+    nombre = (data.get('nombre') or data.get('name') or session.get('nombre') or 'Anónimo').strip()
+    comentario = (data.get('comentario') or data.get('comment') or data.get('texto') or data.get('text') or '').strip()
     if producto_id <= 0 or rating < 1 or rating > 5:
-        return jsonify({'error': 'Datos inválidos'}), 400
+        return jsonify({'success': False, 'error': 'Datos inválidos'}), 400
     conn = get_db()
-    conn.execute(
-        'INSERT INTO resenas (producto_id, usuario_id, nombre, rating, comentario) VALUES (?,?,?,?,?)',
-        (producto_id, session.get('usuario_id'), nombre, rating, comentario)
+    cur = conn.execute(
+        'INSERT INTO resenas (producto_id, usuario_id, nombre, rating, comentario, compra_verificada) VALUES (?,?,?,?,?,?)',
+        (producto_id, session.get('usuario_id'), nombre, rating, comentario, 0)
     )
     conn.commit()
+    resena_id = cur.lastrowid
     conn.close()
-    return jsonify({'success': True})
+    return jsonify({'success': True, 'resena_id': resena_id})
 
 
 @app.route('/api/cart/sync', methods=['POST'])

@@ -1,0 +1,91 @@
+/* Hover Effect Styles */
+.hover-effect-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.hover-effect-container h3 {
+    color: #2ecc71;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.hover-demo {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.hover-item {
+    background: #f9f9f9;
+    border-radius: 10px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.hover-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.hover-icon {
+    font-size: 2.5rem;
+}
+
+.hover-item span {
+    color: #333;
+    font-weight: 500;
+}
+
+.hover-lift:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 25px rgba(46, 204, 113, 0.3);
+}
+
+.hover-scale:hover {
+    transform: scale(1.1);
+    box-shadow: 0 10px 25px rgba(46, 204, 113, 0.3);
+}
+
+.hover-shine {
+    position: relative;
+    overflow: hidden;
+}
+
+.hover-shine::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: left 0.5s ease;
+}
+
+.hover-shine:hover::before {
+    left: 100%;
+}
+
+.hover-3d {
+    perspective: 1000px;
+}
+
+.hover-3d:hover {
+    transform: rotateX(10deg) rotateY(10deg);
+    box-shadow: 0 15px 30px rgba(46, 204, 113, 0.4);
+}
+
+@media (max-width: 768px) {
+    .hover-demo {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,91 @@
+/* Decorative Divider Styles */
+.decorative-divider-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.decorative-divider-container h3 {
+    color: #2ecc71;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.divider-demo {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.divider-section {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.divider-section p {
+    text-align: center;
+    color: #333;
+    margin: 10px 0;
+}
+
+.divider {
+    height: 40px;
+    background: #2ecc71;
+    margin: 20px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.divider-waves {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+}
+
+.divider-waves::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 10px,
+        rgba(255,255,255,0.1) 10px,
+        rgba(255,255,255,0.1) 20px
+    );
+}
+
+.divider-dots {
+    background: transparent;
+    border: 2px dashed #2ecc71;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.divider-dots::before {
+    content: '• • • • • • • • • •';
+    color: #2ecc71;
+    font-size: 1.5rem;
+    letter-spacing: 10px;
+}
+
+.divider-arrows {
+    background: linear-gradient(90deg, #2ecc71, #27ae60);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.divider-arrows::before {
+    content: '→ → → → → → → → → →';
+    color: white;
+    font-size: 1.5rem;
+    letter-spacing: 10px;
+}

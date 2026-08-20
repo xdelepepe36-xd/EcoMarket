@@ -1943,6 +1943,7 @@ def registro():
             (nombre, apellidos or '', email, hashed_password, normalizar_telefono(telefono), ciudad or '', rol)
         )
         usuario = conn.execute('SELECT * FROM usuarios WHERE email = ?', (email,)).fetchone()
+        conn.commit()
         conn.close()
 
         session['usuario_id'] = usuario['id']

@@ -634,6 +634,23 @@ def init_db():
         conn.commit()
     except sqlite3.OperationalError:
         pass
+    # Migraciones para envío y descuento en pedidos (re cálculo del total)
+    try:
+        conn.execute('ALTER TABLE pedidos ADD COLUMN envio REAL DEFAULT 0')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+    try:
+        conn.execute('ALTER TABLE pedidos ADD COLUMN descuento REAL DEFAULT 0')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+    # Migración: reseñas con "compra verificada"
+    try:
+        conn.execute('ALTER TABLE resenas ADD COLUMN compra_verificada INTEGER DEFAULT 0')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
 
     # ── Índices para optimizar búsquedas ──────────────────────
     conn.execute('CREATE INDEX IF NOT EXISTS idx_productos_categoria ON productos(categoria)')
@@ -978,9 +995,18 @@ def agregar_resena_api(producto_id):
         return jsonify({'error': 'Rating inválido'}), 400
 
     conn = get_db()
+    compra_verificada = 0
+    ya_compro = conn.execute('''
+        SELECT pi.id FROM pedido_items pi
+        JOIN pedidos p ON pi.pedido_id = p.id
+        WHERE pi.producto_id = ? AND p.usuario_id = ?
+          AND p.estado NOT IN ('cancelado') LIMIT 1
+    ''', (producto_id, session['usuario_id'])).fetchone()
+    if ya_compro:
+        compra_verificada = 1
     conn.execute(
-        'INSERT INTO resenas (producto_id, usuario_id, nombre, rating, comentario) VALUES (?,?,?,?,?)',
-        (producto_id, session['usuario_id'], session['nombre'], rating, comentario)
+        'INSERT INTO resenas (producto_id, usuario_id, nombre, rating, comentario, compra_verificada) VALUES (?,?,?,?,?,?)',
+        (producto_id, session['usuario_id'], session['nombre'], rating, comentario, compra_verificada)
     )
     conn.commit()
 
@@ -1119,11 +1145,12 @@ def checkout():
         if not items_validados:
             return jsonify({'error': 'No hay productos válidos en el pedido'}), 400
 
-        total = round(total, 2)
+        subtotal = round(total, 2)
 
         # ── Aplicar cupón en el servidor (consistente con el frente) ──
         coupon_code = (data.get('coupon') or '').strip().upper()
         descuento = 0.0
+        envio_free = False
         if coupon_code:
             cupon_conn = get_db()
             cupon = cupon_conn.execute(
@@ -1137,12 +1164,13 @@ def checkout():
                         valido = datetime.strptime(cupon['expira'], '%Y-%m-%d') >= datetime.now()
                     except (TypeError, ValueError):
                         valido = False
-                if valido and total >= cupon['minimo']:
+                if valido and subtotal >= cupon['minimo']:
                     if cupon['tipo'] == '%':
-                        descuento = total * cupon['descuento'] / 100
+                        descuento = subtotal * cupon['descuento'] / 100
                     elif cupon['tipo'] == 'fixed':
                         descuento = float(cupon['descuento'])
-                    # 'shipping' no descuenta el total de productos (el envío es del cliente)
+                    elif cupon['tipo'] == 'shipping':
+                        envio_free = True
                     if descuento > 0:
                         cupon_conn.execute(
                             'UPDATE cupones SET usos_actuales = usos_actuales + 1 WHERE id = ?',
@@ -1150,12 +1178,18 @@ def checkout():
                         )
                         cupon_conn.commit()
             cupon_conn.close()
-            total = round(max(total - descuento, 0), 2)
+
+        total_productos = round(max(subtotal - descuento, 0), 2)
+        envio = 0.0
+        if not envio_free and total_productos < 150:
+            envio = 12.0
+        total_final = round(total_productos + envio, 2)
+        descuento = round(descuento, 2)
 
         conn = get_db()
         cursor = conn.execute(
-            'INSERT INTO pedidos (usuario_id, nombre, email, direccion, total, metodo_pago, ciudad, telefono) VALUES (?,?,?,?,?,?,?,?)',
-            (session['usuario_id'], nombre_comp or nombre, email, direccion, total, metodo_pago, ciudad, telefono)
+            'INSERT INTO pedidos (usuario_id, nombre, email, direccion, total, metodo_pago, ciudad, telefono, envio, descuento) VALUES (?,?,?,?,?,?,?,?,?,?)',
+            (session['usuario_id'], nombre_comp or nombre, email, direccion, total_final, metodo_pago, ciudad, telefono, envio, descuento)
         )
         pedido_id = cursor.lastrowid
 
@@ -1169,7 +1203,7 @@ def checkout():
         conn.close()
 
         add_notificacion(session['usuario_id'], '📦 Pedido confirmado',
-                         f'Tu pedido #{pedido_id} por S/.{total:.2f} ha sido confirmado.', 'success')
+                         f'Tu pedido #{pedido_id} por S/.{total_final:.2f} ha sido confirmado.', 'success')
         add_xp(session['usuario_id'], 25)
 
         return jsonify({'success': True, 'pedido_id': pedido_id})
@@ -1185,7 +1219,22 @@ def checkout():
 @app.route('/confirmacion')
 def confirmacion():
     pedido_id = request.args.get('pedido_id', '')
-    return render_template('confirmacion.html', pedido_id=pedido_id)
+    if not pedido_id or not pedido_id.isdigit():
+        flash('Pedido no encontrado.', 'warning')
+        return redirect(url_for('index'))
+    conn = get_db()
+    pedido = conn.execute('SELECT * FROM pedidos WHERE id = ?', (int(pedido_id),)).fetchone()
+    if not pedido:
+        conn.close()
+        flash('Pedido no encontrado.', 'warning')
+        return redirect(url_for('index'))
+    items = conn.execute('SELECT * FROM pedido_items WHERE pedido_id = ?', (int(pedido_id),)).fetchall()
+    conn.close()
+    if (pedido['usuario_id'] and session.get('usuario_id') != pedido['usuario_id']
+            and session.get('rol') != 'admin'):
+        flash('Este pedido no te pertenece.', 'warning')
+        return redirect(url_for('index'))
+    return render_template('confirmacion.html', pedido=pedido, items=items, pedido_id=pedido_id)
 
 
 @app.route('/publicar', methods=['GET', 'POST'])
@@ -2231,6 +2280,18 @@ def perfil():
         ORDER BY created_at DESC LIMIT 10
     ''', (session['usuario_id'],)).fetchall()
 
+    # Ventas como vendedor: pedidos que incluyen productos propios
+    ventas = conn.execute('''
+        SELECT pi.id, pi.producto_id, pi.nombre as item_nombre, pi.cantidad, pi.precio,
+               pd.id as pedido_id, pd.estado, pd.created_at, pd.direccion, u.nombre as comprador
+        FROM pedido_items pi
+        JOIN productos p ON pi.producto_id = p.id
+        JOIN pedidos pd ON pi.pedido_id = pd.id
+        LEFT JOIN usuarios u ON pd.usuario_id = u.id
+        WHERE p.usuario_id = ?
+        ORDER BY pd.created_at DESC LIMIT 10
+    ''', (session['usuario_id'],)).fetchall()
+
     notificaciones = conn.execute(
         'SELECT * FROM notificaciones WHERE usuario_id = ? AND leida = 0 ORDER BY created_at DESC',
         (session['usuario_id'],)
@@ -2272,6 +2333,7 @@ def perfil():
                            favoritos=favoritos,
                            resenas=resenas,
                            pedidos=pedidos,
+                           ventas=ventas,
                            notificaciones=notificaciones,
                            seguidores=seguidores,
                            siguiendo=siguiendo,
@@ -2414,6 +2476,31 @@ def eliminar_usuario_admin(usuario_id):
     conn.commit()
     conn.close()
     flash_t('usuario_eliminado', 'success')
+    return redirect(url_for('admin'))
+
+
+@app.route('/admin/pedido/<int:pedido_id>/estado', methods=['POST'])
+@login_required
+@admin_required
+def cambiar_estado_pedido(pedido_id):
+    estados_validos = ('pendiente', 'confirmado', 'pagado', 'enviado', 'entregado', 'cancelado')
+    estado = request.form.get('estado', '').strip().lower()
+    if estado not in estados_validos:
+        flash('Estado de pedido inválido.', 'danger')
+        return redirect(url_for('admin'))
+    conn = get_db()
+    pedido = conn.execute('SELECT * FROM pedidos WHERE id = ?', (pedido_id,)).fetchone()
+    if not pedido:
+        conn.close()
+        flash('Pedido no encontrado.', 'danger')
+        return redirect(url_for('admin'))
+    conn.execute('UPDATE pedidos SET estado = ? WHERE id = ?', (estado, pedido_id))
+    conn.commit()
+    if pedido['usuario_id']:
+        add_notificacion(pedido['usuario_id'], '📦 Actualización de pedido',
+                         f'Tu pedido #{pedido_id} ahora está: {estado.capitalize()}.', 'info')
+    conn.close()
+    flash(f'Pedido #{pedido_id} actualizado a "{estado}".', 'success')
     return redirect(url_for('admin'))
 
 

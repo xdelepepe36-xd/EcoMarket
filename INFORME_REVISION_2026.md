@@ -100,6 +100,40 @@ a endpoints inexistentes (404)**.
 ---
 
 *Generado por revisión asistida. Fecha: 2026-08-19.*
+
+---
+
+## 5. Nuevas mejoras implementadas (fase 2)
+
+> Mejoras funcionales de alto valor añadidas sobre la revisión inicial, sin necesidad de
+> credenciales externas. Probadas localmente (smoke test con BD temporal).
+
+### ✅ Implementadas
+1. **Envío real calculado en el backend**
+   - Se añadió columnas `envio` y `descuento` a `pedidos`.
+   - El checkout calcula envío (gratis ≥ S/.150, si no S/.12; cupón `ENVIOFREE` lo exime),
+     persiste el descuento y el total final.
+2. **Estado y seguimiento de pedido**
+   - Confirmación con datos reales (ítems, envío, descuento, total, timeline de estado).
+   - Admin puede cambiar el estado (`/admin/pedido/<id>/estado`) con notificación al cliente.
+   - Estados: pendiente → confirmado → pagado → enviado → entregado (o cancelado).
+3. **Valoración con "compra verificada"**
+   - Nueva columna `compra_verificada` en `resenas`; el backend la marca si realmente se compró
+     el producto (pedido no cancelado).
+4. **Panel del vendedor (ventas)**
+   - `/perfil` muestra "Mis ventas": pedidos con productos propios, estado, total y comprador.
+5. **Refuerzo de datos** — endpoints nuevos ya funcionando (recomendaciones, comparador, banners,
+   cupones disponibles, wishlist smart, voto de reseñas, sync offline).
+
+### Pendientes (requieren credenciales o más alcance)
+- [ ] Pasarela de pago real (Stripe / Mercado Pago / Yape) → requiere API keys.
+- [ ] Notificaciones por email (SMTP) → requiere credenciales de correo.
+- [ ] Google Login operativo → requiere `GOOGLE_CLIENT_ID` (OAuth configurado) en Render.
+- [ ] Carrito/sesión persistente en BD sincronizado multi-dispositivo (hoy se fusiona en login vía
+      localStorage/guest).
+- [ ] Devoluciones completas (solicitud → aprobación → reembolso).
+- [ ] Plan de fidelidad con puntos eco canjeables (los módulos existen; falta el flujo canje con BD).
+- [ ] Optimización de rendimiento: carga diferida de los ~100 scripts decorativos y CSS duplicados.
 ### `templates/base.html`
 - Se retiró `eco-mini-cart.css` y `eco-mini-cart.js` (el widget falso con datos hardcodeados).
 - Se reescribió el script de `#backToTop` para detectar el scroll correctamente

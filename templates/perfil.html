@@ -226,9 +226,27 @@
                 <a href="{{ url_for('productos_view') }}" class="btn-principal" data-i18n="hero.explore">Explore products</a>
             </div>
             {% endif %}
-        </div>
 
-        <!-- TAB: CONFIGURACIÓN -->
+            {% if ventas %}
+            <h3 style="margin:24px 0 12px;font-size:1rem;font-weight:700;color:var(--texto)"><i class="bi bi-graph-up-arrow"></i> Mis ventas ({{ ventas|length }})</h3>
+            <div style="display:flex;flex-direction:column;gap:12px">
+                {% for v in ventas %}
+                <div style="background:var(--blanco);border-radius:16px;padding:16px;border:1px solid rgba(46,125,50,0.08)">
+                    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px">
+                        <div>
+                            <strong>#ECO-{{ v.pedido_id }} · {{ v.item_nombre }}</strong>
+                            <span style="display:inline-block;margin-left:10px;padding:4px 10px;border-radius:999px;background:#e8f5e9;color:#2e7d32;font-size:0.75rem;font-weight:700;text-transform:capitalize">{{ v.estado }}</span>
+                        </div>
+                        <div style="text-align:right">
+                            <strong style="color:var(--verde)">S/. {{ '%.2f'|format((v.precio or 0) * (v.cantidad or 1)) }}</strong>
+                            <div style="font-size:0.72rem;color:var(--texto-sec)">{{ v.created_at[:10] }} · {{ v.comprador or 'Anónimo' }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
         <div id="tab-config" class="tab-content" style="display:none">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
                 <div style="background:var(--blanco);border-radius:20px;padding:24px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">

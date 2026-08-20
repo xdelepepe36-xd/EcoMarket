@@ -9,37 +9,65 @@
             <h2 class="section-title">¡Pedido confirmado!</h2>
             <p data-i18n="auto.confirmacion.10">Gracias por confiar en EcoMarket. Tu pedido ha sido registrado y será procesado en las próximas horas.</p>
 
-            <div class="confirmacion-badges">
-                <span class="badge"><i class="bi bi-box-seam"></i> En proceso</span>
-                <span class="badge"><i class="bi bi-truck"></i> Envío próximo</span>
-                <span class="badge">🌱 Compra ecológica</span>
+            {% if pedido %}
+            <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:20px">
+                <span class="badge"><i class="bi bi-receipt"></i> Pedido #ECO-{{ pedido.id }}</span>
+                <span class="badge" style="background:#e8f5e9;color:#2e7d32;text-transform:capitalize"><i class="bi bi-check-circle"></i> {{ pedido.estado }}</span>
             </div>
 
-            <div class="confirmacion-info">
-                <div class="confirmacion-step">
-                    <i class="bi bi-check-circle-fill"></i>
-                    <span>Pedido recibido</span>
+            {% if items %}
+            <div style="text-align:left;margin-bottom:18px">
+                {% for it in items %}
+                <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(46,125,50,0.08)">
+                    <span>{{ it.cantidad }} x {{ it.nombre }}</span>
+                    <strong>S/. {{ '%.2f'|format(it.precio * it.cantidad) }}</strong>
                 </div>
-                <div class="confirmacion-step confirmacion-step-pending">
-                    <i class="bi bi-circle"></i>
-                    <span>En preparación</span>
+                {% endfor %}
+                <div style="display:flex;justify-content:space-between;padding:10px 0">
+                    <span><i class="bi bi-truck"></i> Envío</span>
+                    <span>{{ 'Gratis 🎉' if pedido.envio == 0 else 'S/. ' ~ '%.2f'|format(pedido.envio) }}</span>
                 </div>
-                <div class="confirmacion-step confirmacion-step-pending">
-                    <i class="bi bi-circle"></i>
-                    <span>En camino</span>
+                {% if pedido.descuento and pedido.descuento > 0 %}
+                <div style="display:flex;justify-content:space-between;padding:10px 0;color:#2e7d32">
+                    <span><i class="bi bi-tag"></i> Descuento</span>
+                    <span>- S/. {{ '%.2f'|format(pedido.descuento) }}</span>
                 </div>
-                <div class="confirmacion-step confirmacion-step-pending">
-                    <i class="bi bi-circle"></i>
-                    <span>Entregado</span>
+                {% endif %}
+                <div style="display:flex;justify-content:space-between;padding:12px 0;font-size:1.1rem;font-weight:800;border-top:1px solid rgba(46,125,50,0.1)">
+                    <span>Total</span>
+                    <span style="color:var(--verde)">S/. {{ '%.2f'|format(pedido.total) }}</span>
                 </div>
             </div>
+            {% endif %}
+
+            <!-- Timeline de estado -->
+            {% set labels = ['Pedido recibido', 'Confirmado', 'Enviado', 'Entregado'] %}
+            {% set order_index = {'pendiente':0,'confirmado':1,'pagado':1,'enviado':2,'entregado':3} %}
+            {% set actual = order_index.get(pedido.estado, 0) %}
+            {% if pedido.estado == 'cancelado' %}
+            <div class="confirmacion-info" style="margin-top:8px;padding:12px;border-radius:12px;background:#fdecea">
+                <i class="bi bi-x-circle"></i> <strong>Este pedido fue cancelado.</strong>
+            </div>
+            {% else %}
+            <div class="confirmacion-info" style="margin-top:10px">
+                {% for paso in labels %}
+                <div class="confirmacion-step {{ 'confirmacion-step-completed' if loop.index0 <= actual else 'confirmacion-step-pending' }}">
+                    <i class="bi {{ 'bi-check-circle-fill' if loop.index0 <= actual else 'bi-circle' }}"></i>
+                    <span>{{ paso }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% else %}
+            <p>No se encontró información del pedido.</p>
+            {% endif %}
 
             <div class="confirmacion-actions">
                 <a href="{{ url_for('productos_view') }}" class="btn-principal">
                     <i class="bi bi-grid"></i> Seguir comprando
                 </a>
-                <a href="{{ url_for('index') }}" class="btn-secundario">
-                    <i class="bi bi-house"></i> Volver al inicio
+                <a href="{{ url_for('perfil') }}" class="btn-secundario">
+                    <i class="bi bi-person"></i> Mis pedidos
                 </a>
             </div>
         </div>

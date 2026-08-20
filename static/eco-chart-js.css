@@ -1,0 +1,21 @@
+/* Chart JS Styles */
+.chart-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.chart-container h3 {
+    color: #2ecc71;
+    margin-bottom: 20px;
+}
+
+.chart-container canvas {
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+}

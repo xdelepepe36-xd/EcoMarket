@@ -1,0 +1,62 @@
+/* Progress Ring Styles */
+.progress-ring-container {
+    max-width: 300px;
+    margin: 50px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.progress-ring-container h3 {
+    color: #2ecc71;
+    margin-bottom: 30px;
+}
+
+.progress-ring {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+}
+
+.progress-svg {
+    transform: rotate(-90deg);
+}
+
+.progress-circle-bg {
+    fill: none;
+    stroke: #e0e0e0;
+    stroke-width: 15;
+}
+
+.progress-circle {
+    fill: none;
+    stroke: #2ecc71;
+    stroke-width: 15;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.1s ease;
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.progress-percentage {
+    display: block;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #2ecc71;
+}
+
+.progress-label {
+    display: block;
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 5px;
+}

@@ -242,7 +242,7 @@ mostrarToast(
 
     setTimeout(function(){
 
-        window.location.href = "index.html";
+        window.location.href = "/";
 
     },2000);
 

@@ -152,7 +152,7 @@ const producto = productos.find(function(item){
 
 if(!producto){
 
-    window.location.href = "catalogo.html";
+    window.location.href = "/productos";
 
 }
 
@@ -440,7 +440,7 @@ if(btnComprar && producto){
 
         );
 
-        window.location.href = "checkout.html";
+        window.location.href = "/checkout";
 
     });
 

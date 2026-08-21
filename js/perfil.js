@@ -306,7 +306,7 @@ if(btnCerrarSesion){
 
         setTimeout(function(){
 
-            window.location.href = "login.html";
+            window.location.href = "/login";
 
         },1500);
 

@@ -82,7 +82,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-flexbox-layout.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-responsive-menu.css') }}">
     
-    <!-- CSS adicionales masivos -->
+    <!-- CSS adicionales masivos (desactivados por sobrecarga) -->
+    <!--
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-drag-drop.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-sortable-list.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-resizable-elements.css') }}">
@@ -116,25 +117,22 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-alert-box.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-notification-badge.css') }}">
     
-    <!-- CSS adicionales extra -->
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-breadcrumb-navigation.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-vertical-timeline.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-horizontal-timeline.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-process-bar.css') }}">
-    <!-- eco-mini-cart.css retirado: widget falso con productos hardcodeados y total ficticio -->
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-quick-view.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-product-filters.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-wishlist.css') }}">
     
-    <!-- CSS animaciones adicionales -->
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-card-flip.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-pulse-animation.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-rotate-animation.css') }}">
     
-    <!-- CSS decorativos adicionales -->
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-decorative-divider.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-hover-effect.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='eco-typography.css') }}">
+    -->
     <link rel="manifest" href="/static/manifest.json">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
     {% block head %}{% endblock %}
@@ -379,7 +377,8 @@
     <script src="{{ url_for('static', filename='eco-flexbox-layout.js') }}"></script>
     <script src="{{ url_for('static', filename='eco-responsive-menu.js') }}"></script>
     
-    <!-- Scripts adicionales masivos -->
+    <!-- Scripts adicionales masivos (desactivados por sobrecarga) -->
+    <!--
     <script src="{{ url_for('static', filename='eco-drag-drop.js') }}"></script>
     <script src="{{ url_for('static', filename='eco-sortable-list.js') }}"></script>
     <script src="{{ url_for('static', filename='eco-resizable-elements.js') }}"></script>
@@ -413,25 +412,22 @@
     <script src="{{ url_for('static', filename='eco-alert-box.js') }}"></script>
     <script src="{{ url_for('static', filename='eco-notification-badge.js') }}"></script>
     
-    <!-- Scripts adicionales extra -->
     <script src="{{ url_for('static', filename='eco-breadcrumb-navigation.js') }}"></script>
     <script src="{{ url_for('static', filename='eco-vertical-timeline.js') }}"></script>
     <script src="{{ url_for('static', filename='eco-horizontal-timeline.js') }}"></script>
     <script src="{{ url_for('static', filename='eco-process-bar.js') }}"></script>
-    <!-- eco-mini-cart.js retirado: creaba un carrito flotante falso (3 items ficticios, total $44.99) -->
     <script src="{{ url_for('static', filename='eco-quick-view.js') }}"></script>
     <script src="{{ url_for('static', filename='eco-product-filters.js') }}"></script>
     <script src="{{ url_for('static', filename='eco-wishlist.js') }}"></script>
     
-    <!-- Scripts animaciones adicionales -->
     <script src="{{ url_for('static', filename='eco-card-flip.js') }}"></script>
     <script src="{{ url_for('static', filename='eco-pulse-animation.js') }}"></script>
     <script src="{{ url_for('static', filename='eco-rotate-animation.js') }}"></script>
     
-    <!-- Scripts decorativos adicionales -->
     <script src="{{ url_for('static', filename='eco-decorative-divider.js') }}"></script>
     <script src="{{ url_for('static', filename='eco-hover-effect.js') }}"></script>
     <script src="{{ url_for('static', filename='eco-typography.js') }}"></script>
+    -->
     <script>
       window.ECOMARKET_GOOGLE_CLIENT_ID = '{{ google_client_id }}';
     </script>

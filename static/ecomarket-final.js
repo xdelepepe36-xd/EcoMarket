@@ -2331,7 +2331,403 @@ const EcoAnimations = {
 };
 
 // ════════════════════════════════════════════════════════════
-// 8. INICIALIZACIÓN
+// 19. ANIMACIONES DE SCROLL
+// ════════════════════════════════════════════════════════════
+
+const EcoScrollAnimations = {
+    init() {
+        this.initScrollReveal();
+        this.initScrollProgress();
+        this.initSmoothScroll();
+    },
+    
+    initScrollReveal() {
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+        
+        // Observar elementos con clase reveal-on-scroll
+        document.querySelectorAll('.reveal-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
+        
+        // Observar elementos con clase fade-on-scroll
+        document.querySelectorAll('.fade-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
+        
+        // Observar elementos con clase scale-on-scroll
+        document.querySelectorAll('.scale-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
+    },
+    
+    initScrollProgress() {
+        // Crear barra de progreso de scroll
+        const progressBar = document.createElement('div');
+        progressBar.className = 'scroll-progress';
+        progressBar.style.width = '0%';
+        document.body.appendChild(progressBar);
+        
+        // Actualizar barra de progreso al hacer scroll
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const progress = (scrollTop / scrollHeight) * 100;
+            progressBar.style.width = progress + '%';
+        });
+    },
+    
+    initSmoothScroll() {
+        // Smooth scroll para enlaces ancla
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    }
+};
+
+// ════════════════════════════════════════════════════════════
+// 20. SISTEMA DE SKELETONS DE CARGA
+// ════════════════════════════════════════════════════════════
+
+const EcoSkeletons = {
+    showSkeletons(container, type = 'card') {
+        const skeletonHTML = this.getSkeletonHTML(type);
+        container.innerHTML = skeletonHTML;
+    },
+    
+    getSkeletonHTML(type) {
+        switch(type) {
+            case 'card':
+                return `
+                    <div class="skeleton skeleton-card">
+                        <div class="skeleton skeleton-header"></div>
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-text skeleton-text-short"></div>
+                        <div class="skeleton skeleton-button"></div>
+                    </div>
+                `;
+            case 'product':
+                return `
+                    <div class="skeleton skeleton-product-card">
+                        <div class="skeleton skeleton-product-image"></div>
+                        <div class="skeleton-product-info">
+                            <div class="skeleton skeleton-text"></div>
+                            <div class="skeleton skeleton-text skeleton-text-short"></div>
+                            <div class="skeleton skeleton-button"></div>
+                        </div>
+                    </div>
+                `;
+            case 'list':
+                return `
+                    <div class="skeleton skeleton-card">
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-text skeleton-text-short"></div>
+                    </div>
+                `;
+            default:
+                return '<div class="skeleton"></div>';
+        }
+    },
+    
+    hideSkeletons(container, content) {
+        container.innerHTML = content;
+    }
+};
+
+// ════════════════════════════════════════════════════════════
+// 22. SISTEMA DE TOAST NOTIFICATIONS MEJORADO
+// ════════════════════════════════════════════════════════════
+
+const EcoToast = {
+    container: null,
+    
+    init() {
+        this.createContainer();
+    },
+    
+    createContainer() {
+        this.container = document.createElement('div');
+        this.container.className = 'toast-container';
+        document.body.appendChild(this.container);
+    },
+    
+    show(title, message, type = 'info', duration = 4000) {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        
+        const icons = {
+            success: 'bi-check-circle',
+            error: 'bi-x-circle',
+            warning: 'bi-exclamation-triangle',
+            info: 'bi-info-circle'
+        };
+        
+        toast.innerHTML = `
+            <i class="bi ${icons[type] || icons.info}"></i>
+            <div class="toast-content">
+                <div class="toast-title">${title}</div>
+                <div class="toast-message">${message}</div>
+            </div>
+            <button class="toast-close">&times;</button>
+            <div class="toast-progress" style="width: 100%"></div>
+        `;
+        
+        this.container.appendChild(toast);
+        
+        // Animación de entrada
+        setTimeout(() => toast.classList.add('show'), 10);
+        
+        // Animación de progreso
+        setTimeout(() => {
+            const progress = toast.querySelector('.toast-progress');
+            if (progress) {
+                progress.style.width = '0%';
+                progress.style.transition = `width ${duration}ms linear`;
+            }
+        }, 10);
+        
+        // Cerrar automáticamente
+        const autoClose = setTimeout(() => this.close(toast), duration);
+        
+        // Cerrar al hacer click en X
+        toast.querySelector('.toast-close').addEventListener('click', () => {
+            clearTimeout(autoClose);
+            this.close(toast);
+        });
+        
+        // Cerrar al hacer click en toast
+        toast.addEventListener('click', () => {
+            clearTimeout(autoClose);
+            this.close(toast);
+        });
+    },
+    
+    close(toast) {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 400);
+    },
+    
+    success(title, message) {
+        this.show(title, message, 'success');
+    },
+    
+    error(title, message) {
+        this.show(title, message, 'error');
+    },
+    
+    warning(title, message) {
+        this.show(title, message, 'warning');
+    },
+    
+    info(title, message) {
+        this.show(title, message, 'info');
+    }
+};
+
+// ════════════════════════════════════════════════════════════
+// 23. MODAL DE PRODUCTO RÁPIDO
+// ════════════════════════════════════════════════════════════
+
+const EcoQuickView = {
+    overlay: null,
+    modal: null,
+    
+    init() {
+        this.createModal();
+        this.bindEvents();
+    },
+    
+    createModal() {
+        this.overlay = document.createElement('div');
+        this.overlay.className = 'modal-overlay';
+        this.overlay.innerHTML = `
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 class="modal-title">Vista Rápida</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="quick-view-modal">
+                        <div class="quick-view-image">
+                            <img src="" alt="Producto">
+                        </div>
+                        <div class="quick-view-info">
+                            <h3 class="product-name"></h3>
+                            <div class="quick-view-price"></div>
+                            <div class="quick-view-description"></div>
+                            <div class="product-rating"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secundario close-modal">Cerrar</button>
+                    <button class="btn-principal add-to-cart">Agregar al Carrito</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(this.overlay);
+        this.modal = this.overlay.querySelector('.modal');
+    },
+    
+    open(product) {
+        const img = this.modal.querySelector('.quick-view-image img');
+        const name = this.modal.querySelector('.product-name');
+        const price = this.modal.querySelector('.quick-view-price');
+        const description = this.modal.querySelector('.quick-view-description');
+        
+        img.src = product.image || '';
+        name.textContent = product.name || '';
+        price.textContent = product.price ? `S/. ${parseFloat(product.price).toFixed(2)}` : '';
+        description.textContent = product.description || '';
+        
+        this.overlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    },
+    
+    close() {
+        this.overlay.classList.remove('show');
+        document.body.style.overflow = '';
+    },
+    
+    bindEvents() {
+        this.overlay.querySelector('.modal-close').addEventListener('click', () => this.close());
+        this.overlay.querySelector('.close-modal').addEventListener('click', () => this.close());
+        this.overlay.addEventListener('click', (e) => {
+            if (e.target === this.overlay) this.close();
+        });
+        
+        // Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.overlay.classList.contains('show')) {
+                this.close();
+            }
+        });
+    }
+};
+
+// ════════════════════════════════════════════════════════════
+// 24. EFECTOS DE RIPPLE
+// ════════════════════════════════════════════════════════════
+
+const EcoRipple = {
+    init() {
+        document.addEventListener('click', (e) => {
+            const button = e.target.closest('.ripple-btn, .btn-principal, .btn-secundario, .btn-pastel, .producto-action-btn, .modal-close');
+            if (button) {
+                this.createRipple(e, button);
+            }
+        });
+    },
+    
+    createRipple(event, button) {
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple';
+        
+        const rect = button.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = event.clientX - rect.left - size / 2 + 'px';
+        ripple.style.top = event.clientY - rect.top - size / 2 + 'px';
+        
+        button.appendChild(ripple);
+        
+        setTimeout(() => ripple.remove(), 600);
+    }
+};
+
+// ════════════════════════════════════════════════════════════
+// 25. BÚSQUEDA CON HISTORIAL
+// ════════════════════════════════════════════════════════════
+
+const EcoSearchHistory = {
+    history: [],
+    maxHistory: 10,
+    
+    init() {
+        this.loadHistory();
+        this.bindEvents();
+    },
+    
+    loadHistory() {
+        const saved = localStorage.getItem('ecomarket-search-history');
+        if (saved) {
+            try {
+                this.history = JSON.parse(saved);
+            } catch (e) {
+                this.history = [];
+            }
+        }
+    },
+    
+    saveHistory() {
+        localStorage.setItem('ecomarket-search-history', JSON.stringify(this.history));
+    },
+    
+    addSearch(query) {
+        if (!query.trim()) return;
+        
+        // Eliminar si ya existe
+        this.history = this.history.filter(item => item !== query);
+        
+        // Agregar al inicio
+        this.history.unshift(query);
+        
+        // Limitar a maxHistory
+        if (this.history.length > this.maxHistory) {
+            this.history = this.history.slice(0, this.maxHistory);
+        }
+        
+        this.saveHistory();
+    },
+    
+    removeSearch(query) {
+        this.history = this.history.filter(item => item !== query);
+        this.saveHistory();
+    },
+    
+    clearHistory() {
+        this.history = [];
+        this.saveHistory();
+    },
+    
+    getHistory() {
+        return this.history;
+    },
+    
+    bindEvents() {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('change', (e) => {
+                this.addSearch(e.target.value);
+            });
+        }
+    }
+};
+
+// ════════════════════════════════════════════════════════════
+// 26. INICIALIZACIÓN FINAL
 // ════════════════════════════════════════════════════════════
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -2353,13 +2749,31 @@ document.addEventListener('DOMContentLoaded', () => {
     EcoWishlist.init();
     EcoOrderTracking.init();
     
-    // Inicializar nuevos módulos adicionales
+    // Inicializar módulos adicionales
     EcoReviews.init();
     EcoSellerRating.init();
     EcoImpactCalculator.init();
     EcoReferrals.init();
     EcoAdvancedSearch.init();
     EcoChallenges.init();
+    
+    // Inicializar nuevas mejoras
+    EcoScrollAnimations.init();
+    EcoToast.init();
+    EcoQuickView.init();
+    EcoRipple.init();
+    EcoSearchHistory.init();
+    
+    // Reemplazar showToast con EcoToast
+    window.showToast = (message, type = 'info') => {
+        const titles = {
+            success: 'Éxito',
+            error: 'Error',
+            warning: 'Advertencia',
+            info: 'Información'
+        };
+        EcoToast.show(titles[type] || titles.info, message, type);
+    };
     
     // Exponer al scope global para uso en plantillas
     window.EcoMarket = EcoMarket;
@@ -2379,6 +2793,12 @@ document.addEventListener('DOMContentLoaded', () => {
     window.EcoReferrals = EcoReferrals;
     window.EcoAdvancedSearch = EcoAdvancedSearch;
     window.EcoChallenges = EcoChallenges;
+    window.EcoSkeletons = EcoSkeletons;
+    window.EcoScrollAnimations = EcoScrollAnimations;
+    window.EcoToast = EcoToast;
+    window.EcoQuickView = EcoQuickView;
+    window.EcoRipple = EcoRipple;
+    window.EcoSearchHistory = EcoSearchHistory;
 });
 
 // ════════════════════════════════════════════════════════════

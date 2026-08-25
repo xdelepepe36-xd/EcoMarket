@@ -26,6 +26,9 @@ const EcoMarket = {
         user: null
     },
     
+    // Todos los temas disponibles
+    themes: ['light', 'dark', 'sepia', 'nature', 'ocean', 'midnight', 'rose', 'high-contrast'],
+    
     // Inicialización
     init() {
         this.initTheme();
@@ -47,7 +50,8 @@ const EcoMarket = {
                 toggleBtn.className = 'theme-toggle';
                 toggleBtn.setAttribute('data-theme-switcher', '');
                 toggleBtn.setAttribute('aria-label', 'Cambiar tema');
-                toggleBtn.innerHTML = this.state.theme === 'dark' ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon"></i>';
+                toggleBtn.setAttribute('title', 'Cambiar tema');
+                toggleBtn.innerHTML = this.getThemeIcon(this.state.theme);
                 headerActions.insertBefore(toggleBtn, headerActions.firstChild);
                 
                 toggleBtn.addEventListener('click', () => this.toggleTheme());
@@ -60,16 +64,33 @@ const EcoMarket = {
     },
     
     toggleTheme() {
-        this.state.theme = this.state.theme === 'light' ? 'dark' : 'light';
+        const currentIndex = this.themes.indexOf(this.state.theme);
+        const nextIndex = (currentIndex + 1) % this.themes.length;
+        this.state.theme = this.themes[nextIndex];
         document.documentElement.setAttribute('data-theme', this.state.theme);
         localStorage.setItem('ecomarket-theme', this.state.theme);
         this.updateThemeIcon();
     },
     
+    getThemeIcon(theme) {
+        const icons = {
+            'light': '<i class="bi bi-sun"></i>',
+            'dark': '<i class="bi bi-moon"></i>',
+            'sepia': '<i class="bi bi-book"></i>',
+            'nature': '<i class="bi bi-tree"></i>',
+            'ocean': '<i class="bi bi-water"></i>',
+            'midnight': '<i class="bi bi-stars"></i>',
+            'rose': '<i class="bi bi-heart"></i>',
+            'high-contrast': '<i class="bi bi-eye"></i>'
+        };
+        return icons[theme] || '<i class="bi bi-palette"></i>';
+    },
+    
     updateThemeIcon() {
         const toggleBtn = document.querySelector('[data-theme-switcher]');
         if (toggleBtn) {
-            toggleBtn.innerHTML = this.state.theme === 'dark' ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon"></i>';
+            toggleBtn.innerHTML = this.getThemeIcon(this.state.theme);
+            toggleBtn.setAttribute('title', `Tema actual: ${this.state.theme}`);
         }
     },
     

@@ -36,6 +36,15 @@
             <input type="number" id="precioMax" placeholder="Máx" min="0" step="0.01" value="{{ request.args.get('precio_max', '') }}" data-i18n-placeholder="products.price_max">
             <button onclick="aplicarFiltroPrecio()" class="btn-principal catalog-filter-btn"><i class="bi bi-funnel"></i> <span data-i18n="products.filter">Filtrar</span></button>
             {% if request.args.get('precio_min') or request.args.get('precio_max') %}
+            <a href="{{ url_for('productos_view', categoria=categoria_sel, orden=orden_sel, ubicacion=ubicacion_sel) }}" class="catalog-clear-link" data-i18n="products.clear">Limpiar</a>
+            {% endif %}
+        </div>
+
+        <div class="catalog-filter-panel">
+            <span class="catalog-filter-label"><i class="bi bi-geo-alt"></i> <span data-i18n="products.location_label">Ubicación:</span></span>
+            <input type="text" id="ubicacionFilter" placeholder="Ej: Lima, Arequipa..." value="{{ request.args.get('ubicacion', '') }}" data-i18n-placeholder="products.location_placeholder">
+            <button onclick="aplicarFiltroUbicacion()" class="btn-principal catalog-filter-btn"><i class="bi bi-funnel"></i> <span data-i18n="products.filter">Filtrar</span></button>
+            {% if request.args.get('ubicacion') %}
             <a href="{{ url_for('productos_view', categoria=categoria_sel, orden=orden_sel) }}" class="catalog-clear-link" data-i18n="products.clear">Limpiar</a>
             {% endif %}
         </div>
@@ -90,6 +99,11 @@
                             <span class="producto-precio-original">S/. {{ '%.2f'|format(producto.precio_original) }}</span>
                             {% endif %}
                         </div>
+                        {% if producto.ubicacion %}
+                        <div style="font-size:0.75rem;color:var(--texto-sec);margin-top:8px;display:flex;align-items:center;gap:4px">
+                            <i class="bi bi-geo-alt"></i> {{ producto.ubicacion }}
+                        </div>
+                        {% endif %}
                     </div>
                 </a>
                 
@@ -122,7 +136,7 @@
         {% if total_paginas > 1 %}
         <div style="display:flex;justify-content:center;align-items:center;gap:8px;margin-top:32px;flex-wrap:wrap">
             {% if pagina > 1 %}
-            <a href="{{ url_for('productos_view', pagina=pagina-1, categoria=categoria_sel, orden=orden_sel, q=busqueda) }}" class="btn-secundario" style="padding:10px 18px;font-size:0.85rem">
+            <a href="{{ url_for('productos_view', pagina=pagina-1, categoria=categoria_sel, orden=orden_sel, q=busqueda, ubicacion=ubicacion_sel) }}" class="btn-secundario" style="padding:10px 18px;font-size:0.85rem">
             <i class="bi bi-chevron-left"></i> <span data-i18n="pagination.prev">Anterior</span>
             </a>
             {% endif %}
@@ -131,14 +145,14 @@
                 {% if p == pagina %}
                 <span style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#4caf50,#2e7d32);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem">{{ p }}</span>
                 {% elif p == 1 or p == total_paginas or (p >= pagina - 2 and p <= pagina + 2) %}
-                <a href="{{ url_for('productos_view', pagina=p, categoria=categoria_sel, orden=orden_sel, q=busqueda) }}" style="width:40px;height:40px;border-radius:12px;background:var(--blanco);color:var(--texto);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:0.9rem;text-decoration:none;border:1px solid rgba(46,125,50,0.12);transition:all 0.2s">{{ p }}</a>
+                <a href="{{ url_for('productos_view', pagina=p, categoria=categoria_sel, orden=orden_sel, q=busqueda, ubicacion=ubicacion_sel) }}" style="width:40px;height:40px;border-radius:12px;background:var(--blanco);color:var(--texto);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:0.9rem;text-decoration:none;border:1px solid rgba(46,125,50,0.12);transition:all 0.2s">{{ p }}</a>
                 {% elif p == pagina - 3 or p == pagina + 3 %}
                 <span style="color:var(--texto-sec);font-size:0.9rem">...</span>
                 {% endif %}
             {% endfor %}
 
             {% if pagina < total_paginas %}
-            <a href="{{ url_for('productos_view', pagina=pagina+1, categoria=categoria_sel, orden=orden_sel, q=busqueda) }}" class="btn-secundario" style="padding:10px 18px;font-size:0.85rem">
+            <a href="{{ url_for('productos_view', pagina=pagina+1, categoria=categoria_sel, orden=orden_sel, q=busqueda, ubicacion=ubicacion_sel) }}" class="btn-secundario" style="padding:10px 18px;font-size:0.85rem">
             <span data-i18n="pagination.next">Siguiente</span> <i class="bi bi-chevron-right"></i>
             </a>
             {% endif %}
@@ -158,6 +172,14 @@ function aplicarFiltroPrecio() {
     const params = new URLSearchParams(window.location.search);
     if (min) params.set('precio_min', min); else params.delete('precio_min');
     if (max) params.set('precio_max', max); else params.delete('precio_max');
+    window.location = '{{ url_for('productos_view') }}?' + params.toString();
+}
+
+// Filtro de ubicación
+function aplicarFiltroUbicacion() {
+    const ubicacion = document.getElementById('ubicacionFilter').value;
+    const params = new URLSearchParams(window.location.search);
+    if (ubicacion) params.set('ubicacion', ubicacion); else params.delete('ubicacion');
     window.location = '{{ url_for('productos_view') }}?' + params.toString();
 }
 </script>

@@ -52,6 +52,12 @@
             </div>
 
             <div>
+                <label><span data-i18n="publicar.location_label">Ubicación de envío</span></label>
+                <input type="text" name="ubicacion" value="{{ producto.ubicacion if producto else '' }}" placeholder="Ej: Lima, Arequipa, Cusco..." data-i18n-placeholder="publicar.placeholder_location">
+                <small style="color:var(--texto-sec);font-size:0.78rem" data-i18n="publicar.location_hint">Ciudad o región desde donde enviarás el producto</small>
+            </div>
+
+            <div>
                 <label><span data-i18n="publicar.specs_label">Especificaciones técnicas</span></label>
 <textarea name="especificaciones" rows="4" data-i18n-placeholder="publicar.specs_placeholder" placeholder="Formato: clave: valor (una por línea)&#10;Ej:&#10;Material: Acero inoxidable&#10;Capacidad: 750ml&#10;Peso: 300g">{% if producto and producto.especificaciones %}{% set specs = producto.especificaciones|fromjson %}{% for k, v in specs.items() %}{{ k }}: {{ v }}
 {% endfor %}{% endif %}</textarea>

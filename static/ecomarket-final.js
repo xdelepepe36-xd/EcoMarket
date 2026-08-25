@@ -464,14 +464,8 @@ const EcoMarket = {
     initSplashScreen() {
         const splashScreen = document.getElementById('splashScreen');
         if (splashScreen) {
-            window.addEventListener('load', () => {
-                setTimeout(() => {
-                    splashScreen.classList.add('hidden');
-                    setTimeout(() => {
-                        splashScreen.style.display = 'none';
-                    }, 500);
-                }, 1500);
-            });
+            // Ocultar splash screen inmediatamente sin animación
+            splashScreen.style.display = 'none';
         }
     },
     
@@ -1702,7 +1696,7 @@ const EcoCoupons = {
 // 8. SISTEMA DE PREGUNTAS Y RESPUESTAS
 // ════════════════════════════════════════════════════════════
 
-const EcoQ&A = {
+const EcoQA = {
     questions: [],
     
     init() {
@@ -2727,78 +2721,97 @@ const EcoSearchHistory = {
 };
 
 // ════════════════════════════════════════════════════════════
-// 26. INICIALIZACIÓN FINAL
+// 26. INICIALIZACIÓN FINAL CON MANEJO DE ERRORES
 // ════════════════════════════════════════════════════════════
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Inicializar todos los módulos
-    EcoMarket.init();
-    EcoCart.init();
-    EcoFavorites.init();
-    EcoSearch.init();
-    EcoGamification.init();
-    EcoForms.init();
-    EcoAnimations.init();
-    
-    // Inicializar módulos avanzados
-    EcoCompare.init();
-    EcoCoupons.init();
-    EcoQ&A.init();
-    EcoNotifications.init();
-    EcoRecommendations.init();
-    EcoWishlist.init();
-    EcoOrderTracking.init();
-    
-    // Inicializar módulos adicionales
-    EcoReviews.init();
-    EcoSellerRating.init();
-    EcoImpactCalculator.init();
-    EcoReferrals.init();
-    EcoAdvancedSearch.init();
-    EcoChallenges.init();
-    
-    // Inicializar nuevas mejoras
-    EcoScrollAnimations.init();
-    EcoToast.init();
-    EcoQuickView.init();
-    EcoRipple.init();
-    EcoSearchHistory.init();
-    
-    // Reemplazar showToast con EcoToast
-    window.showToast = (message, type = 'info') => {
-        const titles = {
-            success: 'Éxito',
-            error: 'Error',
-            warning: 'Advertencia',
-            info: 'Información'
+    try {
+        // Inicializar módulos básicos que están definidos
+        EcoMarket.init();
+        EcoCart.init();
+        EcoFavorites.init();
+        EcoSearch.init();
+        
+        // Inicializar módulos avanzados que están definidos
+        EcoCompare.init();
+        EcoCoupons.init();
+        EcoQA.init();
+        EcoNotifications.init();
+        EcoRecommendations.init();
+        EcoWishlist.init();
+        EcoOrderTracking.init();
+        
+        // Inicializar módulos adicionales que están definidos
+        EcoReviews.init();
+        EcoSellerRating.init();
+        EcoImpactCalculator.init();
+        EcoReferrals.init();
+        EcoAdvancedSearch.init();
+        EcoChallenges.init();
+        
+        // Inicializar nuevas mejoras que están definidas
+        EcoScrollAnimations.init();
+        EcoToast.init();
+        EcoQuickView.init();
+        EcoRipple.init();
+        EcoSearchHistory.init();
+        
+        // Reemplazar showToast con EcoToast
+        window.showToast = (message, type = 'info') => {
+            try {
+                const titles = {
+                    success: 'Éxito',
+                    error: 'Error',
+                    warning: 'Advertencia',
+                    info: 'Información'
+                };
+                EcoToast.show(titles[type] || titles.info, message, type);
+            } catch (e) {
+                console.error('Error en showToast:', e);
+            }
         };
-        EcoToast.show(titles[type] || titles.info, message, type);
-    };
-    
-    // Exponer al scope global para uso en plantillas
-    window.EcoMarket = EcoMarket;
-    window.EcoCart = EcoCart;
-    window.EcoFavorites = EcoFavorites;
-    window.EcoGamification = EcoGamification;
-    window.EcoCompare = EcoCompare;
-    window.EcoCoupons = EcoCoupons;
-    window.EcoQ&A = EcoQ&A;
-    window.EcoNotifications = EcoNotifications;
-    window.EcoRecommendations = EcoRecommendations;
-    window.EcoWishlist = EcoWishlist;
-    window.EcoOrderTracking = EcoOrderTracking;
-    window.EcoReviews = EcoReviews;
-    window.EcoSellerRating = EcoSellerRating;
-    window.EcoImpactCalculator = EcoImpactCalculator;
-    window.EcoReferrals = EcoReferrals;
-    window.EcoAdvancedSearch = EcoAdvancedSearch;
-    window.EcoChallenges = EcoChallenges;
-    window.EcoSkeletons = EcoSkeletons;
-    window.EcoScrollAnimations = EcoScrollAnimations;
-    window.EcoToast = EcoToast;
-    window.EcoQuickView = EcoQuickView;
-    window.EcoRipple = EcoRipple;
-    window.EcoSearchHistory = EcoSearchHistory;
+        
+        // Exponer al scope global para uso en plantillas
+        window.EcoMarket = EcoMarket;
+        window.EcoCart = EcoCart;
+        window.EcoFavorites = EcoFavorites;
+        window.EcoCompare = EcoCompare;
+        window.EcoCoupons = EcoCoupons;
+        window.EcoQA = EcoQA;
+        window.EcoNotifications = EcoNotifications;
+        window.EcoRecommendations = EcoRecommendations;
+        window.EcoWishlist = EcoWishlist;
+        window.EcoOrderTracking = EcoOrderTracking;
+        window.EcoReviews = EcoReviews;
+        window.EcoSellerRating = EcoSellerRating;
+        window.EcoImpactCalculator = EcoImpactCalculator;
+        window.EcoReferrals = EcoReferrals;
+        window.EcoAdvancedSearch = EcoAdvancedSearch;
+        window.EcoChallenges = EcoChallenges;
+        window.EcoScrollAnimations = EcoScrollAnimations;
+        window.EcoToast = EcoToast;
+        window.EcoQuickView = EcoQuickView;
+        window.EcoRipple = EcoRipple;
+        window.EcoSearchHistory = EcoSearchHistory;
+        
+        console.log('EcoMarket inicializado correctamente');
+    } catch (error) {
+        console.error('Error al inicializar EcoMarket:', error);
+        // Mostrar error en la página si es posible
+        const errorDiv = document.createElement('div');
+        errorDiv.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#ef4444;color:white;padding:16px;text-align:center;z-index:99999;font-family:sans-serif;';
+        errorDiv.textContent = 'Error al cargar EcoMarket. Por favor recarga la pagina.';
+        document.body.appendChild(errorDiv);
+    }
+});
+
+// Manejo global de errores
+window.addEventListener('error', (event) => {
+    console.error('Error global:', event.error);
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+    console.error('Promesa rechazada no manejada:', event.reason);
 });
 
 // ════════════════════════════════════════════════════════════

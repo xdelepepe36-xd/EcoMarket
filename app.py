@@ -360,6 +360,7 @@ def init_db():
              eco_score INTEGER DEFAULT 0,
              especificaciones TEXT DEFAULT '',
              usuario_id INTEGER,
+             ubicacion TEXT DEFAULT '',
              vistas INTEGER DEFAULT 0,
              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
              FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
@@ -571,6 +572,13 @@ def init_db():
     # Agregar columna especificaciones si no existe
     try:
         conn.execute('ALTER TABLE productos ADD COLUMN especificaciones TEXT DEFAULT ""')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass  # La columna ya existe
+
+    # Agregar columna ubicacion a productos si no existe
+    try:
+        conn.execute('ALTER TABLE productos ADD COLUMN ubicacion TEXT DEFAULT ""')
         conn.commit()
     except sqlite3.OperationalError:
         pass  # La columna ya existe
@@ -873,6 +881,7 @@ def productos_view():
     orden = request.args.get('orden', 'nuevos')
     precio_min = request.args.get('precio_min', '')
     precio_max = request.args.get('precio_max', '')
+    ubicacion = request.args.get('ubicacion', '')
     busqueda = request.args.get('q', '')
     pagina = int(request.args.get('pagina', 1))
 
@@ -909,6 +918,11 @@ def productos_view():
         count_query += ' AND p.precio <= ?'
         params.append(float(precio_max))
         count_params.append(float(precio_max))
+    if ubicacion:
+        query += ' AND p.ubicacion LIKE ?'
+        count_query += ' AND p.ubicacion LIKE ?'
+        params.extend([f'%{ubicacion}%'])
+        count_params.extend([f'%{ubicacion}%'])
 
     query += ' GROUP BY p.id'
     count_query += ')'
@@ -940,6 +954,7 @@ def productos_view():
                            categoria_sel=categoria,
                            orden_sel=orden,
                            busqueda=busqueda,
+                           ubicacion_sel=ubicacion,
                            pagina=pagina,
                            total_paginas=total_paginas)
 
@@ -1257,6 +1272,7 @@ def publicar():
         stock = request.form.get('stock', '10').strip()
         condicion = request.form.get('condicion', 'nuevo').strip()
         especificaciones_raw = request.form.get('especificaciones', '').strip()
+        ubicacion = request.form.get('ubicacion', '').strip()
         imagen = get_product_image(categoria)
 
         # Subir imagen principal si se proporcionó
@@ -1305,8 +1321,8 @@ def publicar():
 
         conn = get_db()
         cursor = conn.execute(
-            'INSERT INTO productos (nombre, categoria, precio, descripcion, imagen, imagen_thumb, stock, condicion, especificaciones, usuario_id) VALUES (?,?,?,?,?,?,?,?,?,?)',
-            (nombre, categoria, precio_valor, descripcion, imagen, imagen_thumb, stock_valor, condicion, especificaciones_json, session['usuario_id'])
+            'INSERT INTO productos (nombre, categoria, precio, descripcion, imagen, imagen_thumb, stock, condicion, especificaciones, usuario_id, ubicacion) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+            (nombre, categoria, precio_valor, descripcion, imagen, imagen_thumb, stock_valor, condicion, especificaciones_json, session['usuario_id'], ubicacion)
         )
         producto_id = cursor.lastrowid
 

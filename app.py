@@ -1728,6 +1728,23 @@ def api_cupones_disponibles():
     ])
 
 
+@app.route('/api/productos/destacados')
+def api_productos_destacados():
+    """Productos destacados para prefetch del cache/PWA."""
+    excl = request.args.get('exclude', '')
+    return jsonify({'products': _productos_api_json(limit=8, exclude=excl.split(','))})
+
+
+@app.route('/api/categorias')
+def api_categorias():
+    """Lista de categorías para filtros y prefetch del cache/PWA."""
+    conn = get_db()
+    categorias = [r['categoria'] for r in
+                  conn.execute('SELECT DISTINCT categoria FROM productos WHERE categoria IS NOT NULL ORDER BY categoria').fetchall()]
+    conn.close()
+    return jsonify(categorias)
+
+
 @app.route('/api/recomendaciones/wishlist')
 def api_recomendaciones_wishlist():
     conn = get_db()

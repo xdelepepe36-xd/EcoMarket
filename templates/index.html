@@ -2,12 +2,21 @@
 {% block title %}EcoMarket - Marketplace Ecológico{% endblock %}
 
 {% block content %}
-<!-- Contenedores de funcionalidades nuevas (desactivados por sobrecarga) -->
-<!--
-<div data-eco-banners></div>
-<div data-eco-weather-contextual></div>
-<div data-eco-decorations></div>
--->
+
+<!-- BANNER DESTACADO ANIMADO -->
+<section class="featured-banner">
+    <div class="banner-content">
+        <div class="banner-badge" data-i18n="banner.badge">🔥 Oferta especial</div>
+        <h2 class="banner-title" data-i18n="banner.title">¡Compra ecológico y ahorra!</h2>
+        <p class="banner-description" data-i18n="banner.description">Productos sostenibles con hasta 30% de descuento en tu primera compra</p>
+        <a href="{{ url_for('productos_view') }}" class="btn-hero-main banner-cta" data-i18n="banner.cta">Ver ofertas</a>
+    </div>
+    <div class="banner-decoration">
+        <div class="floating-leaf">🌿</div>
+        <div class="floating-leaf" style="animation-delay: 1s">🍃</div>
+        <div class="floating-leaf" style="animation-delay: 2s">🌱</div>
+    </div>
+</section>
 
 <!-- HERO SECTION -->
 <section class="hero-section">
@@ -42,16 +51,16 @@
             </div>
             <div class="hero-stats">
                 <div class="hero-stat">
-                    <strong>4,800+</strong>
-                                    <span data-i18n="hero.families">Familias impactadas</span>
+                    <strong data-animate-counter="4800">4,800+</strong>
+                    <span data-i18n="hero.families">Familias impactadas</span>
                 </div>
                 <div class="hero-stat">
-                    <strong>1,200+</strong>
-                                    <span data-i18n="hero.products">Productos eco</span>
+                    <strong data-animate-counter="1200">1,200+</strong>
+                    <span data-i18n="hero.products">Productos eco</span>
                 </div>
                 <div class="hero-stat">
                     <strong>3.2 ton</strong>
-                                    <span data-i18n="hero.plastic">Plástico evitado</span>
+                    <span data-i18n="hero.plastic">Plástico evitado</span>
                 </div>
             </div>
         </div>
@@ -89,6 +98,103 @@
 
 <!-- PRODUCTOS DESTACADOS -->
 <section class="section section-alt">
+    <div class="container">
+        <div class="section-head-flex">
+            <div>
+            <span class="section-tag"><i class="bi bi-star"></i> <span data-i18n="featured.tag">Destacados</span></span>
+            <h2 class="section-title"><span data-i18n="featured.title">Más vendidos esta semana</span></h2>
+            </div>
+            <a href="{{ url_for('productos_view') }}" class="section-link"><span data-i18n="featured.view_catalog">Ver catálogo completo</span> <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="productos-grid">
+            {% for producto in productos %}
+            {% set img_url = producto.imagen if producto.imagen.startswith('http') else url_for('static', filename=producto.imagen) %}
+            <a href="{{ url_for('producto_detalle', producto_id=producto.id) }}" class="producto-card-link">
+                <article class="producto-card">
+                    <div class="producto-img-container">
+                        {% if producto.precio_original and producto.precio_original > producto.precio %}
+                        <span class="producto-descuento">-{{ ((1 - producto.precio / producto.precio_original) * 100)|round }}%</span>
+                        {% endif %}
+                        {% if producto.imagen and producto.imagen != 'uploads/placeholder.svg' %}
+                        <img class="producto-img-real" src="{{ img_url }}" alt="{{ producto.nombre }}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                        <div class="producto-img-placeholder" style="display:none">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+                        {% else %}
+                        <div class="producto-img-placeholder">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="producto-body">
+                        <span class="producto-categoria">{{ producto.categoria }}</span>
+                        <h3 class="producto-nombre">{{ producto.nombre }}</h3>
+                        <div class="producto-rating">
+                            {% for i in range(5) %}
+                            <i class="bi {% if i < (producto.rating_promedio|round) %}bi-star-fill{% else %}bi-star{% endif %}"></i>
+                            {% endfor %}
+                            <span>({{ producto.total_resenas }})</span>
+                        </div>
+                        <div class="producto-precios">
+                            <strong class="producto-precio">S/. {{ '%.2f'|format(producto.precio) }}</strong>
+                            {% if producto.precio_original and producto.precio_original > producto.precio %}
+                            <span class="producto-precio-original">S/. {{ '%.2f'|format(producto.precio_original) }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </article>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- PRODUCTOS RECOMENDADOS -->
+<section class="section">
+    <div class="container">
+        <div class="section-head-flex">
+            <div>
+                <span class="section-tag"><i class="bi bi-lightning"></i> <span data-i18n="recommended.tag">Recomendados para ti</span></span>
+                <h2 class="section-title" data-i18n="recommended.title">Basado en tu interés ecológico</h2>
+            </div>
+            <a href="{{ url_for('productos_view') }}" class="section-link"><span data-i18n="recommended.view_more">Ver más</span> <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="productos-grid">
+            {% for producto in productos[:4] %}
+            {% set img_url = producto.imagen if producto.imagen.startswith('http') else url_for('static', filename=producto.imagen) %}
+            <a href="{{ url_for('producto_detalle', producto_id=producto.id) }}" class="producto-card-link">
+                <article class="producto-card recommended">
+                    <div class="recommended-badge">
+                        <i class="bi bi-star-fill"></i> Top elección
+                    </div>
+                    <div class="producto-img-container">
+                        {% if producto.imagen and producto.imagen != 'uploads/placeholder.svg' %}
+                        <img class="producto-img-real" src="{{ img_url }}" alt="{{ producto.nombre }}" loading="lazy">
+                        {% else %}
+                        <div class="producto-img-placeholder">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="producto-body">
+                        <span class="producto-categoria">{{ producto.categoria }}</span>
+                        <h3 class="producto-nombre">{{ producto.nombre }}</h3>
+                        <div class="producto-rating">
+                            {% for i in range(5) %}
+                            <i class="bi {% if i < (producto.rating_promedio|round) %}bi-star-fill{% else %}bi-star{% endif %}"></i>
+                            {% endfor %}
+                            <span>({{ producto.total_resenas }})</span>
+                        </div>
+                        <div class="producto-precios">
+                            <strong class="producto-precio">S/. {{ '%.2f'|format(producto.precio) }}</strong>
+                        </div>
+                    </div>
+                </article>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
     <div class="container">
         <div class="section-head-flex">
             <div>
@@ -155,28 +261,28 @@
                     <div class="impacto-card-icon" style="background:var(--verde-suave);color:var(--verde)">
                         <i class="bi bi-tree"></i>
                     </div>
-                    <strong>1,240</strong>
+                    <strong data-animate-counter="1240">1,240</strong>
                     <span data-i18n="impact.trees">Árboles equivalentes salvados</span>
                 </div>
                 <div class="impacto-card-item">
                     <div class="impacto-card-icon" style="background:#e3f2fd;color:#1565c0">
                         <i class="bi bi-droplet"></i>
                     </div>
-                    <strong>85,600</strong>
+                    <strong data-animate-counter="85600">85,600</strong>
                     <span data-i18n="impact.water">Litros de agua ahorrados</span>
                 </div>
                 <div class="impacto-card-item">
                     <div class="impacto-card-icon" style="background:#fff3e0;color:#e65100">
                         <i class="bi bi-recycle"></i>
                     </div>
-                    <strong>3,200</strong>
+                    <strong data-animate-counter="3200">3,200</strong>
                     <span data-i18n="impact.plastic">Kg de plástico evitados</span>
                 </div>
                 <div class="impacto-card-item">
                     <div class="impacto-card-icon" style="background:#f3e5f5;color:#6a1b9a">
                         <i class="bi bi-people"></i>
                     </div>
-                    <strong>4,800</strong>
+                    <strong data-animate-counter="4800">4,800</strong>
                     <span data-i18n="impact.families">Familias impactadas</span>
                 </div>
             </div>

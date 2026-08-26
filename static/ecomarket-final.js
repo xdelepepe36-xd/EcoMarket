@@ -41,9 +41,15 @@ const EcoMarket = {
     
     // ── Theme Toggle ───────────────────────────────────────
     initTheme() {
+        // Si EcoThemes está disponible, usarlo
+        if (window.EcoThemes) {
+            window.EcoThemes.init();
+            return;
+        }
+
+        // Fallback: implementación básica
         const themeToggle = document.querySelector('[data-theme-switcher]');
         
-        // Si no existe, crearlo
         if (!themeToggle) {
             const headerActions = document.querySelector('.header-actions');
             if (headerActions) {
@@ -58,11 +64,9 @@ const EcoMarket = {
                 toggleBtn.addEventListener('click', () => this.toggleTheme());
             }
         } else {
-            // Si ya existe, solo agregar el evento listener
             themeToggle.addEventListener('click', () => this.toggleTheme());
         }
         
-        // Aplicar tema guardado
         document.documentElement.setAttribute('data-theme', this.state.theme);
         this.updateThemeIcon();
     },

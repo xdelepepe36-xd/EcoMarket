@@ -3,12 +3,11 @@
 
 {% block content %}
 <!-- Contenedores de funcionalidades nuevas -->
-<div data-eco-dashboard-stats></div>
-<div data-eco-achievements></div>
-<div data-eco-referral></div>
-<div data-eco-payment-wallet></div>
-<div data-eco-gamification-advanced></div>
-<div data-eco-impact-calculator></div>
+<div id="dashboardContainer"></div>
+<div id="chatContainer"></div>
+<div id="calificacionVendedorForm" data-vendedor-id="{{ session.get('usuario_id') }}"></div>
+<div id="suscripcionesPanel"></div>
+<div id="breadcrumbsContainer"></div>
 
 <section class="section">
     <div class="container">

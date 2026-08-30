@@ -26,7 +26,7 @@ const EcoUltimate = {
             localStorage.setItem('ecomarket-chat-historial', JSON.stringify(this.mensajes));
         },
 
-        enviarMensaje(texto, tipo = 'usuario') {
+        async enviarMensaje(texto, tipo = 'usuario') {
             const mensaje = {
                 id: Date.now(),
                 texto: texto,
@@ -39,11 +39,27 @@ const EcoUltimate = {
             this.guardarHistorial();
             this.renderChat();
             
-            // Simular respuesta del bot
+            // Conectar con backend real
             if (tipo === 'usuario') {
-                setTimeout(() => {
+                try {
+                    const response = await fetch('/api/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ message: texto })
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.enviarMensaje(data.reply, 'bot');
+                    } else {
+                        this.responderBot(texto);
+                    }
+                } catch (error) {
+                    console.error('Error conectando con chat:', error);
                     this.responderBot(texto);
-                }, 1000);
+                }
             }
         },
 
@@ -67,6 +83,21 @@ const EcoUltimate = {
             }
             
             this.enviarMensaje(respuesta, 'bot');
+        },
+
+        typeWriterEffect(texto, elemento, velocidad = 30) {
+            let i = 0;
+            elemento.textContent = '';
+            
+            function type() {
+                if (i < texto.length) {
+                    elemento.textContent += texto.charAt(i);
+                    i++;
+                    setTimeout(type, velocidad);
+                }
+            }
+            
+            type();
         },
 
         renderChat() {

@@ -5,16 +5,16 @@
 {% block content %}
 <section class="section">
   <div class="container">
-    <h2 class="section-title">Comparar productos</h2>
-    <p>Selecciona hasta 4 productos para comparar lado a lado o por puntuación.</p>
+    <h2 class="section-title" data-i18n="compare.title">Comparar productos</h2>
+    <p data-i18n="compare.description">Selecciona hasta 4 productos para comparar lado a lado o por puntuación.</p>
 
     <div style="display:flex;gap:12px;margin-bottom:12px;align-items:center">
       <select id="compareSelect" style="flex:1;padding:8px;border-radius:8px;border:1px solid #e6e6e6"></select>
-      <button id="addCompareBtn" class="btn-principal">Añadir</button>
-      <button id="clearCompareBtn" class="btn-secundario">Limpiar</button>
+      <button id="addCompareBtn" class="btn-principal" data-i18n="compare.add">Añadir</button>
+      <button id="clearCompareBtn" class="btn-secundario" data-i18n="compare.clear">Limpiar</button>
       <select id="compareMode" style="padding:8px;border-radius:8px;border:1px solid #e6e6e6">
-        <option value="side">Lado a lado</option>
-        <option value="score">Por puntuación</option>
+        <option value="side" data-i18n="compare.side_by_side">Lado a lado</option>
+        <option value="score" data-i18n="compare.by_score">Por puntuación</option>
       </select>
     </div>
 

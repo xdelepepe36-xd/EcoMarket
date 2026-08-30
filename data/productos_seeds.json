@@ -460,6 +460,236 @@
       "vendedor": "FermentPro",
       "rating_promedio": 4.6,
       "total_resenas": 58
+    },
+    {
+      "id": 21,
+      "nombre": "Aceite Esencial de Eucalipto Orgánico",
+      "categoria": "Higiene",
+      "precio": 28.00,
+      "precio_original": 35.00,
+      "descripcion": "Aceite esencial de eucalipto 100% orgánico y puro. Ideal para aromaterapia, desinfección natural y alivio respiratorio. Cultivo sostenible.",
+      "imagen": "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=400&h=300&fit=crop",
+      "stock": 85,
+      "condicion": "nuevo",
+      "etiquetas": "aceite, esencial, eucalipto, organico",
+      "eco_score": 95,
+      "especificaciones": {
+        "volumen": "15ml",
+        "pureza": "100% puro",
+        "origen": "Cultivo orgánico certificado",
+        "uso": "Aromaterapia, tópico"
+      },
+      "ubicacion": "Cusco",
+      "vendedor": "OrganicEssentials",
+      "rating_promedio": 4.8,
+      "total_resenas": 134
+    },
+    {
+      "id": 22,
+      "nombre": "Maceta Inteligente Autorriego",
+      "categoria": "Jardín",
+      "precio": 68.00,
+      "precio_original": 85.00,
+      "descripcion": "Maceta con sistema de autorriego inteligente. Indicador de nivel de agua, cultivo sin riego manual por 2 semanas. Perfecto para personas ocupadas.",
+      "imagen": "https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=400&h=300&fit=crop",
+      "stock": 40,
+      "condicion": "nuevo",
+      "etiquetas": "maceta, autorriego, inteligente, jardin",
+      "eco_score": 87,
+      "especificaciones": {
+        "capacidad": "3 litros",
+        "material": "Plástico reciclado",
+        "autonomia": "2 semanas",
+        "indicador": "Nivel de agua visible"
+      },
+      "ubicacion": "Lima",
+      "vendedor": "SmartGarden",
+      "rating_promedio": 4.5,
+      "total_resenas": 67
+    },
+    {
+      "id": 23,
+      "nombre": "Set de Pajillas de Bambú Reutilizables",
+      "categoria": "Hogar",
+      "precio": 18.00,
+      "precio_original": 22.00,
+      "descripcion": "Set de 8 pajillas de bambú con cepillo de limpieza. 100% biodegradables, lavables y reutilizables. Alternativa perfecta al plástico.",
+      "imagen": "https://images.unsplash.com/photo-1546173159-315724a31696?w=400&h=300&fit=crop",
+      "stock": 150,
+      "condicion": "nuevo",
+      "etiquetas": "pajillas, bambu, reutilizable, cero-plastico",
+      "eco_score": 96,
+      "especificaciones": {
+        "cantidad": "8 unidades",
+        "material": "Bambú natural",
+        "incluye": "Cepillo de limpieza",
+        "lavable": "Lavavajillas seguro"
+      },
+      "ubicacion": "Trujillo",
+      "vendedor": "BambooStraws",
+      "rating_promedio": 4.7,
+      "total_resenas": 198
+    },
+    {
+      "id": 24,
+      "nombre": "Calcetines de Algodón Orgánico",
+      "categoria": "Ropa",
+      "precio": 24.00,
+      "precio_original": 30.00,
+      "descripcion": "Pack de 3 pares de calcetines de algodón orgánico certificado. Transpirables, suaves y duraderos. Tintes naturales sin químicos.",
+      "imagen": "https://images.unsplash.com/photo-1586350977773-baa92foo35f8?w=400&h=300&fit=crop",
+      "stock": 200,
+      "condicion": "nuevo",
+      "etiquetas": "calcetines, algodon, organico, ropa",
+      "eco_score": 92,
+      "especificaciones": {
+        "cantidad": "3 pares",
+        "material": "Algodón orgánico GOTS",
+        "tallas": "S, M, L",
+        "tintes": "Naturales sin químicos"
+      },
+      "ubicacion": "Arequipa",
+      "vendedor": "OrganicWear",
+      "rating_promedio": 4.6,
+      "total_resenas": 145
+    },
+    {
+      "id": 25,
+      "nombre": "Difusor de Aceites Esenciales de Madera",
+      "categoria": "Hogar",
+      "precio": 58.00,
+      "precio_original": 75.00,
+      "descripcion": "Difusor ultrasónico de diseño elegante en madera. Difusión silenciosa, luz LED ambiental, apagado automático. Crea ambientes relajantes.",
+      "imagen": "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=400&h=300&fit=crop",
+      "stock": 45,
+      "condicion": "nuevo",
+      "etiquetas": "difusor, aceites, madera, aromaterapia",
+      "eco_score": 88,
+      "especificaciones": {
+        "capacidad": "300ml",
+        "material": "Madera sostenible",
+        "funciones": "Ultrasónico, LED, temporizador",
+        "autonomia": "6-8 horas"
+      },
+      "ubicacion": "Cusco",
+      "vendedor": "ZenDiffuser",
+      "rating_promedio": 4.4,
+      "total_resenas": 89
+    },
+    {
+      "id": 26,
+      "nombre": "Kit de Cultivo de Microgreens",
+      "categoria": "Jardín",
+      "precio": 45.00,
+      "precio_original": 58.00,
+      "descripcion": "Kit completo para cultivar microgreens en casa. Incluye semillas, sustrato y bandejas. Cosecha en 7-10 días, superalimentos nutritivos.",
+      "imagen": "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop",
+      "stock": 55,
+      "condicion": "nuevo",
+      "etiquetas": "microgreens, cultivo, superalimentos, hogar",
+      "eco_score": 93,
+      "especificaciones": {
+        "contenido": "3 tipos de semillas, sustrato, bandejas",
+        "tiempo_cosecha": "7-10 días",
+        "area": "30cm x 20cm",
+        "nivel": "Principiante"
+      },
+      "ubicacion": "Lima",
+      "vendedor": "MicroGreenFarm",
+      "rating_promedio": 4.7,
+      "total_resenas": 76
+    },
+    {
+      "id": 27,
+      "nombre": "Portafolio de Corcho Reciclado",
+      "categoria": "Accesorios",
+      "precio": 52.00,
+      "precio_original": 68.00,
+      "descripcion": "Portafolio elegante hecho de corcho reciclado. Múltiples compartimentos, cierre magnético, diseño profesional y sostenible.",
+      "imagen": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=300&fit=crop",
+      "stock": 30,
+      "condicion": "nuevo",
+      "etiquetas": "portafolio, corcho, reciclado, oficina",
+      "eco_score": 91,
+      "especificaciones": {
+        "material": "Corcho reciclado 100%",
+        "compartimentos": "8",
+        "cierre": "Magnético",
+        "tamano": "A4"
+      },
+      "ubicacion": "Trujillo",
+      "vendedor": "CorkOffice",
+      "rating_promedio": 4.5,
+      "total_resenas": 54
+    },
+    {
+      "id": 28,
+      "nombre": "Jabón Líquido de Castilla Orgánico",
+      "categoria": "Higiene",
+      "precio": 32.00,
+      "precio_original": 40.00,
+      "descripcion": "Jabón líquido multiuso de castilla orgánico. Limpia todo: manos, cuerpo, ropa y hogar. Sin fragancias artificiales, hipoalergénico.",
+      "imagen": "https://images.unsplash.com/photo-1629198688000-71f23e745b9e?w=400&h=300&fit=crop",
+      "stock": 90,
+      "condicion": "nuevo",
+      "etiquetas": "jabon, castilla, organico, multiuso",
+      "eco_score": 94,
+      "especificaciones": {
+        "volumen": "500ml",
+        "ingredientes": "Aceite de oliva, coco, agua",
+        "tipo": "Vegano, cruelty-free",
+        "usos": "Manos, cuerpo, ropa, hogar"
+      },
+      "ubicacion": "Cusco",
+      "vendedor": "CastillaSoap",
+      "rating_promedio": 4.8,
+      "total_resenas": 167
+    },
+    {
+      "id": 29,
+      "nombre": "Set de Esponjas Vegetales Naturales",
+      "categoria": "Hogar",
+      "precio": 15.00,
+      "precio_original": 20.00,
+      "descripcion": "Set de 4 esponjas vegetales naturales: luffa, celulosa, fibra de coco y algodón. 100% biodegradables, perfectas para limpieza ecológica.",
+      "imagen": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400&h=300&fit=crop",
+      "stock": 180,
+      "condicion": "nuevo",
+      "etiquetas": "esponjas, vegetales, limpieza, biodegradable",
+      "eco_score": 97,
+      "especificaciones": {
+        "cantidad": "4 unidades",
+        "tipos": "Luffa, celulosa, coco, algodón",
+        "biodegradable": "100%",
+        "lavable": "Reutilizable"
+      },
+      "ubicacion": "Lima",
+      "vendedor": "NaturalSponges",
+      "rating_promedio": 4.6,
+      "total_resenas": 213
+    },
+    {
+      "id": 30,
+      "nombre": "Cámara de Cultivo de Hongos",
+      "categoria": "Jardín",
+      "precio": 95.00,
+      "precio_original": 120.00,
+      "descripcion": "Cámara de cultivo para hongos gourmet en casa. Incluye sustrato inoculado y instrucciones. Cosecha champiñones en 2-3 semanas.",
+      "imagen": "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop",
+      "stock": 25,
+      "condicion": "nuevo",
+      "etiquetas": "hongos, cultivo, gourmet, jardin",
+      "eco_score": 90,
+      "especificaciones": {
+        "tipo": "Champiñones ostra",
+        "capacidad": "2-3 cosechas",
+        "tiempo_cosecha": "2-3 semanas",
+        "nivel": "Intermedio"
+      },
+      "ubicacion": "Arequipa",
+      "vendedor": "MushroomFarm",
+      "rating_promedio": 4.4,
+      "total_resenas": 38
     }
   ],
   "categorias": [
@@ -471,9 +701,9 @@
     "Alimentación"
   ],
   "meta": {
-    "version": "1.0",
-    "fecha_actualizacion": "2026-08-25",
-    "total_productos": 20,
-    "eco_score_promedio": 91.5
+    "version": "2.0",
+    "fecha_actualizacion": "2026-08-30",
+    "total_productos": 30,
+    "eco_score_promedio": 91.8
   }
 }

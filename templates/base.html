@@ -30,20 +30,29 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
     <!-- EcoMarket FINAL - Sistema de Diseño Unificado -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-final.css') }}">
+    <!-- Versión optimizada con todas las mejoras implementadas -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-consolidated.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-themes-enhanced.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-advanced-features.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-dashboard.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-ultimate.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-extra.css') }}">
-    <script src="{{ url_for('static', filename='ecomarket-final.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='../css/pastel-colors-enhanced.css') }}">
+    
+    <!-- Scripts principales optimizados -->
+    <script src="{{ url_for('static', filename='ecomarket-consolidated.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='ecomarket-corrections.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='ecomarket-security-enhanced.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='ecomarket-i18n-complete.js') }}" defer></script>
     <script src="{{ url_for('static', filename='ecomarket-themes-enhanced.js') }}" defer></script>
     <script src="{{ url_for('static', filename='ecomarket-fixes.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='ecomarket-megaplan.js') }}" defer></script>
+    
+    <!-- Scripts de funcionalidades avanzadas -->
     <script src="{{ url_for('static', filename='ecomarket-advanced-features.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='ecomarket-advanced-search.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='ecomarket-reviews-system.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='ecomarket-megaplan.js') }}" defer></script>
     <script src="{{ url_for('static', filename='ecomarket-dashboard.js') }}" defer></script>
     <script src="{{ url_for('static', filename='ecomarket-ultimate.js') }}" defer></script>
     <script src="{{ url_for('static', filename='ecomarket-extra.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='ecomarket-eco-mechanics.js') }}" defer></script>
     <link rel="manifest" href="/static/manifest.json">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
     
@@ -94,8 +103,7 @@
             </nav>
             <div class="header-actions">
                 <div class="lang-switcher" aria-label="Selector de idioma">
-                    <button type="button" class="lang-btn is-active" data-eco-lang-btn data-lang="es" aria-label="Cambiar a español" aria-pressed="true">ES</button>
-                    <button type="button" class="lang-btn" data-eco-lang-btn data-lang="en" aria-label="Switch to English" aria-pressed="false">EN</button>
+                    <!-- El selector de idioma se genera automáticamente por EcoI18n -->
                 </div>
                 <button class="theme-toggle" data-theme-switcher aria-label="Cambiar tema" title="Cambiar tema">
                     <i class="bi bi-sun"></i>
@@ -178,6 +186,37 @@
 
     <script>
       window.ECOMARKET_GOOGLE_CLIENT_ID = '{{ google_client_id }}';
+    </script>
+
+    <!-- Chat IA Container Global -->
+    <div id="chatContainer" style="display: none;"></div>
+    <button class="chat-toggle" id="chatToggle" title="Asistente IA">
+        <i class="bi bi-chat-dots"></i>
+    </button>
+
+    <script>
+        // Inicializar chat cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof EcoUltimate !== 'undefined' && EcoUltimate.chat) {
+                EcoUltimate.chat.init();
+            }
+
+            // Toggle del chat
+            const chatToggle = document.getElementById('chatToggle');
+            const chatContainer = document.getElementById('chatContainer');
+            
+            if (chatToggle && chatContainer) {
+                chatToggle.addEventListener('click', function() {
+                    if (chatContainer.style.display === 'none') {
+                        chatContainer.style.display = 'block';
+                        chatToggle.innerHTML = '<i class="bi bi-x"></i>';
+                    } else {
+                        chatContainer.style.display = 'none';
+                        chatToggle.innerHTML = '<i class="bi bi-chat-dots"></i>';
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>

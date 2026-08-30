@@ -6,8 +6,8 @@
     <div class="container">
         <div class="section-head">
             <div>
-                <h2 class="section-title"><i class="bi bi-heart-fill"></i> Tus favoritos</h2>
-                <p>Guarda los productos que más te interesan y vuelve a ellos cuando quieras.</p>
+                <h2 class="section-title"><i class="bi bi-heart-fill"></i> <span data-i18n="favorites.title">Tus favoritos</span></h2>
+                <p data-i18n="favorites.description">Guarda los productos que más te interesan y vuelve a ellos cuando quieras.</p>
             </div>
         </div>
 
@@ -45,9 +45,9 @@
         {% else %}
         <div class="no-results" style="text-align:center;padding:60px 20px">
             <i class="bi bi-heart" style="font-size:3rem;display:block;margin-bottom:16px;color:rgba(46,125,50,0.3)"></i>
-            <h3 style="margin-bottom:8px">Aún no tienes favoritos</h3>
-            <p style="color:var(--texto-sec);margin-bottom:20px">Marca productos como favoritos desde el catálogo para encontrarlos aquí.</p>
-            <a href="{{ url_for('productos_view') }}" class="btn-principal" style="display:inline-block"><i class="bi bi-grid"></i> Explorar productos</a>
+            <h3 style="margin-bottom:8px" data-i18n="favorites.empty_title">Aún no tienes favoritos</h3>
+            <p style="color:var(--texto-sec);margin-bottom:20px" data-i18n="favorites.empty_desc">Marca productos como favoritos desde el catálogo para encontrarlos aquí.</p>
+            <a href="{{ url_for('productos_view') }}" class="btn-principal" style="display:inline-block"><i class="bi bi-grid"></i> <span data-i18n="favorites.explore">Explorar productos</span></a>
         </div>
         {% endif %}
     </div>

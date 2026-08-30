@@ -45,15 +45,15 @@
                 <div style="display:flex;gap:16px;flex-wrap:wrap">
                     <div style="text-align:center">
                         <div style="font-size:1.1rem;font-weight:800;color:var(--verde)">{{ seguidores }}</div>
-                        <div style="font-size:0.72rem;color:var(--texto-sec)" data-i18n="profile.followers">Followers</div>
+                        <div style="font-size:0.72rem;color:var(--texto-sec)" data-i18n="profile.followers">Seguidores</div>
                     </div>
                     <div style="text-align:center">
                         <div style="font-size:1.1rem;font-weight:800;color:var(--verde)">{{ siguiendo }}</div>
-                        <div style="font-size:0.72rem;color:var(--texto-sec)" data-i18n="profile.following">Following</div>
+                        <div style="font-size:0.72rem;color:var(--texto-sec)" data-i18n="profile.following">Siguiendo</div>
                     </div>
                     <div style="text-align:center">
                         <div style="font-size:1.1rem;font-weight:800;color:var(--verde)">{{ usuario.xp if usuario else 0 }}</div>
-                        <div style="font-size:0.72rem;color:var(--texto-sec)" data-i18n="profile.xp">XP</div>
+                        <div style="font-size:0.72rem;color:var(--texto-sec)" data-i18n="profile.xp">Puntos</div>
                     </div>
                 </div>
             </div>
@@ -131,9 +131,9 @@
             {% else %}
             <div class="no-results" style="padding:60px 20px;text-align:center;background:var(--blanco);border-radius:24px;box-shadow:var(--sombra)">
                 <i class="bi bi-box-seam" style="font-size:3rem;display:block;margin-bottom:16px;color:rgba(46,125,50,0.3)"></i>
-                <h3 style="margin-bottom:8px" data-i18n="profile.no_products">No products published yet</h3>
-                <p style="color:var(--texto-sec);margin-bottom:20px" data-i18n="profile.no_products_desc">Publish your first product and start selling.</p>
-                <a href="{{ url_for('publicar') }}" class="btn-principal"><i class="bi bi-plus-circle"></i> <span data-i18n="publicar.publish_btn">Publish product</span></a>
+                <h3 style="margin-bottom:8px" data-i18n="profile.no_products">Aún no has publicado productos</h3>
+                <p style="color:var(--texto-sec);margin-bottom:20px" data-i18n="profile.no_products_desc">Publica tu primer producto y comienza a vender.</p>
+                <a href="{{ url_for('publicar') }}" class="btn-principal"><i class="bi bi-plus-circle"></i> <span data-i18n="publicar.publish_btn">Publicar producto</span></a>
             </div>
             {% endif %}
         </div>
@@ -163,9 +163,9 @@
             {% else %}
             <div class="no-results" style="padding:60px 20px;text-align:center;background:var(--blanco);border-radius:24px;box-shadow:var(--sombra)">
                 <i class="bi bi-heart" style="font-size:3rem;display:block;margin-bottom:16px;color:rgba(46,125,50,0.3)"></i>
-                <h3 style="margin-bottom:8px" data-i18n="profile.no_favorites">No favorites yet</h3>
-                <p style="color:var(--texto-sec);margin-bottom:20px" data-i18n="profile.no_favorites_desc">Explore products and save your favorites.</p>
-                <a href="{{ url_for('productos_view') }}" class="btn-principal" data-i18n="hero.explore">Explore products</a>
+                <h3 style="margin-bottom:8px" data-i18n="profile.no_favorites">Aún no tienes favoritos</h3>
+                <p style="color:var(--texto-sec);margin-bottom:20px" data-i18n="profile.no_favorites_desc">Explora productos y guarda tus favoritos.</p>
+                <a href="{{ url_for('productos_view') }}" class="btn-principal" data-i18n="hero.explore">Explorar productos</a>
             </div>
             {% endif %}
         </div>
@@ -194,8 +194,8 @@
             {% else %}
             <div class="no-results" style="padding:60px 20px;text-align:center;background:var(--blanco);border-radius:24px;box-shadow:var(--sombra)">
                 <i class="bi bi-star" style="font-size:3rem;display:block;margin-bottom:16px;color:rgba(46,125,50,0.3)"></i>
-                <h3 style="margin-bottom:8px" data-i18n="profile.no_reviews">No reviews written yet</h3>
-                <p style="color:var(--texto-sec)" data-i18n="profile.no_reviews_desc">Buy products and share your experience.</p>
+                <h3 style="margin-bottom:8px" data-i18n="profile.no_reviews">Aún no has escrito reseñas</h3>
+                <p style="color:var(--texto-sec)" data-i18n="profile.no_reviews_desc">Compra productos y comparte tu experiencia.</p>
             </div>
             {% endif %}
         </div>
@@ -225,9 +225,9 @@
             {% else %}
             <div class="no-results" style="padding:60px 20px;text-align:center;background:var(--blanco);border-radius:24px;box-shadow:var(--sombra)">
                 <i class="bi bi-bag-check" style="font-size:3rem;display:block;margin-bottom:16px;color:rgba(46,125,50,0.3)"></i>
-                <h3 style="margin-bottom:8px" data-i18n="profile.no_orders">No orders yet</h3>
-                <p style="color:var(--texto-sec);margin-bottom:20px" data-i18n="profile.no_orders_desc">Your purchases will appear here.</p>
-                <a href="{{ url_for('productos_view') }}" class="btn-principal" data-i18n="hero.explore">Explore products</a>
+                <h3 style="margin-bottom:8px" data-i18n="profile.no_orders">Aún no tienes pedidos</h3>
+                <p style="color:var(--texto-sec);margin-bottom:20px" data-i18n="profile.no_orders_desc">Tus compras aparecerán aquí.</p>
+                <a href="{{ url_for('productos_view') }}" class="btn-principal" data-i18n="hero.explore">Explorar productos</a>
             </div>
             {% endif %}
 

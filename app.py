@@ -1,6 +1,7 @@
 """
-EcoMarket - Marketplace Ecológico v3.0
+EcoMarket - Marketplace Ecológico v3.2
 Backend completo con SQLite, subida de imágenes, API REST, dashboard y más.
+Optimizado con mejor manejo de errores, caching, seguridad y accesibilidad.
 """
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory
 import sqlite3
@@ -18,12 +19,106 @@ import unicodedata
 import hmac
 import time
 from PIL import Image
+import logging
+from functools import lru_cache
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.environ.get('DATABASE_URL', os.path.join(BASE_DIR, 'data', 'ecomarket.db'))
 UPLOAD_FOLDER = os.environ.get('UPLOADS_DIR', os.path.join(BASE_DIR, 'static', 'uploads'))
+
+# Configurar logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+    handlers=[
+        logging.FileHandler(os.path.join(BASE_DIR, 'ecomarket.log')),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+
+# ── Sistema de Caché Simple ─────────────────────────────────────────────────
+
+class SimpleCache:
+    """Sistema de caché en memoria con expiración."""
+    
+    def __init__(self):
+        self.cache = {}
+        self.timestamps = {}
+        self.default_ttl = 300  # 5 minutos por defecto
+    
+    def get(self, key):
+        """Obtiene un valor del caché si existe y no ha expirado."""
+        if key not in self.cache:
+            return None
+        
+        # Verificar si ha expirado
+        if key in self.timestamps:
+            if time.time() - self.timestamps[key] > self.default_ttl:
+                del self.cache[key]
+                del self.timestamps[key]
+                return None
+        
+        return self.cache[key]
+    
+    def set(self, key, value, ttl=None):
+        """Guarda un valor en el caché con TTL opcional."""
+        self.cache[key] = value
+        self.timestamps[key] = time.time()
+    
+    def delete(self, key):
+        """Elimina un valor del caché."""
+        if key in self.cache:
+            del self.cache[key]
+        if key in self.timestamps:
+            del self.timestamps[key]
+    
+    def clear(self):
+        """Limpia todo el caché."""
+        self.cache.clear()
+        self.timestamps.clear()
+    
+    def cleanup_expired(self):
+        """Limpia entradas expiradas."""
+        current_time = time.time()
+        expired_keys = [
+            key for key, timestamp in self.timestamps.items()
+            if current_time - timestamp > self.default_ttl
+        ]
+        
+        for key in expired_keys:
+            self.delete(key)
+        
+        return len(expired_keys)
+
+
+# Instancia global del caché
+cache = SimpleCache()
+
+
+def cached(ttl=300, key_prefix=''):
+    """Decorator para cachear resultados de funciones."""
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            # Generar clave del caché
+            cache_key = f"{key_prefix}{func.__name__}_{str(args)}_{str(sorted(kwargs.items()))}"
+            
+            # Intentar obtener del caché
+            cached_result = cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            
+            # Ejecutar función y cachear resultado
+            result = func(*args, **kwargs)
+            cache.set(cache_key, result, ttl)
+            
+            return result
+        return wrapper
+    return decorator
 
 
 # ── Filtros Jinja2 personalizados ────────────────────────────────────────────
@@ -79,7 +174,7 @@ def get_product_image(categoria):
 
 
 def create_thumbnail(image_path, size=(300, 300)):
-    """Crea un thumbnail de una imagen."""
+    """Crea un thumbnail de una imagen de manera optimizada."""
     try:
         img = Image.open(image_path)
         img.thumbnail(size, Image.Resampling.LANCZOS)
@@ -88,10 +183,12 @@ def create_thumbnail(image_path, size=(300, 300)):
         base, ext = os.path.splitext(image_path)
         thumb_path = f"{base}_thumb{ext}"
         
-        img.save(thumb_path, optimize=True, quality=85)
+        # Optimizar imagen
+        img.save(thumb_path, optimize=True, quality=85, progressive=True)
+        logger.info(f"Thumbnail creado: {thumb_path}")
         return thumb_path
     except Exception as e:
-        print(f"Error creando thumbnail: {e}")
+        logger.error(f"Error creando thumbnail: {e}")
         return image_path
 
 
@@ -102,6 +199,83 @@ EMAIL_RE = re.compile(r'^[^@\s]+@[^@\s]+\.[^@\s]{2,}$')
 
 def is_valid_email(email):
     return bool(EMAIL_RE.match(email or ''))
+
+
+def sanitize_string(input_string, max_length=1000, allow_html=False):
+    """Sanitiza strings para prevenir XSS y otros ataques."""
+    if not input_string:
+        return ""
+    
+    if not isinstance(input_string, str):
+        input_string = str(input_string)
+    
+    # Truncar si es muy largo
+    if len(input_string) > max_length:
+        input_string = input_string[:max_length]
+    
+    if not allow_html:
+        # Eliminar etiquetas HTML básicas
+        input_string = re.sub(r'<[^>]+>', '', input_string)
+        
+        # Eliminar caracteres peligrosos
+        dangerous_chars = ['<', '>', '"', "'", '&', '\x00', '\x1a']
+        for char in dangerous_chars:
+            input_string = input_string.replace(char, '')
+    
+    # Eliminar espacios excesivos
+    input_string = ' '.join(input_string.split())
+    
+    return input_string.strip()
+
+
+def validate_url(url):
+    """Valida que una URL sea segura."""
+    if not url:
+        return False
+    
+    try:
+        from urllib.parse import urlparse
+        parsed = urlparse(url)
+        
+        # Solo permitir http y https
+        if parsed.scheme not in ['http', 'https']:
+            return False
+        
+        # No permitir URLs vacías
+        if not parsed.netloc:
+            return False
+        
+        return True
+    except:
+        return False
+
+
+def validate_file_upload(file):
+    """Valida que un archivo subido sea seguro."""
+    if not file:
+        return False, "No se proporcionó archivo"
+    
+    # Verificar nombre de archivo
+    filename = file.filename
+    if not filename:
+        return False, "Nombre de archivo vacío"
+    
+    # Verificar extensión
+    if not allowed_file(filename):
+        return False, "Tipo de archivo no permitido"
+    
+    # Verificar tamaño
+    file.seek(0, os.SEEK_END)
+    file_size = file.tell()
+    file.seek(0)
+    
+    if file_size > MAX_CONTENT_LENGTH:
+        return False, f"Archivo demasiado grande (máximo {MAX_CONTENT_LENGTH // (1024*1024)}MB)"
+    
+    if file_size == 0:
+        return False, "Archivo vacío"
+    
+    return True, "Archivo válido"
 
 
 def is_valid_nombre(nombre):
@@ -421,6 +595,8 @@ def init_db():
             metodo_pago TEXT DEFAULT '',
             ciudad TEXT DEFAULT '',
             telefono TEXT DEFAULT '',
+            envio REAL DEFAULT 0,
+            descuento REAL DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
         );
@@ -581,6 +757,64 @@ def init_db():
         conn.execute('ALTER TABLE productos ADD COLUMN ubicacion TEXT DEFAULT ""')
         conn.commit()
     except sqlite3.OperationalError:
+        pass
+
+    # Agregar columnas envio y descuento a pedidos si no existen
+    try:
+        conn.execute('ALTER TABLE pedidos ADD COLUMN envio REAL DEFAULT 0')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+    
+    try:
+        conn.execute('ALTER TABLE pedidos ADD COLUMN descuento REAL DEFAULT 0')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
+    # ── Crear índices para optimizar consultas ─────────────────────────
+    try:
+        # Índices para productos
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_productos_categoria ON productos(categoria)')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_productos_precio ON productos(precio)')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_productos_usuario ON productos(usuario_id)')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_productos_created ON productos(created_at)')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_productos_stock ON productos(stock)')
+        
+        # Índices para usuarios
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_usuarios_email ON usuarios(email)')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_usuarios_rol ON usuarios(rol)')
+        
+        # Índices para pedidos
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_pedidos_usuario ON pedidos(usuario_id)')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_pedidos_estado ON pedidos(estado)')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_pedidos_created ON pedidos(created_at)')
+        
+        # Índices para favoritos
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_favoritos_usuario ON favoritos(usuario_id)')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_favoritos_producto ON favoritos(producto_id)')
+        
+        # Índices para reseñas
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_resenas_producto ON resenas(producto_id)')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_resenas_rating ON resenas(rating)')
+        
+        # Índices para notificaciones
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_notificaciones_usuario ON notificaciones(usuario_id)')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_notificaciones_leida ON notificaciones(leida)')
+        
+        # Índices para visitas
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_visitas_pagina ON visitas(pagina)')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_visitas_usuario ON visitas(usuario_id)')
+        
+        # Índices para cupones
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_cupones_codigo ON cupones(codigo)')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_cupones_activo ON cupones(activo)')
+        
+        conn.commit()
+        logger.info("Índices de base de datos creados/verificados exitosamente")
+    except Exception as e:
+        logger.error(f"Error creando índices: {e}")
+        conn.rollback()
         pass  # La columna ya existe
 
     # Agregar columna imagen_thumb a productos si no existe
@@ -819,48 +1053,66 @@ def get_producto_detalle(producto_id):
     return None
 
 
+@cached(ttl=600, key_prefix='categorias_')
 def get_categorias():
     conn = get_db()
-    categorias = [r['categoria'] for r in
-                  conn.execute('SELECT DISTINCT categoria FROM productos ORDER BY categoria').fetchall()]
-    conn.close()
-    return categorias
+    try:
+        categorias = [r['categoria'] for r in
+                      conn.execute('SELECT DISTINCT categoria FROM productos ORDER BY categoria').fetchall()]
+        return categorias
+    finally:
+        conn.close()
 
 
 def add_notificacion(usuario_id, titulo, mensaje, tipo='info'):
     conn = get_db()
-    conn.execute(
-        'INSERT INTO notificaciones (usuario_id, titulo, mensaje, tipo) VALUES (?,?,?,?)',
-        (usuario_id, titulo, mensaje, tipo)
-    )
-    conn.commit()
-    conn.close()
+    try:
+        conn.execute(
+            'INSERT INTO notificaciones (usuario_id, titulo, mensaje, tipo) VALUES (?,?,?,?)',
+            (usuario_id, titulo, mensaje, tipo)
+        )
+        conn.commit()
+    except Exception as e:
+        logger.error(f"Error adding notification: {e}")
+        conn.rollback()
+    finally:
+        conn.close()
 
 
 def registrar_visita(pagina):
     try:
         conn = get_db()
-        conn.execute(
-            'INSERT INTO visitas (pagina, usuario_id, ip) VALUES (?,?,?)',
-            (pagina, session.get('usuario_id'), request.remote_addr or '')
-        )
-        conn.commit()
-        conn.close()
-    except:
-        pass
+        try:
+            conn.execute(
+                'INSERT INTO visitas (pagina, usuario_id, ip) VALUES (?,?,?)',
+                (pagina, session.get('usuario_id'), request.remote_addr or '')
+            )
+            conn.commit()
+        except Exception as e:
+            logger.error(f"Error registering visit: {e}")
+            conn.rollback()
+        finally:
+            conn.close()
+    except Exception as e:
+        logger.error(f"Error getting DB connection for visit: {e}")
 
 
 def add_xp(usuario_id, cantidad):
     conn = get_db()
-    conn.execute('UPDATE usuarios SET xp = xp + ? WHERE id = ?', (cantidad, usuario_id))
-    usuario = conn.execute('SELECT xp, nivel, rango FROM usuarios WHERE id = ?', (usuario_id,)).fetchone()
-    if usuario:
-        xp = usuario['xp']
-        nuevo_nivel = min(50, 1 + xp // 100)
-        if nuevo_nivel > usuario['nivel']:
-            conn.execute('UPDATE usuarios SET nivel = ? WHERE id = ?', (nuevo_nivel, usuario_id))
-    conn.commit()
-    conn.close()
+    try:
+        conn.execute('UPDATE usuarios SET xp = xp + ? WHERE id = ?', (cantidad, usuario_id))
+        usuario = conn.execute('SELECT xp, nivel, rango FROM usuarios WHERE id = ?', (usuario_id,)).fetchone()
+        if usuario:
+            xp = usuario['xp']
+            nuevo_nivel = min(50, 1 + xp // 100)
+            if nuevo_nivel > usuario['nivel']:
+                conn.execute('UPDATE usuarios SET nivel = ? WHERE id = ?', (nuevo_nivel, usuario_id))
+        conn.commit()
+    except Exception as e:
+        logger.error(f"Error adding XP: {e}")
+        conn.rollback()
+    finally:
+        conn.close()
 
 
 # ── Rutas principales ────────────────────────────────────────────────────────
@@ -877,52 +1129,97 @@ def index():
 def productos_view():
     registrar_visita('productos')
     conn = get_db()
-    categoria = request.args.get('categoria', '')
-    orden = request.args.get('orden', 'nuevos')
-    precio_min = request.args.get('precio_min', '')
-    precio_max = request.args.get('precio_max', '')
-    ubicacion = request.args.get('ubicacion', '')
-    busqueda = request.args.get('q', '')
-    pagina = int(request.args.get('pagina', 1))
+    try:
+        categoria = request.args.get('categoria', '')
+        orden = request.args.get('orden', 'nuevos')
+        precio_min = request.args.get('precio_min', '')
+        precio_max = request.args.get('precio_max', '')
+        ubicacion = request.args.get('ubicacion', '')
+        busqueda = request.args.get('q', '')
+        pagina = int(request.args.get('pagina', 1))
 
-    query = '''
-        SELECT p.*, u.nombre as vendedor_nombre,
-            COALESCE(AVG(r.rating), 0) as rating_promedio,
-            COUNT(DISTINCT r.id) as total_resenas
-        FROM productos p
-        LEFT JOIN usuarios u ON p.usuario_id = u.id
-        LEFT JOIN resenas r ON p.id = r.producto_id
-        WHERE 1=1
-    '''
-    count_query = 'SELECT COUNT(*) FROM (SELECT p.id FROM productos p WHERE 1=1'
-    params = []
-    count_params = []
+        query = '''
+            SELECT p.*, u.nombre as vendedor_nombre,
+                COALESCE(AVG(r.rating), 0) as rating_promedio,
+                COUNT(DISTINCT r.id) as total_resenas
+            FROM productos p
+            LEFT JOIN usuarios u ON p.usuario_id = u.id
+            LEFT JOIN resenas r ON p.id = r.producto_id
+            WHERE 1=1
+        '''
+        count_query = 'SELECT COUNT(*) FROM (SELECT p.id FROM productos p WHERE 1=1'
+        params = []
+        count_params = []
 
-    if categoria and categoria != 'Todas':
-        query += ' AND p.categoria = ?'
-        count_query += ' AND p.categoria = ?'
-        params.append(categoria)
-        count_params.append(categoria)
-    if busqueda:
-        query += ' AND (p.nombre LIKE ? OR p.descripcion LIKE ?)'
-        count_query += ' AND (p.nombre LIKE ? OR p.descripcion LIKE ?)'
-        params.extend([f'%{busqueda}%', f'%{busqueda}%'])
-        count_params.extend([f'%{busqueda}%', f'%{busqueda}%'])
-    if precio_min:
-        query += ' AND p.precio >= ?'
-        count_query += ' AND p.precio >= ?'
-        params.append(float(precio_min))
-        count_params.append(float(precio_min))
-    if precio_max:
-        query += ' AND p.precio <= ?'
-        count_query += ' AND p.precio <= ?'
-        params.append(float(precio_max))
-        count_params.append(float(precio_max))
-    if ubicacion:
-        query += ' AND p.ubicacion LIKE ?'
-        count_query += ' AND p.ubicacion LIKE ?'
-        params.extend([f'%{ubicacion}%'])
-        count_params.extend([f'%{ubicacion}%'])
+        if categoria and categoria != 'Todas':
+            query += ' AND p.categoria = ?'
+            count_query += ' AND p.categoria = ?'
+            params.append(categoria)
+            count_params.append(categoria)
+        if busqueda:
+            query += ' AND (p.nombre LIKE ? OR p.descripcion LIKE ?)'
+            count_query += ' AND (p.nombre LIKE ? OR p.descripcion LIKE ?)'
+            params.extend([f'%{busqueda}%', f'%{busqueda}%'])
+            count_params.extend([f'%{busqueda}%', f'%{busqueda}%'])
+        if precio_min:
+            query += ' AND p.precio >= ?'
+            count_query += ' AND p.precio >= ?'
+            params.append(float(precio_min))
+            count_params.append(float(precio_min))
+        if precio_max:
+            query += ' AND p.precio <= ?'
+            count_query += ' AND p.precio <= ?'
+            params.append(float(precio_max))
+            count_params.append(float(precio_max))
+        if ubicacion:
+            query += ' AND p.ubicacion LIKE ?'
+            count_query += ' AND p.ubicacion LIKE ?'
+            params.extend([f'%{ubicacion}%'])
+            count_params.extend([f'%{ubicacion}%'])
+
+        query += ' GROUP BY p.id'
+        count_query += ')'
+
+        total_productos = conn.execute(count_query, count_params).fetchone()[0]
+        total_paginas = max(1, (total_productos + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE)
+        pagina = max(1, min(pagina, total_paginas))
+        offset = (pagina - 1) * ITEMS_PER_PAGE
+
+        ordenes = {
+            'nuevos': 'ORDER BY p.created_at DESC',
+            'populares': 'ORDER BY p.vistas DESC',
+            'baratos': 'ORDER BY p.precio ASC',
+            'caros': 'ORDER BY p.precio DESC',
+            'mejor_valorados': 'ORDER BY rating_promedio DESC'
+        }
+        query += ' ' + ordenes.get(orden, 'ORDER BY p.created_at DESC')
+        query += f' LIMIT {ITEMS_PER_PAGE} OFFSET {offset}'
+
+        productos = [dict(row) for row in conn.execute(query, params).fetchall()]
+        
+        categorias = [r['categoria'] for r in
+                      conn.execute('SELECT DISTINCT categoria FROM productos ORDER BY categoria').fetchall()]
+    except Exception as e:
+        logger.error(f"Error in productos_view: {e}")
+        conn.rollback()
+        productos = []
+        categorias = []
+        total_productos = 0
+        total_paginas = 1
+        pagina = 1
+    finally:
+        conn.close()
+
+    return render_template('productos.html',
+                           productos=productos,
+                           categorias=categorias,
+                           total_productos=total_productos,
+                           categoria_sel=categoria,
+                           orden_sel=orden,
+                           busqueda=busqueda,
+                           ubicacion_sel=ubicacion,
+                           pagina=pagina,
+                           total_paginas=total_paginas)
 
     query += ' GROUP BY p.id'
     count_query += ')'

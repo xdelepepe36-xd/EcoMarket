@@ -4,6 +4,7 @@ Backend completo con SQLite, subida de imágenes, API REST, dashboard y más.
 Optimizado con mejor manejo de errores, caching, seguridad y accesibilidad.
 """
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory
+from whitenoise import WhiteNoise
 import sqlite3
 import os
 import json
@@ -27,6 +28,9 @@ app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.environ.get('DATABASE_URL', os.path.join(BASE_DIR, 'data', 'ecomarket.db'))
 UPLOAD_FOLDER = os.environ.get('UPLOADS_DIR', os.path.join(BASE_DIR, 'static', 'uploads'))
+
+# Configurar WhiteNoise para servir archivos estáticos eficientemente en producción
+app.wsgi_app = WhiteNoise(app.wsgi_app, root=os.path.join(BASE_DIR, 'static'))
 
 # Configurar logging
 logging.basicConfig(

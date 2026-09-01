@@ -1,6 +1,7 @@
 /**
- * EcoMarket - Funcionalidades Ultimate
+ * EcoMarket - Funcionalidades Ultimate v3.2
  * Últimas mejoras y características premium
+ * Optimizado con mejor manejo de errores y rendimiento
  */
 
 const EcoUltimate = {
@@ -8,58 +9,80 @@ const EcoUltimate = {
     chat: {
         mensajes: [],
         conectado: false,
+        maxHistorial: 50,
 
         init() {
-            this.cargarHistorial();
-            this.renderChat();
-            this.inicializarWebSocket();
+            try {
+                this.cargarHistorial();
+                this.renderChat();
+                this.inicializarWebSocket();
+            } catch (error) {
+                console.error('Error inicializando chat:', error);
+            }
         },
 
         cargarHistorial() {
-            const saved = localStorage.getItem('ecomarket-chat-historial');
-            if (saved) {
-                this.mensajes = JSON.parse(saved);
+            try {
+                const saved = localStorage.getItem('ecomarket-chat-historial');
+                if (saved) {
+                    this.mensajes = JSON.parse(saved);
+                    // Limitar historial
+                    if (this.mensajes.length > this.maxHistorial) {
+                        this.mensajes = this.mensajes.slice(-this.maxHistorial);
+                    }
+                }
+            } catch (error) {
+                console.error('Error cargando historial:', error);
+                this.mensajes = [];
             }
         },
 
         guardarHistorial() {
-            localStorage.setItem('ecomarket-chat-historial', JSON.stringify(this.mensajes));
+            try {
+                localStorage.setItem('ecomarket-chat-historial', JSON.stringify(this.mensajes));
+            } catch (error) {
+                console.error('Error guardando historial:', error);
+            }
         },
 
         async enviarMensaje(texto, tipo = 'usuario') {
-            const mensaje = {
-                id: Date.now(),
-                texto: texto,
-                tipo: tipo,
-                fecha: new Date().toISOString(),
-                leido: false
-            };
-            
-            this.mensajes.push(mensaje);
-            this.guardarHistorial();
-            this.renderChat();
-            
-            // Conectar con backend real
-            if (tipo === 'usuario') {
-                try {
-                    const response = await fetch('/api/chat', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ message: texto })
-                    });
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        this.enviarMensaje(data.reply, 'bot');
-                    } else {
+            try {
+                const mensaje = {
+                    id: Date.now(),
+                    texto: texto,
+                    tipo: tipo,
+                    fecha: new Date().toISOString(),
+                    leido: false
+                };
+                
+                this.mensajes.push(mensaje);
+                this.guardarHistorial();
+                this.renderChat();
+                
+                // Conectar con backend real
+                if (tipo === 'usuario') {
+                    try {
+                        const response = await fetch('/api/chat', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ message: texto })
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            this.enviarMensaje(data.reply, 'bot');
+                        } else {
+                            this.responderBot(texto);
+                        }
+                    } catch (error) {
+                        console.error('Error conectando con chat:', error);
                         this.responderBot(texto);
                     }
-                } catch (error) {
-                    console.error('Error conectando con chat:', error);
-                    this.responderBot(texto);
                 }
+            } catch (error) {
+                console.error('Error enviando mensaje:', error);
             }
         },
 

@@ -1,6 +1,7 @@
 /**
- * EcoMarket - Funcionalidades Extra
+ * EcoMarket - Funcionalidades Extra v3.2
  * Funcionalidades adicionales útiles
+ * Optimizado con mejor manejo de errores y rendimiento
  */
 
 const EcoExtra = {
@@ -15,19 +16,32 @@ const EcoExtra = {
         ],
 
         init() {
-            this.cargarCupones();
-            this.renderInputCupon();
+            try {
+                this.cargarCupones();
+                this.renderInputCupon();
+            } catch (error) {
+                console.error('Error inicializando cupones:', error);
+            }
         },
 
         cargarCupones() {
-            const saved = localStorage.getItem('ecomarket-cupones');
-            if (saved) {
-                this.activos = JSON.parse(saved);
+            try {
+                const saved = localStorage.getItem('ecomarket-cupones');
+                if (saved) {
+                    this.activos = JSON.parse(saved);
+                }
+            } catch (error) {
+                console.error('Error cargando cupones:', error);
+                this.activos = [];
             }
         },
 
         guardarCupones() {
-            localStorage.setItem('ecomarket-cupones', JSON.stringify(this.activos));
+            try {
+                localStorage.setItem('ecomarket-cupones', JSON.stringify(this.activos));
+            } catch (error) {
+                console.error('Error guardando cupones:', error);
+            }
         },
 
         aplicarCupon(codigo) {

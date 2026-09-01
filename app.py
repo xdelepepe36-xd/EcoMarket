@@ -22,7 +22,7 @@ from PIL import Image
 import logging
 from functools import lru_cache
 
-app = Flask(__name__, static_folder='static', static_url_path='/static')
+app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.environ.get('DATABASE_URL', os.path.join(BASE_DIR, 'data', 'ecomarket.db'))
@@ -1661,13 +1661,6 @@ def publicar():
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-
-
-@app.route('/css/<path:filename>')
-def serve_css(filename):
-    """Servir archivos CSS desde la carpeta css"""
-    css_folder = os.path.join(BASE_DIR, 'css')
-    return send_from_directory(css_folder, filename)
 
 
 @app.route('/producto/<int:producto_id>/editar', methods=['GET', 'POST'])

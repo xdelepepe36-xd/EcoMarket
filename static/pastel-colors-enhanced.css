@@ -1,0 +1,750 @@
+/**
+ * EcoMarket - Paleta de Colores Pasteles Mejorada
+ * Sistema de diseño moderno con colores pasteles optimizados
+ * Versión mejorada con mejor contraste y accesibilidad
+ */
+
+/* ════════════════════════════════════════════════════════════
+   VARIABLES CSS - PALETA PASTELES MEJORADA
+   ════════════════════════════════════════════════════════════ */
+:root {
+    /* ════════════════════════════════════════════════════════════
+       VERDE ECO - Color Primario (Identidad Ecológica)
+       ════════════════════════════════════════════════════════════ */
+    --verde-50: #F0FDF4;          /* Fondo muy suave */
+    --verde-100: #DCFCE7;         /* Fondo suave */
+    --verde-200: #BBF7D0;         /* Verde muy claro */
+    --verde-300: #86EFAC;         /* Verde claro */
+    --verde-400: #4ADE80;         /* Verde pastel medio */
+    --verde-500: #22C55E;         /* Verde principal (MEJORADO) */
+    --verde-600: #16A34A;         /* Verde medio-oscuro */
+    --verde-700: #15803D;         /* Verde oscuro */
+    --verde-800: #166534;         /* Verde muy oscuro */
+    --verde-900: #14532D;         /* Verde profundo */
+    
+    /* Alias para compatibilidad con código existente */
+    --verde: var(--verde-500);
+    --verde-claro: var(--verde-300);
+    --verde-oscuro: var(--verde-700);
+    --verde-suave: var(--verde-100);
+    
+    /* ════════════════════════════════════════════════════════════
+       AZUL CIELO - Confianza y Serenidad
+       ════════════════════════════════════════════════════════════ */
+    --azul-50: #EFF6FF;           /* Fondo muy suave */
+    --azul-100: #DBEAFE;          /* Fondo suave */
+    --azul-200: #BFDBFE;          /* Azul muy claro */
+    --azul-300: #93C5FD;          /* Azul claro */
+    --azul-400: #60A5FA;          /* Azul pastel medio */
+    --azul-500: #3B82F6;          /* Azul principal (MEJORADO) */
+    --azul-600: #2563EB;          /* Azul medio-oscuro */
+    --azul-700: #1D4ED8;          /* Azul oscuro */
+    --azul-800: #1E40AF;          /* Azul muy oscuro */
+    --azul-900: #1E3A8A;          /* Azul profundo */
+    
+    /* Alias para compatibilidad */
+    --azul: var(--azul-500);
+    --azul-claro: var(--azul-300);
+    --azul-oscuro: var(--azul-700);
+    
+    /* ════════════════════════════════════════════════════════════
+       ROSA SUAVE - Amabilidad y Comunidad
+       ════════════════════════════════════════════════════════════ */
+    --rosa-50: #FDF2F8;           /* Fondo muy suave */
+    --rosa-100: #FCE7F3;          /* Fondo suave */
+    --rosa-200: #FBCFE8;          /* Rosa muy claro */
+    --rosa-300: #F9A8D4;          /* Rosa claro */
+    --rosa-400: #F472B6;          /* Rosa pastel medio */
+    --rosa-500: #EC4899;          /* Rosa principal (MEJORADO) */
+    --rosa-600: #DB2777;          /* Rosa medio-oscuro */
+    --rosa-700: #BE185D;          /* Rosa oscuro */
+    --rosa-800: #9D174D;          /* Rosa muy oscuro */
+    --rosa-900: #831843;          /* Rosa profundo */
+    
+    /* Alias para compatibilidad */
+    --rosa: var(--rosa-500);
+    --rosa-claro: var(--rosa-300);
+    --rosa-oscuro: var(--rosa-700);
+    
+    /* ════════════════════════════════════════════════════════════
+       NARANJA CORAL - Energía y Vitalidad
+       ════════════════════════════════════════════════════════════ */
+    --naranja-50: #FFF7ED;        /* Fondo muy suave */
+    --naranja-100: #FFEDD5;       /* Fondo suave */
+    --naranja-200: #FED7AA;       /* Naranja muy claro */
+    --naranja-300: #FDBA74;       /* Naranja claro */
+    --naranja-400: #FB923C;       /* Naranja pastel medio */
+    --naranja-500: #F97316;       /* Naranja principal (MEJORADO) */
+    --naranja-600: #EA580C;       /* Naranja medio-oscuro */
+    --naranja-700: #C2410C;       /* Naranja oscuro */
+    --naranja-800: #9A3412;       /* Naranja muy oscuro */
+    --naranja-900: #7C2D12;       /* Naranja profundo */
+    
+    /* Alias para compatibilidad */
+    --naranja: var(--naranja-500);
+    --naranja-claro: var(--naranja-300);
+    --naranja-oscuro: var(--naranja-700);
+    
+    /* ════════════════════════════════════════════════════════════
+       AMARILLO SOL - Optimismo y Claridad
+       ════════════════════════════════════════════════════════════ */
+    --amarillo-50: #FEFCE8;       /* Fondo muy suave */
+    --amarillo-100: #FEF9C3;      /* Fondo suave */
+    --amarillo-200: #FEF08A;      /* Amarillo muy claro */
+    --amarillo-300: #FDE047;      /* Amarillo claro */
+    --amarillo-400: #FACC15;      /* Amarillo pastel medio */
+    --amarillo-500: #EAB308;      /* Amarillo principal (MEJORADO) */
+    --amarillo-600: #CA8A04;      /* Amarillo medio-oscuro */
+    --amarillo-700: #A16207;      /* Amarillo oscuro */
+    --amarillo-800: #854D0E;      /* Amarillo muy oscuro */
+    --amarillo-900: #713F12;      /* Amarillo profundo */
+    
+    /* Alias para compatibilidad */
+    --amarillo: var(--amarillo-500);
+    --amarillo-claro: var(--amarillo-300);
+    --amarillo-oscuro: var(--amarillo-700);
+    
+    /* ════════════════════════════════════════════════════════════
+       MORADO LAVANDA - Creatividad y Premium
+       ════════════════════════════════════════════════════════════ */
+    --morado-50: #F5F3FF;         /* Fondo muy suave */
+    --morado-100: #EDE9FE;        /* Fondo suave */
+    --morado-200: #DDD6FE;        /* Morado muy claro */
+    --morado-300: #C4B5FD;        /* Morado claro */
+    --morado-400: #A78BFA;        /* Morado pastel medio */
+    --morado-500: #8B5CF6;        /* Morado principal (MEJORADO) */
+    --morado-600: #7C3AED;        /* Morado medio-oscuro */
+    --morado-700: #6D28D9;        /* Morado oscuro */
+    --morado-800: #5B21B6;        /* Morado muy oscuro */
+    --morado-900: #4C1D95;        /* Morado profundo */
+    
+    /* Alias para compatibilidad */
+    --morado: var(--morado-500);
+    --morado-claro: var(--morado-300);
+    --morado-oscuro: var(--morado-700);
+    
+    /* ════════════════════════════════════════════════════════════
+       TURQUESA MENTA - Frescura y Naturaleza
+       ════════════════════════════════════════════════════════════ */
+    --turquesa-50: #F0FDFA;       /* Fondo muy suave */
+    --turquesa-100: #CCFBF1;      /* Fondo suave */
+    --turquesa-200: #99F6E4;      /* Turquesa muy claro */
+    --turquesa-300: #5EEAD4;      /* Turquesa claro */
+    --turquesa-400: #2DD4BF;      /* Turquesa pastel medio */
+    --turquesa-500: #14B8A6;      /* Turquesa principal (MEJORADO) */
+    --turquesa-600: #0D9488;      /* Turquesa medio-oscuro */
+    --turquesa-700: #0F766E;      /* Turquesa oscuro */
+    --turquesa-800: #115E59;      /* Turquesa muy oscuro */
+    --turquesa-900: #134E4A;      /* Turquesa profundo */
+    
+    /* Alias para compatibilidad */
+    --turquesa: var(--turquesa-500);
+    --turquesa-claro: var(--turquesa-300);
+    --turquesa-oscuro: var(--turquesa-700);
+    
+    /* ════════════════════════════════════════════════════════════
+       CYAN AGUA - Pureza y Claridad
+       ════════════════════════════════════════════════════════════ */
+    --cyan-50: #ECFEFF;           /* Fondo muy suave */
+    --cyan-100: #CFFAFE;          /* Fondo suave */
+    --cyan-200: #A5F3FC;          /* Cyan muy claro */
+    --cyan-300: #67E8F9;          /* Cyan claro */
+    --cyan-400: #22D3EE;          /* Cyan pastel medio */
+    --cyan-500: #06B6D4;          /* Cyan principal (MEJORADO) */
+    --cyan-600: #0891B2;          /* Cyan medio-oscuro */
+    --cyan-700: #0E7490;          /* Cyan oscuro */
+    --cyan-800: #155E75;          /* Cyan muy oscuro */
+    --cyan-900: #164E63;          /* Cyan profundo */
+    
+    /* Alias para compatibilidad */
+    --cyan: var(--cyan-500);
+    --cyan-claro: var(--cyan-300);
+    --cyan-oscuro: var(--cyan-700);
+    
+    /* ════════════════════════════════════════════════════════════
+       LILA SERENIDAD - Calma y Elegancia
+       ════════════════════════════════════════════════════════════ */
+    --lila-50: #F5F3FF;           /* Fondo muy suave */
+    --lila-100: #EDE9FE;          /* Fondo suave */
+    --lila-200: #DDD6FE;          /* Lila muy claro */
+    --lila-300: #C4B5FD;          /* Lila claro */
+    --lila-400: #A78BFA;          /* Lila pastel medio */
+    --lila-500: #8B5CF6;          /* Lila principal (MEJORADO) */
+    --lila-600: #7C3AED;          /* Lila medio-oscuro */
+    --lila-700: #6D28D9;          /* Lila oscuro */
+    --lila-800: #5B21B6;          /* Lila muy oscuro */
+    --lila-900: #4C1D95;          /* Lila profundo */
+    
+    /* Alias para compatibilidad */
+    --lila: var(--lila-500);
+    --lila-claro: var(--lila-300);
+    --lila-oscuro: var(--lila-700);
+    
+    /* ════════════════════════════════════════════════════════════
+       CORAL CÁLIDO - Pasión y Acción
+       ════════════════════════════════════════════════════════════ */
+    --coral-50: #FFF1F2;          /* Fondo muy suave */
+    --coral-100: #FFE4E6;         /* Fondo suave */
+    --coral-200: #FECDD3;         /* Coral muy claro */
+    --coral-300: #FDA4AF;         /* Coral claro */
+    --coral-400: #FB7185;         /* Coral pastel medio */
+    --coral-500: #F43F5E;         /* Coral principal (MEJORADO) */
+    --coral-600: #E11D48;         /* Coral medio-oscuro */
+    --coral-700: #BE123C;         /* Coral oscuro */
+    --coral-800: #9F1239;         /* Coral muy oscuro */
+    --coral-900: #881337;         /* Coral profundo */
+    
+    /* Alias para compatibilidad */
+    --coral: var(--coral-500);
+    --coral-claro: var(--coral-300);
+    --coral-oscuro: var(--coral-700);
+    
+    /* ════════════════════════════════════════════════════════════
+       MENTA FRESCA - Naturaleza y Salud
+       ════════════════════════════════════════════════════════════ */
+    --menta-50: #F0FDF4;          /* Fondo muy suave */
+    --menta-100: #DCFCE7;         /* Fondo suave */
+    --menta-200: #BBF7D0;         /* Menta muy claro */
+    --menta-300: #86EFAC;         /* Menta claro */
+    --menta-400: #4ADE80;         /* Menta pastel medio */
+    --menta-500: #22C55E;         /* Menta principal (MEJORADO) */
+    --menta-600: #16A34A;         /* Menta medio-oscuro */
+    --menta-700: #15803D;         /* Menta oscuro */
+    --menta-800: #166534;         /* Menta muy oscuro */
+    --menta-900: #14532D;         /* Menta profundo */
+    
+    /* Alias para compatibilidad */
+    --menta: var(--menta-500);
+    --menta-claro: var(--menta-300);
+    --menta-oscuro: var(--menta-700);
+    
+    /* ════════════════════════════════════════════════════════════
+       COLORES NEUTROS MEJORADOS
+       ════════════════════════════════════════════════════════════ */
+    --blanco: #FFFFFF;            /* Blanco puro */
+    --gris-50: #F9FAFB;           /* Gris muy claro */
+    --gris-100: #F3F4F6;          /* Gris claro */
+    --gris-200: #E5E7EB;          /* Gris medio-claro */
+    --gris-300: #D1D5DB;          /* Gris medio */
+    --gris-400: #9CA3AF;          /* Gris medio-oscuro */
+    --gris-500: #6B7280;          /* Gris oscuro */
+    --gris-600: #4B5563;          /* Gris más oscuro */
+    --gris-700: #374151;          /* Gris muy oscuro */
+    --gris-800: #1F2937;          /* Gris casi negro */
+    --gris-900: #111827;          /* Gris negro */
+    
+    /* Alias para compatibilidad */
+    --negro: var(--gris-900);
+    
+    /* ════════════════════════════════════════════════════════════
+       COLORES DE TEXTO OPTIMIZADOS (WCAG AA)
+       ════════════════════════════════════════════════════════════ */
+    --texto-principal: #1F2937;   /* Gris oscuro para texto principal */
+    --texto-secundario: #4B5563;  /* Gris medio para texto secundario */
+    --texto-terciario: #6B7280;   /* Gris claro para texto terciario */
+    --texto-placeholder: #9CA3AF; /* Gris muy claro para placeholders */
+    --texto-inverso: #FFFFFF;     /* Blanco para texto sobre fondos oscuros */
+    --texto-suave: rgba(31, 41, 55, 0.8); /* Texto con transparencia */
+    
+    /* Alias para compatibilidad */
+    --texto: var(--texto-principal);
+    --texto-sec: var(--texto-secundario);
+    --texto-claro: var(--texto-terciario);
+    
+    /* ════════════════════════════════════════════════════════════
+       FONDOS Y SUPERFICIES
+       ════════════════════════════════════════════════════════════ */
+    --fondo: #FAFAFA;             /* Fondo principal */
+    --fondo-alt: #F5F5F5;         /* Fondo alternativo */
+    --surface: rgba(255, 255, 255, 0.95); /* Superficie */
+    --surface-strong: rgba(255, 255, 255, 0.98); /* Superficie fuerte */
+    
+    /* ════════════════════════════════════════════════════════════
+       COLORES DE ESTADO SEMÁNTICOS
+       ════════════════════════════════════════════════════════════ */
+    /* Éxito */
+    --exito-50: #F0FDF4;
+    --exito-100: #DCFCE7;
+    --exito-500: #22C55E;
+    --exito-600: #16A34A;
+    --exito-700: #15803D;
+    
+    /* Advertencia */
+    --advertencia-50: #FFFBEB;
+    --advertencia-100: #FEF3C7;
+    --advertencia-500: #F59E0B;
+    --advertencia-600: #D97706;
+    --advertencia-700: #B45309;
+    
+    /* Error */
+    --error-50: #FEF2F2;
+    --error-100: #FEE2E2;
+    --error-500: #EF4444;
+    --error-600: #DC2626;
+    --error-700: #B91C1C;
+    
+    /* Información */
+    --info-50: #EFF6FF;
+    --info-100: #DBEAFE;
+    --info-500: #3B82F6;
+    --info-600: #2563EB;
+    --info-700: #1D4ED8;
+    
+    /* Alias para compatibilidad */
+    --success: var(--exito-500);
+    --warning: var(--advertencia-500);
+    --error: var(--error-500);
+    --info: var(--info-500);
+    --rojo: var(--error-500);
+    --rojo-claro: var(--error-100);
+    
+    /* ════════════════════════════════════════════════════════════
+       SOMBRAS MEJORADAS
+       ════════════════════════════════════════════════════════════ */
+    --sombra: 0 4px 20px rgba(0, 0, 0, 0.08);
+    --sombra-suave: 0 2px 12px rgba(0, 0, 0, 0.05);
+    --sombra-hover: 0 8px 30px rgba(34, 197, 94, 0.2);
+    --sombra-profunda: 0 12px 40px rgba(0, 0, 0, 0.12);
+    --sombra-verde: 0 4px 20px rgba(34, 197, 94, 0.15);
+    --sombra-azul: 0 4px 20px rgba(59, 130, 246, 0.15);
+    --sombra-rosa: 0 4px 20px rgba(236, 72, 153, 0.15);
+    
+    /* ════════════════════════════════════════════════════════════
+       GRADIENTES MEJORADOS
+       ════════════════════════════════════════════════════════════ */
+    --gradiente-principal: linear-gradient(135deg, var(--verde-500), var(--verde-600));
+    --gradiente-suave: linear-gradient(135deg, var(--verde-100), var(--verde-200));
+    --gradiente-azul: linear-gradient(135deg, var(--azul-500), var(--azul-600));
+    --gradiente-rosa: linear-gradient(135deg, var(--rosa-500), var(--rosa-600));
+    --gradiente-naranja: linear-gradient(135deg, var(--naranja-500), var(--naranja-600));
+    --gradiente-morado: linear-gradient(135deg, var(--morado-500), var(--morado-600));
+    --gradiente-turquesa: linear-gradient(135deg, var(--turquesa-500), var(--turquesa-600));
+    --gradiente-sunset: linear-gradient(135deg, var(--naranja-400), var(--coral-500));
+    --gradiente-lavender: linear-gradient(135deg, var(--lila-400), var(--morado-500));
+    
+    /* ════════════════════════════════════════════════════════════
+       TRANSICIONES MEJORADAS
+       ════════════════════════════════════════════════════════════ */
+    --transicion-instantanea: 0.1s ease;
+    --transicion-rapida: 0.2s ease;
+    --transicion-normal: 0.3s ease;
+    --transicion-suave: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transicion-lenta: 0.5s ease;
+    --transicion-muy-lenta: 0.7s ease;
+    
+    /* Easing functions */
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-in-quad: cubic-bezier(0.55, 0.085, 0.68, 0.53);
+    --ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    
+    /* ════════════════════════════════════════════════════════════
+       BORDES Y RADIO
+       ════════════════════════════════════════════════════════════ */
+    --borde-radio-sm: 8px;
+    --borde-radio-md: 12px;
+    --borde-radio-lg: 16px;
+    --borde-radio-xl: 20px;
+    --borde-radio-2xl: 24px;
+    --borde-radio-full: 999px;
+    
+    /* ════════════════════════════════════════════════════════════
+       ESPACIADO
+       ════════════════════════════════════════════════════════════ */
+    --espacio-xs: 4px;
+    --espacio-sm: 8px;
+    --espacio-md: 16px;
+    --espacio-lg: 24px;
+    --espacio-xl: 32px;
+    --espacio-2xl: 48px;
+    --espacio-3xl: 64px;
+}
+
+/* ════════════════════════════════════════════════════════════
+   TEMA PASTEL MODERN (NUEVO)
+   ════════════════════════════════════════════════════════════ */
+[data-theme="pastel-modern"] {
+    /* Fondo */
+    --bg-primary: var(--verde-50);
+    --bg-secondary: var(--blanco);
+    --bg-tertiary: var(--gris-50);
+    
+    /* Texto */
+    --text-primary: var(--texto-principal);
+    --text-secondary: var(--texto-secundario);
+    --text-tertiary: var(--texto-terciario);
+    
+    /* Acentos */
+    --accent-primary: var(--verde-500);
+    --accent-secondary: var(--turquesa-500);
+    --accent-tertiary: var(--menta-400);
+    
+    /* Componentes */
+    --card-bg: var(--blanco);
+    --input-bg: var(--blanco);
+    --button-primary: var(--verde-500);
+    --button-primary-hover: var(--verde-600);
+    --button-secondary: var(--azul-500);
+    --button-secondary-hover: var(--azul-600);
+    
+    /* Estados */
+    --success-color: var(--exito-500);
+    --warning-color: var(--advertencia-500);
+    --error-color: var(--error-500);
+    --info-color: var(--info-500);
+    
+    /* Bordes y Sombras */
+    --border-color: var(--gris-200);
+    --shadow-color: rgba(34, 197, 94, 0.1);
+}
+
+/* ════════════════════════════════════════════════════════════
+   TEMA FOREST PASTEL (MEJORADO)
+   ════════════════════════════════════════════════════════════ */
+[data-theme="forest-pastel"] {
+    --bg-primary: var(--menta-50);
+    --bg-secondary: var(--verde-100);
+    --bg-tertiary: var(--verde-200);
+    
+    --text-primary: var(--verde-900);
+    --text-secondary: var(--verde-700);
+    --text-tertiary: var(--verde-600);
+    
+    --accent-primary: var(--verde-600);
+    --accent-secondary: var(--menta-500);
+    --accent-tertiary: var(--turquesa-500);
+    
+    --card-bg: var(--blanco);
+    --input-bg: var(--verde-50);
+    
+    --button-primary: var(--verde-600);
+    --button-primary-hover: var(--verde-700);
+    --button-secondary: var(--menta-500);
+    --button-secondary-hover: var(--menta-600);
+    
+    --border-color: var(--verde-200);
+    --shadow-color: rgba(34, 197, 94, 0.15);
+}
+
+/* ════════════════════════════════════════════════════════════
+   TEMA OCEAN PASTEL (MEJORADO)
+   ════════════════════════════════════════════════════════════ */
+[data-theme="ocean-pastel"] {
+    --bg-primary: var(--cyan-50);
+    --bg-secondary: var(--azul-100);
+    --bg-tertiary: var(--turquesa-100);
+    
+    --text-primary: var(--azul-900);
+    --text-secondary: var(--azul-700);
+    --text-tertiary: var(--azul-600);
+    
+    --accent-primary: var(--azul-500);
+    --accent-secondary: var(--cyan-500);
+    --accent-tertiary: var(--turquesa-500);
+    
+    --card-bg: var(--blanco);
+    --input-bg: var(--cyan-50);
+    
+    --button-primary: var(--azul-500);
+    --button-primary-hover: var(--azul-600);
+    --button-secondary: var(--cyan-500);
+    --button-secondary-hover: var(--cyan-600);
+    
+    --border-color: var(--azul-200);
+    --shadow-color: rgba(59, 130, 246, 0.15);
+}
+
+/* ════════════════════════════════════════════════════════════
+   TEMA SUNSET PASTEL (MEJORADO)
+   ════════════════════════════════════════════════════════════ */
+[data-theme="sunset-pastel"] {
+    --bg-primary: var(--naranja-50);
+    --bg-secondary: var(--coral-100);
+    --bg-tertiary: var(--rosa-100);
+    
+    --text-primary: var(--naranja-900);
+    --text-secondary: var(--coral-700);
+    --text-tertiary: var(--rosa-600);
+    
+    --accent-primary: var(--naranja-500);
+    --accent-secondary: var(--coral-500);
+    --accent-tertiary: var(--rosa-500);
+    
+    --card-bg: var(--blanco);
+    --input-bg: var(--naranja-50);
+    
+    --button-primary: var(--naranja-500);
+    --button-primary-hover: var(--naranja-600);
+    --button-secondary: var(--coral-500);
+    --button-secondary-hover: var(--coral-600);
+    
+    --border-color: var(--naranja-200);
+    --shadow-color: rgba(249, 115, 22, 0.15);
+}
+
+/* ════════════════════════════════════════════════════════════
+   TEMA LAVENDER PASTEL (NUEVO)
+   ════════════════════════════════════════════════════════════ */
+[data-theme="lavender-pastel"] {
+    --bg-primary: var(--lila-50);
+    --bg-secondary: var(--morado-100);
+    --bg-tertiary: var(--rosa-100);
+    
+    --text-primary: var(--morado-900);
+    --text-secondary: var(--morado-700);
+    --text-tertiary: var(--morado-600);
+    
+    --accent-primary: var(--morado-500);
+    --accent-secondary: var(--lila-500);
+    --accent-tertiary: var(--rosa-500);
+    
+    --card-bg: var(--blanco);
+    --input-bg: var(--lila-50);
+    
+    --button-primary: var(--morado-500);
+    --button-primary-hover: var(--morado-600);
+    --button-secondary: var(--lila-500);
+    --button-secondary-hover: var(--lila-600);
+    
+    --border-color: var(--morado-200);
+    --shadow-color: rgba(139, 92, 246, 0.15);
+}
+
+/* ════════════════════════════════════════════════════════════
+   TRANSICIONES MEJORADAS
+   ════════════════════════════════════════════════════════════ */
+[data-theme] {
+    transition: 
+        background-color var(--transicion-suave),
+        color var(--transicion-suave),
+        border-color var(--transicion-normal),
+        box-shadow var(--transicion-normal);
+}
+
+/* Elementos específicos con transiciones más rápidas */
+.btn, .nav-link, .form-control, .card, .producto-card {
+    transition: 
+        background-color var(--transicion-normal),
+        color var(--transicion-normal),
+        border-color var(--transicion-normal),
+        transform var(--transicion-suave),
+        box-shadow var(--transicion-normal);
+}
+
+/* ════════════════════════════════════════════════════════════
+   ANIMACIONES DE TRANSICIÓN DE TEMA
+   ════════════════════════════════════════════════════════════ */
+@keyframes themeFadeIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.98);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes themeColorShift {
+    0% {
+        filter: hue-rotate(0deg);
+    }
+    50% {
+        filter: hue-rotate(10deg);
+    }
+    100% {
+        filter: hue-rotate(0deg);
+    }
+}
+
+/* Clase para activar transición de tema */
+.theme-transitioning {
+    animation: themeFadeIn 0.4s var(--ease-in-out);
+}
+
+.theme-transitioning * {
+    animation: themeColorShift 0.6s var(--ease-in-out);
+}
+
+/* ════════════════════════════════════════════════════════════
+   ACCESIBILIDAD - WCAG AA
+   ════════════════════════════════════════════════════════════ */
+/* Focus visible para accesibilidad */
+:focus-visible {
+    outline: 3px solid var(--verde-500);
+    outline-offset: 2px;
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    :root {
+        --verde-500: #16A34A;
+        --azul-500: #2563EB;
+        --texto-principal: #000000;
+        --border-color: #000000;
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+}
+
+/* ════════════════════════════════════════════════════════════
+   COMPONENTES UI MEJORADOS CON PASTELES
+   ════════════════════════════════════════════════════════════ */
+
+/* Botón Principal - Verde Eco */
+.btn-principal {
+    background: var(--gradiente-principal);
+    color: white;
+    box-shadow: 0 4px 14px rgba(34, 197, 94, 0.3);
+    transition: all var(--transicion-normal) var(--ease-in-out);
+}
+
+.btn-principal:hover {
+    background: linear-gradient(135deg, var(--verde-600), var(--verde-700));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+}
+
+/* Botón Secundario - Azul Cielo */
+.btn-secundario {
+    background: var(--gradiente-azul);
+    color: white;
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+}
+
+/* Botón Outline - Borde Pasteles */
+.btn-outline {
+    background: transparent;
+    border: 2px solid var(--verde-500);
+    color: var(--verde-600);
+}
+
+.btn-outline:hover {
+    background: var(--verde-50);
+    border-color: var(--verde-600);
+}
+
+/* Tarjeta con sombra colorida */
+.producto-card {
+    background: var(--blanco);
+    border: 1px solid var(--gris-200);
+    border-radius: var(--borde-radio-lg);
+    box-shadow: var(--sombra);
+    transition: all var(--transicion-suave) var(--ease-in-out);
+    overflow: hidden;
+}
+
+.producto-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--sombra-hover);
+    border-color: var(--verde-200);
+}
+
+/* Badge de producto */
+.badge-eco {
+    background: linear-gradient(135deg, var(--verde-400), var(--verde-500));
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Navbar con fondo glassmorphism */
+.navbar {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--gris-200);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.04);
+}
+
+/* Inputs modernos */
+.form-control {
+    background: var(--blanco);
+    border: 2px solid var(--gris-200);
+    border-radius: var(--borde-radio-md);
+    padding: 12px 16px;
+    color: var(--texto-principal);
+    transition: all var(--transicion-normal) ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--verde-500);
+    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
+}
+
+/* Alertas con bordes suaves */
+.alert {
+    border-radius: var(--borde-radio-md);
+    padding: 16px 20px;
+    border-left: 4px solid;
+    background: var(--blanco);
+    box-shadow: var(--sombra-suave);
+}
+
+.alert-success {
+    border-color: var(--exito-500);
+    background: linear-gradient(135deg, var(--exito-50), var(--blanco));
+    color: var(--exito-700);
+}
+
+.alert-warning {
+    border-color: var(--advertencia-500);
+    background: linear-gradient(135deg, var(--advertencia-50), var(--blanco));
+    color: var(--advertencia-700);
+}
+
+.alert-error {
+    border-color: var(--error-500);
+    background: linear-gradient(135deg, var(--error-50), var(--blanco));
+    color: var(--error-700);
+}
+
+.alert-info {
+    border-color: var(--info-500);
+    background: linear-gradient(135deg, var(--info-50), var(--blanco));
+    color: var(--info-700);
+}
+
+/* Badges decorativos mejorados */
+.badge-new {
+    background: linear-gradient(135deg, var(--coral-400), var(--rosa-500));
+    color: white;
+    animation: pulse-pastel 2s infinite;
+}
+
+.badge-premium {
+    background: linear-gradient(135deg, var(--amarillo-400), var(--naranja-500));
+    color: var(--gris-900);
+    box-shadow: 0 2px 8px rgba(234, 179, 8, 0.25);
+}
+
+.badge-organic {
+    background: linear-gradient(135deg, var(--menta-400), var(--verde-500));
+    color: white;
+}
+
+.badge-recycled {
+    background: linear-gradient(135deg, var(--cyan-400), var(--turquesa-500));
+    color: white;
+}
+
+@keyframes pulse-pastel {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 2px 8px rgba(244, 31, 94, 0.25);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(244, 31, 94, 0.4);
+    }
+}

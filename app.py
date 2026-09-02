@@ -29,8 +29,19 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.environ.get('DATABASE_URL', os.path.join(BASE_DIR, 'data', 'ecomarket.db'))
 UPLOAD_FOLDER = os.environ.get('UPLOADS_DIR', os.path.join(BASE_DIR, 'static', 'uploads'))
 
+# Logging de debug para producción
+logger.info(f"BASE_DIR: {BASE_DIR}")
+logger.info(f"Static folder exists: {os.path.exists(os.path.join(BASE_DIR, 'static'))}")
+logger.info(f"Static folder path: {os.path.join(BASE_DIR, 'static')}")
+if os.path.exists(os.path.join(BASE_DIR, 'static')):
+    logger.info(f"Static files: {os.listdir(os.path.join(BASE_DIR, 'static'))}")
+
 # Configurar WhiteNoise para servir archivos estáticos eficientemente en producción
-app.wsgi_app = WhiteNoise(app.wsgi_app, root=os.path.join(BASE_DIR, 'static'))
+try:
+    app.wsgi_app = WhiteNoise(app.wsgi_app, root=os.path.join(BASE_DIR, 'static'))
+    logger.info("WhiteNoise configurado exitosamente")
+except Exception as e:
+    logger.error(f"Error configurando WhiteNoise: {e}")
 
 # Configurar logging
 logging.basicConfig(

@@ -29,6 +29,17 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.environ.get('DATABASE_URL', os.path.join(BASE_DIR, 'data', 'ecomarket.db'))
 UPLOAD_FOLDER = os.environ.get('UPLOADS_DIR', os.path.join(BASE_DIR, 'static', 'uploads'))
 
+# Configurar logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+    handlers=[
+        logging.FileHandler(os.path.join(BASE_DIR, 'ecomarket.log')),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
 # Logging de debug para producción
 logger.info(f"BASE_DIR: {BASE_DIR}")
 logger.info(f"Static folder exists: {os.path.exists(os.path.join(BASE_DIR, 'static'))}")
@@ -42,17 +53,6 @@ try:
     logger.info("WhiteNoise configurado exitosamente")
 except Exception as e:
     logger.error(f"Error configurando WhiteNoise: {e}")
-
-# Configurar logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
-    handlers=[
-        logging.FileHandler(os.path.join(BASE_DIR, 'ecomarket.log')),
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger(__name__)
 
 
 # ── Sistema de Caché Simple ─────────────────────────────────────────────────

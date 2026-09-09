@@ -6,6 +6,11 @@
     <title>{% block title %}EcoMarket{% endblock %}</title>
     <meta name="description" content="EcoMarket - Marketplace ecológico. Compra y vende productos sostenibles.">
     <meta name="theme-color" content="#2e7d32">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="EcoMarket">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='assets/icon-192.png') }}">
     <meta property="og:title" content="EcoMarket - Marketplace Ecológico">
     <meta property="og:description" content="Compra y vende productos sostenibles. Marketplace 100% ecológico.">
     <meta property="og:type" content="website">
@@ -35,6 +40,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-themes-enhanced.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-advanced-features.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='pastel-colors-enhanced.css') }}">
+    
+    <!-- Modo Oscuro Mejorado -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-dark-mode.css') }}">
     
     <!-- Accesibilidad WCAG 2.1 AA -->
     <link rel="stylesheet" href="{{ url_for('static', filename='accessibility.css') }}">
@@ -245,6 +253,24 @@
                 });
             }
         });
+    </script>
+
+    <!-- Modo Oscuro Mejorado -->
+    <script src="{{ url_for('static', filename='ecomarket-dark-mode.js') }}"></script>
+
+    <!-- PWA Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/sw-push.js')
+                    .then(registration => {
+                        console.log('✅ Service Worker registrado:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('❌ Error registrando Service Worker:', error);
+                    });
+            });
+        }
     </script>
 </body>
 </html>

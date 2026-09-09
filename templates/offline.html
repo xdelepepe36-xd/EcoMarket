@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}EcoMarket - Sin Conexión{% endblock %}
+
+{% block content %}
+<section class="section" style="min-height:70vh;display:flex;align-items:center">
+    <div class="container" style="text-align:center">
+        <div style="font-size:6rem;margin-bottom:24px">📶</div>
+        <h1 style="font-size:2.5rem;font-weight:800;color:var(--verde);margin-bottom:16px">Sin Conexión a Internet</h1>
+        <p style="color:var(--texto-sec);max-width:480px;margin:0 auto 32px;line-height:1.8">
+            Parece que no tienes conexión a internet en este momento. 
+            EcoMarket funciona mejor con conexión, pero algunas funciones están disponibles offline.
+        </p>
+        
+        <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:32px">
+            <button onclick="window.location.reload()" class="btn-principal" style="padding:14px 32px">
+                <i class="bi bi-arrow-clockwise"></i> Reintentar
+            </button>
+            <a href="/" class="btn-secundario" style="padding:14px 32px">
+                <i class="bi bi-house"></i> Ir al Inicio
+            </a>
+        </div>
+
+        <div style="background:var(--blanco);border-radius:16px;padding:24px;max-width:400px;margin:0 auto;box-shadow:var(--sombra)">
+            <h3 style="color:var(--verde);margin-bottom:16px">📱 Funciones Offline</h3>
+            <ul style="text-align:left;color:var(--texto-sec);line-height:1.8">
+                <li>✅ Ver productos en caché</li>
+                <li>✅ Navegar por páginas visitadas</li>
+                <li>❌ Realizar compras</li>
+                <li>❌ Publicar productos</li>
+                <li>❌ Actualizar datos</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<script>
+// Verificar conexión periódicamente
+function checkConnection() {
+    if (navigator.onLine) {
+        window.location.reload();
+    }
+}
+
+// Verificar cada 5 segundos
+setInterval(checkConnection, 5000);
+
+// Escuchar eventos de conexión
+window.addEventListener('online', () => {
+    window.location.reload();
+});
+</script>
+{% endblock %}

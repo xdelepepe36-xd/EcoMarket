@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EcoMarket{% endblock %}</title>
+    <meta name="description" content="EcoMarket - Marketplace ecológico. Compra y vende productos sostenibles.">
+    <meta name="theme-color" content="#2e7d32">
+    <meta property="og:title" content="EcoMarket - Marketplace Ecológico">
+    <meta property="og:description" content="Compra y vende productos sostenibles. Marketplace 100% ecológico.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1200&h=630&fit=crop">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="EcoMarket - Marketplace Ecológico">
+    <meta name="twitter:description" content="Compra y vende productos sostenibles. Marketplace 100% ecológico.">
+    <link rel="canonical" href="{{ request.url }}">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "EcoMarket",
+        "url": "{{ request.url_root }}",
+        "description": "Marketplace ecológico para comprar y vender productos sostenibles."
+    }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- EcoMarket FINAL - Sistema de Diseño Unificado -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-final.css') }}">
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+    {% block head %}{% endblock %}
+</head>
+<body data-user-id="{{ session.get('usuario_id', '') }}">
+    <!-- SPLASH SCREEN -->
+    <div id="splashScreen" class="splash-screen">
+        <div class="splash-icon">🌱</div>
+        <div class="splash-title">EcoMarket</div>
+        <div class="splash-subtitle">Cargando...</div>
+        <div class="splash-loader">
+            <div class="splash-loader-bar"></div>
+        </div>
+    </div>
+
+    <header class="header" id="header">
+        <div class="container header-container">
+            <a href="{{ url_for('index') }}" class="logo">
+                <i class="bi bi-flower2"></i> EcoMarket
+            </a>
+            <nav class="navbar" id="navbar">
+                            <a href="{{ url_for('index') }}" class="nav-link"><i class="bi bi-house"></i> <span data-i18n="nav.home">Inicio</span></a>
+                            <a href="{{ url_for('productos_view') }}" class="nav-link"><i class="bi bi-grid"></i> <span data-i18n="nav.products">Productos</span></a>
+                            <a href="{{ url_for('favoritos_view') }}" class="nav-link"><i class="bi bi-heart"></i> <span data-i18n="nav.favorites">Favoritos</span></a>
+                <a href="{{ url_for('carrito_view') }}" class="nav-link">
+                                <i class="bi bi-cart3"></i> <span data-i18n="nav.cart">Carrito</span>
+                    <span class="cart-badge" id="cartCount">0</span>
+                </a>
+                            <a href="{{ url_for('impacto') }}" class="nav-link"><i class="bi bi-globe-americas"></i> <span data-i18n="nav.impact">Impacto</span></a>
+                            <a href="{{ url_for('contacto') }}" class="nav-link"><i class="bi bi-envelope"></i> <span data-i18n="nav.contact">Contacto</span></a>
+                {% if session.get('usuario_id') %}
+                                <a href="{{ url_for('publicar') }}" class="btn-principal nav-publish"><i class="bi bi-plus-circle"></i> <span data-i18n="nav.publish">Publicar</span></a>
+                    <div class="nav-user-menu">
+                        <button class="nav-user-btn"><i class="bi bi-person-circle"></i> {{ session.get('nombre', 'Usuario') }}</button>
+                        <div class="nav-user-dropdown">
+                                        <a href="{{ url_for('perfil') }}"><i class="bi bi-person"></i> <span data-i18n="nav.profile">Mi perfil</span></a>
+                            {% if session.get('rol') == 'admin' %}
+                                        <a href="{{ url_for('admin') }}"><i class="bi bi-shield-check"></i> <span data-i18n="nav.admin">Admin</span></a>
+                            {% endif %}
+                                        <a href="{{ url_for('logout') }}" class="logout-link"><i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">Cerrar sesión</span></a>
+                        </div>
+                    </div>
+                {% else %}
+                                <a href="{{ url_for('login') }}" class="btn-secundario nav-login"><i class="bi bi-person"></i> <span data-i18n="nav.login">Ingresar</span></a>
+                                <a href="{{ url_for('registro') }}" class="btn-principal nav-publish"><i class="bi bi-person-plus"></i> <span data-i18n="nav.register">Registrarse</span></a>
+                {% endif %}
+            </nav>
+            <div class="header-actions">
+                <div class="lang-switcher" aria-label="Selector de idioma">
+                    <button type="button" class="lang-btn is-active" data-eco-lang-btn data-lang="es" aria-label="Cambiar a español" aria-pressed="true">ES</button>
+                    <button type="button" class="lang-btn" data-eco-lang-btn data-lang="en" aria-label="Switch to English" aria-pressed="false">EN</button>
+                </div>
+                <div data-theme-switcher></div>
+                <button class="nav-toggle" id="navToggle" aria-label="Abrir menú">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-grid">
+                        {% for category, message in messages %}
+                            <div class="flash flash-{{ category }}"><i class="bi bi-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-triangle{% else %}info-circle{% endif %}"></i> {{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+        </div>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a class="logo footer-logo" href="{{ url_for('index') }}"><i class="bi bi-flower2"></i> EcoMarket</a>
+                    <p data-i18n="footer.description">Marketplace ecológico donde puedes comprar, vender y dar una segunda vida a productos reciclados y sostenibles.</p>
+                    <div class="footer-social">
+                        <a href="#" aria-label="Facebook" title="Facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="#" aria-label="Instagram" title="Instagram"><i class="bi bi-instagram"></i></a>
+                        <a href="#" aria-label="Twitter" title="Twitter"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" aria-label="WhatsApp" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+                        <a href="#" aria-label="TikTok" title="TikTok"><i class="bi bi-tiktok"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4><i class="bi bi-compass"></i> <span data-i18n="footer.navigation">Navegación</span></h4>
+                    <a href="{{ url_for('index') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="nav.home">Inicio</span></a>
+                    <a href="{{ url_for('productos_view') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="nav.catalog">Catálogo</span></a>
+                    <a href="{{ url_for('favoritos_view') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="nav.favorites">Favoritos</span></a>
+                    <a href="{{ url_for('impacto') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="nav.impact">Impacto</span></a>
+                    <a href="{{ url_for('contacto') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="nav.contact">Contacto</span></a>
+                </div>
+                <div class="footer-col">
+                    <h4><i class="bi bi-person"></i> <span data-i18n="footer.account">Cuenta</span></h4>
+                    {% if session.get('usuario_id') %}
+                        <a href="{{ url_for('perfil') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="footer.profile">Mi perfil</span></a>
+                        <a href="{{ url_for('publicar') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="footer.publish">Publicar producto</span></a>
+                        <a href="{{ url_for('logout') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="footer.logout">Cerrar sesión</span></a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="footer.login">Iniciar sesión</span></a>
+                        <a href="{{ url_for('registro') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="footer.register">Registrarse</span></a>
+                    {% endif %}
+                    <a href="{{ url_for('carrito_view') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="footer.cart">Mi carrito</span></a>
+                </div>
+                <div class="footer-col">
+                    <h4><i class="bi bi-shield-check"></i> <span data-i18n="footer.legal">Legal</span></h4>
+                    <a href="{{ url_for('terminos') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="footer.terms">Términos y condiciones</span></a>
+                    <a href="{{ url_for('privacidad') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="footer.privacy">Política de privacidad</span></a>
+                    <a href="{{ url_for('contacto') }}"><i class="bi bi-chevron-right"></i> <span data-i18n="nav.contact">Contacto</span></a>
+                </div>
+                <div class="footer-col">
+                    <h4><i class="bi bi-headset"></i> <span data-i18n="footer.contact">Contacto</span></h4>
+                    <p><i class="bi bi-envelope"></i> <span data-i18n="footer.email">hola@ecomarket.com</span></p>
+                    <p><i class="bi bi-telephone"></i> <span data-i18n="footer.phone">+51 999 888 777</span></p>
+                    <p><i class="bi bi-geo-alt"></i> <span data-i18n="footer.location">Lima, Perú</span></p>
+                    <p><i class="bi bi-clock"></i> <span data-i18n="footer.hours">Lun - Sáb: 9am - 6pm</span></p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p data-i18n="footer.copyright">© 2026 EcoMarket — Todos los derechos reservados.</p>
+                <p data-i18n="footer.made_with">Hecho con <i class="bi bi-heart-fill footer-heart"></i> para el planeta</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Botón volver arriba -->
+    <button id="backToTop" class="back-to-top" aria-label="Volver arriba" title="Volver arriba" data-i18n-title="back_to_top">
+        <i class="bi bi-arrow-up"></i>
+    </button>
+
+    <!-- EcoMarket Core Scripts -->
+    <script src="{{ url_for('static', filename='eco-auth.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-toast.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-cart.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-favorites.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-search.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-animations.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-notifications.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-gamification.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-reviews.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-analytics.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-chat.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-improvements.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-marketplace.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-profile.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-admin.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-i18n.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-ux.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-effects.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-ai.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-validation.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-google.js') }}"></script>
+    
+    <!-- Scripts nuevos v4.0-14.0 (desactivados por sobrecarga) -->
+    <!--
+    <script src="{{ url_for('static', filename='eco-accessibility.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-ar-products.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-banners.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-cache.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-chatgpt.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-communication-tracking.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-compare-advanced.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-confetti-celebrations.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-coupons.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-dashboard-stats.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-filters-advanced.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-gallery.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-gamification-advanced.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-impact-calculator.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-micro-interactions.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-notifications-realtime.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-price-history.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-recommendations-ai.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-reviews-advanced.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-rewards-shop.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-secondhand-marketplace.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-skeleton-loading.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-social-shopping.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-support-customer.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-themes-advanced.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-transitions-preloader.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-weather-contextual.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-wishlist-smart.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-payment-wallet.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-payment-methods.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-payment-installments.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-payment-oneclick.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-search-advanced.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-push-notifications.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-returns-system.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-reviews-verified.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-referral-system.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-achievements-advanced.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-visual-decorations.js') }}"></script>
+    <script src="{{ url_for('static', filename='sw-advanced.js') }}"></script>
+    
+    <script src="{{ url_for('static', filename='eco-hero-advanced.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-cards-improved.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-footer-advanced.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-animated-hero.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-smooth-scroll.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-lazy-loading.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-mega-menu.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-infinite-scroll.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-live-chat.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-popups.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-testimonials.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-countdown-timer.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-product-quick-view.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-social-proof.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-product-comparison.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-product-reviews.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-advanced-filters.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-product-zoom.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-image-gallery.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-product-slider.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-carousel.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-ticker.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-progress-bar.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-accordion.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-tabs.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-tooltip.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-modal.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-dropdown.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-breadcrumb.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-pagination.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-search-suggestions.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-back-to-top.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-loading-spinner.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-skeleton-screen.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-ripple-effect.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-parallax-scroll.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-sticky-header.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-masonry-layout.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-grid-layout.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-flexbox-layout.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-responsive-menu.js') }}"></script>
+    -->
+    
+    <!-- Scripts adicionales masivos (desactivados por sobrecarga) -->
+    <!--
+    <script src="{{ url_for('static', filename='eco-drag-drop.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-sortable-list.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-resizable-elements.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-split-view.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-tree-view.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-timeline.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-stepper.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-wizard.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-data-table.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-chart-js.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-progress-steps.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-status-badge.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-avatar-upload.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-file-upload.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-rich-text-editor.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-color-picker.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-date-picker.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-time-picker.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-range-slider.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-toggle-switch.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-checkbox-group.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-radio-group.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-select-dropdown.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-multi-select.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-tag-input.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-rating-stars.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-progress-ring.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-circular-menu.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-context-menu.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-toast-notification.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-alert-box.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-notification-badge.js') }}"></script>
+    
+    <script src="{{ url_for('static', filename='eco-breadcrumb-navigation.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-vertical-timeline.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-horizontal-timeline.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-process-bar.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-quick-view.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-product-filters.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-wishlist.js') }}"></script>
+    
+    <script src="{{ url_for('static', filename='eco-card-flip.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-pulse-animation.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-rotate-animation.js') }}"></script>
+    
+    <script src="{{ url_for('static', filename='eco-decorative-divider.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-hover-effect.js') }}"></script>
+    <script src="{{ url_for('static', filename='eco-typography.js') }}"></script>
+    -->
+    <script>
+      window.ECOMARKET_GOOGLE_CLIENT_ID = '{{ google_client_id }}';
+    </script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/static/sw.js');
+      }
+      // Splash screen auto-hide
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          var splash = document.getElementById('splashScreen');
+          if (splash) {
+            splash.style.opacity = '0';
+            splash.style.visibility = 'hidden';
+          }
+        }, 800);
+      });
+    </script>
+    <script>
+      // Back to top (con detección de scroll válida y guard de null)
+      var backToTop = document.getElementById('backToTop');
+      if (backToTop) {
+        window.addEventListener('scroll', function() {
+          var y = (typeof window.scrollY === 'number' && window.scrollY !== null)
+            ? window.scrollY
+            : (document.documentElement ? document.documentElement.scrollTop : 0);
+          if (y > 400) backToTop.classList.add('visible');
+          else backToTop.classList.remove('visible');
+        });
+        backToTop.addEventListener('click', function() {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+    </script>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+    
+    <!-- Script básico del carrito -->
+    <script src="{{ url_for('static', filename='eco-cart-basic.js') }}"></script>
+</body>
+</html>

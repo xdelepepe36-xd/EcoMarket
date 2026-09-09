@@ -599,6 +599,16 @@ def init_db():
             FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
         );
         
+        CREATE TABLE IF NOT EXISTS resena_respuestas (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            resena_id INTEGER NOT NULL,
+            usuario_id INTEGER NOT NULL,
+            comentario TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (resena_id) REFERENCES resenas(id) ON DELETE CASCADE,
+            FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+        );
+        
         CREATE TABLE IF NOT EXISTS pedidos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             usuario_id INTEGER,
@@ -1151,6 +1161,9 @@ def productos_view():
         precio_max = request.args.get('precio_max', '')
         ubicacion = request.args.get('ubicacion', '')
         busqueda = request.args.get('q', '')
+        condicion = request.args.get('condicion', '')
+        eco_score_min = request.args.get('eco_score_min', '')
+        etiquetas = request.args.get('etiquetas', '')
         pagina = int(request.args.get('pagina', 1))
 
         query = '''
@@ -1172,10 +1185,10 @@ def productos_view():
             params.append(categoria)
             count_params.append(categoria)
         if busqueda:
-            query += ' AND (p.nombre LIKE ? OR p.descripcion LIKE ?)'
-            count_query += ' AND (p.nombre LIKE ? OR p.descripcion LIKE ?)'
-            params.extend([f'%{busqueda}%', f'%{busqueda}%'])
-            count_params.extend([f'%{busqueda}%', f'%{busqueda}%'])
+            query += ' AND (p.nombre LIKE ? OR p.descripcion LIKE ? OR p.etiquetas LIKE ?)'
+            count_query += ' AND (p.nombre LIKE ? OR p.descripcion LIKE ? OR p.etiquetas LIKE ?)'
+            params.extend([f'%{busqueda}%', f'%{busqueda}%', f'%{busqueda}%'])
+            count_params.extend([f'%{busqueda}%', f'%{busqueda}%', f'%{busqueda}%'])
         if precio_min:
             query += ' AND p.precio >= ?'
             count_query += ' AND p.precio >= ?'
@@ -1191,6 +1204,21 @@ def productos_view():
             count_query += ' AND p.ubicacion LIKE ?'
             params.extend([f'%{ubicacion}%'])
             count_params.extend([f'%{ubicacion}%'])
+        if condicion:
+            query += ' AND p.condicion = ?'
+            count_query += ' AND p.condicion = ?'
+            params.append(condicion)
+            count_params.append(condicion)
+        if eco_score_min:
+            query += ' AND p.eco_score >= ?'
+            count_query += ' AND p.eco_score >= ?'
+            params.append(int(eco_score_min))
+            count_params.append(int(eco_score_min))
+        if etiquetas:
+            query += ' AND p.etiquetas LIKE ?'
+            count_query += ' AND p.etiquetas LIKE ?'
+            params.extend([f'%{etiquetas}%'])
+            count_params.extend([f'%{etiquetas}%'])
 
         query += ' GROUP BY p.id'
         count_query += ')'
@@ -1205,7 +1233,8 @@ def productos_view():
             'populares': 'ORDER BY p.vistas DESC',
             'baratos': 'ORDER BY p.precio ASC',
             'caros': 'ORDER BY p.precio DESC',
-            'mejor_valorados': 'ORDER BY rating_promedio DESC'
+            'mejor_valorados': 'ORDER BY rating_promedio DESC',
+            'eco_score': 'ORDER BY p.eco_score DESC'
         }
         query += ' ' + ordenes.get(orden, 'ORDER BY p.created_at DESC')
         query += f' LIMIT {ITEMS_PER_PAGE} OFFSET {offset}'
@@ -1233,14 +1262,11 @@ def productos_view():
                            orden_sel=orden,
                            busqueda=busqueda,
                            ubicacion_sel=ubicacion,
+                           condicion_sel=condicion,
+                           eco_score_min=eco_score_min,
+                           etiquetas_sel=etiquetas,
                            pagina=pagina,
                            total_paginas=total_paginas)
-
-    query += ' GROUP BY p.id'
-    count_query += ')'
-
-    total_productos = conn.execute(count_query, count_params).fetchone()[0]
-    total_paginas = max(1, (total_productos + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE)
     pagina = max(1, min(pagina, total_paginas))
     offset = (pagina - 1) * ITEMS_PER_PAGE
 
@@ -2836,6 +2862,453 @@ def marcar_todas_leidas():
     conn.commit()
     conn.close()
     return jsonify({'success': True})
+
+
+# ── Seguridad Mejorada ───────────────────────────────────────────────────────────
+
+# Validaciones adicionales
+def validate_text_input(text, max_length=1000, min_length=1):
+    """Valida input de texto con sanitización básica."""
+    if not isinstance(text, str):
+        return False
+    
+    text = text.strip()
+    
+    if len(text) < min_length or len(text) > max_length:
+        return False
+    
+    # Sanitización básica
+    dangerous_patterns = [
+        '<script', 'javascript:', 'onerror=', 'onload=', 
+        'onclick=', 'onmouseover=', 'onfocus=', 'onblur=',
+        'eval(', 'expression(', 'vbscript:', 'data:text/html'
+    ]
+    
+    text_lower = text.lower()
+    for pattern in dangerous_patterns:
+        if pattern in text_lower:
+            return False
+    
+    return True
+
+def validate_product_data(data):
+    """Valida datos de producto de forma más estricta."""
+    required_fields = ['nombre', 'categoria', 'precio', 'descripcion']
+    
+    for field in required_fields:
+        if field not in data or not data[field]:
+            return False, f"Campo {field} requerido"
+    
+    # Validar nombre
+    if not validate_text_input(data['nombre'], max_length=200):
+        return False, "Nombre inválido"
+    
+    # Validar descripción
+    if not validate_text_input(data['descripcion'], max_length=2000):
+        return False, "Descripción inválida"
+    
+    # Validar precio
+    try:
+        precio = float(data['precio'])
+        if precio < 0 or precio > 100000:
+            return False, "Precio fuera de rango válido"
+    except (ValueError, TypeError):
+        return False, "Precio inválido"
+    
+    # Validar stock
+    if 'stock' in data:
+        try:
+            stock = int(data['stock'])
+            if stock < 0 or stock > 10000:
+                return False, "Stock fuera de rango válido"
+        except (ValueError, TypeError):
+            return False, "Stock inválido"
+    
+    return True, "Validación exitosa"
+
+def validate_user_data(data):
+    """Valida datos de usuario de forma más estricta."""
+    required_fields = ['nombre', 'email', 'password']
+    
+    for field in required_fields:
+        if field not in data or not data[field]:
+            return False, f"Campo {field} requerido"
+    
+    # Validar nombre
+    if not validate_text_input(data['nombre'], max_length=100):
+        return False, "Nombre inválido"
+    
+    # Validar email
+    email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    if not re.match(email_pattern, data['email']):
+        return False, "Email inválido"
+    
+    # Validar contraseña
+    password = data['password']
+    if len(password) < 8:
+        return False, "Contraseña debe tener al menos 8 caracteres"
+    
+    if not re.search(r'[A-Z]', password):
+        return False, "Contraseña debe tener al menos una mayúscula"
+    
+    if not re.search(r'[a-z]', password):
+        return False, "Contraseña debe tener al menos una minúscula"
+    
+    if not re.search(r'\d', password):
+        return False, "Contraseña debe tener al menos un número"
+    
+    return True, "Validación exitosa"
+
+# Rate limiting mejorado
+login_attempts = {}
+MAX_LOGIN_ATTEMPTS = 5
+LOGIN_ATTEMPT_WINDOW = 300  # 5 minutos
+
+def check_login_attempts(identifier):
+    """Verifica si hay demasiados intentos de login."""
+    now = time.time()
+    
+    # Limpiar intentos antiguos
+    if identifier in login_attempts:
+        login_attempts[identifier] = [
+            attempt for attempt in login_attempts[identifier]
+            if now - attempt < LOGIN_ATTEMPT_WINDOW
+        ]
+    
+    current_attempts = len(login_attempts.get(identifier, []))
+    
+    if current_attempts >= MAX_LOGIN_ATTEMPTS:
+        return False, f"Demasiados intentos. Intenta nuevamente en {LOGIN_ATTEMPT_WINDOW//60} minutos."
+    
+    return True, "Intentos permitidos"
+
+def record_login_attempt(identifier):
+    """Registra un intento de login."""
+    if identifier not in login_attempts:
+        login_attempts[identifier] = []
+    
+    login_attempts[identifier].append(time.time())
+
+# Headers de seguridad mejorados
+@app.after_request
+def add_security_headers(response):
+    """Agrega headers de seguridad adicionales."""
+    # Protección contra clickjacking
+    response.headers['X-Frame-Options'] = 'DENY'
+    
+    # Protección contra MIME sniffing
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    
+    # Habilitar XSS Protection
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    
+    # Política de referer
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    
+    # CSP básico
+    response.headers['Content-Security-Policy'] = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://www.google.com https://www.gstatic.com; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; "
+        "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; "
+        "img-src 'self' data: https:; "
+        "connect-src 'self'; "
+        "frame-ancestors 'none';"
+    )
+    
+    # HSTS (solo en producción con HTTPS)
+    if not app.debug:
+        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    
+    return response
+
+# Validación de archivos mejorada
+def validate_file_upload(file):
+    """Valida uploads de archivos de forma más estricta."""
+    if not file:
+        return False, "No se proporcionó archivo"
+    
+    # Validar tamaño máximo (5MB)
+    MAX_FILE_SIZE = 5 * 1024 * 1024
+    file.seek(0, os.SEEK_END)
+    file_size = file.tell()
+    file.seek(0)
+    
+    if file_size > MAX_FILE_SIZE:
+        return False, "Archivo muy grande (máximo 5MB)"
+    
+    if file_size == 0:
+        return False, "Archivo vacío"
+    
+    # Validar tipo de archivo
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
+    ALLOWED_MIME_TYPES = {
+        'image/png', 'image/jpeg', 'image/webp', 'image/gif'
+    }
+    
+    filename = file.filename
+    if not filename:
+        return False, "Nombre de archivo inválido"
+    
+    # Validar extensión
+    ext = filename.rsplit('.', 1)[1].lower() if '.' in filename else ''
+    if ext not in ALLOWED_EXTENSIONS:
+        return False, f"Extensión no permitida: {ext}"
+    
+    # Validar MIME type
+    file_content = file.read()
+    file.seek(0)
+    
+    import imghdr
+    img_type = imghdr.what(None, file_content)
+    
+    if img_type not in ['png', 'jpeg', 'webp', 'gif']:
+        return False, "Tipo de imagen no válido"
+    
+    return True, "Archivo válido"
+
+# Sanitización de URLs
+def sanitize_url(url):
+    """Sanitiza URLs para prevenir ataques."""
+    if not url or not isinstance(url, str):
+        return ''
+    
+    url = url.strip()
+    
+    # Solo permitir protocolos seguros
+    allowed_protocols = ['http', 'https']
+    if '://' in url:
+        protocol = url.split('://')[0].lower()
+        if protocol not in allowed_protocols:
+            return ''
+    
+    # Prevenir javascript: y data: URLs
+    dangerous_patterns = ['javascript:', 'data:', 'vbscript:', 'file:']
+    url_lower = url.lower()
+    for pattern in dangerous_patterns:
+        if pattern in url_lower:
+            return ''
+    
+    return url
+
+# Protección contra enumeración de usuarios
+@app.route('/api/check-user/<email>')
+def check_user_exists(email):
+    """Endpoint para verificar si existe un usuario (protegido)."""
+    try:
+        # Validar email primero
+        if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+            return jsonify({'exists': False}), 200
+        
+        # Rate limiting para este endpoint
+        client_ip = request.remote_addr
+        if not check_login_attempts(client_ip)[0]:
+            return jsonify({'error': 'Demasiados intentos'}), 429
+        
+        conn = get_db()
+        user = conn.execute('SELECT id FROM usuarios WHERE email = ?', (email,)).fetchone()
+        conn.close()
+        
+        # Siempre retornar lo mismo para prevenir enumeración
+        # Solo dar información diferente si el usuario está logueado y es admin
+        if 'usuario_id' in session:
+            user_id = session['usuario_id']
+            conn = get_db()
+            current_user = conn.execute('SELECT rol FROM usuarios WHERE id = ?', (user_id,)).fetchone()
+            conn.close()
+            
+            if current_user and current_user['rol'] == 'admin':
+                return jsonify({'exists': user is not None})
+        
+        # Para usuarios normales, respuesta genérica
+        return jsonify({'exists': False})
+        
+    except Exception as e:
+        logger.error(f"Error verificando usuario: {e}")
+        return jsonify({'exists': False}), 200
+
+# ── Sistema de Respuestas a Reseñas ───────────────────────────────────────────────
+
+@app.route('/api/resenas/<int:resena_id>/responder', methods=['POST'])
+@login_required
+def responder_resena(resena_id):
+    """Permite responder a una reseña de producto."""
+    if 'usuario_id' not in session:
+        return jsonify({'error': 'Debes iniciar sesión'}), 401
+    
+    try:
+        data = request.get_json()
+        comentario = data.get('comentario', '').strip()
+        
+        if not comentario:
+            return jsonify({'error': 'El comentario no puede estar vacío'}), 400
+        
+        conn = get_db()
+        usuario_id = session['usuario_id']
+        
+        # Verificar que la reseña existe
+        resena = conn.execute(
+            'SELECT * FROM resenas WHERE id = ?',
+            (resena_id,)
+        ).fetchone()
+        
+        if not resena:
+            return jsonify({'error': 'Reseña no encontrada'}), 404
+        
+        # Verificar que el usuario es el vendedor del producto
+        producto = conn.execute(
+            'SELECT * FROM productos WHERE id = ?',
+            (resena['producto_id'],)
+        ).fetchone()
+        
+        if not producto or producto['usuario_id'] != usuario_id:
+            return jsonify({'error': 'Solo el vendedor puede responder reseñas'}), 403
+        
+        # Crear respuesta
+        conn.execute(
+            'INSERT INTO resena_respuestas (resena_id, usuario_id, comentario) VALUES (?, ?, ?)',
+            (resena_id, usuario_id, comentario)
+        )
+        conn.commit()
+        
+        # Crear notificación al autor de la reseña
+        if resena['usuario_id']:
+            conn.execute(
+                'INSERT INTO notificaciones (usuario_id, titulo, mensaje, tipo) VALUES (?, ?, ?, ?)',
+                (resena['usuario_id'], 
+                 'Respuesta a tu reseña', 
+                 f'El vendedor respondió a tu reseña de "{producto["nombre"]}"',
+                 'info')
+            )
+            conn.commit()
+        
+        return jsonify({'success': True, 'mensaje': 'Respuesta enviada exitosamente'})
+    except Exception as e:
+        logger.error(f"Error respondiendo reseña: {e}")
+        conn.rollback()
+        return jsonify({'error': 'Error al responder reseña'}), 500
+    finally:
+        conn.close()
+
+@app.route('/api/resenas/<int:resena_id>/respuestas', methods=['GET'])
+def obtener_respuestas_resena(resena_id):
+    """Obtiene todas las respuestas a una reseña."""
+    try:
+        conn = get_db()
+        
+        respuestas = [dict(row) for row in conn.execute(
+            '''SELECT rr.*, u.nombre as usuario_nombre, u.avatar 
+               FROM resena_respuestas rr 
+               JOIN usuarios u ON rr.usuario_id = u.id 
+               WHERE rr.resena_id = ? 
+               ORDER BY rr.created_at ASC''',
+            (resena_id,)
+        ).fetchall()]
+        
+        return jsonify({'respuestas': respuestas})
+    except Exception as e:
+        logger.error(f"Error obteniendo respuestas de reseña: {e}")
+        return jsonify({'error': 'Error al obtener respuestas'}), 500
+    finally:
+        conn.close()
+
+# ── Sistema de Recomendaciones ────────────────────────────────────────────────────
+
+@app.route('/api/recomendaciones', methods=['GET'])
+@login_required
+def api_recomendaciones():
+    """Genera recomendaciones de productos basadas en el historial del usuario."""
+    if 'usuario_id' not in session:
+        return jsonify({'error': 'Debes iniciar sesión'}), 401
+    
+    try:
+        conn = get_db()
+        usuario_id = session['usuario_id']
+        
+        # Obtener categorías que el usuario ha visto o comprado
+        categorias_vistas = [r['categoria'] for r in conn.execute(
+            'SELECT DISTINCT categoria FROM productos p '
+            'JOIN visitas v ON v.pagina = "producto_detalle" '
+            'WHERE v.usuario_id = ?',
+            (usuario_id,)
+        ).fetchall()]
+        
+        categorias_compradas = [r['categoria'] for r in conn.execute(
+            'SELECT DISTINCT p.categoria FROM pedido_items pi '
+            'JOIN pedidos ped ON pi.pedido_id = ped.id '
+            'JOIN productos p ON pi.producto_id = p.id '
+            'WHERE ped.usuario_id = ?',
+            (usuario_id,)
+        ).fetchall()]
+        
+        # Combinar categorías y dar prioridad a las compradas
+        categorias_prioritarias = list(set(categorias_compradas + categorias_vistas))
+        
+        # Obtener productos de esas categorías que el usuario no ha visto
+        productos_vistos = [r['producto_id'] for r in conn.execute(
+            'SELECT DISTINCT producto_id FROM visitas WHERE usuario_id = ? AND pagina = "producto_detalle"',
+            (usuario_id,)
+        ).fetchall()]
+        
+        if categorias_prioritarias:
+            placeholders = ','.join(['?'] * len(categorias_prioritarias))
+            if productos_vistos:
+                productos_vistos_str = ','.join(['?'] * len(productos_vistos))
+                query = f'''
+                    SELECT p.*, u.nombre as vendedor_nombre,
+                        COALESCE(AVG(r.rating), 0) as rating_promedio,
+                        COUNT(DISTINCT r.id) as total_resenas
+                    FROM productos p
+                    LEFT JOIN usuarios u ON p.usuario_id = u.id
+                    LEFT JOIN resenas r ON p.id = r.producto_id
+                    WHERE p.categoria IN ({placeholders})
+                    AND p.stock > 0
+                    AND p.id NOT IN ({productos_vistos_str})
+                    GROUP BY p.id
+                    ORDER BY rating_promedio DESC, p.vistas DESC
+                    LIMIT 8
+                '''
+                params = categorias_prioritarias + productos_vistos
+            else:
+                query = f'''
+                    SELECT p.*, u.nombre as vendedor_nombre,
+                        COALESCE(AVG(r.rating), 0) as rating_promedio,
+                        COUNT(DISTINCT r.id) as total_resenas
+                    FROM productos p
+                    LEFT JOIN usuarios u ON p.usuario_id = u.id
+                    LEFT JOIN resenas r ON p.id = r.producto_id
+                    WHERE p.categoria IN ({placeholders})
+                    AND p.stock > 0
+                    GROUP BY p.id
+                    ORDER BY rating_promedio DESC, p.vistas DESC
+                    LIMIT 8
+                '''
+                params = categorias_prioritarias
+        else:
+            # Si no hay historial, recomendar productos populares
+            query = '''
+                SELECT p.*, u.nombre as vendedor_nombre,
+                    COALESCE(AVG(r.rating), 0) as rating_promedio,
+                    COUNT(DISTINCT r.id) as total_resenas
+                FROM productos p
+                LEFT JOIN usuarios u ON p.usuario_id = u.id
+                LEFT JOIN resenas r ON p.id = r.producto_id
+                WHERE p.stock > 0
+                GROUP BY p.id
+                ORDER BY p.vistas DESC, rating_promedio DESC
+                LIMIT 8
+            '''
+            params = []
+        
+        recomendaciones = [dict(row) for row in conn.execute(query, params).fetchall()]
+        
+        return jsonify({'recomendaciones': recomendaciones})
+    except Exception as e:
+        logger.error(f"Error generando recomendaciones: {e}")
+        conn.rollback()
+        return jsonify({'error': 'Error al generar recomendaciones'}), 500
+    finally:
+        conn.close()
 
 
 # ── Admin ─────────────────────────────────────────────────────────────────────

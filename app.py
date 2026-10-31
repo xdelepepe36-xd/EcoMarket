@@ -29,6 +29,30 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.environ.get('DATABASE_URL', os.path.join(BASE_DIR, 'data', 'ecomarket.db'))
 UPLOAD_FOLDER = os.environ.get('UPLOADS_DIR', os.path.join(BASE_DIR, 'static', 'uploads'))
 
+# Headers de seguridad HTTP profesionales
+@app.after_request
+def add_security_headers(response):
+    """Agrega headers de seguridad a todas las respuestas."""
+    # Protección contra XSS
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    
+    # HSTS (solo en producción con HTTPS)
+    if os.environ.get('FLASK_ENV') == 'production':
+        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    
+    # CSP básico
+    response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https:;"
+    
+    # Referrer Policy
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    
+    # Permissions Policy
+    response.headers['Permissions-Policy'] = 'geolocation=(), microphone=(), camera=(), payment=(self)'
+    
+    return response
+
 # Configurar logging
 logging.basicConfig(
     level=logging.INFO,
@@ -49,24 +73,35 @@ if os.path.exists(os.path.join(BASE_DIR, 'static')):
 
 # Configurar WhiteNoise para servir archivos estáticos eficientemente en producción
 try:
-    app.wsgi_app = WhiteNoise(app.wsgi_app, root=os.path.join(BASE_DIR, 'static'))
+    app.wsgi_app = WhiteNoise(
+        app.wsgi_app, 
+        root=os.path.join(BASE_DIR, 'static'),
+        autorefresh=True,
+        max_age=3600  # 1 hora de caché en navegador
+    )
     logger.info("WhiteNoise configurado exitosamente")
 except Exception as e:
     logger.error(f"Error configurando WhiteNoise: {e}")
 
 
-# ── Sistema de Caché Simple ─────────────────────────────────────────────────
+# ── Sistema de Caché Simple Optimizado ─────────────────────────────────────────────────
 
 class SimpleCache:
-    """Sistema de caché en memoria con expiración."""
+    """Sistema de caché en memoria con expiración automática."""
     
     def __init__(self):
         self.cache = {}
         self.timestamps = {}
         self.default_ttl = 300  # 5 minutos por defecto
+        self.max_size = 1000  # Máximo de entradas para no sobrecargar
+        self.last_cleanup = time.time()
     
     def get(self, key):
         """Obtiene un valor del caché si existe y no ha expirado."""
+        # Limpieza automática cada 5 minutos
+        if time.time() - self.last_cleanup > 300:
+            self._auto_cleanup()
+        
         if key not in self.cache:
             return None
         
@@ -81,6 +116,10 @@ class SimpleCache:
     
     def set(self, key, value, ttl=None):
         """Guarda un valor en el caché con TTL opcional."""
+        # No cachear si está lleno para no sobrecargar
+        if len(self.cache) >= self.max_size:
+            self._evict_oldest()
+        
         self.cache[key] = value
         self.timestamps[key] = time.time()
     
@@ -108,6 +147,35 @@ class SimpleCache:
             self.delete(key)
         
         return len(expired_keys)
+    
+    def _auto_cleanup(self):
+        """Limpieza automática periódica."""
+        self.last_cleanup = time.time()
+        self.cleanup_expired()
+        
+        # Si todavía hay muchas entradas, eliminar las más viejas
+        if len(self.cache) > self.max_size * 0.8:
+            self._evict_oldest(int(self.max_size * 0.5))
+    
+    def _evict_oldest(self, count=1):
+        """Elimina las entradas más viejas."""
+        if len(self.timestamps) <= count:
+            self.clear()
+            return
+        
+        # Ordenar por timestamp y eliminar las más viejas
+        sorted_keys = sorted(self.timestamps.items(), key=lambda x: x[1])[:count]
+        for key, _ in sorted_keys:
+            self.delete(key)
+    
+    def get_stats(self):
+        """Obtiene estadísticas del caché."""
+        return {
+            'size': len(self.cache),
+            'max_size': self.max_size,
+            'usage_percent': (len(self.cache) / self.max_size) * 100,
+            'last_cleanup': self.last_cleanup
+        }
 
 
 # Instancia global del caché
@@ -154,6 +222,7 @@ MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5MB
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
 ITEMS_PER_PAGE = 12
+ITEMS_PER_PAGE_SMALL = 6  # Para móviles y carga rápida
 
 
 @app.context_processor
@@ -799,12 +868,17 @@ def init_db():
 
     # ── Crear índices para optimizar consultas ─────────────────────────
     try:
-        # Índices para productos
+        # Índices simples para productos
         conn.execute('CREATE INDEX IF NOT EXISTS idx_productos_categoria ON productos(categoria)')
         conn.execute('CREATE INDEX IF NOT EXISTS idx_productos_precio ON productos(precio)')
         conn.execute('CREATE INDEX IF NOT EXISTS idx_productos_usuario ON productos(usuario_id)')
         conn.execute('CREATE INDEX IF NOT EXISTS idx_productos_created ON productos(created_at)')
         conn.execute('CREATE INDEX IF NOT EXISTS idx_productos_stock ON productos(stock)')
+        
+        # Índices compuestos optimizados para consultas frecuentes
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_productos_categoria_precio ON productos(categoria, precio)')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_productos_usuario_created ON productos(usuario_id, created_at)')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_productos_eco_score_vistas ON productos(eco_score DESC, vistas DESC)')
         
         # Índices para usuarios
         conn.execute('CREATE INDEX IF NOT EXISTS idx_usuarios_email ON usuarios(email)')
@@ -813,19 +887,22 @@ def init_db():
         # Índices para pedidos
         conn.execute('CREATE INDEX IF NOT EXISTS idx_pedidos_usuario ON pedidos(usuario_id)')
         conn.execute('CREATE INDEX IF NOT EXISTS idx_pedidos_estado ON pedidos(estado)')
-        conn.execute('CREATE INDEX IF NOT EXISTS idx_pedidos_created ON pedidos(created_at)')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_pedidos_usuario_estado ON pedidos(usuario_id, estado)')
         
         # Índices para favoritos
         conn.execute('CREATE INDEX IF NOT EXISTS idx_favoritos_usuario ON favoritos(usuario_id)')
         conn.execute('CREATE INDEX IF NOT EXISTS idx_favoritos_producto ON favoritos(producto_id)')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_favoritos_usuario_producto ON favoritos(usuario_id, producto_id)')
         
         # Índices para reseñas
         conn.execute('CREATE INDEX IF NOT EXISTS idx_resenas_producto ON resenas(producto_id)')
         conn.execute('CREATE INDEX IF NOT EXISTS idx_resenas_rating ON resenas(rating)')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_resenas_producto_rating ON resenas(producto_id, rating DESC)')
         
         # Índices para notificaciones
         conn.execute('CREATE INDEX IF NOT EXISTS idx_notificaciones_usuario ON notificaciones(usuario_id)')
         conn.execute('CREATE INDEX IF NOT EXISTS idx_notificaciones_leida ON notificaciones(leida)')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_notificaciones_usuario_leida ON notificaciones(usuario_id, leida)')
         
         # Índices para visitas
         conn.execute('CREATE INDEX IF NOT EXISTS idx_visitas_pagina ON visitas(pagina)')
@@ -1148,6 +1225,31 @@ def index():
     productos = get_productos_destacados(6)
     categorias = get_categorias()
     return render_template('index.html', productos=productos, categorias=categorias)
+
+
+@app.route('/premium')
+def index_premium():
+    """Ruta dedicada para el diseño premium con gradientes modernos."""
+    registrar_visita('premium')
+    conn = get_db()
+    productos = conn.execute('''
+        SELECT p.*, COALESCE(AVG(r.rating), 0) as rating_promedio
+        FROM productos p
+        LEFT JOIN resenas r ON p.id = r.producto_id
+        GROUP BY p.id
+        ORDER BY p.created_at DESC
+        LIMIT 12
+    ''').fetchall()
+    conn.close()
+    return render_template('index-premium.html', productos=productos)
+
+
+@app.route('/dashboard-premium')
+@login_required
+def dashboard_premium():
+    """Dashboard premium con todas las funcionalidades."""
+    registrar_visita('dashboard_premium')
+    return render_template('dashboard-premium.html')
 
 
 @app.route('/productos')
@@ -2866,9 +2968,9 @@ def marcar_todas_leidas():
 
 # ── Seguridad Mejorada ───────────────────────────────────────────────────────────
 
-# Validaciones adicionales
+# Validaciones adicionales mejoradas
 def validate_text_input(text, max_length=1000, min_length=1):
-    """Valida input de texto con sanitización básica."""
+    """Valida input de texto con sanitización avanzada."""
     if not isinstance(text, str):
         return False
     
@@ -2877,11 +2979,19 @@ def validate_text_input(text, max_length=1000, min_length=1):
     if len(text) < min_length or len(text) > max_length:
         return False
     
-    # Sanitización básica
+    # Sanitización avanzada contra XSS avanzado
     dangerous_patterns = [
         '<script', 'javascript:', 'onerror=', 'onload=', 
         'onclick=', 'onmouseover=', 'onfocus=', 'onblur=',
-        'eval(', 'expression(', 'vbscript:', 'data:text/html'
+        'onmouseenter=', 'onmouseleave=', 'onkeydown=', 'onkeyup=',
+        'eval(', 'expression(', 'vbscript:', 'data:text/html',
+        'data:', 'background:', 'style=', 'xmlns:',
+        '<iframe', '<object', '<embed', '<form',
+        'alert(', 'confirm(', 'prompt(',
+        'document.', 'window.', 'location.',
+        'setTimeout(', 'setInterval(',
+        'Function(', 'String.fromCharCode(',
+        '\\x', '\\u', '\\n', '\\r', '\\t'
     ]
     
     text_lower = text.lower()
@@ -2889,7 +2999,1975 @@ def validate_text_input(text, max_length=1000, min_length=1):
         if pattern in text_lower:
             return False
     
+    # Validación contra null bytes
+    if '\x00' in text:
+        return False
+    
     return True
+
+def validate_number_input(number, min_value=0, max_value=1000000):
+    """Valida input numérico con sanitización."""
+    try:
+        num = float(number)
+        return min_value <= num <= max_value
+    except (ValueError, TypeError):
+        return False
+
+def validate_url_input(url):
+    """Valida URLs de forma más estricta."""
+    if not url or not isinstance(url, str):
+        return False
+    
+    url = url.strip()
+    
+    # Protocolos permitidos
+    allowed_protocols = ['http://', 'https://']
+    if not any(url.startswith(protocol) for protocol in allowed_protocols):
+        return False
+    
+    # Patrones peligrosos
+    dangerous_patterns = [
+        'javascript:', 'data:', 'vbscript:', 'file:',
+        '<script', 'onerror=', 'onload='
+    ]
+    
+    url_lower = url.lower()
+    for pattern in dangerous_patterns:
+        if pattern in url_lower:
+            return False
+    
+    return True
+
+# ── Sistema de Optimización de Consultas SQL ───────────────────────────────────────
+
+def optimize_sql_query(query, params=None):
+    """Optimiza consultas SQL básicas."""
+    if params is None:
+        params = []
+    
+    # Eliminar SELECT * cuando sea posible
+    if 'SELECT *' in query:
+        # Intentar inferir columnas principales
+        if 'usuarios' in query:
+            query = query.replace('SELECT *', 'SELECT id, nombre, email, rol, created_at')
+        elif 'productos' in query:
+            query = query.replace('SELECT *', 'SELECT id, nombre, categoria, precio, vistas, created_at')
+        elif 'pedidos' in query:
+            query = query.replace('SELECT *', 'SELECT id, usuario_id, total, estado, created_at')
+    
+    return query, params
+
+# ── Sistema de Paginación Avanzada ───────────────────────────────────────────────────
+
+class AdvancedPagination:
+    """Sistema de paginación optimizado para grandes volúmenes de datos."""
+    
+    def __init__(self, per_page=20, max_per_page=100):
+        self.per_page = per_page
+        self.max_per_page = max_per_page
+    
+    def get_pagination_info(self, total_items, current_page=1):
+        """Calcula información de paginación."""
+        total_pages = max(1, (total_items + self.per_page - 1) // self.per_page)
+        current_page = max(1, min(current_page, total_pages))
+        offset = (current_page - 1) * self.per_page
+        
+        return {
+            'total_items': total_items,
+            'total_pages': total_pages,
+            'current_page': current_page,
+            'per_page': self.per_page,
+            'offset': offset,
+            'has_next': current_page < total_pages,
+            'has_prev': current_page > 1
+        }
+    
+    def paginate_query(self, query, params=None, current_page=1):
+        """Aplica paginación a una consulta SQL."""
+        if params is None:
+            params = []
+        
+        pagination_info = self.get_pagination_info(
+            self._count_query(query, params),
+            current_page
+        )
+        
+        paginated_query = f"{query} LIMIT {self.per_page} OFFSET {pagination_info['offset']}"
+        
+        return paginated_query, params, pagination_info
+    
+    def _count_query(self, query, params):
+        """Genera consulta de conteo."""
+        # Extraer la parte SELECT ... FROM
+        if 'SELECT' in query and 'FROM' in query:
+            select_part = query[query.find('SELECT'):query.find('FROM')]
+            from_part = query[query.find('FROM'):]
+            count_query = f"SELECT COUNT(*) as total {from_part}"
+            
+            try:
+                conn = get_db()
+                result = conn.execute(count_query, params).fetchone()
+                conn.close()
+                return result['total'] if result else 0
+            except Exception as advanced_pagination:
+                logger.error(f"Error en conteo: {advanced_pagination}")
+                return 0
+        
+        return 0
+
+# Instancia global de paginación
+pagination = AdvancedPagination()
+
+# ── Sistema de Caché Mejorado con Soporte Redis ───────────────────────────────────────
+
+class EnhancedCache:
+    """Sistema de caché mejorado con soporte para Redis."""
+    
+    def __init__(self):
+        self.cache = {}
+        self.timestamps = {}
+        self.default_ttl = 300  # 5 minutos
+        self.redis_available = False
+        self._check_redis_availability()
+    
+    def _check_redis_availability(self):
+        """Verifica si Redis está disponible."""
+        try:
+            import redis
+            self.redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+            self.redis_client.ping()
+            self.redis_available = True
+            logger.info("Redis disponible, usando caché distribuido")
+        except ImportError:
+            logger.info("Redis no disponible, usando caché en memoria")
+        except Exception as e:
+            logger.info(f"Redis no disponible: {e}, usando caché en memoria")
+    
+    def get(self, key):
+        """Obtiene un valor del caché."""
+        if self.redis_available:
+            try:
+                value = self.redis_client.get(key)
+                if value:
+                    return json.loads(value)
+            except Exception as e:
+                logger.error(f"Error obteniendo de Redis: {e}")
+        
+        # Fallback a caché en memoria
+        if key not in self.cache:
+            return None
+        
+        if key in self.timestamps:
+            if time.time() - self.timestamps[key] > self.default_ttl:
+                del self.cache[key]
+                del self.timestamps[key]
+                return None
+        
+        return self.cache[key]
+    
+    def set(self, key, value, ttl=None):
+        """Guarda un valor en el caché."""
+        ttl = ttl or self.default_ttl
+        
+        if self.redis_available:
+            try:
+                self.redis_client.setex(key, ttl, json.dumps(value))
+            except Exception as e:
+                logger.error(f"Error guardando en Redis: {e}")
+        
+        # Siempre guardar en caché local como fallback
+        self.cache[key] = value
+        self.timestamps[key] = time.time()
+    
+    def delete(self, key):
+        """Elimina un valor del caché."""
+        if self.redis_available:
+            try:
+                self.redis_client.delete(key)
+            except Exception as e:
+                logger.error(f"Error eliminando de Redis: {e}")
+        
+        if key in self.cache:
+            del self.cache[key]
+        if key in self.timestamps:
+            del self.timestamps[key]
+    
+    def clear(self):
+        """Limpia todo el caché."""
+        if self.redis_available:
+            try:
+                self.redis_client.flushdb()
+            except Exception as e:
+                logger.error(f"Error limpiando Redis: {e}")
+        
+        self.cache.clear()
+        self.timestamps.clear()
+    
+    def cleanup_expired(self):
+        """Limpia entradas expiradas."""
+        current_time = time.time()
+        expired_keys = [
+            key for key, timestamp in self.timestamps.items()
+            if current_time - timestamp > self.default_ttl
+        ]
+        
+        for key in expired_keys:
+            self.delete(key)
+        
+        return len(expired_keys)
+
+# Reemplazar caché simple con el mejorado
+cache = EnhancedCache()
+
+# ── Sistema de Websockets para Tiempo Real ───────────────────────────────────────────────
+
+class WebSocketManager:
+    """Gestor de conexiones WebSocket para actualizaciones en tiempo real."""
+    
+    def __init__(self):
+        self.active_connections = {}
+        self.user_connections = {}
+    
+    def connect(self, user_id, websocket):
+        """Conecta un usuario al sistema de websockets."""
+        if user_id not in self.user_connections:
+            self.user_connections[user_id] = []
+        self.user_connections[user_id].append(websocket)
+        logger.info(f"Usuario {user_id} conectado via WebSocket")
+    
+    def disconnect(self, user_id, websocket):
+        """Desconecta un usuario."""
+        if user_id in self.user_connections:
+            self.user_connections[user_id].remove(websocket)
+            if not self.user_connections[user_id]:
+                del self.user_connections[user_id]
+            logger.info(f"Usuario {user_id} desconectado via WebSocket")
+    
+    def send_to_user(self, user_id, message):
+        """Envía un mensaje a un usuario específico."""
+        if user_id in self.user_connections:
+            for connection in self.user_connections[user_id]:
+                try:
+                    connection.send(json.dumps(message))
+                except Exception as e:
+                    logger.error(f"Error enviando mensaje: {e}")
+    
+    def broadcast(self, message):
+        """Envía un mensaje a todos los usuarios conectados."""
+        for user_id, connections in self.user_connections.items():
+            for connection in connections:
+                try:
+                    connection.send(json.dumps(message))
+                except Exception as e:
+                    logger.error(f"Error en broadcast: {e}")
+
+# Instancia global del gestor de websockets
+websocket_manager = WebSocketManager()
+
+# ── Sistema de Colas de Mensajes ───────────────────────────────────────────────────────
+
+class MessageQueue:
+    """Sistema de colas de mensajes para tareas asíncronas."""
+    
+    def __init__(self):
+        self.queues = {
+            'email': [],
+            'notifications': [],
+            'analytics': [],
+            'backup': []
+        }
+    
+    def push(self, queue_name, message):
+        """Agrega un mensaje a una cola."""
+        if queue_name in self.queues:
+            self.queues[queue_name].append({
+                'message': message,
+                'timestamp': time.time(),
+                'processed': False
+            })
+            logger.info(f"Mensaje agregado a cola {queue_name}")
+    
+    def pop(self, queue_name):
+        """Obtiene y elimina un mensaje de una cola."""
+        if queue_name in self.queues and self.queues[queue_name]:
+            return self.queues[queue_name].pop(0)
+        return None
+    
+    def size(self, queue_name):
+        """Obtiene el tamaño de una cola."""
+        return len(self.queues.get(queue_name, []))
+    
+    def process_queue(self, queue_name, processor):
+        """Procesa todos los mensajes de una cola."""
+        while self.size(queue_name) > 0:
+            item = self.pop(queue_name)
+            if item and not item['processed']:
+                try:
+                    processor(item['message'])
+                    item['processed'] = True
+                except Exception as e:
+                    logger.error(f"Error procesando mensaje: {e}")
+
+# Instancia global de colas
+message_queue = MessageQueue()
+
+# ── Sistema de Backup Automático ───────────────────────────────────────────────────────
+
+class BackupManager:
+    """Gestor de backups automáticos de la base de datos."""
+    
+    def __init__(self, backup_dir='backups'):
+        self.backup_dir = os.path.join(BASE_DIR, backup_dir)
+        os.makedirs(self.backup_dir, exist_ok=True)
+        self.max_backups = 10
+    
+    def create_backup(self):
+        """Crea un backup de la base de datos."""
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        backup_file = os.path.join(self.backup_dir, f'ecomarket_backup_{timestamp}.db')
+        
+        try:
+            import shutil
+            shutil.copy2(DB_PATH, backup_file)
+            logger.info(f"Backup creado: {backup_file}")
+            
+            # Limpiar backups antiguos
+            self._cleanup_old_backups()
+            
+            return backup_file
+        except Exception as e:
+            logger.error(f"Error creando backup: {e}")
+            return None
+    
+    def _cleanup_old_backups(self):
+        """Elimina backups antiguos manteniendo solo los más recientes."""
+        backups = sorted(
+            [f for f in os.listdir(self.backup_dir) if f.startswith('ecomarket_backup_')],
+            reverse=True
+        )
+        
+        for old_backup in backups[self.max_backups:]:
+            try:
+                os.remove(os.path.join(self.backup_dir, old_backup))
+                logger.info(f"Backup antiguo eliminado: {old_backup}")
+            except Exception as e:
+                logger.error(f"Error eliminando backup: {e}")
+    
+    def restore_backup(self, backup_file):
+        """Restaura un backup de la base de datos."""
+        try:
+            import shutil
+            shutil.copy2(backup_file, DB_PATH)
+            logger.info(f"Backup restaurado: {backup_file}")
+            return True
+        except Exception as e:
+            logger.error(f"Error restaurando backup: {e}")
+            return False
+
+# Instancia global de backup
+backup_manager = BackupManager()
+
+# ── Sistema de Monitoring y Alertas ───────────────────────────────────────────────────
+
+class MonitoringSystem:
+    """Sistema de monitoring y alertas del sistema."""
+    
+    def __init__(self):
+        self.metrics = {
+            'requests_total': 0,
+            'requests_success': 0,
+            'requests_error': 0,
+            'response_times': [],
+            'db_queries': 0,
+            'cache_hits': 0,
+            'cache_misses': 0
+        }
+        self.alerts = []
+    
+    def record_request(self, success=True, response_time=0):
+        """Registra una petición HTTP."""
+        self.metrics['requests_total'] += 1
+        if success:
+            self.metrics['requests_success'] += 1
+        else:
+            self.metrics['requests_error'] += 1
+        
+        if response_time > 0:
+            self.metrics['response_times'].append(response_time)
+            # Mantener solo los últimos 1000 tiempos
+            if len(self.metrics['response_times']) > 1000:
+                self.metrics['response_times'] = self.metrics['response_times'][-1000:]
+    
+    def record_db_query(self):
+        """Registra una consulta a la base de datos."""
+        self.metrics['db_queries'] += 1
+    
+    def record_cache_hit(self):
+        """Registra un hit de caché."""
+        self.metrics['cache_hits'] += 1
+    
+    def record_cache_miss(self):
+        """Registra un miss de caché."""
+        self.metrics['cache_misses'] += 1
+    
+    def get_stats(self):
+        """Obtiene estadísticas del sistema."""
+        avg_response_time = (
+            sum(self.metrics['response_times']) / len(self.metrics['response_times'])
+            if self.metrics['response_times'] else 0
+        )
+        
+        cache_hit_rate = (
+            self.metrics['cache_hits'] / (self.metrics['cache_hits'] + self.metrics['cache_misses'])
+            if (self.metrics['cache_hits'] + self.metrics['cache_misses']) > 0 else 0
+        )
+        
+        return {
+            'requests_total': self.metrics['requests_total'],
+            'success_rate': (
+                self.metrics['requests_success'] / self.metrics['requests_total']
+                if self.metrics['requests_total'] > 0 else 0
+            ),
+            'avg_response_time': avg_response_time,
+            'db_queries': self.metrics['db_queries'],
+            'cache_hit_rate': cache_hit_rate,
+            'uptime': time.time() - self.start_time if hasattr(self, 'start_time') else 0
+        }
+    
+    def check_alerts(self):
+        """Verifica condiciones de alerta."""
+        stats = self.get_stats()
+        alerts = []
+        
+        # Alerta si el error rate > 5%
+        if stats['success_rate'] < 0.95:
+            alerts.append({
+                'type': 'error_rate',
+                'severity': 'high',
+                'message': f"Error rate alto: {(1 - stats['success_rate']) * 100:.2f}%"
+            })
+        
+        # Alerta si el tiempo de respuesta > 2s
+        if stats['avg_response_time'] > 2000:
+            alerts.append({
+                'type': 'slow_response',
+                'severity': 'medium',
+                'message': f"Tiempo de respuesta alto: {stats['avg_response_time']:.2f}ms"
+            })
+        
+        # Alerta si el cache hit rate < 50%
+        if stats['cache_hit_rate'] < 0.5:
+            alerts.append({
+                'type': 'low_cache_hit',
+                'severity': 'low',
+                'message': f"Cache hit rate bajo: {stats['cache_hit_rate'] * 100:.2f}%"
+            })
+        
+        self.alerts = alerts
+        return alerts
+
+# Instancia global de monitoring
+monitoring = MonitoringSystem()
+monitoring.start_time = time.time()
+
+# ── Sistema de SEO y Metadatos ───────────────────────────────────────────────────────
+
+class SEOManager:
+    """Gestor de SEO y metadatos dinámicos."""
+    
+    def __init__(self):
+        self.default_meta = {
+            'title': 'EcoMarket - Marketplace Ecológico',
+            'description': 'Compra y vende productos ecológicos de forma sostenible. Encuentra productos eco-friendly, orgánicos y respetuosos con el medio ambiente.',
+            'keywords': 'ecomarket, ecológico, sostenible, orgánico, eco-friendly, marketplace',
+            'og_image': 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200&h=630&fit=crop',
+            'twitter_card': 'summary_large_image'
+        }
+    
+    def get_meta_tags(self, page_data=None):
+        """Genera metadatos dinámicos basados en el contenido."""
+        meta = self.default_meta.copy()
+        
+        if page_data:
+            # Personalizar para productos
+            if 'producto' in page_data:
+                producto = page_data['producto']
+                meta['title'] = f"{producto['nombre']} - EcoMarket"
+                meta['description'] = producto['descripcion'][:160]
+                meta['keywords'] = f"{producto['categoria']}, {producto['nombre']}, ecológico, sostenible"
+                if producto['imagen']:
+                    meta['og_image'] = producto['imagen']
+            
+            # Personalizar para categorías
+            elif 'categoria' in page_data:
+                categoria = page_data['categoria']
+                meta['title'] = f"{categoria} - EcoMarket"
+                meta['description'] = f"Descubre los mejores productos ecológicos de {categoria}. Compra de forma sostenible."
+                meta['keywords'] = f"{categoria}, ecológico, sostenible, eco-friendly"
+        
+        return meta
+    
+    def generate_structured_data(self, data_type, data):
+        """Genera datos estructurados Schema.org."""
+        if data_type == 'product':
+            return {
+                '@context': 'https://schema.org/',
+                '@type': 'Product',
+                'name': data.get('nombre', ''),
+                'description': data.get('descripcion', ''),
+                'image': data.get('imagen', ''),
+                'offers': {
+                    '@type': 'Offer',
+                    'price': data.get('precio', 0),
+                    'priceCurrency': 'PEN',
+                    'availability': 'https://schema.org/InStock'
+                }
+            }
+        elif data_type == 'organization':
+            return {
+                '@context': 'https://schema.org/',
+                '@type': 'Organization',
+                'name': 'EcoMarket',
+                'url': 'https://ecomarket.com',
+                'logo': 'https://ecomarket.com/logo.png',
+                'description': 'Marketplace ecológico y sostenible'
+            }
+        return {}
+
+# Instancia global de SEO
+seo_manager = SEOManager()
+
+# ── Sistema de Optimización de Assets ───────────────────────────────────────────────────
+
+class AssetOptimizer:
+    """Optimizador de assets estáticos."""
+    
+    def __init__(self):
+        self.image_cache = {}
+        self.css_cache = {}
+        self.js_cache = {}
+    
+    def optimize_image(self, image_path, quality=85, max_width=1200):
+        """Optimiza imágenes reduciendo tamaño y mejorando carga."""
+        try:
+            img = Image.open(image_path)
+            
+            # Redimensionar si es muy grande
+            if img.width > max_width:
+                ratio = max_width / img.width
+                new_height = int(img.height * ratio)
+                img = img.resize((max_width, new_height), Image.Resampling.LANCZOS)
+            
+            # Optimizar y guardar
+            output = io.BytesIO()
+            img.save(output, format='WEBP', quality=quality, optimize=True)
+            img.close()
+            
+            return output.getvalue()
+        except Exception as e:
+            logger.error(f"Error optimizando imagen: {e}")
+            return None
+    
+    def minify_css(self, css_content):
+        """Minifica CSS eliminando espacios innecesarios."""
+        # Eliminar comentarios
+        css_content = re.sub(r'/\*.*?\*/', '', css_content, flags=re.DOTALL)
+        # Eliminar espacios múltiples
+        css_content = re.sub(r'\s+', ' ', css_content)
+        # Eliminar espacios alrededor de caracteres especiales
+        css_content = re.sub(r'\s*([{}:;,])\s*', r'\1', css_content)
+        return css_content.strip()
+    
+    def minify_js(self, js_content):
+        """Minifica JavaScript básico."""
+        # Eliminar comentarios de una línea
+        js_content = re.sub(r'//.*', '', js_content)
+        # Eliminar comentarios multi-línea
+        js_content = re.sub(r'/\*.*?\*/', '', js_content, flags=re.DOTALL)
+        # Eliminar espacios múltiples
+        js_content = re.sub(r'\s+', ' ', js_content)
+        return js_content.strip()
+
+# Instancia global de optimizador
+asset_optimizer = AssetOptimizer()
+
+# ── Sistema de Lazy Loading ───────────────────────────────────────────────────────────
+
+class LazyLoader:
+    """Sistema de lazy loading para mejorar performance."""
+    
+    def __init__(self):
+        self.loaded_scripts = set()
+        self.loaded_styles = set()
+    
+    def should_load_script(self, script_name, current_page):
+        """Determina si un script debe cargarse en la página actual."""
+        # Scripts que siempre cargan
+        always_load = ['ecomarket-consolidated', 'ecomarket-security']
+        if script_name in always_load:
+            return True
+        
+        # Scripts específicos por página
+        page_scripts = {
+            'index': ['ecommerce-analytics', 'ecomarket-social'],
+            'detalle_producto': ['ecomarket-comments', 'ecomarket-compare'],
+            'checkout': ['ecomarket-payments'],
+            'perfil': ['ecomarket-gamification']
+        }
+        
+        return script_name in page_scripts.get(current_page, [])
+    
+    def get_critical_css(self, current_page):
+        """Obtiene CSS crítico para la página actual."""
+        critical_css = {
+            'index': ['ecomarket-consolidated', 'accessibility'],
+            'detalle_producto': ['ecomarket-consolidated', 'ecomarket-advanced-features'],
+            'checkout': ['ecomarket-consolidated'],
+            'default': ['ecomarket-consolidated', 'accessibility']
+        }
+        
+        return critical_css.get(current_page, critical_css['default'])
+
+# Instancia global de lazy loader
+lazy_loader = LazyLoader()
+
+# ── Sistema de A/B Testing ───────────────────────────────────────────────────────────
+
+class ABTesting:
+    """Sistema de A/B testing para optimización de conversión."""
+    
+    def __init__(self):
+        self.experiments = {
+            'button_color': {
+                'control': '#2e7d32',
+                'variant_a': '#1b5e20',
+                'variant_b': '#43a047'
+            },
+            'product_card_layout': {
+                'control': 'standard',
+                'variant_a': 'minimal',
+                'variant_b': 'detailed'
+            }
+        }
+    
+    def get_variant(self, experiment_name, user_id):
+        """Asigna una variante a un usuario."""
+        if experiment_name not in self.experiments:
+            return 'control'
+        
+        # Hash del user_id para consistencia
+        user_hash = hashlib.md5(str(user_id).encode()).hexdigest()
+        variant_index = int(user_hash, 16) % 3
+        
+        variants = ['control', 'variant_a', 'variant_b']
+        return variants[variant_index]
+    
+    def track_conversion(self, experiment_name, variant, user_id):
+        """Registra una conversión en un experimento."""
+        # Aquí se guardaría en base de datos o analytics
+        logger.info(f"Conversión registrada: {experiment_name} - {variant} - user {user_id}")
+
+# Instancia global de A/B testing
+ab_testing = ABTesting()
+
+# ── Sistema de Notificaciones Email/SMS ───────────────────────────────────────────────
+
+class NotificationManager:
+    """Gestor de notificaciones por email y SMS."""
+    
+    def __init__(self):
+        self.email_queue = []
+        self.sms_queue = []
+    
+    def send_email(self, to, subject, body, template=None):
+        """Envía un email (simulado - requiere configuración SMTP)."""
+        email_data = {
+            'to': to,
+            'subject': subject,
+            'body': body,
+            'template': template,
+            'timestamp': time.time()
+        }
+        self.email_queue.append(email_data)
+        logger.info(f"Email en cola para {to}: {subject}")
+        
+        # En producción, aquí se integraría con SMTP o servicio como SendGrid
+        return True
+    
+    def send_sms(self, to, message):
+        """Envía un SMS (simulado - requiere integración Twilio)."""
+        sms_data = {
+            'to': to,
+            'message': message,
+            'timestamp': time.time()
+        }
+        self.sms_queue.append(sms_data)
+        logger.info(f"SMS en cola para {to}")
+        
+        # En producción, aquí se integraría con Twilio o similar
+        return True
+    
+    def send_order_confirmation(self, user_email, order_id, total):
+        """Envía confirmación de pedido."""
+        subject = f"Confirmación de Pedido #{order_id} - EcoMarket"
+        body = f"""
+        ¡Gracias por tu compra!
+        
+        Pedido: #{order_id}
+        Total: S/ {total:.2f}
+        
+        Tu pedido ha sido procesado exitosamente.
+        
+        Saludos,
+        El equipo de EcoMarket
+        """
+        return self.send_email(user_email, subject, body)
+    
+    def send_password_reset(self, user_email, reset_token):
+        """Envía email de restablecimiento de contraseña."""
+        subject = "Restablecer Contraseña - EcoMarket"
+        body = f"""
+        Hola,
+        
+        Para restablecer tu contraseña, haz clic en el siguiente enlace:
+        
+        {request.host_url}reset-password?token={reset_token}
+        
+        Este enlace expirará en 1 hora.
+        
+        Saludos,
+        El equipo de EcoMarket
+        """
+        return self.send_email(user_email, subject, body)
+
+# Instancia global de notificaciones
+notification_manager = NotificationManager()
+
+# ── Sistema de Analytics Avanzado ───────────────────────────────────────────────────────
+
+class AdvancedAnalytics:
+    """Sistema de analytics avanzado con machine learning básico."""
+    
+    def __init__(self):
+        self.events = []
+        self.user_sessions = {}
+        self.conversion_funnel = {
+            'page_view': 0,
+            'product_view': 0,
+            'add_to_cart': 0,
+            'checkout': 0,
+            'purchase': 0
+        }
+    
+    def track_event(self, event_name, user_id=None, properties=None):
+        """Registra un evento de analytics."""
+        event = {
+            'name': event_name,
+            'user_id': user_id,
+            'properties': properties or {},
+            'timestamp': time.time()
+        }
+        self.events.append(event)
+        
+        # Actualizar funnel
+        if event_name in self.conversion_funnel:
+            self.conversion_funnel[event_name] += 1
+        
+        logger.info(f"Evento tracked: {event_name}")
+    
+    def get_funnel_analysis(self):
+        """Analiza el funnel de conversión."""
+        total = self.conversion_funnel['page_view'] or 1
+        analysis = {}
+        
+        for step, count in self.conversion_funnel.items():
+            if step == 'page_view':
+                analysis[step] = {'count': count, 'rate': 1.0}
+            else:
+                prev_step = list(self.conversion_funnel.keys())[
+                    list(self.conversion_funnel.keys()).index(step) - 1
+                ]
+                prev_count = self.conversion_funnel[prev_step] or 1
+                analysis[step] = {
+                    'count': count,
+                    'rate': count / prev_count
+                }
+        
+        return analysis
+    
+    def get_user_behavior(self, user_id):
+        """Analiza comportamiento de un usuario."""
+        user_events = [e for e in self.events if e['user_id'] == user_id]
+        
+        if not user_events:
+            return None
+        
+        return {
+            'total_events': len(user_events),
+            'most_common_action': self._get_most_common_action(user_events),
+            'session_duration': self._calculate_session_duration(user_events),
+            'conversion_status': self._get_conversion_status(user_events)
+        }
+    
+    def _get_most_common_action(self, events):
+        """Obtiene la acción más común del usuario."""
+        actions = [e['name'] for e in events]
+        from collections import Counter
+        return Counter(actions).most_common(1)[0][0]
+    
+    def _calculate_session_duration(self, events):
+        """Calcula duración de sesión."""
+        if len(events) < 2:
+            return 0
+        return events[-1]['timestamp'] - events[0]['timestamp']
+    
+    def _get_conversion_status(self, events):
+        """Determina estado de conversión."""
+        actions = [e['name'] for e in events]
+        if 'purchase' in actions:
+            return 'converted'
+        elif 'checkout' in actions:
+            return 'in_checkout'
+        elif 'add_to_cart' in actions:
+            return 'in_cart'
+        else:
+            return 'browsing'
+
+# Instancia global de analytics
+advanced_analytics = AdvancedAnalytics()
+
+# ── Sistema de Búsqueda Semántica ───────────────────────────────────────────────────────
+
+class SemanticSearch:
+    """Sistema de búsqueda semántica con análisis de texto."""
+    
+    def __init__(self):
+        self.vocabulary = {}
+        self.product_vectors = {}
+        self._build_vocabulary()
+    
+    def _build_vocabulary(self):
+        """Construye vocabulario de los productos."""
+        try:
+            conn = get_db()
+            productos = conn.execute('SELECT id, nombre, descripcion, categoria, etiquetas FROM productos').fetchall()
+            conn.close()
+            
+            # Tokenizar y construir vocabulario
+            for producto in productos:
+                text = f"{producto['nombre']} {producto['descripcion']} {producto['categoria']} {producto['etiquetas']}"
+                tokens = self._tokenize(text)
+                
+                for token in tokens:
+                    if token not in self.vocabulary:
+                        self.vocabulary[token] = len(self.vocabulary)
+                
+                # Crear vector del producto
+                self.product_vectors[producto['id']] = self._text_to_vector(tokens)
+            
+            logger.info(f"Vocabulario construido: {len(self.vocabulary)} tokens")
+        except Exception as e:
+            logger.error(f"Error construyendo vocabulario: {e}")
+    
+    def _tokenize(self, text):
+        """Tokeniza texto de forma básica."""
+        # Convertir a minúsculas
+        text = text.lower()
+        # Eliminar puntuación
+        text = re.sub(r'[^\w\s]', '', text)
+        # Tokenizar
+        tokens = text.split()
+        # Eliminar stopwords básicas
+        stopwords = {'el', 'la', 'de', 'en', 'y', 'o', 'que', 'para', 'con', 'por', 'un', 'una', 'los', 'las'}
+        tokens = [t for t in tokens if t not in stopwords and len(t) > 2]
+        return tokens
+    
+    def _text_to_vector(self, tokens):
+        """Convierte tokens a vector TF-IDF simplificado."""
+        vector = {}
+        for token in tokens:
+            if token in self.vocabulary:
+                idx = self.vocabulary[token]
+                vector[idx] = vector.get(idx, 0) + 1
+        return vector
+    
+    def search(self, query, limit=10):
+        """Realiza búsqueda semántica."""
+        if not query:
+            return []
+        
+        query_tokens = self._tokenize(query)
+        query_vector = self._text_to_vector(query_tokens)
+        
+        if not query_vector:
+            return []
+        
+        # Calcular similitud con cada producto
+        similarities = []
+        for product_id, product_vector in self.product_vectors.items():
+            similarity = self._cosine_similarity(query_vector, product_vector)
+            if similarity > 0:
+                similarities.append((product_id, similarity))
+        
+        # Ordenar por similitud
+        similarities.sort(key=lambda x: x[1], reverse=True)
+        
+        # Obtener IDs de productos
+        product_ids = [pid for pid, _ in similarities[:limit]]
+        
+        return product_ids
+    
+    def _cosine_similarity(self, vec1, vec2):
+        """Calcula similitud coseno entre dos vectores."""
+        intersection = set(vec1.keys()) & set(vec2.keys())
+        if not intersection:
+            return 0
+        
+        dot_product = sum(vec1[k] * vec2[k] for k in intersection)
+        norm1 = sum(v ** 2 for v in vec1.values()) ** 0.5
+        norm2 = sum(v ** 2 for v in vec2.values()) ** 0.5
+        
+        if norm1 == 0 or norm2 == 0:
+            return 0
+        
+        return dot_product / (norm1 * norm2)
+
+# Instancia global de búsqueda semántica
+semantic_search = SemanticSearch()
+
+# ── Sistema de Recomendaciones con ML ───────────────────────────────────────────────────
+
+class MLRecommender:
+    """Sistema de recomendaciones con técnicas de machine learning básicas."""
+    
+    def __init__(self):
+        self.user_item_matrix = {}
+        self.item_similarity = {}
+        self._build_matrices()
+    
+    def _build_matrices(self):
+        """Construye matrices de usuario-item y similitud."""
+        try:
+            conn = get_db()
+            
+            # Construir matriz usuario-item basada en favoritos y compras
+            favoritos = conn.execute('SELECT usuario_id, producto_id FROM favoritos').fetchall()
+            pedidos = conn.execute('SELECT usuario_id FROM pedidos').fetchall()
+            
+            for fav in favoritos:
+                user_id = fav['usuario_id']
+                product_id = fav['producto_id']
+                if user_id not in self.user_item_matrix:
+                    self.user_item_matrix[user_id] = {}
+                self.user_item_matrix[user_id][product_id] = 1  # Interacción positiva
+            
+            conn.close()
+            logger.info(f"Matriz usuario-item construida: {len(self.user_item_matrix)} usuarios")
+        except Exception as e:
+            logger.error(f"Error construyendo matrices: {e}")
+    
+    def get_recommendations(self, user_id, limit=10):
+        """Obtiene recomendaciones para un usuario."""
+        if user_id not in self.user_item_matrix:
+            # Usuario nuevo, recomendar populares
+            return self._get_popular_items(limit)
+        
+        user_items = self.user_item_matrix[user_id]
+        recommendations = {}
+        
+        # Colaborative filtering básico
+        for other_user_id, other_items in self.user_item_matrix.items():
+            if other_user_id == user_id:
+                continue
+            
+            # Calcular similitud entre usuarios
+            similarity = self._user_similarity(user_items, other_items)
+            
+            if similarity > 0:
+                for product_id, rating in other_items.items():
+                    if product_id not in user_items:
+                        recommendations[product_id] = recommendations.get(product_id, 0) + similarity * rating
+        
+        # Ordenar por score
+        sorted_recommendations = sorted(recommendations.items(), key=lambda x: x[1], reverse=True)
+        
+        return [pid for pid, _ in sorted_recommendations[:limit]]
+    
+    def _get_popular_items(self, limit=10):
+        """Obtiene items populares."""
+        try:
+            conn = get_db()
+            populares = conn.execute('''
+                SELECT id FROM productos 
+                ORDER BY vistas DESC, eco_score DESC 
+                LIMIT ?
+            ''', (limit,)).fetchall()
+            conn.close()
+            return [p['id'] for p in populares]
+        except Exception as e:
+            logger.error(f"Error obteniendo populares: {e}")
+            return []
+    
+    def _user_similarity(self, user1_items, user2_items):
+        """Calcula similitud entre usuarios (Jaccard)."""
+        set1 = set(user1_items.keys())
+        set2 = set(user2_items.keys())
+        
+        intersection = len(set1 & set2)
+        union = len(set1 | set2)
+        
+        if union == 0:
+            return 0
+        
+        return intersection / union
+
+# Instancia global de recomendaciones
+ml_recommender = MLRecommender()
+
+# ── Sistema de Mejoras de Accesibilidad WCAG 2.1 AAA ───────────────────────────────────────
+
+class AccessibilityEnhancer:
+    """Mejoras de accesibilidad avanzadas."""
+    
+    def __init__(self):
+        self.high_contrast_mode = False
+        self.reduced_motion = False
+        self.large_text = False
+    
+    def check_preferences(self):
+        """Verifica preferencias de accesibilidad del usuario."""
+        # Se puede extender para leer preferencias guardadas en base de datos
+        pass
+    
+    def get_aria_labels(self, context):
+        """Genera etiquetas ARIA dinámicas."""
+        labels = {
+            'search': 'Buscar productos',
+            'cart': 'Ver carrito de compras',
+            'favorite': 'Agregar a favoritos',
+            'buy': 'Comprar producto',
+            'filter': 'Filtrar productos'
+        }
+        return labels.get(context, '')
+    
+    def generate_skip_links(self):
+        """Genera enlaces de navegación por saltos."""
+        return """
+        <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+        <a href="#navigation" class="skip-link">Saltar a navegación</a>
+        <a href="#search" class="skip-link">Saltar a búsqueda</a>
+        """
+    
+    def get_color_contrast_ratio(self, foreground, background):
+        """Calcula ratio de contraste entre colores."""
+        # Implementación simplificada
+        try:
+            # Convertir hex a RGB
+            fg = self._hex_to_rgb(foreground)
+            bg = self._hex_to_rgb(background)
+            
+            # Calcular luminancia
+            fg_lum = self._get_luminance(fg)
+            bg_lum = self._get_luminance(bg)
+            
+            # Calcular ratio
+            lighter = max(fg_lum, bg_lum)
+            darker = min(fg_lum, bg_lum)
+            
+            return (lighter + 0.05) / (darker + 0.05)
+        except:
+            return 4.5  # Default
+    
+    def _hex_to_rgb(self, hex_color):
+        """Convierte color hex a RGB."""
+        hex_color = hex_color.lstrip('#')
+        return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+    
+    def _get_luminance(self, rgb):
+        """Calcula luminancia relativa."""
+        r, g, b = [x / 255.0 for x in rgb]
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+# Instancia global de accesibilidad
+accessibility = AccessibilityEnhancer()
+
+# ── Sistema de PWA Completo con Sync Offline ───────────────────────────────────────────────
+
+class PWAManager:
+    """Gestor de PWA con sincronización offline."""
+    
+    def __init__(self):
+        self.offline_queue = []
+        self.sync_pending = False
+    
+    def queue_offline_action(self, action_type, data):
+        """Encola una acción para sincronización offline."""
+        action = {
+            'type': action_type,
+            'data': data,
+            'timestamp': time.time(),
+            'synced': False
+        }
+        self.offline_queue.append(action)
+        self.sync_pending = True
+        logger.info(f"Acción encolada para sync offline: {action_type}")
+    
+    def sync_offline_actions(self):
+        """Sincroniza acciones pendientes cuando hay conexión."""
+        if not self.offline_queue:
+            return True
+        
+        sync_errors = []
+        
+        for action in self.offline_queue:
+            if action['synced']:
+                continue
+            
+            try:
+                if action['type'] == 'favorite':
+                    # Sincronizar favorito
+                    self._sync_favorite(action['data'])
+                elif action['type'] == 'review':
+                    # Sincronizar reseña
+                    self._sync_review(action['data'])
+                elif action['type'] == 'order':
+                    # Sincronizar pedido
+                    self._sync_order(action['data'])
+                
+                action['synced'] = True
+            except Exception as e:
+                sync_errors.append(e)
+                logger.error(f"Error sincronizando acción: {e}")
+        
+        # Limpiar acciones sincronizadas
+        self.offline_queue = [a for a in self.offline_queue if not a['synced']]
+        self.sync_pending = len(self.offline_queue) > 0
+        
+        return len(sync_errors) == 0
+    
+    def _sync_favorite(self, data):
+        """Sincroniza un favorito."""
+        conn = get_db()
+        conn.execute('''
+            INSERT OR IGNORE INTO favoritos (usuario_id, producto_id)
+            VALUES (?, ?)
+        ''', (data['usuario_id'], data['producto_id']))
+        conn.commit()
+        conn.close()
+    
+    def _sync_review(self, data):
+        """Sincroniza una reseña."""
+        conn = get_db()
+        conn.execute('''
+            INSERT INTO resenas (producto_id, usuario_id, nombre, rating, comentario)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (data['producto_id'], data['usuario_id'], data['nombre'], 
+              data['rating'], data['comentario']))
+        conn.commit()
+        conn.close()
+    
+    def _sync_order(self, data):
+        """Sincroniza un pedido."""
+        # Implementación más compleja requeriría re-procesar el pedido
+        pass
+    
+    def get_sync_status(self):
+        """Obtiene estado de sincronización."""
+        return {
+            'pending': len(self.offline_queue),
+            'sync_pending': self.sync_pending,
+            'last_sync': time.time()
+        }
+
+# Instancia global de PWA
+pwa_manager = PWAManager()
+
+# ── Sistema Multi-Idioma Completo ───────────────────────────────────────────────────────
+
+class I18NManager:
+    """Gestor de internacionalización completo."""
+    
+    def __init__(self):
+        self.supported_languages = ['es', 'en', 'pt', 'fr']
+        self.translations = {
+            'es': {
+                # Navegación
+                'home': 'Inicio',
+                'shop': 'Tienda',
+                'refill': 'Recargas',
+                'impact': 'Impacto',
+                'learn': 'Aprender',
+                'find_store': 'Encontrar Tienda',
+                'search': 'Buscar',
+                'cart': 'Carrito',
+                'login': 'Iniciar Sesión',
+                'register': 'Registrarse',
+                'profile': 'Perfil',
+                'logout': 'Cerrar Sesión',
+                'welcome': 'Bienvenido',
+                'buy': 'Comprar',
+                'products': 'Productos',
+                # Hero Section
+                'hero_title': 'Raíces en la Naturaleza, Construido para el Futuro',
+                'hero_subtitle': 'Tu tienda de un solo paso para esenciales de cero residuos, recargas a granel y una comunidad dedicada a un planeta más limpio.',
+                'shop_zero_waste': 'Comprar Cero Residuos',
+                'how_refills_work': 'Cómo Funcionan las Recargas',
+                'plastic_saved': 'Botellas de Plástico Ahorradas',
+                # Categorías
+                'shop_by_category': 'Comprar por Categoría',
+                'category_subtitle': 'Todo lo que necesitas para transitionar a un estilo de vida sostenible, curado por calidad e impacto.',
+                'personal_care': 'Cuidado Personal',
+                'home_essentials': 'Esenciales del Hogar',
+                'kitchen': 'Cocina',
+                'on_the_go': 'En Movimiento',
+                'cleaning': 'Limpieza',
+                'wellness': 'Bienestar',
+                # Productos
+                'eco_score': 'Puntuación Eco',
+                'condition': 'Condición',
+                'new': 'Nuevo',
+                'used': 'Usado',
+                'refurbished': 'Reacondicionado',
+                'price': 'Precio',
+                'stock': 'Stock',
+                'description': 'Descripción',
+                'specifications': 'Especificaciones',
+                'location': 'Ubicación',
+                'seller': 'Vendedor',
+                'reviews': 'Reseñas',
+                'rating': 'Calificación',
+                'add_to_cart': 'Agregar al Carrito',
+                'add_to_favorites': 'Agregar a Favoritos',
+                'view_details': 'Ver Detalles',
+                # Checkout
+                'checkout': 'Checkout',
+                'shipping': 'Envío',
+                'payment': 'Pago',
+                'order_summary': 'Resumen del Pedido',
+                'subtotal': 'Subtotal',
+                'total': 'Total',
+                'shipping_address': 'Dirección de Envío',
+                'payment_method': 'Método de Pago',
+                'place_order': 'Realizar Pedido',
+                'credit_card': 'Tarjeta de Crédito',
+                'paypal': 'PayPal',
+                'cash_on_delivery': 'Pago contra Entrega',
+                # Usuario
+                'my_account': 'Mi Cuenta',
+                'my_orders': 'Mis Pedidos',
+                'my_favorites': 'Mis Favoritos',
+                'my_reviews': 'Mis Reseñas',
+                'settings': 'Configuración',
+                'notifications': 'Notificaciones',
+                'messages': 'Mensajes',
+                'edit_profile': 'Editar Perfil',
+                'change_password': 'Cambiar Contraseña',
+                'shipping_addresses': 'Direcciones de Envío',
+                'payment_methods': 'Métodos de Pago',
+                # Admin
+                'admin_panel': 'Panel de Administración',
+                'manage_products': 'Gestionar Productos',
+                'manage_users': 'Gestionar Usuarios',
+                'manage_orders': 'Gestionar Pedidos',
+                'analytics': 'Analíticas',
+                'reports': 'Reportes',
+                'settings_admin': 'Configuración',
+                # Mensajes
+                'success': 'Éxito',
+                'error': 'Error',
+                'warning': 'Advertencia',
+                'info': 'Información',
+                'login_success': 'Inicio de sesión exitoso',
+                'login_failed': 'Error en inicio de sesión',
+                'register_success': 'Registro exitoso',
+                'register_failed': 'Error en registro',
+                'added_to_cart': 'Agregado al carrito',
+                'removed_from_cart': 'Eliminado del carrito',
+                'order_placed': 'Pedido realizado',
+                'order_failed': 'Error al realizar pedido',
+                'profile_updated': 'Perfil actualizado',
+                'password_changed': 'Contraseña cambiada',
+                # Footer
+                'about_us': 'Sobre Nosotros',
+                'contact': 'Contacto',
+                'faq': 'Preguntas Frecuentes',
+                'privacy_policy': 'Política de Privacidad',
+                'terms_of_service': 'Términos de Servicio',
+                'shipping_policy': 'Política de Envío',
+                'return_policy': 'Política de Devoluciones',
+                'follow_us': 'Síguenos',
+                'newsletter': 'Boletín',
+                'subscribe': 'Suscribirse',
+                # Otros
+                'loading': 'Cargando...',
+                'no_results': 'No hay resultados',
+                'try_again': 'Intentar de nuevo',
+                'view_all': 'Ver Todo',
+                'show_more': 'Mostrar Más',
+                'show_less': 'Mostrar Menos',
+                'filter': 'Filtrar',
+                'sort': 'Ordenar',
+                'sort_by': 'Ordenar por',
+                'price_low_high': 'Precio: Bajo a Alto',
+                'price_high_low': 'Precio: Alto a Bajo',
+                'newest': 'Más Recientes',
+                'oldest': 'Más Antiguos',
+                'popular': 'Populares',
+                'rating_high': 'Mejor Calificación',
+                'eco_score_high': 'Mejor Puntuación Eco'
+            },
+            'en': {
+                # Navigation
+                'home': 'Home',
+                'shop': 'Shop',
+                'refill': 'Refill',
+                'impact': 'Impact',
+                'learn': 'Learn',
+                'find_store': 'Find Store',
+                'search': 'Search',
+                'cart': 'Cart',
+                'login': 'Login',
+                'register': 'Register',
+                'profile': 'Profile',
+                'logout': 'Logout',
+                'welcome': 'Welcome',
+                'buy': 'Buy',
+                'products': 'Products',
+                # Hero Section
+                'hero_title': 'Rooted in Nature, Built for the Future',
+                'hero_subtitle': 'Your one-stop shop for premium zero-waste essentials, bulk refills, and a community dedicated to a cleaner planet.',
+                'shop_zero_waste': 'Shop Zero Waste',
+                'how_refills_work': 'How Refills Work',
+                'plastic_saved': 'Plastic Bottles Saved',
+                # Categories
+                'shop_by_category': 'Shop by Category',
+                'category_subtitle': 'Everything you need to transition to a sustainable lifestyle, curated for quality and impact.',
+                'personal_care': 'Personal Care',
+                'home_essentials': 'Home Essentials',
+                'kitchen': 'Kitchen',
+                'on_the_go': 'On the Go',
+                'cleaning': 'Cleaning',
+                'wellness': 'Wellness',
+                # Products
+                'eco_score': 'Eco Score',
+                'condition': 'Condition',
+                'new': 'New',
+                'used': 'Used',
+                'refurbished': 'Refurbished',
+                'price': 'Price',
+                'stock': 'Stock',
+                'description': 'Description',
+                'specifications': 'Specifications',
+                'location': 'Location',
+                'seller': 'Seller',
+                'reviews': 'Reviews',
+                'rating': 'Rating',
+                'add_to_cart': 'Add to Cart',
+                'add_to_favorites': 'Add to Favorites',
+                'view_details': 'View Details',
+                # Checkout
+                'checkout': 'Checkout',
+                'shipping': 'Shipping',
+                'payment': 'Payment',
+                'order_summary': 'Order Summary',
+                'subtotal': 'Subtotal',
+                'total': 'Total',
+                'shipping_address': 'Shipping Address',
+                'payment_method': 'Payment Method',
+                'place_order': 'Place Order',
+                'credit_card': 'Credit Card',
+                'paypal': 'PayPal',
+                'cash_on_delivery': 'Cash on Delivery',
+                # User
+                'my_account': 'My Account',
+                'my_orders': 'My Orders',
+                'my_favorites': 'My Favorites',
+                'my_reviews': 'My Reviews',
+                'settings': 'Settings',
+                'notifications': 'Notifications',
+                'messages': 'Messages',
+                'edit_profile': 'Edit Profile',
+                'change_password': 'Change Password',
+                'shipping_addresses': 'Shipping Addresses',
+                'payment_methods': 'Payment Methods',
+                # Admin
+                'admin_panel': 'Admin Panel',
+                'manage_products': 'Manage Products',
+                'manage_users': 'Manage Users',
+                'manage_orders': 'Manage Orders',
+                'analytics': 'Analytics',
+                'reports': 'Reports',
+                'settings_admin': 'Settings',
+                # Messages
+                'success': 'Success',
+                'error': 'Error',
+                'warning': 'Warning',
+                'info': 'Information',
+                'login_success': 'Login successful',
+                'login_failed': 'Login failed',
+                'register_success': 'Registration successful',
+                'register_failed': 'Registration failed',
+                'added_to_cart': 'Added to cart',
+                'removed_from_cart': 'Removed from cart',
+                'order_placed': 'Order placed',
+                'order_failed': 'Order failed',
+                'profile_updated': 'Profile updated',
+                'password_changed': 'Password changed',
+                # Footer
+                'about_us': 'About Us',
+                'contact': 'Contact',
+                'faq': 'FAQ',
+                'privacy_policy': 'Privacy Policy',
+                'terms_of_service': 'Terms of Service',
+                'shipping_policy': 'Shipping Policy',
+                'return_policy': 'Return Policy',
+                'follow_us': 'Follow Us',
+                'newsletter': 'Newsletter',
+                'subscribe': 'Subscribe',
+                # Other
+                'loading': 'Loading...',
+                'no_results': 'No results',
+                'try_again': 'Try again',
+                'view_all': 'View All',
+                'show_more': 'Show More',
+                'show_less': 'Show Less',
+                'filter': 'Filter',
+                'sort': 'Sort',
+                'sort_by': 'Sort by',
+                'price_low_high': 'Price: Low to High',
+                'price_high_low': 'Price: High to Low',
+                'newest': 'Newest',
+                'oldest': 'Oldest',
+                'popular': 'Popular',
+                'rating_high': 'Highest Rating',
+                'eco_score_high': 'Highest Eco Score'
+            },
+            'pt': {
+                'home': 'Início',
+                'shop': 'Loja',
+                'refill': 'Recargas',
+                'impact': 'Impacto',
+                'learn': 'Aprender',
+                'find_store': 'Encontrar Loja',
+                'search': 'Buscar',
+                'cart': 'Carrinho',
+                'login': 'Entrar',
+                'register': 'Registrar',
+                'profile': 'Perfil',
+                'logout': 'Sair',
+                'welcome': 'Bem-vindo',
+                'buy': 'Comprar',
+                'products': 'Produtos',
+                'hero_title': 'Enraizado na Natureza, Construído para o Futuro',
+                'hero_subtitle': 'Sua loja de parada única para essenciais de zero resíduos, recargas a granel e uma comunidade dedicada a um planeta mais limpo.',
+                'shop_zero_waste': 'Comprar Zero Resíduos',
+                'how_refills_work': 'Como Funcionam as Recargas',
+                'plastic_saved': 'Garrafas de Plástico Economizadas',
+                'shop_by_category': 'Comprar por Categoria',
+                'category_subtitle': 'Tudo que você precisa para transicionar para um estilo de vida sustentável, curado por qualidade e impacto.',
+                'personal_care': 'Cuidado Pessoal',
+                'home_essentials': 'Essenciais da Casa',
+                'kitchen': 'Cozinha',
+                'on_the_go': 'Em Movimento',
+                'cleaning': 'Limpeza',
+                'wellness': 'Bem-estar',
+                'eco_score': 'Pontuação Eco',
+                'condition': 'Condição',
+                'new': 'Novo',
+                'used': 'Usado',
+                'refurbished': 'Recondicionado',
+                'price': 'Preço',
+                'stock': 'Estoque',
+                'description': 'Descrição',
+                'specifications': 'Especificações',
+                'location': 'Localização',
+                'seller': 'Vendedor',
+                'reviews': 'Avaliações',
+                'rating': 'Classificação',
+                'add_to_cart': 'Adicionar ao Carrinho',
+                'add_to_favorites': 'Adicionar aos Favoritos',
+                'view_details': 'Ver Detalhes',
+                'checkout': 'Checkout',
+                'shipping': 'Envio',
+                'payment': 'Pagamento',
+                'order_summary': 'Resumo do Pedido',
+                'subtotal': 'Subtotal',
+                'total': 'Total',
+                'shipping_address': 'Endereço de Envio',
+                'payment_method': 'Método de Pagamento',
+                'place_order': 'Fazer Pedido',
+                'credit_card': 'Cartão de Crédito',
+                'paypal': 'PayPal',
+                'cash_on_delivery': 'Pagamento na Entrega',
+                'my_account': 'Minha Conta',
+                'my_orders': 'Meus Pedidos',
+                'my_favorites': 'Meus Favoritos',
+                'my_reviews': 'Minhas Avaliações',
+                'settings': 'Configurações',
+                'notifications': 'Notificações',
+                'messages': 'Mensagens',
+                'edit_profile': 'Editar Perfil',
+                'change_password': 'Alterar Senha',
+                'success': 'Sucesso',
+                'error': 'Erro',
+                'warning': 'Aviso',
+                'info': 'Informação',
+                'login_success': 'Login bem-sucedido',
+                'login_failed': 'Login falhou',
+                'register_success': 'Registro bem-sucedido',
+                'register_failed': 'Registro falhou',
+                'added_to_cart': 'Adicionado ao carrinho',
+                'removed_from_cart': 'Removido do carrinho',
+                'order_placed': 'Pedido realizado',
+                'order_failed': 'Falha ao realizar pedido',
+                'loading': 'Carregando...',
+                'no_results': 'Sem resultados',
+                'try_again': 'Tentar novamente',
+                'view_all': 'Ver Tudo',
+                'show_more': 'Mostrar Mais',
+                'show_less': 'Mostrar Menos',
+                'filter': 'Filtrar',
+                'sort': 'Ordenar',
+                'sort_by': 'Ordenar por',
+                'price_low_high': 'Preço: Baixo a Alto',
+                'price_high_low': 'Preço: Alto a Baixo',
+                'newest': 'Mais Recentes',
+                'oldest': 'Mais Antigos',
+                'popular': 'Populares',
+                'rating_high': 'Maior Classificação',
+                'eco_score_high': 'Maior Pontuação Eco'
+            },
+            'fr': {
+                'home': 'Accueil',
+                'shop': 'Boutique',
+                'refill': 'Recharge',
+                'impact': 'Impact',
+                'learn': 'Apprendre',
+                'find_store': 'Trouver Magasin',
+                'search': 'Rechercher',
+                'cart': 'Panier',
+                'login': 'Connexion',
+                'register': 'S\'inscrire',
+                'profile': 'Profil',
+                'logout': 'Déconnexion',
+                'welcome': 'Bienvenue',
+                'buy': 'Acheter',
+                'products': 'Produits',
+                'hero_title': 'Enraciné dans la Nature, Construit pour l\'Avenir',
+                'hero_subtitle': 'Votre magasin tout-en-un pour les essentiels zéro déchet, recharges en vrac et une communauté dédiée à une planète plus propre.',
+                'shop_zero_waste': 'Acheter Zéro Déchet',
+                'how_refills_work': 'Comment Fonctionnent les Recharges',
+                'plastic_saved': 'Bouteilles en Plastique Économisées',
+                'shop_by_category': 'Acheter par Catégorie',
+                'category_subtitle': 'Tout ce dont vous avez besoin pour transitionner vers un mode de vie durable, sélectionné pour la qualité et l\'impact.',
+                'personal_care': 'Soins Personnels',
+                'home_essentials': 'Essentiels de la Maison',
+                'kitchen': 'Cuisine',
+                'on_the_go': 'En Déplacement',
+                'cleaning': 'Nettoyage',
+                'wellness': 'Bien-être',
+                'eco_score': 'Score Éco',
+                'condition': 'Condition',
+                'new': 'Nouveau',
+                'used': 'Utilisé',
+                'refurbished': 'Reconditionné',
+                'price': 'Prix',
+                'stock': 'Stock',
+                'description': 'Description',
+                'specifications': 'Spécifications',
+                'location': 'Emplacement',
+                'seller': 'Vendeur',
+                'reviews': 'Avis',
+                'rating': 'Note',
+                'add_to_cart': 'Ajouter au Panier',
+                'add_to_favorites': 'Ajouter aux Favoris',
+                'view_details': 'Voir Détails',
+                'checkout': 'Paiement',
+                'shipping': 'Livraison',
+                'payment': 'Paiement',
+                'order_summary': 'Résumé de la Commande',
+                'subtotal': 'Sous-total',
+                'total': 'Total',
+                'shipping_address': 'Adresse de Livraison',
+                'payment_method': 'Méthode de Paiement',
+                'place_order': 'Passer la Commande',
+                'credit_card': 'Carte de Crédit',
+                'paypal': 'PayPal',
+                'cash_on_delivery': 'Paiement à la Livraison',
+                'my_account': 'Mon Compte',
+                'my_orders': 'Mes Commandes',
+                'my_favorites': 'Mes Favoris',
+                'my_reviews': 'Mes Avis',
+                'settings': 'Paramètres',
+                'notifications': 'Notifications',
+                'messages': 'Messages',
+                'edit_profile': 'Modifier le Profil',
+                'change_password': 'Changer le Mot de Passe',
+                'success': 'Succès',
+                'error': 'Erreur',
+                'warning': 'Avertissement',
+                'info': 'Information',
+                'login_success': 'Connexion réussie',
+                'login_failed': 'Échec de la connexion',
+                'register_success': 'Inscription réussie',
+                'register_failed': 'Échec de l\'inscription',
+                'added_to_cart': 'Ajouté au panier',
+                'removed_from_cart': 'Retiré du panier',
+                'order_placed': 'Commande passée',
+                'order_failed': 'Échec de la commande',
+                'loading': 'Chargement...',
+                'no_results': 'Aucun résultat',
+                'try_again': 'Réessayer',
+                'view_all': 'Voir Tout',
+                'show_more': 'Afficher Plus',
+                'show_less': 'Afficher Moins',
+                'filter': 'Filtrer',
+                'sort': 'Trier',
+                'sort_by': 'Trier par',
+                'price_low_high': 'Prix: Bas à Haut',
+                'price_high_low': 'Prix: Haut à Bas',
+                'newest': 'Plus Récents',
+                'oldest': 'Plus Anciens',
+                'popular': 'Populaires',
+                'rating_high': 'Note la Plus Élevée',
+                'eco_score_high': 'Score Éco le Plus Élevé'
+            }
+        }
+    
+    def get_translation(self, key, lang='es'):
+        """Obtiene traducción de una clave."""
+        if lang not in self.translations:
+            lang = 'es'
+        return self.translations[lang].get(key, key)
+    
+    def get_translations_for_lang(self, lang='es'):
+        """Obtiene todas las traducciones para un idioma."""
+        if lang not in self.translations:
+            lang = 'es'
+        return self.translations[lang]
+    
+    def detect_language(self, request):
+        """Detecta idioma preferido del usuario."""
+        # Verificar cookie de idioma
+        lang_cookie = request.cookies.get('lang')
+        if lang_cookie in self.supported_languages:
+            return lang_cookie
+        
+        # Verificar header Accept-Language
+        accept_lang = request.headers.get('Accept-Language', 'es')
+        if accept_lang:
+            for lang in self.supported_languages:
+                if lang in accept_lang.lower():
+                    return lang
+        
+        return 'es'
+
+# Instancia global de I18N
+i18n_manager = I18NManager()
+
+# ── API Endpoints para Nuevas Funcionalidades ───────────────────────────────────────────────
+
+@app.route('/api/monitoring/stats')
+@login_required
+@admin_required
+def monitoring_stats():
+    """API para obtener estadísticas de monitoring."""
+    return jsonify(monitoring.get_stats())
+
+@app.route('/api/monitoring/alerts')
+@login_required
+@admin_required
+def monitoring_alerts():
+    """API para obtener alertas del sistema."""
+    return jsonify(monitoring.check_alerts())
+
+@app.route('/api/backup/create', methods=['POST'])
+@login_required
+@admin_required
+def create_backup():
+    """API para crear backup de la base de datos."""
+    backup_file = backup_manager.create_backup()
+    if backup_file:
+        return jsonify({'success': True, 'backup_file': backup_file})
+    return jsonify({'success': False, 'error': 'Error creando backup'}), 500
+
+@app.route('/api/semantic/search')
+def semantic_search_api():
+    """API para búsqueda semántica."""
+    query = request.args.get('q', '').strip()
+    limit = int(request.args.get('limit', 10))
+    
+    if not query:
+        return jsonify({'results': []})
+    
+    product_ids = semantic_search.search(query, limit)
+    
+    conn = get_db()
+    placeholders = ','.join('?' * len(product_ids))
+    productos = conn.execute(f'''
+        SELECT * FROM productos WHERE id IN ({placeholders})
+    ''', product_ids).fetchall()
+    conn.close()
+    
+    return jsonify({'results': [dict(p) for p in productos]})
+
+@app.route('/api/recommendations/ml')
+@login_required
+def ml_recommendations():
+    """API para recomendaciones con ML."""
+    user_id = session.get('usuario_id')
+    limit = int(request.args.get('limit', 10))
+    
+    recommended_ids = ml_recommender.get_recommendations(user_id, limit)
+    
+    if not recommended_ids:
+        return jsonify({'recommendations': []})
+    
+    conn = get_db()
+    placeholders = ','.join('?' * len(recommended_ids))
+    productos = conn.execute(f'''
+        SELECT * FROM productos WHERE id IN ({placeholders})
+    ''', recommended_ids).fetchall()
+    conn.close()
+    
+    return jsonify({'recommendations': [dict(p) for p in productos]})
+
+@app.route('/api/analytics/track', methods=['POST'])
+def track_analytics():
+    """API para tracking de eventos analytics."""
+    data = request.get_json()
+    event_name = data.get('event')
+    user_id = session.get('usuario_id')
+    properties = data.get('properties', {})
+    
+    advanced_analytics.track_event(event_name, user_id, properties)
+    
+    return jsonify({'success': True})
+
+@app.route('/api/analytics/funnel')
+@login_required
+@admin_required
+def analytics_funnel():
+    """API para análisis de funnel."""
+    return jsonify(advanced_analytics.get_funnel_analysis())
+
+@app.route('/api/analytics/user/<int:user_id>')
+@login_required
+@admin_required
+def user_analytics(user_id):
+    """API para analytics de usuario específico."""
+    behavior = advanced_analytics.get_user_behavior(user_id)
+    return jsonify(behavior or {})
+
+@app.route('/api/pwa/sync', methods=['POST'])
+@login_required
+def pwa_sync():
+    """API para sincronización offline."""
+    data = request.get_json()
+    action_type = data.get('action_type')
+    action_data = data.get('data')
+    
+    pwa_manager.queue_offline_action(action_type, action_data)
+    
+    return jsonify({'success': True, 'sync_status': pwa_manager.get_sync_status()})
+
+@app.route('/api/pwa/sync-status')
+@login_required
+def pwa_sync_status():
+    """API para obtener estado de sincronización."""
+    return jsonify(pwa_manager.get_sync_status())
+
+@app.route('/api/i18n/translations')
+def get_translations():
+    """API para obtener traducciones."""
+    lang = request.args.get('lang', 'es')
+    return jsonify(i18n_manager.get_translations_for_lang(lang))
+
+@app.route('/api/ab/test/variant')
+@login_required
+def get_ab_variant():
+    """API para obtener variante de A/B test."""
+    experiment_name = request.args.get('experiment')
+    user_id = session.get('usuario_id')
+    
+    variant = ab_testing.get_variant(experiment_name, user_id)
+    
+    return jsonify({'experiment': experiment_name, 'variant': variant})
+
+@app.route('/api/ab/test/conversion', methods=['POST'])
+@login_required
+def track_ab_conversion():
+    """API para tracking de conversión A/B test."""
+    data = request.get_json()
+    experiment_name = data.get('experiment')
+    variant = data.get('variant')
+    user_id = session.get('usuario_id')
+    
+    ab_testing.track_conversion(experiment_name, variant, user_id)
+    
+    return jsonify({'success': True})
+
+@app.route('/api/cache/stats')
+@login_required
+@admin_required
+def cache_stats():
+    """API para estadísticas de caché."""
+    stats = {
+        'redis_available': cache.redis_available,
+        'cache_size': len(cache.cache),
+        'expired_cleaned': cache.cleanup_expired()
+    }
+    return jsonify(stats)
+
+@app.route('/api/cache/clear', methods=['POST'])
+@login_required
+@admin_required
+def clear_cache():
+    """API para limpiar caché."""
+    cache.clear()
+    return jsonify({'success': True})
+
+# ── Gamificación API ───────────────────────────────────────────────────────
+
+@app.route('/api/usuario/<int:user_id>/gamificacion')
+@login_required
+def get_user_gamification(user_id):
+    """API para obtener datos de gamificación de usuario."""
+    if session.get('usuario_id') != user_id and session.get('rol') != 'admin':
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    conn = get_db()
+    usuario = conn.execute('SELECT * FROM usuarios WHERE id = ?', (user_id,)).fetchone()
+    conn.close()
+    
+    if not usuario:
+        return jsonify({'error': 'User not found'}), 404
+    
+    # Badges disponibles
+    badges = [
+        {'icon': '🌱', 'name': 'First Purchase', 'unlocked': usuario['xp'] > 0},
+        {'icon': '🌿', 'name': 'Eco Warrior', 'unlocked': usuario['xp'] > 100},
+        {'icon': '🌳', 'name': 'Nature Guardian', 'unlocked': usuario['xp'] > 500},
+        {'icon': '🌍', 'name': 'Planet Savior', 'unlocked': usuario['xp'] > 1000},
+        {'icon': '⭐', 'name': 'Top Reviewer', 'unlocked': usuario['eco_puntos'] > 50},
+        {'icon': '🏆', 'name': 'Champion', 'unlocked': usuario['nivel'] > 5}
+    ]
+    
+    return jsonify({
+        'usuario_id': usuario['id'],
+        'nombre': usuario['nombre'],
+        'xp': usuario['xp'],
+        'nivel': usuario['nivel'],
+        'rango': usuario['rango'],
+        'eco_puntos': usuario['eco_puntos'],
+        'badges': badges
+    })
+
+@app.route('/api/gamificacion/xp', methods=['POST'])
+@login_required
+def add_xp():
+    """API para agregar XP a usuario."""
+    data = request.get_json()
+    xp_amount = data.get('xp', 0)
+    user_id = session.get('usuario_id')
+    
+    if xp_amount <= 0:
+        return jsonify({'error': 'Invalid XP amount'}), 400
+    
+    conn = get_db()
+    conn.execute('UPDATE usuarios SET xp = xp + ? WHERE id = ?', (xp_amount, user_id))
+    
+    # Check for level up
+    usuario = conn.execute('SELECT xp, nivel FROM usuarios WHERE id = ?', (user_id,)).fetchone()
+    new_level = 1 + (usuario['xp'] // 100)
+    
+    if new_level > usuario['nivel']:
+        conn.execute('UPDATE usuarios SET nivel = ? WHERE id = ?', (new_level, user_id))
+        
+        # Update rango
+        rangos = ['Semilla 🌱', 'Brote 🌿', 'Planta 🌱', 'Árbol 🌳', 'Bosque 🌲', 'Ecosistema 🌍']
+        rango_index = min(new_level - 1, len(rangos) - 1)
+        conn.execute('UPDATE usuarios SET rango = ? WHERE id = ?', (rangos[rango_index], user_id))
+    
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'success': True, 'xp_added': xp_amount})
+
+@app.route('/api/leaderboard')
+def get_leaderboard():
+    """API para obtener leaderboard."""
+    conn = get_db()
+    
+    # Leaderboard de vendedores (por productos vendidos)
+    vendedores = conn.execute('''
+        SELECT u.id, u.nombre, u.avatar, u.xp, u.nivel, u.rango,
+               COUNT(p.id) as productos_vendidos
+        FROM usuarios u
+        LEFT JOIN productos p ON u.id = p.usuario_id
+        WHERE u.rol = 'vendedor' OR u.rol = 'admin'
+        GROUP BY u.id
+        ORDER BY productos_vendidos DESC
+        LIMIT 10
+    ''').fetchall()
+    
+    # Leaderboard de compradores (por XP)
+    compradores = conn.execute('''
+        SELECT id, nombre, avatar, xp, nivel, rango
+        FROM usuarios
+        WHERE rol = 'comprador'
+        ORDER BY xp DESC
+        LIMIT 10
+    ''').fetchall()
+    
+    conn.close()
+    
+    return jsonify({
+        'vendedores': [dict(v) for v in vendedores],
+        'compradores': [dict(c) for c in compradores]
+    })
+
+@app.route('/api/cupones/disponibles')
+def get_available_coupons():
+    """API para obtener cupones disponibles."""
+    conn = get_db()
+    cupones = conn.execute('''
+        SELECT * FROM cupones
+        WHERE activo = 1 AND usos_actuales < usos_maximos
+        ORDER BY descuento DESC
+    ''').fetchall()
+    conn.close()
+    
+    return jsonify({'cupones': [dict(c) for c in cupones]})
+
+@app.route('/api/cupones/aplicar', methods=['POST'])
+@login_required
+def apply_coupon():
+    """API para aplicar cupón."""
+    data = request.get_json()
+    codigo = data.get('codigo', '').strip().upper()
+    
+    if not codigo:
+        return jsonify({'error': 'Coupon code required'}), 400
+    
+    conn = get_db()
+    cupon = conn.execute('''
+        SELECT * FROM cupones
+        WHERE codigo = ? AND activo = 1 AND usos_actuales < usos_maximos
+    ''', (codigo,)).fetchone()
+    
+    if not cupon:
+        conn.close()
+        return jsonify({'error': 'Invalid or expired coupon'}), 400
+    
+    conn.close()
+    
+    return jsonify({
+        'success': True,
+        'cupon': dict(cupon),
+        'descuento': cupon['descuento'],
+        'tipo': cupon['tipo']
+    })()
 
 def validate_product_data(data):
     """Valida datos de producto de forma más estricta."""

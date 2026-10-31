@@ -1,0 +1,387 @@
+{% extends "base.html" %}
+
+{% block title %}EcoMarket - Premium Dashboard{% endblock %}
+
+{% block head %}
+<style>
+    .premium-dashboard {
+        padding: 100px 2rem 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .dashboard-title {
+        font-family: 'Playfair Display', Georgia, serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--eco-green-dark);
+    }
+    
+    .dashboard-controls {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+    
+    .lang-selector-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 9999px;
+        cursor: pointer;
+    }
+    
+    .dark-mode-toggle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="premium-dashboard">
+    <!-- Header con controles -->
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">Premium Dashboard</h1>
+        <div class="dashboard-controls">
+            <!-- Selector de idioma -->
+            <div class="lang-selector">
+                <button class="lang-selector-btn">
+                    <span id="currentLang">🇪🇸</span>
+                    <span>▼</span>
+                </button>
+                <div class="lang-dropdown">
+                    <div class="lang-option" data-lang="es">
+                        <span class="lang-flag">🇪🇸</span>
+                        <span>Español</span>
+                    </div>
+                    <div class="lang-option" data-lang="en">
+                        <span class="lang-flag">🇬🇧</span>
+                        <span>English</span>
+                    </div>
+                    <div class="lang-option" data-lang="pt">
+                        <span class="lang-flag">🇵🇹</span>
+                        <span>Português</span>
+                    </div>
+                    <div class="lang-option" data-lang="fr">
+                        <span class="lang-flag">🇫🇷</span>
+                        <span>Français</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Toggle modo oscuro -->
+            <button class="dark-mode-toggle">🌙</button>
+        </div>
+    </div>
+
+    <!-- Analytics Dashboard -->
+    <section class="analytics-dashboard reveal">
+        <h2 style="font-family: 'Playfair Display', Georgia, serif; font-size: 1.8rem; font-weight: 700; color: var(--eco-green-dark); margin-bottom: 1.5rem;">Analytics Overview</h2>
+        
+        <div class="analytics-grid">
+            <div class="analytics-card">
+                <div class="analytics-card-icon">📊</div>
+                <div class="analytics-card-value">1,234</div>
+                <div class="analytics-card-label">Total Visitors</div>
+            </div>
+            <div class="analytics-card">
+                <div class="analytics-card-icon">🛒</div>
+                <div class="analytics-card-value">89</div>
+                <div class="analytics-card-label">Orders Today</div>
+            </div>
+            <div class="analytics-card">
+                <div class="analytics-card-icon">💰</div>
+                <div class="analytics-card-value">S/ 12,450</div>
+                <div class="analytics-card-label">Revenue Today</div>
+            </div>
+            <div class="analytics-card">
+                <div class="analytics-card-icon">⭐</div>
+                <div class="analytics-card-value">4.8</div>
+                <div class="analytics-card-label">Avg Rating</div>
+            </div>
+        </div>
+        
+        <div class="analytics-chart">
+            <h3 class="analytics-chart-title">Sales Trend</h3>
+            <div style="height: 300px; display: flex; align-items: flex-end; justify-content: space-around; gap: 1rem;">
+                <div style="flex: 1; background: var(--gradient-accent); border-radius: 8px 8px 0 0; height: 60%;"></div>
+                <div style="flex: 1; background: var(--gradient-accent); border-radius: 8px 8px 0 0; height: 80%;"></div>
+                <div style="flex: 1; background: var(--gradient-accent); border-radius: 8px 8px 0 0; height: 45%;"></div>
+                <div style="flex: 1; background: var(--gradient-accent); border-radius: 8px 8px 0 0; height: 90%;"></div>
+                <div style="flex: 1; background: var(--gradient-accent); border-radius: 8px 8px 0 0; height: 70%;"></div>
+                <div style="flex: 1; background: var(--gradient-accent); border-radius: 8px 8px 0 0; height: 85%;"></div>
+                <div style="flex: 1; background: var(--gradient-accent); border-radius: 8px 8px 0 0; height: 55%;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gamificación -->
+    <section class="gamification-panel reveal" style="margin-top: 2rem;">
+        <h2 style="font-family: 'Playfair Display', Georgia, serif; font-size: 1.8rem; font-weight: 700; color: var(--eco-green-dark); margin-bottom: 1.5rem;">Your Progress</h2>
+        
+        <div class="level-badge">
+            <div class="level-icon">🌱</div>
+            <div class="level-info">
+                <div class="level-name">Semilla 🌱</div>
+                <div class="level-progress">
+                    <div class="level-progress-bar" style="width: 45%;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <h3 style="font-size: 1.2rem; font-weight: 600; color: var(--eco-green-dark); margin-bottom: 1rem;">Badges</h3>
+        <div class="badges-grid">
+            <div class="badge-item">
+                <div class="badge-icon">🌱</div>
+                <div class="badge-name">First Purchase</div>
+            </div>
+            <div class="badge-item locked">
+                <div class="badge-icon">🌿</div>
+                <div class="badge-name">Eco Warrior</div>
+            </div>
+            <div class="badge-item locked">
+                <div class="badge-icon">🌳</div>
+                <div class="badge-name">Nature Guardian</div>
+            </div>
+            <div class="badge-item locked">
+                <div class="badge-icon">🌍</div>
+                <div class="badge-name">Planet Savior</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Misiones Diarias -->
+    <section class="missions-section reveal" style="margin-top: 2rem;">
+        <div class="missions-header">
+            <h2 class="missions-title">Daily Missions</h2>
+            <span class="recommendations-badge">3 Available</span>
+        </div>
+        
+        <div class="missions-grid">
+            <div class="mission-card">
+                <div class="mission-icon">🛒</div>
+                <div class="mission-title">Buy 5 eco products</div>
+                <div class="mission-description">Purchase 5 eco-friendly items</div>
+                <div class="mission-reward">+50 XP</div>
+                <div class="mission-progress">
+                    <div class="mission-progress-bar">
+                        <div class="mission-progress-fill" style="width: 60%;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="mission-card">
+                <div class="mission-icon">⭐</div>
+                <div class="mission-title">Leave 3 reviews</div>
+                <div class="mission-description">Review 3 products</div>
+                <div class="mission-reward">+30 XP</div>
+                <div class="mission-progress">
+                    <div class="mission-progress-bar">
+                        <div class="mission-progress-fill" style="width: 33%;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="mission-card">
+                <div class="mission-icon">🔄</div>
+                <div class="mission-title">Refer a friend</div>
+                <div class="mission-description">Invite a friend to join</div>
+                <div class="mission-reward">+100 XP</div>
+                <div class="mission-progress">
+                    <div class="mission-progress-bar">
+                        <div class="mission-progress-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Leaderboard -->
+    <section class="leaderboard reveal" style="margin-top: 2rem;">
+        <div class="leaderboard-header">
+            <h2 class="leaderboard-title">Leaderboard</h2>
+        </div>
+        
+        <div class="leaderboard-tabs">
+            <div class="leaderboard-tab active">Top Sellers</div>
+            <div class="leaderboard-tab">Top Buyers</div>
+        </div>
+        
+        <div class="leaderboard-list">
+            <div class="leaderboard-item">
+                <div class="leaderboard-rank">1</div>
+                <div class="leaderboard-avatar">👤</div>
+                <div class="leaderboard-info">
+                    <div class="leaderboard-name">Maria Eco</div>
+                    <div class="leaderboard-score">45 products sold</div>
+                </div>
+                <div class="leaderboard-points">2,340 XP</div>
+            </div>
+            <div class="leaderboard-item">
+                <div class="leaderboard-rank">2</div>
+                <div class="leaderboard-avatar">👤</div>
+                <div class="leaderboard-info">
+                    <div class="leaderboard-name">Juan Green</div>
+                    <div class="leaderboard-score">38 products sold</div>
+                </div>
+                <div class="leaderboard-points">1,890 XP</div>
+            </div>
+            <div class="leaderboard-item">
+                <div class="leaderboard-rank">3</div>
+                <div class="leaderboard-avatar">👤</div>
+                <div class="leaderboard-info">
+                    <div class="leaderboard-name">Ana Nature</div>
+                    <div class="leaderboard-score">32 products sold</div>
+                </div>
+                <div class="leaderboard-points">1,650 XP</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cupones -->
+    <section class="coupons-section reveal" style="margin-top: 2rem;">
+        <h2 style="font-family: 'Playfair Display', Georgia, serif; font-size: 1.8rem; font-weight: 700; color: var(--eco-green-dark); margin-bottom: 1.5rem;">Available Coupons</h2>
+        
+        <div class="coupons-grid">
+            <div class="coupon-card">
+                <div class="coupon-header">
+                    <div class="coupon-discount">20%</div>
+                    <div class="coupon-type">OFF</div>
+                </div>
+                <div class="coupon-body">
+                    <div class="coupon-title">Eco First Order</div>
+                    <div class="coupon-description">Get 20% off your first eco purchase</div>
+                    <div class="coupon-code">ECO20</div>
+                </div>
+                <div class="coupon-footer">
+                    <div class="coupon-expiry">Expires in 7 days</div>
+                    <button class="coupon-apply">Apply</button>
+                </div>
+            </div>
+            <div class="coupon-card">
+                <div class="coupon-header">
+                    <div class="coupon-discount">S/ 50</div>
+                    <div class="coupon-type">OFF</div>
+                </div>
+                <div class="coupon-body">
+                    <div class="coupon-title">Green Friday</div>
+                    <div class="coupon-description">S/ 50 off orders over S/ 200</div>
+                    <div class="coupon-code">GREEN50</div>
+                </div>
+                <div class="coupon-footer">
+                    <div class="coupon-expiry">Expires in 30 days</div>
+                    <button class="coupon-apply">Apply</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Suscripciones -->
+    <section class="subscriptions-section reveal" style="margin-top: 2rem;">
+        <h2 style="font-family: 'Playfair Display', Georgia, serif; font-size: 1.8rem; font-weight: 700; color: var(--eco-green-dark); margin-bottom: 1.5rem; text-align: center;">Seller Plans</h2>
+        
+        <div class="subscriptions-grid">
+            <div class="subscription-card">
+                <div class="subscription-name">Basic</div>
+                <div class="subscription-price">
+                    <div class="subscription-price-amount">Free</div>
+                    <div class="subscription-price-period">forever</div>
+                </div>
+                <ul class="subscription-features">
+                    <li>Up to 10 products</li>
+                    <li>Basic analytics</li>
+                    <li>Community support</li>
+                </ul>
+                <button class="subscription-btn subscription-btn-secondary">Current Plan</button>
+            </div>
+            
+            <div class="subscription-card featured">
+                <div class="subscription-badge">Most Popular</div>
+                <div class="subscription-name">Pro</div>
+                <div class="subscription-price">
+                    <div class="subscription-price-amount">S/ 49</div>
+                    <div class="subscription-price-period">/month</div>
+                </div>
+                <ul class="subscription-features">
+                    <li>Unlimited products</li>
+                    <li>Advanced analytics</li>
+                    <li>Priority support</li>
+                    <li>Featured placement</li>
+                    <li>Custom branding</li>
+                </ul>
+                <button class="subscription-btn subscription-btn-primary">Upgrade</button>
+            </div>
+            
+            <div class="subscription-card">
+                <div class="subscription-name">Enterprise</div>
+                <div class="subscription-price">
+                    <div class="subscription-price-amount">S/ 149</div>
+                    <div class="subscription-price-period">/month</div>
+                </div>
+                <ul class="subscription-features">
+                    <li>Everything in Pro</li>
+                    <li>Dedicated account manager</li>
+                    <li>API access</li>
+                    <li>White-label solution</li>
+                    <li>Custom integrations</li>
+                </ul>
+                <button class="subscription-btn subscription-btn-secondary">Contact Sales</button>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Chat Widget -->
+<div class="chat-widget">
+    <button class="chat-button">💬</button>
+    <div class="chat-container">
+        <div class="chat-header">
+            <span class="chat-header-title">EcoMarket Support</span>
+            <button class="chat-header-close">✕</button>
+        </div>
+        <div class="chat-messages">
+            <div class="chat-message received">
+                <div class="chat-message-bubble">Hello! How can we help you today?</div>
+            </div>
+        </div>
+        <div class="chat-input-container">
+            <input type="text" class="chat-input" placeholder="Type a message...">
+            <button class="chat-send">Send</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialize scroll reveal
+    document.addEventListener('DOMContentLoaded', () => {
+        const reveals = document.querySelectorAll('.reveal');
+        
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        reveals.forEach(reveal => revealObserver.observe(reveal));
+    });
+</script>
+{% endblock %}

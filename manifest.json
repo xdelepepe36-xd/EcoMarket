@@ -1,9 +1,10 @@
 {
-  "name": "EcoMarket - Marketplace Ecológico",
+  "name": "EcoMarket - Marketplace Ecológico Profesional",
   "short_name": "EcoMarket",
-  "description": "Marketplace ecológico para comprar y vender productos sostenibles",
+  "description": "Marketplace ecológico profesional para comprar y vender productos sostenibles. 223+ productos, 8 categorías, sin plástico.",
   "start_url": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#2e7d32",
   "theme_color": "#2e7d32",
   "orientation": "portrait-primary",
@@ -77,19 +78,22 @@
       "src": "/static/assets/screenshot-wide.png",
       "sizes": "1280x720",
       "type": "image/png",
-      "form_factor": "wide"
+      "form_factor": "wide",
+      "label": "EcoMarket - Catálogo de productos ecológicos"
     },
     {
       "src": "/static/assets/screenshot-narrow.png",
       "sizes": "750x1334",
       "type": "image/png",
-      "form_factor": "narrow"
+      "form_factor": "narrow",
+      "label": "EcoMarket - App móvil"
     }
   ],
   "categories": [
     "shopping",
     "lifestyle",
-    "business"
+    "business",
+    "sustainability"
   ],
   "shortcuts": [
     {
@@ -148,5 +152,28 @@
   },
   "launch_handler": {
     "client_mode": "navigate-existing"
+  },
+  "protocol_handlers": [],
+  "share_target": {
+    "action": "/publicar",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "nombre",
+      "text": "descripcion",
+      "url": "imagen",
+      "files": [
+        {
+          "name": "imagen",
+          "accept": ["image/*"]
+        }
+      ]
+    }
+  },
+  "file_handlers": [],
+  "url_handlers": [],
+  "iarc_rating_id": "",
+  "externally_connectable": {
+    "matches": ["https://ecomarket.onrender.com/*"]
   }
 }

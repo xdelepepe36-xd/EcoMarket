@@ -1,20 +1,25 @@
-# EcoMarket - GitIgnore
-# Entornos virtuales
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
 venv/
 env/
-.venv/
-__pycache__/
-*.pyc
-*.pyo
+ENV/
+*.egg-info/
+dist/
+build/
 
 # Base de datos
 *.db
 *.sqlite
-data/*.db
+*.sqlite3
 
-# Uploads
-static/uploads/*
-!static/uploads/.gitkeep
+# Variables de entorno
+.env
+.env.local
+.env.*.local
 
 # IDE
 .vscode/
@@ -23,12 +28,24 @@ static/uploads/*
 *.swo
 *~
 
-# Sistema
+# OS
 .DS_Store
 Thumbs.db
-*.log
 
-# Flask
-instance/
-.env
-*.env
+# Logs
+*.log
+logs/
+
+# Uploads
+uploads/*
+!uploads/.gitkeep
+
+# Baldi Basics (no subir este juego)
+Baldi Bassics/
+
+# Node modules (si hubiera)
+node_modules/
+
+# Archivos temporales
+*.tmp
+*.bak

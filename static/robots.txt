@@ -1,8 +1,38 @@
+# EcoMarket - Robots.txt Professional SEO
+# Allow all crawlers to access public content
+# Disallow private and administrative areas
+
 User-agent: *
 Allow: /
-Disallow: /admin/
-Disallow: /api/
-Disallow: /perfil/
-Disallow: /static/uploads/
 
+# Disallow private areas
+Disallow: /admin/
+Disallow: /perfil/
+Disallow: /login/
+Disallow: /registro/
+Disallow: /logout/
+Disallow: /carrito
+Disallow: /api/
+Disallow: /api/usuario/
+Disallow: /api/pedidos/
+Disallow: /api/notificaciones/
+Disallow: /static/uploads/
+Disallow: /data/
+Disallow: /scripts/
+Disallow: /tests/
+
+# Crawl-delay for politeness
+Crawl-delay: 1
+
+# Allow specific API endpoints for public access
+Allow: /api/productos
+Allow: /api/categorias
+Allow: /api/semantico/search
+Allow: /api/i18n/translations
+
+# Sitemap location
 Sitemap: https://ecomarket.onrender.com/sitemap.xml
+
+# Additional sitemaps for specific sections
+# Sitemap: https://ecomarket.onrender.com/sitemap-products.xml
+# Sitemap: https://ecomarket.onrender.com/sitemap-categories.xml

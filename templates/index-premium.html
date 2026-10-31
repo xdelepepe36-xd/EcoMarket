@@ -1,0 +1,383 @@
+{% extends "base.html" %}
+
+{% block title %}EcoMarket - Rooted in Nature, Built for the Future{% endblock %}
+
+{% block head %}
+<style>
+    /* Override para usar el diseño premium en esta página */
+    body {
+        background: var(--earth-white);
+    }
+    
+    .premium-nav {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--glass-border);
+        box-shadow: var(--shadow-sm);
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        padding: 1rem 2rem;
+        transition: all var(--transition-normal);
+    }
+    
+    .premium-nav.scrolled {
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .premium-hero {
+        min-height: 100vh;
+        background: var(--gradient-hero);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 2rem;
+        position: relative;
+        overflow: hidden;
+        margin-top: 80px;
+    }
+    
+    .premium-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="rgba(255,255,255,0.05)"/></svg>');
+        background-size: 60px;
+        animation: float 20s linear infinite;
+    }
+    
+    @keyframes float {
+        0% { transform: translateY(0) rotate(0deg); }
+        100% { transform: translateY(-100px) rotate(360deg); }
+    }
+    
+    .premium-hero-content {
+        max-width: 1400px;
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .premium-hero-text {
+        color: white;
+    }
+    
+    .premium-hero-title {
+        font-family: 'Playfair Display', Georgia, serif;
+        font-size: 3.5rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin-bottom: 1.5rem;
+        animation: fadeInUp 0.8s ease;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .premium-hero-subtitle {
+        font-size: 1.2rem;
+        line-height: 1.8;
+        margin-bottom: 2rem;
+        opacity: 0.95;
+        animation: fadeInUp 0.8s ease 0.2s backwards;
+    }
+    
+    .premium-hero-buttons {
+        display: flex;
+        gap: 1rem;
+        animation: fadeInUp 0.8s ease 0.4s backwards;
+    }
+    
+    .premium-btn-primary {
+        background: white;
+        color: var(--eco-green-primary);
+        padding: 1rem 2rem;
+        border-radius: 9999px;
+        font-weight: 700;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: all var(--transition-normal);
+        box-shadow: var(--shadow-lg);
+        border: none;
+        cursor: pointer;
+    }
+    
+    .premium-btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-xl);
+    }
+    
+    .premium-btn-secondary {
+        background: transparent;
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 9999px;
+        font-weight: 600;
+        font-size: 1rem;
+        text-decoration: none;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        transition: all var(--transition-normal);
+        cursor: pointer;
+    }
+    
+    .premium-btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: white;
+    }
+    
+    .premium-hero-image {
+        position: relative;
+        animation: fadeIn 1s ease 0.6s backwards;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    .premium-hero-image img {
+        width: 100%;
+        max-width: 500px;
+        border-radius: 24px;
+        box-shadow: var(--shadow-xl);
+    }
+    
+    .premium-stats {
+        position: absolute;
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        padding: 1.5rem;
+        border-radius: 16px;
+        box-shadow: var(--shadow-lg);
+        animation: fadeInUp 0.8s ease 0.8s backwards;
+        bottom: -50px;
+        right: 50px;
+    }
+    
+    .premium-stats-number {
+        font-family: 'Playfair Display', Georgia, serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--eco-green-primary);
+    }
+    
+    .premium-stats-label {
+        font-size: 0.9rem;
+        color: var(--eco-green-dark);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    @media (max-width: 1024px) {
+        .premium-hero-content {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+        
+        .premium-hero-title {
+            font-size: 2.5rem;
+        }
+        
+        .premium-hero-buttons {
+            justify-content: center;
+        }
+        
+        .premium-hero-image {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .premium-stats {
+            position: relative;
+            bottom: auto;
+            right: auto;
+            margin-top: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Premium Navigation -->
+<nav class="premium-nav" id="premiumNav">
+    <div class="nav-container">
+        <a href="{{ url_for('index') }}" class="nav-logo">
+            <span class="nav-logo-icon">🌱</span>
+            EcoMarket
+        </a>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('index') }}" class="nav-link">Home</a></li>
+            <li><a href="{{ url_for('productos_view') }}" class="nav-link">Shop</a></li>
+            <li><a href="#" class="nav-link">Refill</a></li>
+            <li><a href="#" class="nav-link">Impact</a></li>
+            <li><a href="#" class="nav-link">Learn</a></li>
+            <li><a href="#" class="nav-btn">Find Store</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Premium Hero Section -->
+<section class="premium-hero">
+    <div class="premium-hero-content">
+        <div class="premium-hero-text">
+            <h1 class="premium-hero-title">Rooted in Nature, Built for the Future</h1>
+            <p class="premium-hero-subtitle">Your one-stop shop for premium zero-waste essentials, bulk refills, and a community dedicated to a cleaner planet.</p>
+            <div class="premium-hero-buttons">
+                <a href="{{ url_for('productos_view') }}" class="premium-btn-primary">Shop Zero Waste</a>
+                <a href="#" class="premium-btn-secondary">How Refills Work</a>
+            </div>
+        </div>
+        <div class="premium-hero-image">
+            <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=500&h=600&fit=crop" alt="Sustainable lifestyle">
+            <div class="premium-stats">
+                <div class="premium-stats-number">1.2M+</div>
+                <div class="premium-stats-label">Plastic Bottles Saved</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Category Section -->
+<section class="category-section">
+    <div class="category-header">
+        <h2 class="category-title">Shop by Category</h2>
+        <p class="category-subtitle">Everything you need to transition to a sustainable lifestyle, curated for quality and impact.</p>
+    </div>
+    <div class="category-grid">
+        <a href="{{ url_for('productos_view') }}?categoria=Higiene" class="category-card">
+            <div class="category-icon">🧴</div>
+            <h3 class="category-name">Personal Care</h3>
+            <div class="category-count">45 products</div>
+        </a>
+        <a href="{{ url_for('productos_view') }}?categoria=Hogar" class="category-card">
+            <div class="category-icon">🏠</div>
+            <h3 class="category-name">Home Essentials</h3>
+            <div class="category-count">38 products</div>
+        </a>
+        <a href="{{ url_for('productos_view') }}?categoria=Alimentación" class="category-card">
+            <div class="category-icon">🍳</div>
+            <h3 class="category-name">Kitchen</h3>
+            <div class="category-count">52 products</div>
+        </a>
+        <a href="{{ url_for('productos_view') }}?categoria=Accesorios" class="category-card">
+            <div class="category-icon">🎒</div>
+            <h3 class="category-name">On the Go</h3>
+            <div class="category-count">29 products</div>
+        </a>
+        <a href="{{ url_for('productos_view') }}?categoria=Jardín" class="category-card">
+            <div class="category-icon">🌿</div>
+            <h3 class="category-name">Cleaning</h3>
+            <div class="category-count">35 products</div>
+        </a>
+        <a href="{{ url_for('productos_view') }}?categoria=Ropa" class="category-card">
+            <div class="category-icon">🧘</div>
+            <h3 class="category-name">Wellness</h3>
+            <div class="category-count">24 products</div>
+        </a>
+    </div>
+</section>
+
+<!-- Featured Products -->
+<section class="section-padding" style="background: var(--earth-cream);">
+    <div class="container">
+        <div class="category-header">
+            <h2 class="category-title">Featured Products</h2>
+            <p class="category-subtitle">Our most popular zero-waste essentials, loved by thousands.</p>
+        </div>
+        <div class="product-grid">
+            {% for producto in productos[:6] %}
+            <div class="product-card">
+                <img src="{{ producto.imagen or get_product_image(producto.categoria) }}" alt="{{ producto.nombre }}" class="product-image">
+                <div class="product-badge">New</div>
+                <div class="product-eco-score">Eco: {{ producto.eco_score }}/10</div>
+                <div class="product-info">
+                    <div class="product-category">{{ producto.categoria }}</div>
+                    <h3 class="product-name">{{ producto.nombre }}</h3>
+                    <div class="product-price">S/ {{ producto.precio }}</div>
+                    <div class="product-actions">
+                        <button class="product-btn-cart" onclick="addToCart({{ producto.id }})">Add to Cart</button>
+                        <button class="product-btn-favorite" onclick="addToFavorites({{ producto.id }})">❤️</button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<script>
+    // Navbar scroll effect
+    window.addEventListener('scroll', function() {
+        const nav = document.getElementById('premiumNav');
+        if (window.scrollY > 50) {
+            nav.classList.add('scrolled');
+        } else {
+            nav.classList.remove('scrolled');
+        }
+    });
+    
+    // Add to cart function
+    function addToCart(productId) {
+        fetch('/api/carrito/agregar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                producto_id: productId,
+                cantidad: 1
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Added to cart!');
+            } else {
+                alert('Please login to add items to cart');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    
+    // Add to favorites function
+    function addToFavorites(productId) {
+        fetch('/api/favoritos/agregar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                producto_id: productId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Added to favorites!');
+            } else {
+                alert('Please login to add items to favorites');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
+{% endblock %}

@@ -406,3 +406,576 @@ progress::-webkit-progress-value {
     border-color: #28a745;
     color: #155724;
 }
+
+/* WCAG 2.1 AA Additional Improvements */
+
+/* Target size minimum 44x44px for touch */
+button,
+a,
+input[type="checkbox"],
+input[type="radio"],
+select {
+    min-width: 44px;
+    min-height: 44px;
+}
+
+/* Spacing improvements for readability */
+p,
+li,
+div {
+    max-width: 80ch;
+    line-height: 1.6;
+}
+
+/* Better focus indicators for keyboard navigation */
+:focus {
+    outline: 3px solid var(--verde);
+    outline-offset: 2px;
+}
+
+/* Custom checkbox/radio styling with accessibility */
+input[type="checkbox"],
+input[type="radio"] {
+    cursor: pointer;
+}
+
+/* Label association improvements */
+label[for] {
+    cursor: pointer;
+}
+
+/* Fieldset and legend for form groups */
+fieldset {
+    border: 2px solid #dee2e6;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 5px;
+}
+
+legend {
+    font-weight: 600;
+    padding: 0 10px;
+}
+
+/* Accessible color combinations - minimum 4.5:1 ratio */
+.text-contrast-low {
+    color: #000;
+    background: #fff;
+}
+
+.text-contrast-medium {
+    color: #333;
+    background: #fff;
+}
+
+.text-contrast-high {
+    color: #000;
+    background: #fff;
+    font-weight: 700;
+}
+
+/* Skip links for multiple navigation points */
+.skip-link-top,
+.skip-link-main,
+.skip-link-footer {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--verde);
+    color: white;
+    padding: 8px 16px;
+    z-index: 100;
+    transition: top 0.3s;
+}
+
+.skip-link-top:focus,
+.skip-link-main:focus,
+.skip-link-footer:focus {
+    top: 0;
+}
+
+/* Dialog accessibility */
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+dialog[open] {
+    border: 2px solid var(--verde);
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 90vw;
+    max-height: 90vh;
+}
+
+/* Accessible data tables */
+table caption {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+table th[scope="col"] {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    padding: 12px;
+}
+
+table th[scope="row"] {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    padding: 12px;
+}
+
+/* Accessible tabs */
+[role="tablist"] {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+[role="tab"] {
+    padding: 12px 24px;
+    border: 2px solid transparent;
+    border-bottom: none;
+    cursor: pointer;
+    background: #f8f9fa;
+    min-width: 44px;
+    min-height: 44px;
+}
+
+[role="tab"][aria-selected="true"] {
+    background: white;
+    border-color: #dee2e6;
+    border-bottom: 2px solid white;
+    margin-bottom: -2px;
+}
+
+[role="tab"]:focus {
+    outline: 3px solid var(--verde);
+    outline-offset: -3px;
+}
+
+[role="tabpanel"] {
+    padding: 20px;
+    border: 2px solid #dee2e6;
+    border-top: none;
+}
+
+/* Accessible carousel */
+[role="region"][aria-label*="carousel"] {
+    position: relative;
+}
+
+[role="region"][aria-label*="carousel"] button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    padding: 15px;
+    cursor: pointer;
+    z-index: 10;
+}
+
+[role="region"][aria-label*="carousel"] button:focus {
+    outline: 3px solid var(--verde);
+}
+
+/* Accessible dropdown menus */
+[role="menu"] {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border: 2px solid #dee2e6;
+    border-radius: 5px;
+    background: white;
+}
+
+[role="menuitem"] {
+    padding: 12px 20px;
+    cursor: pointer;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+}
+
+[role="menuitem"]:hover,
+[role="menuitem"]:focus {
+    background: #f8f9fa;
+    outline: none;
+}
+
+[role="menuitem"][aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Accessible accordions */
+[role="region"][aria-labelledby*="accordion"] {
+    border: 2px solid #dee2e6;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+
+[aria-expanded="true"] + [role="region"] {
+    display: block;
+}
+
+[aria-expanded="false"] + [role="region"] {
+    display: none;
+}
+
+/* Status messages */
+[role="status"] {
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+/* Timer accessibility */
+[role="timer"] {
+    font-family: monospace;
+    font-size: 1.2rem;
+}
+
+/* Marquee alternative - accessible scrolling text */
+.accessible-marquee {
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 10px;
+    background: #f8f9fa;
+}
+
+.accessible-marquee p {
+    animation: scroll-left 20s linear infinite;
+    display: inline-block;
+}
+
+@keyframes scroll-left {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
+/* Accessible pagination */
+[role="navigation"][aria-label*="pagination"] {
+    display: flex;
+    gap: 10px;
+    padding: 20px 0;
+}
+
+[role="navigation"][aria-label*="pagination"] a,
+[role="navigation"][aria-label*="pagination"] button {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 10px 15px;
+    border: 2px solid #dee2e6;
+    background: white;
+    cursor: pointer;
+}
+
+[role="navigation"][aria-label*="pagination"] a[aria-current="page"],
+[role="navigation"][aria-label*="pagination"] button[aria-current="page"] {
+    background: var(--verde);
+    color: white;
+    border-color: var(--verde);
+}
+
+/* Accessible search */
+[role="search"] form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+[role="search"] input[type="search"] {
+    flex: 1;
+    min-width: 200px;
+}
+
+[role="search"] button[type="submit"] {
+    min-width: 44px;
+    min-height: 44px;
+}
+
+/* Accessible breadcrumbs */
+[role="navigation"][aria-label*="breadcrumb"] {
+    padding: 15px 0;
+    background: #f8f9fa;
+}
+
+[role="navigation"][aria-label*="breadcrumb"] ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 10px;
+}
+
+[role="navigation"][aria-label*="breadcrumb"] li::after {
+    content: ">";
+    margin-left: 10px;
+}
+
+[role="navigation"][aria-label*="breadcrumb"] li:last-child::after {
+    content: "";
+}
+
+/* Accessible cards */
+article.card {
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+article.card h2 {
+    margin-top: 0;
+}
+
+/* Accessible time */
+time {
+    font-family: monospace;
+}
+
+time[datetime] {
+    display: inline-block;
+}
+
+/* Accessible quotes */
+blockquote {
+    border-left: 4px solid var(--verde);
+    padding-left: 20px;
+    margin: 20px 0;
+    font-style: italic;
+}
+
+blockquote cite {
+    display: block;
+    margin-top: 10px;
+    font-style: normal;
+    font-size: 0.9rem;
+}
+
+/* Accessible code */
+code {
+    background: #f8f9fa;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+pre {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+}
+
+pre code {
+    background: none;
+    padding: 0;
+}
+
+/* Accessible figures */
+figure {
+    margin: 20px 0;
+}
+
+figure img {
+    display: block;
+    margin: 0 auto;
+}
+
+figcaption {
+    text-align: center;
+    font-style: italic;
+    margin-top: 10px;
+    font-size: 0.9rem;
+}
+
+/* Accessible media */
+video,
+audio {
+    max-width: 100%;
+}
+
+video[controls],
+audio[controls] {
+    width: 100%;
+}
+
+/* Accessible SVG */
+svg {
+    max-width: 100%;
+    height: auto;
+}
+
+svg[aria-hidden="true"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Skip to content enhancement */
+.skip-to-content {
+    position: fixed;
+    top: -100px;
+    left: 0;
+    background: var(--verde);
+    color: white;
+    padding: 15px 30px;
+    z-index: 9999;
+    transition: top 0.3s;
+    font-weight: 600;
+}
+
+.skip-to-content:focus {
+    top: 0;
+}
+
+/* Accessible modal close button */
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 10px;
+}
+
+.modal-close:focus {
+    outline: 3px solid var(--verde);
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+/* Accessible loading indicators */
+[aria-busy="true"]::before {
+    content: "";
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid var(--verde);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Accessible progress indicators */
+[role="progressbar"] {
+    height: 20px;
+    background: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+[role="progressbar"] .progress-fill {
+    height: 100%;
+    background: var(--verde);
+    transition: width 0.3s ease;
+}
+
+/* Accessible toggle switches */
+[role="switch"] {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+[role="switch"] input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+[role="switch"] .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 34px;
+}
+
+[role="switch"] .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+[role="switch"] input:checked + .slider {
+    background-color: var(--verde);
+}
+
+[role="switch"] input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+[role="switch"] input:focus + .slider {
+    box-shadow: 0 0 1px var(--verde);
+}
+
+/* Accessible slider/range input */
+input[type="range"] {
+    width: 100%;
+    height: 10px;
+    background: #e0e0e0;
+    border-radius: 5px;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--verde);
+    cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--verde);
+    cursor: pointer;
+    border: none;
+}
+
+input[type="range"]:focus {
+    outline: 3px solid var(--verde);
+}

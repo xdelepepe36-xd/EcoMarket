@@ -116,16 +116,17 @@
     <script src="{{ url_for('static', filename='ecomarket-schema-org.js') }}"></script>
     
     <!-- Mejoras Adicionales -->
-    <script src="{{ url_for('static', filename='ecomarket-verificacion-vendedores.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='ecomarket-reviews-fotos.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='ecomarket-analytics-visual.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='ecomarket-favoritos-colecciones.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='ecomarket-chat-historial.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='mejoras-adicionales/ecomarket-verificacion-vendedores.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='mejoras-adicionales/ecomarket-reviews-fotos.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='mejoras-adicionales/ecomarket-analytics-visual.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='mejoras-adicionales/ecomarket-favoritos-colecciones.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='mejoras-adicionales/ecomarket-chat-historial.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='mejoras-adicionales/busqueda-avanzada.js') }}" defer></script>
     
     <!-- Service Worker Offline -->
     <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('{{ url_for('static', filename='sw-offline.js') }}')
+            navigator.serviceWorker.register('{{ url_for('static', filename='mejoras-adicionales/sw-offline.js') }}')
                 .then(reg => console.log('Service Worker registrado'))
                 .catch(err => console.log('Error SW:', err));
         }

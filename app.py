@@ -23,11 +23,41 @@ from PIL import Image
 import logging
 from functools import lru_cache
 
+# Importar sistemas de mejoras adicionales
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'mejoras_adicionales'))
+try:
+    from quality_control import QualityControlSystem
+    from inventory_system import InventorySystem
+    from geolocation_system import GeolocationSystem
+    from ai_description_generator import AIDescriptionGenerator
+    from support_system import SupportSystem
+    from newsletter_system import NewsletterSystem
+    SISTEMAS_ADICIONALES = True
+except ImportError:
+    SISTEMAS_ADICIONALES = False
+
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.environ.get('DATABASE_URL', os.path.join(BASE_DIR, 'data', 'ecomarket.db'))
 UPLOAD_FOLDER = os.environ.get('UPLOADS_DIR', os.path.join(BASE_DIR, 'static', 'uploads'))
+
+# Inicializar sistemas adicionales
+if SISTEMAS_ADICIONALES:
+    quality_control = QualityControlSystem()
+    inventory_system = InventorySystem()
+    geolocation_system = GeolocationSystem()
+    ai_generator = AIDescriptionGenerator()
+    support_system = SupportSystem()
+    newsletter_system = NewsletterSystem()
+else:
+    quality_control = None
+    inventory_system = None
+    geolocation_system = None
+    ai_generator = None
+    support_system = None
+    newsletter_system = None
 
 # Headers de seguridad HTTP profesionales
 @app.after_request

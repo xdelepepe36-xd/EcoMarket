@@ -115,6 +115,22 @@
     <!-- Schema.org SEO -->
     <script src="{{ url_for('static', filename='ecomarket-schema-org.js') }}"></script>
     
+    <!-- Mejoras Adicionales -->
+    <script src="{{ url_for('static', filename='ecomarket-verificacion-vendedores.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='ecomarket-reviews-fotos.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='ecomarket-analytics-visual.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='ecomarket-favoritos-colecciones.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='ecomarket-chat-historial.js') }}" defer></script>
+    
+    <!-- Service Worker Offline -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('{{ url_for('static', filename='sw-offline.js') }}')
+                .then(reg => console.log('Service Worker registrado'))
+                .catch(err => console.log('Error SW:', err));
+        }
+    </script>
+    
     {% block head %}{% endblock %}
 </head>
 <body data-user-id="{{ session.get('usuario_id', '') }}">

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Newsletter - EcoMarket{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Newsletter EcoMarket</h1>
+    
+    <div class="newsletter-container">
+        <div class="suscripcion">
+            <h2>Suscríbete</h2>
+            <p>Recibe ofertas, novedades y tips ecológicos directamente en tu email.</p>
+            <form id="newsletter-form">
+                <div class="form-group">
+                    <label>Nombre</label>
+                    <input type="text" id="newsletter-nombre" placeholder="Tu nombre">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="newsletter-email" required placeholder="tu@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Preferencias</label>
+                    <div class="checkboxes">
+                        <label><input type="checkbox" value="ofertas" checked> Ofertas y descuentos</label>
+                        <label><input type="checkbox" value="nuevos"> Nuevos productos</label>
+                        <label><input type="checkbox" value="tips"> Tips ecológicos</label>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-principal">Suscribirse</button>
+            </form>
+        </div>
+        
+        <div class="suscripto-info">
+            <h2>¿Por qué suscribirse?</h2>
+            <ul>
+                <li>✓ Ofertas exclusivas cada semana</li>
+                <li>✓ Descuentos secretos solo para suscriptores</li>
+                <li>✓ Tips para vivir más sostenible</li>
+                <li>✓ Primeras noticias de productos nuevos</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+.newsletter-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+}
+
+.checkboxes label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.suscripto-info {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 10px;
+}
+
+.suscripto-info ul {
+    list-style: none;
+    padding: 0;
+}
+
+.suscripto-info li {
+    padding: 10px 0;
+    border-bottom: 1px solid #dee2e6;
+}
+</style>
+{% endblock %}

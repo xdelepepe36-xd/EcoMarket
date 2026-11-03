@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Soporte al Cliente - EcoMarket{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Soporte al Cliente</h1>
+    
+    <div class="support-container">
+        <div class="crear-ticket">
+            <h2>Crear Ticket</h2>
+            <form id="ticket-form">
+                <div class="form-group">
+                    <label>Asunto</label>
+                    <input type="text" id="ticket-asunto" required>
+                </div>
+                <div class="form-group">
+                    <label>Prioridad</label>
+                    <select id="ticket-prioridad">
+                        <option value="baja">Baja</option>
+                        <option value="media" selected>Media</option>
+                        <option value="alta">Alta</option>
+                        <option value="urgente">Urgente</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Descripción</label>
+                    <textarea id="ticket-descripcion" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-principal">Enviar Ticket</button>
+            </form>
+        </div>
+        
+        <div class="mis-tickets">
+            <h2>Mis Tickets</h2>
+            <div id="tickets-lista">
+                <p>Cargando tickets...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.support-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+}
+
+.ticket-item {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.ticket-item.abierto {
+    border-left: 4px solid #ffc107;
+}
+
+.ticket-item.resuelto {
+    border-left: 4px solid #28a745;
+}
+</style>
+{% endblock %}

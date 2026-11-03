@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Verificación de Vendedor - EcoMarket{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="verificacion-container">
+        <h1>Verificación de Vendedor</h1>
+        
+        <div id="panel-verificacion">
+            <!-- Se llena con JavaScript -->
+        </div>
+
+        <div class="verificacion-niveles">
+            <h2>Niveles de Verificación</h2>
+            <div class="niveles-grid">
+                <div class="nivel-card">
+                    <span class="badge-nivel" style="background-color: #6c757d;">📝</span>
+                    <h3>Básico</h3>
+                    <p>Email verificado</p>
+                    <p>Confianza: ★☆☆☆☆</p>
+                </div>
+                <div class="nivel-card">
+                    <span class="badge-nivel" style="background-color: #28a745;">✓</span>
+                    <h3>Confirmado</h3>
+                    <p>Email + Teléfono</p>
+                    <p>Confianza: ★★☆☆☆</p>
+                </div>
+                <div class="nivel-card">
+                    <span class="badge-nivel" style="background-color: #007bff;">✓✓</span>
+                    <h3>Verificado</h3>
+                    <p>Email + Teléfono + Documento</p>
+                    <p>Confianza: ★★★☆☆</p>
+                </div>
+                <div class="nivel-card">
+                    <span class="badge-nivel" style="background-color: #ffc107;">⭐</span>
+                    <h3>Premium</h3>
+                    <p>+50 ventas exitosas</p>
+                    <p>Confianza: ★★★★☆</p>
+                </div>
+                <div class="nivel-card">
+                    <span class="badge-nivel" style="background-color: #17a2b8;">🏆</span>
+                    <h3>Top Seller</h3>
+                    <p>+100 ventas + Rating 4.5+</p>
+                    <p>Confianza: ★★★★★</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.verificacion-container {
+    max-width: 1200px;
+    margin: 40px auto;
+}
+
+.verificacion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.nivel-actual {
+    padding: 10px 20px;
+    border-radius: 20px;
+    color: white;
+    font-weight: 600;
+}
+
+.nivel-actual.sin-verificar {
+    background-color: #6c757d;
+}
+
+.verificacion-progreso {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.verificacion-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.verificacion-item.completado {
+    background-color: #d4edda;
+}
+
+.verificacion-item.pendiente {
+    background-color: #f8d7da;
+}
+
+.icono {
+    font-size: 1.5rem;
+    margin-right: 15px;
+}
+
+.siguiente-nivel {
+    background: #fff3cd;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.acciones-verificacion {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-verificar {
+    background-color: #2e7d32;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.niveles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.nivel-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.badge-nivel {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 20px;
+    color: white;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+</style>
+{% endblock %}

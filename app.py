@@ -5547,6 +5547,149 @@ def health_check():
     })
 
 
+# ── API Rutas para Sistemas Adicionales ───────────────────────────────────────────────
+
+@app.route('/api/quality/validar', methods=['POST'])
+@login_required
+def api_validar_producto():
+    """Valida un producto antes de publicar"""
+    if not quality_control:
+        return jsonify({'error': 'Sistema no disponible'}), 503
+    
+    data = request.get_json()
+    validacion = quality_control.validar_producto(data)
+    return jsonify(validacion)
+
+@app.route('/api/inventario/actualizar', methods=['POST'])
+@login_required
+def api_actualizar_inventario():
+    """Actualiza el stock de un producto"""
+    if not inventory_system:
+        return jsonify({'error': 'Sistema no disponible'}), 503
+    
+    data = request.get_json()
+    stock = inventory_system.actualizar_stock(data['producto_id'], data['cantidad'])
+    return jsonify({'stock': stock})
+
+@app.route('/api/geolocalizacion/registrar', methods=['POST'])
+@login_required
+def api_registrar_ubicacion():
+    """Registra la ubicación de un usuario"""
+    if not geolocation_system:
+        return jsonify({'error': 'Sistema no disponible'}), 503
+    
+    data = request.get_json()
+    ubicacion = geolocation_system.registrar_ubicacion(
+        session['usuario_id'],
+        data['latitud'],
+        data['longitud'],
+        data['direccion']
+    )
+    return jsonify(ubicacion)
+
+@app.route('/api/geolocalizacion/vendedores-cercanos')
+@login_required
+def api_vendedores_cercanos():
+    """Busca vendedores cercanos"""
+    if not geolocation_system:
+        return jsonify({'error': 'Sistema no disponible'}), 503
+    
+    radio = request.args.get('radio', 10, type=int)
+    cercanos = geolocation_system.buscar_vendedores_cercanos(session['usuario_id'], radio)
+    return jsonify({'vendedores': cercanos})
+
+@app.route('/api/ai/generar-descripcion', methods=['POST'])
+@login_required
+def api_generar_descripcion():
+    """Genera descripción con AI"""
+    if not ai_generator:
+        return jsonify({'error': 'Sistema no disponible'}), 503
+    
+    data = request.get_json()
+    descripcion = ai_generator.generar_descripcion(data)
+    return jsonify({'descripcion': descripcion})
+
+@app.route('/api/soporte/ticket', methods=['POST'])
+@login_required
+def api_crear_ticket():
+    """Crea un ticket de soporte"""
+    if not support_system:
+        return jsonify({'error': 'Sistema no disponible'}), 503
+    
+    data = request.get_json()
+    ticket = support_system.crear_ticket(
+        session['usuario_id'],
+        data['asunto'],
+        data['descripcion'],
+        data.get('prioridad', 'media')
+    )
+    return jsonify(ticket)
+
+@app.route('/api/soporte/tickets')
+@login_required
+def api_obtener_tickets():
+    """Obtiene tickets del usuario"""
+    if not support_system:
+        return jsonify({'error': 'Sistema no disponible'}), 503
+    
+    tickets = support_system.obtener_tickets_usuario(session['usuario_id'])
+    return jsonify({'tickets': tickets})
+
+@app.route('/api/newsletter/suscribir', methods=['POST'])
+def api_suscribir_newsletter():
+    """Suscribe al newsletter"""
+    if not newsletter_system:
+        return jsonify({'error': 'Sistema no disponible'}), 503
+    
+    data = request.get_json()
+    suscriptor = newsletter_system.suscribir(
+        data['email'],
+        data.get('nombre', ''),
+        data.get('preferencias', [])
+    )
+    return jsonify(suscriptor)
+
+@app.route('/api/newsletter/desuscribir', methods=['POST'])
+def api_desuscribir_newsletter():
+    """Desuscribe del newsletter"""
+    if not newsletter_system:
+        return jsonify({'error': 'Sistema no disponible'}), 503
+    
+    data = request.get_json()
+    resultado = newsletter_system.desuscribir(data['email'])
+    return jsonify(resultado)
+
+# ── Rutas para Templates de Nuevas Funcionalidades ───────────────────────────────
+
+@app.route('/verificacion')
+@login_required
+def verificacion_vendedor():
+    """Página de verificación de vendedor"""
+    return render_template('verificacion_vendedor.html')
+
+@app.route('/soporte')
+@login_required
+def soporte_cliente():
+    """Página de soporte al cliente"""
+    return render_template('soporte.html')
+
+@app.route('/newsletter')
+def newsletter():
+    """Página de newsletter"""
+    return render_template('newsletter.html')
+
+@app.route('/inventario')
+@login_required
+@admin_required
+def inventario():
+    """Página de gestión de inventario"""
+    return render_template('inventario.html')
+
+@app.route('/busqueda-avanzada')
+def busqueda_avanzada():
+    """Página de búsqueda avanzada"""
+    return render_template('busqueda_avanzada.html')
+
 # ── Error handlers ───────────────────────────────────────────────────────────
 
 @app.errorhandler(404)

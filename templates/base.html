@@ -27,6 +27,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
     <!-- CSS Optimizado - Solo lo esencial -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-rediseño.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-consolidated.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-themes-enhanced.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='accessibility.css') }}">
@@ -211,12 +212,12 @@
         </div>
     </main>
 
-    <!-- Footer Mejorado -->
+    <!-- Footer Profesional Rediseñado -->
     <footer class="footer">
         <div class="container">
             <div class="footer-grid">
-                <div class="footer-brand">
-                    <a class="logo footer-logo" href="{{ url_for('index') }}">
+                <div class="footer-col footer-brand">
+                    <a class="logo" href="{{ url_for('index') }}">
                         <i class="bi bi-flower2"></i> EcoMarket
                     </a>
                     <p>Marketplace ecológico donde puedes comprar, vender y dar una segunda vida a productos reciclados y sostenibles.</p>
@@ -233,11 +234,11 @@
                     <a href="{{ url_for('index') }}">Inicio</a>
                     <a href="{{ url_for('productos_view') }}">Catálogo</a>
                     <a href="{{ url_for('favoritos_view') }}">Favoritos</a>
-                    <a href="{{ url_for('impacto') }}">Impacto</a>
+                    <a href="{{ url_for('impacto') }}">Impacto ambiental</a>
                 </div>
                 
                 <div class="footer-col">
-                    <h4>Cuenta</h4>
+                    <h4>Mi cuenta</h4>
                     {% if session.get('usuario_id') %}
                         <a href="{{ url_for('perfil') }}">Mi perfil</a>
                         <a href="{{ url_for('publicar') }}">Publicar producto</a>
@@ -265,7 +266,7 @@
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; {{ ANIO_ACTUAL }} {{ SITIO_NOMBRE }}. Todos los derechos reservados.</p>
+                <p>&copy; 2026 EcoMarket. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>

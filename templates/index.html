@@ -3,88 +3,45 @@
 
 {% block content %}
 
-<!-- BANNER ROTATIVO -->
-<div id="bannerContainer"></div>
-
-<!-- ESTADÍSTICAS -->
-<div id="estadisticasContainer"></div>
-
-<!-- PRODUCTOS VISTOS RECIENTEMENTE -->
-<div id="recientesContainer"></div>
-
-<!-- BANNER DESTACADO ANIMADO -->
-<section class="featured-banner">
-    <div class="banner-content">
-        <div class="banner-badge" data-i18n="banner.badge">🔥 Oferta especial</div>
-        <h2 class="banner-title" data-i18n="banner.title">¡Compra ecológico y ahorra!</h2>
-        <p class="banner-description" data-i18n="banner.description">Productos sostenibles con hasta 30% de descuento en tu primera compra</p>
-        <a href="{{ url_for('productos_view') }}" class="btn-hero-main banner-cta" data-i18n="banner.cta">Ver ofertas</a>
-    </div>
-    <div class="banner-decoration">
-        <div class="floating-leaf">🌿</div>
-        <div class="floating-leaf" style="animation-delay: 1s">🍃</div>
-        <div class="floating-leaf" style="animation-delay: 2s">🌱</div>
-    </div>
-</section>
-
-<!-- HERO SECTION -->
+<!-- 1. HERO SECTION -->
 <section class="hero-section">
-    <div class="hero-bg-pattern"></div>
-    <div class="hero-circle-1"></div>
-    <div class="hero-circle-2"></div>
-    <div class="container" style="position:relative;z-index:1">
-        <div style="max-width:600px">
-            <div class="hero-badge">
-                <span class="hero-badge-dot"></span>
-                            <i class="bi bi-leaf"></i> <span data-i18n="hero.badge">Marketplace 100% ecológico</span>
-            </div>
-            <h1 class="hero-title">
-                            <span data-i18n="hero.title">Compra y vende productos sostenibles</span>
-            </h1>
-            <p class="hero-subtitle">
-                            <span data-i18n="hero.subtitle">Descubre miles de productos ecológicos de vendedores comprometidos con el planeta. Cada compra genera un impacto positivo real.</span>
-            </p>
-            <div class="hero-actions">
-                <a href="{{ url_for('productos_view') }}" class="btn-hero-main">
-                                    <i class="bi bi-bag"></i> <span data-i18n="hero.explore">Explorar productos</span>
-                </a>
-                <a href="{{ url_for('publicar') }}" class="btn-hero-sec">
-                                    <i class="bi bi-plus-lg"></i> <span data-i18n="hero.publish">Publicar gratis</span>
-                </a>
-            </div>
-            <div class="hero-trust-bar" aria-label="Ventajas de EcoMarket">
-                <div class="trust-pill"><i class="bi bi-truck"></i> <span data-i18n="hero.trust.shipping">Envío gratis</span></div>
-                <div class="trust-pill"><i class="bi bi-shield-check"></i> <span data-i18n="hero.trust.payment">Pago seguro</span></div>
-                <div class="trust-pill"><i class="bi bi-arrow-repeat"></i> <span data-i18n="hero.trust.returns">Devoluciones fáciles</span></div>
-                <div class="trust-pill"><i class="bi bi-clock-history"></i> <span data-i18n="hero.trust.delivery">Entrega rápida</span></div>
-            </div>
-            <div class="hero-stats">
-                <div class="hero-stat">
-                    <strong data-animate-counter="4800">4,800+</strong>
-                    <span data-i18n="hero.families">Familias impactadas</span>
-                </div>
-                <div class="hero-stat">
-                    <strong data-animate-counter="1200">1,200+</strong>
-                    <span data-i18n="hero.products">Productos eco</span>
-                </div>
-                <div class="hero-stat">
-                    <strong>3.2 ton</strong>
-                    <span data-i18n="hero.plastic">Plástico evitado</span>
-                </div>
-            </div>
+    <div class="container">
+        <h1 class="hero-title">Compra y vende productos sostenibles</h1>
+        <p class="hero-description">
+            Descubre miles de productos ecológicos de vendedores comprometidos con el planeta. 
+            Cada compra genera un impacto positivo real.
+        </p>
+        <div class="hero-buttons">
+            <a href="{{ url_for('productos_view') }}" class="btn-principal">Explorar productos</a>
+            <a href="{{ url_for('publicar') }}" class="btn-secundario">Publicar gratis</a>
         </div>
     </div>
 </section>
 
-<!-- CATEGORÍAS -->
-<section class="section">
+<!-- 2. BARRA DE BÚSQUEDA -->
+<section class="search-bar-section">
     <div class="container">
-        <div class="section-head-flex">
-            <div>
-            <span class="section-tag"><i class="bi bi-compass"></i> <span data-i18n="explore.tag">Explora</span></span>
-            <h2 class="section-title"><span data-i18n="categories.title">Categorías populares</span></h2>
-            </div>
-            <a href="{{ url_for('productos_view') }}" class="section-link"><span data-i18n="categories.view_all">Ver todos</span> <i class="bi bi-arrow-right"></i></a>
+        <div class="search-bar">
+            <form action="{{ url_for('productos_view') }}" method="GET">
+                <input 
+                    type="text" 
+                    name="q" 
+                    class="search-input" 
+                    placeholder="Buscar productos ecológicos..."
+                    aria-label="Buscar productos"
+                >
+                <button type="submit" class="btn-principal">Buscar</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- 3. CATEGORÍAS DE PRODUCTOS -->
+<section class="categorias-section section">
+    <div class="container">
+        <div class="section-title">
+            <h2>Categorías de productos</h2>
+            <p>Explora nuestra variedad de productos sostenibles</p>
         </div>
         <div class="categorias-grid">
             {% for cat in categorias %}
@@ -96,221 +53,459 @@
                     {% elif cat == 'Jardín' %}<i class="bi bi-flower1"></i>
                     {% elif cat == 'Alimentación' %}<i class="bi bi-cup-straw"></i>
                     {% elif cat == 'Ropa' %}<i class="bi bi-handbag"></i>
+                    {% elif cat == 'Tecnología' %}<i class="bi bi-laptop"></i>
+                    {% elif cat == 'Deportes' %}<i class="bi bi-bicycle"></i>
+                    {% elif cat == 'Juguetes' %}<i class="bi bi-joystick"></i>
+                    {% elif cat == 'Arte' %}<i class="bi bi-palette"></i>
+                    {% elif cat == 'Mascotas' %}<i class="bi bi-heart"></i>
+                    {% elif cat == 'Bebés' %}<i class="bi bi-baby"></i>
+                    {% elif cat == 'Libros' %}<i class="bi bi-book"></i>
+                    {% elif cat == 'Papelería' %}<i class="bi bi-pencil"></i>
+                    {% elif cat == 'Música' %}<i class="bi bi-music-note"></i>
+                    {% elif cat == 'Electrodomésticos' %}<i class="bi bi-lightning"></i>
+                    {% elif cat == 'Herramientas' %}<i class="bi bi-tools"></i>
+                    {% elif cat == 'Muebles' %}<i class="bi bi-lamp"></i>
                     {% else %}<i class="bi bi-box-seam"></i>{% endif %}
                 </div>
-                <strong>{{ cat }}</strong>
+                <div class="categoria-nombre">{{ cat }}</div>
             </a>
             {% endfor %}
         </div>
     </div>
 </section>
 
-<!-- PRODUCTOS DESTACADOS -->
+<!-- 4. PRODUCTOS DESTACADOS -->
+<section class="productos-section section">
+    <div class="container">
+        <div class="section-title">
+            <h2>Productos destacados</h2>
+            <p>Los más vendidos esta semana</p>
+        </div>
+        <div class="productos-grid">
+            {% for producto in productos[:8] %}
+            {% set img_url = producto.imagen if producto.imagen.startswith('http') else url_for('static', filename=producto.imagen) %}
+            <a href="{{ url_for('producto_detalle', producto_id=producto.id) }}" class="product-card-link">
+                <article class="product-card">
+                    <div class="product-image-container">
+                        {% if producto.imagen and producto.imagen != 'uploads/placeholder.svg' %}
+                        <img class="product-image" src="{{ img_url }}" alt="{{ producto.nombre }}" loading="lazy">
+                        {% else %}
+                        <div class="product-image-placeholder">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="product-content">
+                        <div class="product-categoria">{{ producto.categoria }}</div>
+                        <h3 class="product-nombre">{{ producto.nombre }}</h3>
+                        <div class="product-precio">S/. {{ '%.2f'|format(producto.precio) }}</div>
+                        <div class="product-disponibilidad disponible">Disponible</div>
+                        <div class="product-botones">
+                            <button class="btn-card btn-primary">Ver detalles</button>
+                        </div>
+                    </div>
+                </article>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- 5. ¿CÓMO FUNCIONA ECOMARKET? -->
+<section class="section" style="background: var(--blanco);">
+    <div class="container">
+        <div class="section-title">
+            <h2>¿Cómo funciona EcoMarket?</h2>
+            <p>Comprar y vender productos sostenibles nunca fue tan fácil</p>
+        </div>
+        <div class="como-funciona-grid">
+            <div class="como-funciona-card">
+                <div class="como-funciona-number">1</div>
+                <h3>Regístrate gratis</h3>
+                <p>Crea tu cuenta en segundos y empieza a explorar productos ecológicos.</p>
+            </div>
+            <div class="como-funciona-card">
+                <div class="como-funciona-number">2</div>
+                <h3>Explora productos</h3>
+                <p>Encuentra artículos sostenibles que se adapten a tu estilo de vida.</p>
+            </div>
+            <div class="como-funciona-card">
+                <div class="como-funciona-number">3</div>
+                <h3>Compra segura</h3>
+                <p>Paga de forma segura y recibe tus productos en casa.</p>
+            </div>
+            <div class="como-funciona-card">
+                <div class="como-funciona-number">4</div>
+                <h3>Impacto real</h3>
+                <p>Cada compra contribuye a reducir residuos y proteger el planeta.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 6. BENEFICIOS PARA COMPRADORES Y VENDEDORES -->
 <section class="section section-alt">
     <div class="container">
-        <div class="section-head-flex">
-            <div>
-            <span class="section-tag"><i class="bi bi-star"></i> <span data-i18n="featured.tag">Destacados</span></span>
-            <h2 class="section-title"><span data-i18n="featured.title">Más vendidos esta semana</span></h2>
-            </div>
-            <a href="{{ url_for('productos_view') }}" class="section-link"><span data-i18n="featured.view_catalog">Ver catálogo completo</span> <i class="bi bi-arrow-right"></i></a>
+        <div class="section-title">
+            <h2>Beneficios para todos</h2>
+            <p>Tanto compradores como vendedores ganan en EcoMarket</p>
         </div>
-        <div class="productos-grid">
-            {% for producto in productos %}
-            {% set img_url = producto.imagen if producto.imagen.startswith('http') else url_for('static', filename=producto.imagen) %}
-            <a href="{{ url_for('producto_detalle', producto_id=producto.id) }}" class="producto-card-link">
-                <article class="producto-card">
-                    <div class="producto-img-container">
-                        {% if producto.precio_original and producto.precio_original > producto.precio %}
-                        <span class="producto-descuento">-{{ ((1 - producto.precio / producto.precio_original) * 100)|round }}%</span>
-                        {% endif %}
-                        {% if producto.imagen and producto.imagen != 'uploads/placeholder.svg' %}
-                        <img class="producto-img-real" src="{{ img_url }}" alt="{{ producto.nombre }}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                        <div class="producto-img-placeholder" style="display:none">
-                            <i class="bi bi-box-seam"></i>
-                        </div>
-                        {% else %}
-                        <div class="producto-img-placeholder">
-                            <i class="bi bi-box-seam"></i>
-                        </div>
-                        {% endif %}
-                    </div>
-                    <div class="producto-body">
-                        <span class="producto-categoria">{{ producto.categoria }}</span>
-                        <h3 class="producto-nombre">{{ producto.nombre }}</h3>
-                        <div class="producto-rating">
-                            {% for i in range(5) %}
-                            <i class="bi {% if i < (producto.rating_promedio|round) %}bi-star-fill{% else %}bi-star{% endif %}"></i>
-                            {% endfor %}
-                            <span>({{ producto.total_resenas }})</span>
-                        </div>
-                        <div class="producto-precios">
-                            <strong class="producto-precio">S/. {{ '%.2f'|format(producto.precio) }}</strong>
-                            {% if producto.precio_original and producto.precio_original > producto.precio %}
-                            <span class="producto-precio-original">S/. {{ '%.2f'|format(producto.precio_original) }}</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                </article>
-            </a>
-            {% endfor %}
+        <div class="beneficios-grid">
+            <div class="beneficio-card">
+                <div class="beneficio-icon">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <h3>Para compradores</h3>
+                <ul>
+                    <li>Productos verificados y de calidad</li>
+                    <li>Pagos seguros y protegidos</li>
+                    <li>Envíos confiables y rápidos</li>
+                    <li>Soporte 24/7</li>
+                </ul>
+            </div>
+            <div class="beneficio-card">
+                <div class="beneficio-icon">
+                    <i class="bi bi-currency-dollar"></i>
+                </div>
+                <h3>Para vendedores</h3>
+                <ul>
+                    <li>Publica productos gratis</li>
+                    <li>Comisiones bajas</li>
+                    <li>Panel de control completo</li>
+                    <li>Alcance a miles de compradores</li>
+                </ul>
+            </div>
         </div>
     </div>
 </section>
 
-<!-- PRODUCTOS RECOMENDADOS -->
-<section class="section">
-    <div class="container">
-        <div class="section-head-flex">
-            <div>
-                <span class="section-tag"><i class="bi bi-lightning"></i> <span data-i18n="recommended.tag">Recomendados para ti</span></span>
-                <h2 class="section-title" data-i18n="recommended.title">Basado en tu interés ecológico</h2>
-            </div>
-            <a href="{{ url_for('productos_view') }}" class="section-link"><span data-i18n="recommended.view_more">Ver más</span> <i class="bi bi-arrow-right"></i></a>
-        </div>
-        <div class="productos-grid">
-            {% for producto in productos[:4] %}
-            {% set img_url = producto.imagen if producto.imagen.startswith('http') else url_for('static', filename=producto.imagen) %}
-            <a href="{{ url_for('producto_detalle', producto_id=producto.id) }}" class="producto-card-link">
-                <article class="producto-card recommended">
-                    <div class="recommended-badge">
-                        <i class="bi bi-star-fill"></i> Top elección
-                    </div>
-                    <div class="producto-img-container">
-                        {% if producto.imagen and producto.imagen != 'uploads/placeholder.svg' %}
-                        <img class="producto-img-real" src="{{ img_url }}" alt="{{ producto.nombre }}" loading="lazy">
-                        {% else %}
-                        <div class="producto-img-placeholder">
-                            <i class="bi bi-box-seam"></i>
-                        </div>
-                        {% endif %}
-                    </div>
-                    <div class="producto-body">
-                        <span class="producto-categoria">{{ producto.categoria }}</span>
-                        <h3 class="producto-nombre">{{ producto.nombre }}</h3>
-                        <div class="producto-rating">
-                            {% for i in range(5) %}
-                            <i class="bi {% if i < (producto.rating_promedio|round) %}bi-star-fill{% else %}bi-star{% endif %}"></i>
-                            {% endfor %}
-                            <span>({{ producto.total_resenas }})</span>
-                        </div>
-                        <div class="producto-precios">
-                            <strong class="producto-precio">S/. {{ '%.2f'|format(producto.precio) }}</strong>
-                        </div>
-                    </div>
-                </article>
-            </a>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-
-<!-- IMPACTO -->
+<!-- 7. ESTADÍSTICAS DE IMPACTO AMBIENTAL -->
 <section class="impacto-section">
     <div class="container">
-        <div class="impacto-grid-2cols">
-            <div class="impacto-content">
-                <span class="section-tag" style="background:var(--blanco);color:var(--verde)"><i class="bi bi-globe-americas"></i> <span data-i18n="impact.real">Impacto real</span></span>
-                <h2 class="impacto-title" data-i18n="impact.title_main">Cada compra cuenta</h2>
-                <p class="impacto-desc" data-i18n="impact.desc_full">En EcoMarket medimos el impacto ambiental de cada transacción. Juntos estamos construyendo un futuro más sostenible.</p>
-                <a href="{{ url_for('impacto') }}" class="section-link"><span data-i18n="impact.view_full">Ver nuestro impacto completo</span> <i class="bi bi-arrow-right"></i></a>
+        <div class="section-title">
+            <h2 style="color: var(--verde-oscuro);">Nuestro impacto ambiental</h2>
+            <p style="color: var(--gris-secundario);">Cifras reales de nuestro compromiso con el planeta</p>
+        </div>
+        <div class="impacto-stats">
+            <div class="impacto-stat">
+                <div class="impacto-valor">1,240</div>
+                <div class="impacto-label">Árboles equivalentes salvados</div>
             </div>
-            <div class="impacto-cards">
-                <div class="impacto-card-item">
-                    <div class="impacto-card-icon" style="background:var(--verde-suave);color:var(--verde)">
-                        <i class="bi bi-tree"></i>
-                    </div>
-                    <strong data-animate-counter="1240">1,240</strong>
-                    <span data-i18n="impact.trees">Árboles equivalentes salvados</span>
-                </div>
-                <div class="impacto-card-item">
-                    <div class="impacto-card-icon" style="background:#e3f2fd;color:#1565c0">
-                        <i class="bi bi-droplet"></i>
-                    </div>
-                    <strong data-animate-counter="85600">85,600</strong>
-                    <span data-i18n="impact.water">Litros de agua ahorrados</span>
-                </div>
-                <div class="impacto-card-item">
-                    <div class="impacto-card-icon" style="background:#fff3e0;color:#e65100">
-                        <i class="bi bi-recycle"></i>
-                    </div>
-                    <strong data-animate-counter="3200">3,200</strong>
-                    <span data-i18n="impact.plastic">Kg de plástico evitados</span>
-                </div>
-                <div class="impacto-card-item">
-                    <div class="impacto-card-icon" style="background:#f3e5f5;color:#6a1b9a">
-                        <i class="bi bi-people"></i>
-                    </div>
-                    <strong data-animate-counter="4800">4,800</strong>
-                    <span data-i18n="impact.families">Familias impactadas</span>
-                </div>
+            <div class="impacto-stat">
+                <div class="impacto-valor">85,600</div>
+                <div class="impacto-label">Litros de agua ahorrados</div>
+            </div>
+            <div class="impacto-stat">
+                <div class="impacto-valor">3,200</div>
+                <div class="impacto-label">Kg de plástico evitados</div>
+            </div>
+            <div class="impacto-stat">
+                <div class="impacto-valor">4,800</div>
+                <div class="impacto-label">Familias impactadas</div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- CTA -->
+<!-- 8. SECCIÓN PARA INVITAR A PUBLICAR PRODUCTOS -->
 <section class="cta-section">
     <div class="container">
-        <div class="cta-grid">
-            <div class="cta-content">
-                <h2 class="cta-title"><span data-i18n="cta.title">¿Tienes productos ecológicos?</span></h2>
-                <p class="cta-desc"><span data-i18n="cta.desc">Publica gratis y llega a miles de compradores comprometidos con el planeta.</span></p>
-                <div class="cta-actions">
-                    <a href="{{ url_for('publicar') }}" class="btn-hero-main" style="background:#fff;color:var(--verde);box-shadow:0 8px 24px rgba(0,0,0,0.15)">
-                        <i class="bi bi-plus-lg"></i> <span data-i18n="cta.publish_now">Publicar ahora</span>
-                    </a>
-                    <a href="{{ url_for('registro') }}" class="btn-hero-sec" style="border-color:rgba(255,255,255,0.4);color:#fff">
-                        <i class="bi bi-person-plus"></i> <span data-i18n="cta.create_account">Crear cuenta gratis</span>
-                    </a>
-                </div>
-            </div>
+        <div class="cta-content">
+            <h2>¿Tienes productos ecológicos?</h2>
+            <p>Publica gratis y llega a miles de compradores comprometidos con el planeta.</p>
             <div class="cta-features">
-                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> <span data-i18n="cta.feature.no_commission">Sin comisión los primeros 3 meses</span></div>
-                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> <span data-i18n="cta.feature.dashboard">Panel de vendedor completo</span></div>
-                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> <span data-i18n="cta.feature.payments">Pagos seguros y rápidos</span></div>
-                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> <span data-i18n="cta.feature.support">Soporte 7 días a la semana</span></div>
+                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> Sin comisión los primeros 3 meses</div>
+                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> Panel de vendedor completo</div>
+                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> Pagos seguros y rápidos</div>
+                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> Soporte 7 días a la semana</div>
+            </div>
+            <div class="cta-buttons">
+                <a href="{{ url_for('publicar') }}" class="btn-principal">Publicar ahora</a>
+                <a href="{{ url_for('registro') }}" class="btn-secundario">Crear cuenta gratis</a>
             </div>
         </div>
     </div>
 </section>
 
-<!-- TESTIMONIOS -->
-<section class="section" style="background:var(--blanco)">
+<!-- 9. TESTIMONIOS DE USUARIOS REALES -->
+<section class="section" style="background: var(--blanco);">
     <div class="container">
-        <div style="text-align:center;margin-bottom:40px">
-            <span class="section-tag" style="margin:0 auto 8px"><i class="bi bi-people"></i> <span data-i18n="community.tag">Comunidad</span></span>
-            <h2 class="section-title" data-i18n="community.title">Lo que dice nuestra comunidad</h2>
+        <div class="section-title">
+            <h2>Lo que dicen nuestros usuarios</h2>
+            <p>Experiencias reales de nuestra comunidad</p>
         </div>
         <div class="testimonios-grid">
             <div class="testimonio-card">
-                <div class="testimonio-quote"><i class="bi bi-quote"></i></div>
-                <p data-i18n="community.review_1">"Desde que compro en EcoMarket siento que mis decisiones de consumo realmente importan. Los productos son increíbles."</p>
                 <div class="testimonio-stars">★★★★★</div>
+                <p>"Desde que compro en EcoMarket siento que mis decisiones de consumo realmente importan. Los productos son increíbles."</p>
                 <div class="testimonio-author">
-                    <div class="testimonio-avatar" style="background:#2e7d32;color:#fff">M</div>
-                    <div><strong data-i18n="community.name_1">María García</strong><span data-i18n="community.city_1">Lima, Perú</span></div>
-                </div>
-            </div>
-            <div class="testimonio-card featured">
-                <div class="testimonio-quote" style="color:rgba(255,255,255,0.5)"><i class="bi bi-quote"></i></div>
-                <p data-i18n="community.review_2">"Publiqué mis productos artesanales y en un mes ya tenía 20 ventas. La plataforma es muy fácil de usar."</p>
-                <div class="testimonio-stars">★★★★★</div>
-                <div class="testimonio-author">
-                    <div class="testimonio-avatar" style="background:rgba(255,255,255,0.2);color:#fff">C</div>
-                    <div><strong style="color:#fff" data-i18n="community.name_2">Carlos López</strong><span style="color:rgba(255,255,255,0.6)" data-i18n="community.city_2">Bogotá, Colombia</span></div>
+                    <strong>María García</strong>
+                    <span>Lima, Perú</span>
                 </div>
             </div>
             <div class="testimonio-card">
-                <div class="testimonio-quote"><i class="bi bi-quote"></i></div>
-                <p data-i18n="community.review_3">"Me encanta que puedo ver el impacto real de cada compra. Es motivador saber que estoy ayudando al planeta."</p>
                 <div class="testimonio-stars">★★★★★</div>
+                <p>"Publiqué mis productos artesanales y en un mes ya tenía 20 ventas. La plataforma es muy fácil de usar."</p>
                 <div class="testimonio-author">
-                    <div class="testimonio-avatar" style="background:#6a1b9a;color:#fff">A</div>
-                    <div><strong data-i18n="community.name_3">Ana Torres</strong><span data-i18n="community.city_3">Santiago, Chile</span></div>
+                    <strong>Carlos López</strong>
+                    <span>Bogotá, Colombia</span>
+                </div>
+            </div>
+            <div class="testimonio-card">
+                <div class="testimonio-stars">★★★★★</div>
+                <p>"Me encanta que puedo ver el impacto real de cada compra. Es motivador saber que estoy ayudando al planeta."</p>
+                <div class="testimonio-author">
+                    <strong>Ana Torres</strong>
+                    <span>Santiago, Chile</span>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<!-- 10. PREGUNTAS FRECUENTES -->
+<section class="section">
+    <div class="container">
+        <div class="section-title">
+            <h2>Preguntas frecuentes</h2>
+            <p>Todo lo que necesitas saber sobre EcoMarket</p>
+        </div>
+        <div class="faq-grid">
+            <div class="faq-item">
+                <h3>¿Es gratis registrarse?</h3>
+                <p>Sí, el registro es completamente gratuito para compradores y vendedores.</p>
+            </div>
+            <div class="faq-item">
+                <h3>¿Cómo protegen mis pagos?</h3>
+                <p>Utilizamos sistemas de pago seguros con encriptación SSL y protecciones anti-fraude.</p>
+            </div>
+            <div class="faq-item">
+                <h3>¿Puedo devolver un producto?</h3>
+                <p>Sí, ofrecemos una política de devoluciones de 30 días para productos que no cumplan con lo esperado.</p>
+            </div>
+            <div class="faq-item">
+                <h3>¿Cómo verifican a los vendedores?</h3>
+                <p>Implementamos un sistema de verificación en varios niveles para garantizar la confianza.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
 {% endblock %}
+
+<!-- Estilos adicionales para la página principal -->
+<style>
+.search-bar-section {
+    padding: var(--spacing-xl) 0;
+    background: var(--gris-verdoso);
+}
+
+.search-bar {
+    display: flex;
+    gap: var(--spacing-sm);
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.search-input {
+    flex: 1;
+}
+
+.como-funciona-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-xl);
+}
+
+.como-funciona-card {
+    background: var(--gris-verdoso);
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius-lg);
+    text-align: center;
+}
+
+.como-funciona-number {
+    width: 50px;
+    height: 50px;
+    background: var(--verde-intenso);
+    color: var(--blanco);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 auto var(--spacing-md);
+}
+
+.como-funciona-card h3 {
+    font-size: 1.25rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+.beneficios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-xl);
+    margin-top: var(--spacing-xl);
+}
+
+.beneficio-card {
+    background: var(--blanco);
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.beneficio-icon {
+    font-size: 2.5rem;
+    color: var(--verde-intenso);
+    margin-bottom: var(--spacing-md);
+}
+
+.beneficio-card h3 {
+    margin-bottom: var(--spacing-md);
+}
+
+.beneficio-card ul {
+    list-style: none;
+}
+
+.beneficio-card li {
+    padding: var(--spacing-sm) 0;
+    padding-left: var(--spacing-lg);
+    position: relative;
+}
+
+.beneficio-card li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--verde-intenso);
+    font-weight: 700;
+}
+
+.cta-section {
+    background: linear-gradient(135deg, var(--verde-oscuro) 0%, var(--verde-intenso) 100%);
+    color: var(--blanco);
+    padding: var(--spacing-2xl) 0;
+    text-align: center;
+}
+
+.cta-content h2 {
+    color: var(--blanco);
+    margin-bottom: var(--spacing-md);
+}
+
+.cta-content p {
+    color: var(--verde-claro);
+    margin-bottom: var(--spacing-xl);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cta-features {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.cta-feature {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.cta-buttons {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.cta-buttons .btn-secundario {
+    border-color: var(--blanco);
+    color: var(--blanco);
+}
+
+.cta-buttons .btn-secundario:hover {
+    background: var(--blanco);
+    color: var(--verde-intenso);
+}
+
+.testimonios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-xl);
+}
+
+.testimonio-card {
+    background: var(--gris-verdoso);
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius-lg);
+}
+
+.testimonio-stars {
+    color: var(--naranja);
+    margin-bottom: var(--spacing-md);
+    font-size: 1.25rem;
+}
+
+.testimonio-card p {
+    font-style: italic;
+    margin-bottom: var(--spacing-md);
+}
+
+.testimonio-author {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.testimonio-author strong {
+    color: var(--gris-oscuro);
+}
+
+.testimonio-author span {
+    color: var(--gris-secundario);
+    font-size: 0.875rem;
+}
+
+.faq-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-xl);
+}
+
+.faq-item {
+    background: var(--blanco);
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.faq-item h3 {
+    font-size: 1.1rem;
+    margin-bottom: var(--spacing-sm);
+    color: var(--verde-oscuro);
+}
+
+.faq-item p {
+    color: var(--gris-secundario);
+    margin-bottom: 0;
+}
+
+.section-alt {
+    background: var(--gris-verdoso);
+}
+
+.product-card-link {
+    text-decoration: none;
+}
+</style>

@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Búsqueda Avanzada - EcoMarket{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Búsqueda Avanzada</h1>
+    
+    <div class="busqueda-container">
+        <div class="busqueda-input">
+            <input type="text" id="busqueda-input" placeholder="Buscar productos..." autocomplete="off">
+            <div id="sugerencias-busqueda" class="sugerencias"></div>
+        </div>
+        
+        <div class="filtros-busqueda">
+            <h2>Filtros</h2>
+            <div class="filtro-item">
+                <label>Categoría</label>
+                <select class="filtro-avanzado" name="categoria">
+                    <option value="">Todas</option>
+                    <option value="Higiene">Higiene</option>
+                    <option value="Hogar">Hogar</option>
+                    <option value="Ropa">Ropa</option>
+                </select>
+            </div>
+            <div class="filtro-item">
+                <label>Precio Mín</label>
+                <input type="number" class="filtro-avanzado" name="precio_min" value="0">
+            </div>
+            <div class="filtro-item">
+                <label>Precio Máx</label>
+                <input type="number" class="filtro-avanzado" name="precio_max" value="10000">
+            </div>
+            <div class="filtro-item">
+                <label>Eco Score Mín</label>
+                <input type="range" class="filtro-avanzado" name="eco_score" min="0" max="10" value="0">
+            </div>
+        </div>
+        
+        <div class="historial-busqueda">
+            <h2>Historial de Búsquedas</h2>
+            <div id="historial-busqueda"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+.busqueda-container {
+    margin-top: 30px;
+}
+
+.busqueda-input {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+#busqueda-input {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.2rem;
+    border: 2px solid #dee2e6;
+    border-radius: 10px;
+}
+
+.sugerencias {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.sugerencia-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.sugerencia-item:hover {
+    background: #f8f9fa;
+}
+
+.filtros-busqueda {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.filtro-item {
+    margin-bottom: 15px;
+}
+
+.filtro-item label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.filtro-item input,
+.filtro-item select {
+    width: 100%;
+    padding: 10px;
+}
+
+.historial-busqueda {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.historial-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #dee2e6;
+}
+</style>
+{% endblock %}

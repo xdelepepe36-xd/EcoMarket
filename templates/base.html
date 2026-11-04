@@ -34,6 +34,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-dark-mode.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-animations.css') }}">
     
+    <!-- EcoHamster - Mascota -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-mascota.css') }}">
+    
     <!-- Premium Design - Solo en páginas premium -->
     {% if request.endpoint in ['index_premium', 'dashboard_premium'] %}
     <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-premium-design.css') }}">
@@ -292,5 +295,8 @@
             }
         });
     </script>
+    
+    <!-- EcoHamster - Mascota con consejos ecológicos -->
+    <script src="{{ url_for('static', filename='ecomarket-mascota.js') }}"></script>
 </body>
 </html>

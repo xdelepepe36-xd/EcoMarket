@@ -26,115 +26,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
-    <!-- CSS Optimizado - Solo lo esencial -->
+    <!-- CSS Consolidado - Solo lo esencial -->
     <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-rediseño.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-consolidated.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-themes-enhanced.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='accessibility.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-dark-mode.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-animations.css') }}">
     
-    <!-- EcoHamster - Mascota -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-mascota.css') }}">
-    
-    <!-- Premium Design - Solo en páginas premium -->
-    {% if request.endpoint in ['index_premium', 'dashboard_premium'] %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-premium-design.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-premium-extended.css') }}">
-    {% endif %}
-    
-    <!-- JS Optimizado - Solo lo esencial -->
+    <!-- JS Consolidado - Solo lo esencial -->
     <script src="{{ url_for('static', filename='ecomarket-consolidated.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='ecomarket-security-enhanced.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='ecomarket-i18n-complete.js') }}" defer></script>
-    
-    <!-- Performance Optimizer - Carga diferida -->
-    <script src="{{ url_for('static', filename='ecomarket-performance-optimizer.js') }}" defer></script>
-    
-    <!-- Filtros Avanzados - Solo en página de productos -->
-    {% if request.endpoint == 'productos_view' %}
-    <script src="{{ url_for('static', filename='ecomarket-filtros-avanzados.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='ecomarket-comparacion-productos.js') }}" defer></script>
-    {% endif %}
-    
-    <!-- Seguimiento de Pedidos - Solo en página de perfil/pedidos -->
-    {% if request.endpoint in ['perfil', 'pedidos_view'] %}
-    <script src="{{ url_for('static', filename='ecomarket-seguimiento-pedidos.js') }}" defer></script>
-    {% endif %}
-    
-    <!-- Checkout Wizard - Solo en página de checkout -->
-    {% if request.endpoint == 'carrito_view' %}
-    <script src="{{ url_for('static', filename='ecomarket-checkout-wizard.js') }}" defer></script>
-    {% endif %}
-    
-    <!-- Preguntas/Respuestas - Solo en página de producto -->
-    {% if request.endpoint == 'producto_detalle' %}
-    <script src="{{ url_for('static', filename='ecomarket-preguntas-respuestas.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='ecomarket-pagina-producto-mejorada.js') }}" defer></script>
-    {% endif %}
-    
-    <!-- Dashboard Premium - Solo en página de dashboard/premium -->
-    {% if request.endpoint in ['dashboard_premium', 'perfil'] %}
-    <script src="{{ url_for('static', filename='ecomarket-dashboard-premium-v2.js') }}" defer></script>
-    {% endif %}
-    
-    <!-- Cupones y Descuentos - Solo en página de carrito -->
-    {% if request.endpoint == 'carrito_view' %}
-    <script src="{{ url_for('static', filename='ecomarket-cupones-descuentos.js') }}" defer></script>
-    {% endif %}
-    
-    <!-- Notificaciones Push - Solo en páginas de usuario -->
-    {% if request.endpoint in ['perfil', 'configuracion'] %}
-    <script src="{{ url_for('static', filename='ecomarket-notificaciones-push-avanzadas.js') }}" defer></script>
-    {% endif %}
-    
-    <!-- Chat Tiempo Real - Solo en página de producto -->
-    {% if request.endpoint == 'producto_detalle' %}
-    <script src="{{ url_for('static', filename='ecomarket-chat-tiempo-real.js') }}" defer></script>
-    {% endif %}
-    
-    <!-- Valoración Vendedores - Solo en página de vendedor -->
-    {% if request.endpoint == 'vendedor_perfil' %}
-    <script src="{{ url_for('static', filename='ecomarket-valoracion-vendedores.js') }}" defer></script>
-    {% endif %}
-    
-    <!-- Alertas de Precio - Solo en página de usuario -->
-    {% if request.endpoint in ['perfil', 'alertas'] %}
-    <script src="{{ url_for('static', filename='ecomarket-alertas-precio.js') }}" defer></script>
-    {% endif %}
-    
-    <!-- Wishlist Compartido - Solo en página de wishlist -->
-    {% if request.endpoint in ['wishlist', 'favoritos_view'] %}
-    <script src="{{ url_for('static', filename='ecomarket-wishlist-compartido.js') }}" defer></script>
-    {% endif %}
-    
-    <!-- Premium JS - Solo en páginas premium -->
-    {% if request.endpoint in ['index_premium', 'dashboard_premium'] %}
-    <script src="{{ url_for('static', filename='ecomarket-premium-extended.js') }}" defer></script>
-    {% endif %}
-    
-    <!-- Modo Oscuro -->
-    <script src="{{ url_for('static', filename='ecomarket-dark-mode.js') }}"></script>
-    
-    <!-- Schema.org SEO -->
-    <script src="{{ url_for('static', filename='ecomarket-schema-org.js') }}"></script>
-    
-    <!-- Mejoras Adicionales -->
-    <script src="{{ url_for('static', filename='mejoras-adicionales/ecomarket-verificacion-vendedores.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='mejoras-adicionales/ecomarket-reviews-fotos.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='mejoras-adicionales/ecomarket-analytics-visual.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='mejoras-adicionales/ecomarket-favoritos-colecciones.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='mejoras-adicionales/ecomarket-chat-historial.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='mejoras-adicionales/busqueda-avanzada.js') }}" defer></script>
-    
-    <!-- Service Worker Offline -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('{{ url_for('static', filename='mejoras-adicionales/sw-offline.js') }}')
-                .then(reg => console.log('Service Worker registrado'))
-                .catch(err => console.log('Error SW:', err));
-        }
-    </script>
     
     {% block head %}{% endblock %}
 </head>
@@ -295,8 +192,5 @@
             }
         });
     </script>
-    
-    <!-- EcoHamster - Mascota con consejos ecológicos -->
-    <script src="{{ url_for('static', filename='ecomarket-mascota.js') }}"></script>
 </body>
 </html>

@@ -3,60 +3,74 @@
 
 {% block content %}
 
-<!-- 1. HERO SECTION LIMPIO -->
-<section class="hero-section-enhanced">
-    <div class="hero-background">
-        <div class="hero-image-container">
-            <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1920&q=80" alt="Productos ecológicos" class="hero-bg-image">
-            <div class="hero-overlay"></div>
-        </div>
-    </div>
-    <div class="container hero-content-wrapper">
+<!-- 1. HERO SECTION MEJORADO -->
+<section class="hero-section-modern">
+    <div class="hero-gradient"></div>
+    <div class="hero-pattern"></div>
+    <div class="container hero-container">
         <div class="hero-content">
-            <div class="hero-badge">
-                <i class="bi bi-leaf"></i>
-                <span>Marketplace 100% ecológico</span>
+            <div class="hero-badge-modern">
+                <i class="bi bi-award"></i>
+                <span>Marketplace Ecológico #1</span>
             </div>
-            <h1 class="hero-title">Compra y vende productos sostenibles</h1>
-            <p class="hero-description">
-                Descubre miles de productos ecológicos de vendedores comprometidos con el planeta.
-                Cada compra genera un impacto positivo real.
+            <h1 class="hero-title-modern">
+                <span class="highlight">Compra y vende</span><br>
+                productos sostenibles
+            </h1>
+            <p class="hero-description-modern">
+                Tu tienda ecológica favorita. Descubre productos únicos, 
+                apoya a vendedores locales y ayuda al planeta con cada compra.
             </p>
-            <div class="hero-stats-quick">
-                <div class="hero-stat-item">
-                    <strong>{{ total_productos }}</strong>
-                    <span>Productos</span>
-                </div>
-                <div class="hero-stat-item">
-                    <strong>{{ total_categorias }}</strong>
-                    <span>Categorías</span>
-                </div>
-                <div class="hero-stat-item">
-                    <strong>{{ total_usuarios }}</strong>
-                    <span>Usuarios</span>
-                </div>
-            </div>
-            <div class="hero-buttons">
-                <a href="{{ url_for('productos_view') }}" class="btn-principal btn-hero">
+            <div class="hero-buttons-modern">
+                <a href="{{ url_for('productos_view') }}" class="btn-hero-primary">
                     <i class="bi bi-bag"></i> Explorar productos
                 </a>
-                <a href="{{ url_for('publicar') }}" class="btn-secundario btn-hero">
-                    <i class="bi bi-plus-lg"></i> Publicar gratis
+                <a href="{{ url_for('publicar') }}" class="btn-hero-secondary">
+                    <i class="bi bi-plus-circle"></i> Vender ahora
                 </a>
             </div>
-            <div class="hero-trust-badges">
-                <div class="trust-badge">
-                    <i class="bi bi-truck"></i>
-                    <span>Envío gratis</span>
+            <div class="hero-stats-modern">
+                <div class="stat-modern">
+                    <div class="stat-icon">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+                    <div class="stat-number">{{ total_productos }}</div>
+                    <div class="stat-label">Productos</div>
                 </div>
-                <div class="trust-badge">
-                    <i class="bi bi-shield-check"></i>
-                    <span>Pago seguro</span>
+                <div class="stat-modern">
+                    <div class="stat-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <div class="stat-number">{{ total_usuarios }}</div>
+                    <div class="stat-label">Usuarios</div>
                 </div>
-                <div class="trust-badge">
-                    <i class="bi bi-arrow-repeat"></i>
-                    <span>Devoluciones</span>
+                <div class="stat-modern">
+                    <div class="stat-icon">
+                        <i class="bi bi-geo-alt"></i>
+                    </div>
+                    <div class="stat-number">Collique</div>
+                    <div class="stat-label">Ubicación</div>
                 </div>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="hero-card-floating">
+                <div class="hero-card-img">
+                    <i class="bi bi-recycle"></i>
+                </div>
+                <div class="hero-card-text">Recicla</div>
+            </div>
+            <div class="hero-card-floating" style="animation-delay: 0.2s">
+                <div class="hero-card-img">
+                    <i class="bi bi-heart"></i>
+                </div>
+                <div class="hero-card-text">Ahorra</div>
+            </div>
+            <div class="hero-card-floating" style="animation-delay: 0.4s">
+                <div class="hero-card-img">
+                    <i class="bi bi-tree"></i>
+                </div>
+                <div class="hero-card-text">Planta</div>
             </div>
         </div>
     </div>

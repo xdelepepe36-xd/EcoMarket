@@ -781,11 +781,29 @@ p {
     overflow: hidden;
     transition: all var(--transition-normal);
     position: relative;
+    border: 1px solid var(--gris-verdoso);
+}
+
+.producto-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--verde-intenso), var(--naranja));
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+}
+
+.producto-card:hover::before {
+    opacity: 1;
 }
 
 .producto-card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(20, 83, 45, 0.15);
+    border-color: var(--verde-intenso);
 }
 
 .producto-img-container {

@@ -98,13 +98,13 @@
 <section class="categorias-section section">
     <div class="container">
         <div class="section-title">
-            <h2>Categorías de productos</h2>
-            <p>Explora nuestra variedad de productos sostenibles</p>
+            <h2><i class="bi bi-grid-3x3-gap"></i> Categorías populares</h2>
+            <p>Explora por tipo de material sostenible</p>
         </div>
         <div class="categorias-grid">
             {% for cat in categorias %}
-            <a href="{{ url_for('productos_view', categoria=cat) }}" class="categoria-card">
-                <div class="categoria-icon">
+            <a href="{{ url_for('productos_view', categoria=cat) }}" class="categoria-card-modern">
+                <div class="categoria-icon-modern">
                     {% if cat == 'Hogar' %}<i class="bi bi-house-heart"></i>
                     {% elif cat == 'Accesorios' %}<i class="bi bi-gem"></i>
                     {% elif cat == 'Higiene' %}<i class="bi bi-droplet"></i>
@@ -125,7 +125,10 @@
                     {% elif cat == 'Muebles' %}<i class="bi bi-lamp"></i>
                     {% else %}<i class="bi bi-box-seam"></i>{% endif %}
                 </div>
-                <div class="categoria-nombre">{{ cat }}</div>
+                <div class="categoria-nombre-modern">{{ cat }}</div>
+                <div class="categoria-arrow">
+                    <i class="bi bi-arrow-right"></i>
+                </div>
             </a>
             {% endfor %}
         </div>

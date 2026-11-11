@@ -3456,3 +3456,85 @@ html { scroll-behavior: smooth; }
     height: 200px;
 }
 
+
+/* Categorías modernas */
+.categoria-card-modern {
+    background: var(--blanco);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-xl);
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-normal);
+    cursor: pointer;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid var(--gris-verdoso);
+}
+
+.categoria-card-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--verde-claro) 0%, var(--blanco) 100%);
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+    z-index: 0;
+}
+
+.categoria-card-modern:hover::before {
+    opacity: 1;
+}
+
+.categoria-card-modern:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--verde-intenso);
+}
+
+.categoria-icon-modern {
+    font-size: 2.5rem;
+    color: var(--verde-intenso);
+    margin-bottom: var(--spacing-md);
+    position: relative;
+    z-index: 1;
+    transition: transform var(--transition-normal);
+}
+
+.categoria-card-modern:hover .categoria-icon-modern {
+    transform: scale(1.2);
+}
+
+.categoria-nombre-modern {
+    font-weight: 700;
+    color: var(--gris-oscuro);
+    font-size: 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+.categoria-arrow {
+    position: absolute;
+    bottom: var(--spacing-md);
+    right: var(--spacing-md);
+    width: 30px;
+    height: 30px;
+    background: var(--verde-intenso);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--blanco);
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all var(--transition-normal);
+}
+
+.categoria-card-modern:hover .categoria-arrow {
+    opacity: 1;
+    transform: translateX(0);
+}
+

@@ -2,52 +2,123 @@
 {% block title %}EcoMarket - Impacto{% endblock %}
 
 {% block content %}
-<section class="section impacto-hero">
+<section class="impacto-hero-modern">
     <div class="container">
-        <div class="section-head">
-            <div>
-                <h2 class="section-title"><i class="bi bi-globe-americas"></i> Impacto ecológico real</h2>
-                <p>En EcoMarket transformamos el consumo con productos sostenibles, reducción de residuos y un mercado más justo.</p>
+        <div class="impacto-hero-content">
+            <h1 class="impacto-hero-title">
+                <i class="bi bi-globe-americas"></i><br>
+                Nuestro impacto ecológico
+            </h1>
+            <p class="impacto-hero-subtitle">
+                En EcoMarket transformamos el consumo con productos sostenibles, 
+                reducción de residuos y un mercado más justo.
+            </p>
+        </div>
+        
+        <!-- Stats visuales -->
+        <div class="impacto-stats-modern">
+            <div class="impacto-stat-modern animate-fade-in-up" style="animation-delay: 0.1s">
+                <div class="impacto-stat-icon">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <div class="impacto-stat-number">{{ total_productos }}</div>
+                <div class="impacto-stat-label">Productos</div>
+            </div>
+            <div class="impacto-stat-modern animate-fade-in-up" style="animation-delay: 0.2s">
+                <div class="impacto-stat-icon">
+                    <i class="bi bi-tags"></i>
+                </div>
+                <div class="impacto-stat-number">{{ total_categorias }}</div>
+                <div class="impacto-stat-label">Categorías</div>
+            </div>
+            <div class="impacto-stat-modern animate-fade-in-up" style="animation-delay: 0.3s">
+                <div class="impacto-stat-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="impacto-stat-number">{{ total_usuarios }}</div>
+                <div class="impacto-stat-label">Usuarios</div>
+            </div>
+            <div class="impacto-stat-modern animate-fade-in-up" style="animation-delay: 0.4s">
+                <div class="impacto-stat-icon">
+                    <i class="bi bi-star"></i>
+                </div>
+                <div class="impacto-stat-number">{{ total_resenas }}</div>
+                <div class="impacto-stat-label">Reseñas</div>
+            </div>
+            <div class="impacto-stat-modern animate-fade-in-up" style="animation-delay: 0.5s">
+                <div class="impacto-stat-icon">
+                    <i class="bi bi-bag-check"></i>
+                </div>
+                <div class="impacto-stat-number">{{ total_pedidos }}</div>
+                <div class="impacto-stat-label">Pedidos</div>
+            </div>
+            <div class="impacto-stat-modern animate-fade-in-up" style="animation-delay: 0.6s">
+                <div class="impacto-stat-icon">
+                    <i class="bi bi-eye"></i>
+                </div>
+                <div class="impacto-stat-number">{{ total_visitas }}</div>
+                <div class="impacto-stat-label">Visitas</div>
             </div>
         </div>
+    </div>
+</section>
 
-        <!-- Stats reales de la plataforma -->
-        <div class="stats-grid" style="margin-bottom:32px">
-            <div class="stat-card">
-                <strong>{{ total_productos }}</strong>
-                <span><i class="bi bi-box-seam"></i> Productos ecológicos</span>
-            </div>
-            <div class="stat-card">
-                <strong>{{ total_categorias }}</strong>
-                <span><i class="bi bi-tags"></i> Categorías</span>
-            </div>
-            <div class="stat-card">
-                <strong>{{ total_usuarios }}</strong>
-                <span><i class="bi bi-people"></i> Usuarios</span>
-            </div>
-            <div class="stat-card">
-                <strong>{{ total_resenas }}</strong>
-                <span><i class="bi bi-star"></i> Reseñas</span>
-            </div>
-            <div class="stat-card">
-                <strong>{{ total_pedidos }}</strong>
-                <span><i class="bi bi-bag-check"></i> Pedidos</span>
-            </div>
-            <div class="stat-card">
-                <strong>{{ total_visitas }}</strong>
-                <span><i class="bi bi-eye"></i> Visitas</span>
-            </div>
+<section class="section" style="background: var(--blanco);">
+    <div class="container">
+        <div class="section-title">
+            <h2><i class="bi bi-tree"></i> ¿Cómo ayudamos al planeta?</h2>
+            <p>Cada acción en EcoMarket tiene un impacto positivo real</p>
         </div>
-
-        <div class="impacto-grid">
-            <article class="impacto-card">
+        
+        <div class="impacto-grid-modern">
+            <article class="impacto-card-modern animate-fade-in-up" style="animation-delay: 0.1s">
+                <div class="impacto-card-icon">
+                    <i class="bi bi-recycle"></i>
+                </div>
                 <h3>Reducción de plástico</h3>
                 <p>Más del 75% de los productos destacados son reutilizables o biodegradables, ayudando a disminuir plásticos de un solo uso.</p>
-                <div class="impacto-graphic"><div class="progress-bar" style="width: 76%" data-animate-progress="76"></div></div>
-                <span class="progress-label">76% de reducción estimada</span>
+                <div class="impacto-progress">
+                    <div class="progress-bar-fill" style="width: 76%"></div>
+                    <span class="progress-label">76% de reducción estimada</span>
+                </div>
             </article>
-            <article class="impacto-card">
+            <article class="impacto-card-modern animate-fade-in-up" style="animation-delay: 0.2s">
+                <div class="impacto-card-icon">
+                    <i class="bi bi-scales"></i>
+                </div>
                 <h3>Comercio justo</h3>
+                <p>Conectamos vendedores locales directamente con compradores, eliminando intermediarios y generando mejores precios.</p>
+                <div class="impacto-progress">
+                    <div class="progress-bar-fill" style="width: 85%"></div>
+                    <span class="progress-label">85% impacto positivo</span>
+                </div>
+            </article>
+            <article class="impacto-card-modern animate-fade-in-up" style="animation-delay: 0.3s">
+                <div class="impacto-card-icon">
+                    <i class="bi bi-water"></i>
+                </div>
+                <h3>Ahorro de agua</h3>
+                <p>La reutilización de productos reduce significativamente el consumo de agua en la producción de nuevos artículos.</p>
+                <div class="impacto-progress">
+                    <div class="progress-bar-fill" style="width: 60%"></div>
+                    <span class="progress-label">60% de ahorro estimado</span>
+                </div>
+            </article>
+            <article class="impacto-card-modern animate-fade-in-up" style="animation-delay: 0.4s">
+                <div class="impacto-card-icon">
+                    <i class="bi bi-tree"></i>
+                </div>
+                <h3>Plantas más verdes</h3>
+                <p>Cada producto reutilizado es una planta que no necesita crecer, contribuyendo a la preservación de bosques.</p>
+                <div class="impacto-progress">
+                    <div class="progress-bar-fill" style="width: 70%"></div>
+                    <span class="progress-label">70% de efecto ecológico</span>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+{% endblock %}
                 <p>Apoyamos creadores locales y materiales responsables para garantizar un impacto social positivo.</p>
                 <div class="impacto-graphic"><div class="progress-bar" style="width: 82%" data-animate-progress="82"></div></div>
                 <span class="progress-label">82% de productos con origen responsable</span>

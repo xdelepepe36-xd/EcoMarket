@@ -3630,3 +3630,132 @@ html { scroll-behavior: smooth; }
     background: var(--verde-oscuro);
 }
 
+
+/* Impacto moderno */
+.impacto-hero-modern {
+    background: linear-gradient(135deg, var(--verde-oscuro) 0%, var(--verde-intenso) 100%);
+    color: var(--blanco);
+    padding: var(--spacing-2xl) 0;
+}
+
+.impacto-hero-content {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.impacto-hero-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: var(--spacing-md);
+}
+
+.impacto-hero-subtitle {
+    font-size: 1.25rem;
+    color: var(--verde-claro);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.impacto-stats-modern {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-2xl);
+}
+
+.impacto-stat-modern {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius-lg);
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.impacto-stat-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--blanco);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--verde-oscuro);
+    margin: 0 auto var(--spacing-md);
+}
+
+.impacto-stat-number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--blanco);
+}
+
+.impacto-stat-label {
+    font-size: 0.875rem;
+    color: var(--verde-claro);
+}
+
+.impacto-grid-modern {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-xl);
+    margin-top: var(--spacing-xl);
+}
+
+.impacto-card-modern {
+    background: var(--blanco);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-normal);
+    border: 1px solid var(--gris-verdoso);
+}
+
+.impacto-card-modern:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--verde-intenso);
+}
+
+.impacto-card-icon {
+    width: 50px;
+    height: 50px;
+    background: var(--verde-claro);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--verde-oscuro);
+    margin-bottom: var(--spacing-md);
+}
+
+.impacto-card-modern h3 {
+    color: var(--verde-oscuro);
+    margin-bottom: var(--spacing-sm);
+}
+
+.impacto-card-modern p {
+    color: var(--gris-secundario);
+    margin-bottom: var(--spacing-md);
+}
+
+.impacto-progress {
+    margin-top: var(--spacing-md);
+}
+
+.progress-bar-fill {
+    height: 8px;
+    background: linear-gradient(90deg, var(--verde-intenso), var(--naranja));
+    border-radius: var(--border-radius-sm);
+    transition: width 1s ease;
+}
+
+.progress-label {
+    font-size: 0.875rem;
+    color: var(--gris-secundario);
+    margin-top: var(--spacing-sm);
+    display: block;
+}
+

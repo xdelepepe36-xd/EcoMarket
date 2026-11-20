@@ -247,7 +247,7 @@ p {
     grid-template-columns: 1fr 1fr;
     gap: var(--spacing-2xl);
     align-items: center;
-    padding: var(--spacing-2xl) 0;
+    padding: var(--spacing-xl) 0;
 }
 
 /* Si la mascota fue eliminada del hero, el contenido ocupa todo el ancho */
@@ -373,9 +373,9 @@ p {
 }
 
 .hero-title {
-    font-size: 3.5rem;
+    font-size: clamp(2.2rem, 4.5vw, 3.25rem);
     font-weight: 700;
-    line-height: 1.2;
+    line-height: 1.15;
     margin-bottom: var(--spacing-lg);
     max-width: 800px;
 }

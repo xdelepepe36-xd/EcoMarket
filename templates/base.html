@@ -27,7 +27,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
-    <!-- CSS Consolidado - Solo lo esencial -->
+    <!-- CSS: final.css como base (cubre todas las clases de las plantillas)
+         + rediseño.css encima (nuevo diseño gana donde define estilos) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-final.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-rediseño.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='accessibility.css') }}">
     

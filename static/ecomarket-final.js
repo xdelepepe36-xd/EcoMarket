@@ -600,6 +600,8 @@ const EcoCart = {
         this.loadFromStorage();
         this.updateBadge();
         this.bindEvents();
+        // Notificar a las vistas (carrito, badges) que ya hay items cargados
+        this.dispatchUpdate();
     },
     
     loadFromStorage() {
@@ -724,6 +726,35 @@ const EcoCart = {
             toast.classList.remove('show');
             setTimeout(() => toast.remove(), 300);
         }, 3000);
+    },
+    
+    // Alias usado por algunas plantillas
+    showToast(message, type = 'info') {
+        this.showNotification(message, type);
+    },
+    
+    getItems() {
+        return this.items;
+    },
+    
+    // Cupones: el código se guarda localmente; el backend lo valida en checkout
+    applyCoupon(code) {
+        code = (code || '').trim().toUpperCase();
+        if (!code) {
+            this.showNotification('Ingresa un código de cupón', 'warning');
+            return false;
+        }
+        localStorage.setItem('ecomarket_coupon', code);
+        this.showNotification(`Cupón ${code} aplicado`, 'success');
+        return true;
+    },
+    
+    getAppliedCoupon() {
+        return localStorage.getItem('ecomarket_coupon') || '';
+    },
+    
+    clearCoupon() {
+        localStorage.removeItem('ecomarket_coupon');
     }
 };
 
@@ -2069,32 +2100,8 @@ const EcoOrderTracking = {
     },
     
     bindEvents() {
-        // Eventos de checkout
-        const checkoutForm = document.getElementById('checkoutForm');
-        if (checkoutForm) {
-            checkoutForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const cart = EcoCart.getSummary();
-                const order = {
-                    items: cart.items,
-                    subtotal: cart.subtotal,
-                    shipping: cart.shipping,
-                    total: cart.total,
-                    customer: {
-                        name: document.getElementById('customerName').value,
-                        email: document.getElementById('customerEmail').value,
-                        address: document.getElementById('customerAddress').value
-                    }
-                };
-                
-                this.addOrder(order);
-                EcoCart.items = [];
-                EcoCart.saveToStorage();
-                
-                // Redirigir a confirmación
-                window.location.href = '/confirmacion';
-            });
-        }
+        // El checkout real lo maneja templates/checkout.html (POST /checkout);
+        // aquí solo se sincroniza el estado de pedidos si existe UI de tracking.
     }
 };
 
@@ -2634,8 +2641,10 @@ const EcoQuickView = {
     },
     
     bindEvents() {
-        this.overlay.querySelector('.modal-close').addEventListener('click', () => this.close());
-        this.overlay.querySelector('.close-modal').addEventListener('click', () => this.close());
+        const closeBtn = this.overlay.querySelector('.modal-close');
+        const closeBtn2 = this.overlay.querySelector('.close-modal');
+        if (closeBtn) closeBtn.addEventListener('click', () => this.close());
+        if (closeBtn2) closeBtn2.addEventListener('click', () => this.close());
         this.overlay.addEventListener('click', (e) => {
             if (e.target === this.overlay) this.close();
         });
@@ -2755,52 +2764,8 @@ const EcoSearchHistory = {
 
 document.addEventListener('DOMContentLoaded', () => {
     try {
-        // Inicializar módulos básicos que están definidos
-        EcoMarket.init();
-        EcoCart.init();
-        EcoFavorites.init();
-        EcoSearch.init();
-        
-        // Inicializar módulos avanzados que están definidos
-        EcoCompare.init();
-        EcoCoupons.init();
-        EcoQA.init();
-        EcoNotifications.init();
-        EcoRecommendations.init();
-        EcoWishlist.init();
-        EcoOrderTracking.init();
-        
-        // Inicializar módulos adicionales que están definidos
-        EcoReviews.init();
-        EcoSellerRating.init();
-        EcoImpactCalculator.init();
-        EcoReferrals.init();
-        EcoAdvancedSearch.init();
-        EcoChallenges.init();
-        
-        // Inicializar nuevas mejoras que están definidas
-        EcoScrollAnimations.init();
-        EcoToast.init();
-        EcoQuickView.init();
-        EcoRipple.init();
-        EcoSearchHistory.init();
-        
-        // Reemplazar showToast con EcoToast
-        window.showToast = (message, type = 'info') => {
-            try {
-                const titles = {
-                    success: 'Éxito',
-                    error: 'Error',
-                    warning: 'Advertencia',
-                    info: 'Información'
-                };
-                EcoToast.show(titles[type] || titles.info, message, type);
-            } catch (e) {
-                console.error('Error en showToast:', e);
-            }
-        };
-        
-        // Exponer al scope global para uso en plantillas
+        // Exponer al scope global ANTES de inicializar, para que las vistas
+        // (carrito, badges) puedan usar EcoCart/EcoFavorites desde el inicio.
         window.EcoMarket = EcoMarket;
         window.EcoCart = EcoCart;
         window.EcoFavorites = EcoFavorites;
@@ -2822,6 +2787,31 @@ document.addEventListener('DOMContentLoaded', () => {
         window.EcoQuickView = EcoQuickView;
         window.EcoRipple = EcoRipple;
         window.EcoSearchHistory = EcoSearchHistory;
+
+        // Inicializar módulos básicos que están definidos
+        const safeInit = (mod) => { try { if (mod && typeof mod.init === 'function') mod.init(); } catch (e) { console.warn('Init falló:', e); } };
+        [EcoMarket, EcoCart, EcoFavorites, EcoSearch,
+         EcoCompare, EcoCoupons, EcoQA, EcoNotifications,
+         EcoRecommendations, EcoWishlist, EcoOrderTracking,
+         EcoReviews, EcoSellerRating, EcoImpactCalculator, EcoReferrals,
+         EcoAdvancedSearch, EcoChallenges,
+         EcoScrollAnimations, EcoToast, EcoQuickView, EcoRipple, EcoSearchHistory
+        ].forEach(safeInit);
+        
+        // Reemplazar showToast con EcoToast
+        window.showToast = (message, type = 'info') => {
+            try {
+                const titles = {
+                    success: 'Éxito',
+                    error: 'Error',
+                    warning: 'Advertencia',
+                    info: 'Información'
+                };
+                EcoToast.show(titles[type] || titles.info, message, type);
+            } catch (e) {
+                console.error('Error en showToast:', e);
+            }
+        };
         
         console.log('EcoMarket inicializado correctamente');
     } catch (error) {

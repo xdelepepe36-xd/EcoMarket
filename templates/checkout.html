@@ -147,7 +147,9 @@
 // Leer carrito desde localStorage (EcoCart format)
 function getCartItems() {
     try {
-        const data = localStorage.getItem('ecomarket_cart');
+        const data = localStorage.getItem('ecomarket-cart')
+            || localStorage.getItem('ecomarket_cart')
+            || localStorage.getItem('ecomarket-carrito');
         return data ? JSON.parse(data) : [];
     } catch { return []; }
 }
@@ -253,7 +255,9 @@ document.getElementById('checkoutForm').addEventListener('submit', function(e) {
     .then(r => r.json())
     .then(d => {
         if (d.success) {
+            localStorage.removeItem('ecomarket-cart');
             localStorage.removeItem('ecomarket_cart');
+            localStorage.removeItem('ecomarket-carrito');
             localStorage.removeItem('ecomarket_coupon');
             window.location.href = '/confirmacion?pedido_id=' + d.pedido_id;
         } else {

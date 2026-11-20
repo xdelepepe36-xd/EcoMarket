@@ -26,7 +26,6 @@ const EcoSecurity = {
         this.initCSRFProtection();
         this.initSessionTimeout();
         this.initInputValidation();
-        this.initXSSProtection();
         this.initContentSecurityPolicy();
         this.initSecurityMonitoring();
         this.initSecureStorage();
@@ -201,22 +200,10 @@ const EcoSecurity = {
         return emailRegex.test(email);
     },
     
-    // Protección XSS
-    initXSSProtection() {
-        // Sanitizar HTML dinámico
-        const originalInnerHTML = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
-        
-        Object.defineProperty(Element.prototype, 'innerHTML', {
-            set: function(html) {
-                // Sanitizar HTML antes de asignar
-                const sanitized = EcoSecurity.sanitizeHTML(html);
-                originalInnerHTML.set.call(this, sanitized);
-            },
-            get: function() {
-                return originalInnerHTML.get.call(this);
-            }
-        });
-    },
+    // Protección XSS: NO se intercepta Element.prototype.innerHTML.
+    // La "sanitización" anterior escapaba TODO el HTML y rompía el render
+    // de carrito, favoritos, búsqueda, etc. El escapado real lo hace el
+    // servidor (Jinja autoescape) y textContent donde aplique.
     
     sanitizeHTML(html) {
         // Sanitización básica de HTML

@@ -192,8 +192,9 @@ class TestEcoMarketSecurity(unittest.TestCase):
         response = self.client.get(f'/productos?q={malicious_input}')
         # La aplicación debería sanear el input
         self.assertEqual(response.status_code, 200)
-        # El script malicioso no debería estar en la respuesta
-        self.assertNotIn(b'<script>', response.data)
+        # El payload malicioso no debe reflejarse sin escapar
+        self.assertNotIn(b"<script>alert", response.data)
+        self.assertIn(b'&lt;script&gt;', response.data)
 
 
 class TestEcoMarketValidation(unittest.TestCase):
@@ -218,10 +219,14 @@ class TestEcoMarketValidation(unittest.TestCase):
             response = self.client.post('/registro', data={
                 'nombre': 'Test User',
                 'email': email,
-                'password': 'Test123456'
+                'password': 'Test123456',
+                'password2': 'Test123456'
             })
-            # Debería rechazar emails inválidos
-            self.assertIn(response.status_code, [200, 400])
+            # Debe rechazar emails inválidos: redirect con flash o error,
+            # y en ningún caso crear la sesión del usuario
+            self.assertIn(response.status_code, [200, 302, 400])
+            with self.client.session_transaction() as sess:
+                self.assertNotIn('usuario_id', sess, f"Email inválido aceptado: {email}")
 
     def test_password_validation(self):
         """Test de validación de contraseña"""
@@ -236,10 +241,13 @@ class TestEcoMarketValidation(unittest.TestCase):
             response = self.client.post('/registro', data={
                 'nombre': 'Test User',
                 'email': 'test@test.com',
-                'password': password
+                'password': password,
+                'password2': password
             })
-            # Debería rechazar contraseñas débiles
-            self.assertIn(response.status_code, [200, 400])
+            # Debe rechazar contraseñas débiles y no crear la sesión
+            self.assertIn(response.status_code, [200, 302, 400])
+            with self.client.session_transaction() as sess:
+                self.assertNotIn('usuario_id', sess, f"Contraseña débil aceptada: {password}")
 
 
 if __name__ == '__main__':

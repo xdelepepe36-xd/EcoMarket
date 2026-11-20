@@ -25,7 +25,7 @@ from functools import lru_cache
 
 # Importar sistemas de mejoras adicionales
 import sys
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'mejoras_adicionales'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'mejoras-adicionales'))
 try:
     from quality_control import QualityControlSystem
     from inventory_system import InventorySystem
@@ -73,7 +73,7 @@ def add_security_headers(response):
         response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
     
     # CSP básico
-    response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https:;"
+    response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https:;"
     
     # Referrer Policy
     response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
@@ -312,7 +312,9 @@ EMAIL_RE = re.compile(r'^[^@\s]+@[^@\s]+\.[^@\s]{2,}$')
 
 
 def is_valid_email(email):
-    return bool(EMAIL_RE.match(email or ''))
+    if not email or '..' in email.split('@')[0]:
+        return False
+    return bool(EMAIL_RE.match(email))
 
 
 def sanitize_string(input_string, max_length=1000, allow_html=False):
@@ -1056,7 +1058,7 @@ def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if 'usuario_id' not in session:
-            if request.is_json:
+            if request.is_json or request.path.startswith('/api/'):
                 return jsonify({'error': tr('debes_iniciar_sesion')}), 401
             flash_t('debes_iniciar_sesion', 'warning')
             return redirect(url_for('login'))
@@ -1540,10 +1542,17 @@ def favoritos_view():
     return render_template('favoritos.html', productos=productos)
 
 
-@app.route('/api/favorito/<int:producto_id>', methods=['DELETE'])
+@app.route('/api/favorito/<int:producto_id>', methods=['GET', 'DELETE'])
 @login_required
-def eliminar_favorito_api(producto_id):
+def favorito_api(producto_id):
     conn = get_db()
+    if request.method == 'GET':
+        existe = conn.execute(
+            'SELECT 1 FROM favoritos WHERE usuario_id = ? AND producto_id = ?',
+            (session['usuario_id'], producto_id)
+        ).fetchone()
+        conn.close()
+        return jsonify({'favorito': bool(existe)})
     conn.execute(
         'DELETE FROM favoritos WHERE usuario_id = ? AND producto_id = ?',
         (session['usuario_id'], producto_id)
@@ -1890,6 +1899,57 @@ def eliminar_producto(producto_id):
     conn.close()
     flash_t('producto_eliminado', 'success')
     return redirect(url_for('perfil'))
+
+
+@app.route('/producto/<int:producto_id>/upload_images', methods=['POST'])
+@login_required
+def upload_images_producto(producto_id):
+    """Sube imágenes adicionales a la galería de un producto (dueño o admin)."""
+    conn = get_db()
+    producto = conn.execute('SELECT id, usuario_id FROM productos WHERE id = ?', (producto_id,)).fetchone()
+    if not producto or (producto['usuario_id'] != session['usuario_id'] and session.get('rol') != 'admin'):
+        conn.close()
+        return jsonify({'error': 'No autorizado'}), 403
+
+    files = request.files.getlist('images') or request.files.getlist('imagenes_extra')
+    if not files:
+        conn.close()
+        return jsonify({'error': 'No se proporcionaron imágenes'}), 400
+
+    orden = conn.execute(
+        'SELECT COALESCE(MAX(orden), -1) + 1 FROM producto_imagenes WHERE producto_id = ?',
+        (producto_id,)
+    ).fetchone()[0]
+
+    added = []
+    for file in files:
+        if not file or not file.filename or not allowed_file(file.filename):
+            continue
+        valido, _msg = validate_file_upload(file)
+        if not valido:
+            continue
+        ext = file.filename.rsplit('.', 1)[1].lower()
+        filename = f"{uuid.uuid4().hex}.{ext}"
+        saved_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(saved_path)
+        imagen_rel = f'uploads/{filename}'
+
+        thumb_name = f"{uuid.uuid4().hex}_thumb.jpg"
+        thumb_path = os.path.join(app.config['UPLOAD_FOLDER'], thumb_name)
+        imagen_thumb_rel = ''
+        if _create_thumbnail(saved_path, thumb_path, max_size=800):
+            imagen_thumb_rel = f'uploads/{thumb_name}'
+
+        conn.execute(
+            'INSERT INTO producto_imagenes (producto_id, imagen, imagen_thumb, titulo, orden) VALUES (?,?,?,?,?)',
+            (producto_id, imagen_rel, imagen_thumb_rel, '', orden)
+        )
+        added.append(imagen_rel)
+        orden += 1
+
+    conn.commit()
+    conn.close()
+    return jsonify({'added': added, 'success': True}), 201 if added else 400
 
 
 @app.route('/terminos')
@@ -4813,6 +4873,23 @@ def get_translations():
     lang = request.args.get('lang', 'es')
     return jsonify(i18n_manager.get_translations_for_lang(lang))
 
+@app.route('/api/productos/traducciones')
+def api_productos_traducciones():
+    """Traducciones de productos por idioma (campos nombre_XX/descripcion_XX si existen)."""
+    conn = get_db()
+    conn.row_factory = sqlite3.Row
+    columnas = {r[1] for r in conn.execute('PRAGMA table_info(productos)')}
+    idiomas = [c[2:] for c in columnas if c.startswith('nombre_')]
+    traducciones = {}
+    if idiomas:
+        campos = ','.join(f'id, {", ".join(c for c in columnas if c.startswith(("nombre_", "descripcion_")))}')
+        for row in conn.execute(f'SELECT {campos} FROM productos').fetchall():
+            pid = str(row['id'])
+            traducciones[pid] = {k: row[k] for k in row.keys() if k.startswith(('nombre_', 'descripcion_')) and row[k]}
+    conn.close()
+    return jsonify({'success': True, 'traducciones': traducciones, 'idiomas': idiomas})
+
+
 @app.route('/api/ab/test/variant')
 @login_required
 def get_ab_variant():
@@ -4895,7 +4972,7 @@ def get_user_gamification(user_id):
 
 @app.route('/api/gamificacion/xp', methods=['POST'])
 @login_required
-def add_xp():
+def api_gamificacion_xp():
     """API para agregar XP a usuario."""
     data = request.get_json()
     xp_amount = data.get('xp', 0)

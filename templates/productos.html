@@ -2,17 +2,22 @@
 {% block title %}EcoMarket - Catálogo{% endblock %}
 
 {% block content %}
+<section class="section productos-header-section">
+    <div class="container">
+        <div class="productos-header-content">
+            <div class="productos-header-text">
+                <h1 class="productos-title"><i class="bi bi-grid"></i> Catálogo de productos</h1>
+                <p class="productos-subtitle">Descubre {{ total_productos }} productos ecológicos disponibles</p>
+            </div>
+            <a class="btn-principal productos-header-btn" href="{{ url_for('publicar') }}">
+                <i class="bi bi-plus-circle"></i> Publicar producto
+            </a>
+        </div>
+    </div>
+</section>
+
 <section class="section">
     <div class="container">
-        <div class="section-head-flex">
-            <div>
-                <h2 class="section-title"><i class="bi bi-grid"></i> <span data-i18n="products.title">Catálogo de productos</span></h2>
-                <p><span data-i18n="products.desc">Descubre artículos ecológicos.</span> <span data-i18n="products.count">{{ total_productos }} producto(s) disponible(s).</span></p>
-            </div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap">
-                <a class="btn-principal" href="{{ url_for('publicar') }}"><i class="bi bi-plus-circle"></i> <span data-i18n="products.publish">Publicar</span></a>
-            </div>
-        </div>
 
         <div class="catalog-toolbar">
             <div class="catalog-search-wrap">

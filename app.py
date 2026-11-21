@@ -5648,6 +5648,29 @@ def api_actualizar_inventario():
     stock = inventory_system.actualizar_stock(data['producto_id'], data['cantidad'])
     return jsonify({'stock': stock})
 
+@app.route('/api/inventario/dashboard')
+@login_required
+@admin_required
+def api_inventario_dashboard():
+    """Estadísticas de inventario desde la base de datos real"""
+    conn = get_db()
+    try:
+        total = conn.execute('SELECT COUNT(*) FROM productos').fetchone()[0]
+        bajo = conn.execute('SELECT COUNT(*) FROM productos WHERE stock > 0 AND stock < 5').fetchone()[0]
+        sin = conn.execute('SELECT COUNT(*) FROM productos WHERE stock <= 0').fetchone()[0]
+        alertas = conn.execute('''
+            SELECT id, nombre, stock, categoria FROM productos
+            WHERE stock <= 5 ORDER BY stock ASC LIMIT 20
+        ''').fetchall()
+        return jsonify({
+            'total_productos': total,
+            'stock_bajo': bajo,
+            'sin_stock': sin,
+            'alertas': [dict(a) for a in alertas]
+        })
+    finally:
+        conn.close()
+
 @app.route('/api/geolocalizacion/registrar', methods=['POST'])
 @login_required
 def api_registrar_ubicacion():

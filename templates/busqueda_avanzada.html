@@ -4,45 +4,62 @@
 
 {% block content %}
 <div class="container">
-    <h1>Búsqueda Avanzada</h1>
-    
+    <h1 data-i18n="busq.title">Búsqueda Avanzada</h1>
+
     <div class="busqueda-container">
         <div class="busqueda-input">
-            <input type="text" id="busqueda-input" placeholder="Buscar productos..." autocomplete="off">
+            <input type="text" id="busqueda-input" placeholder="Buscar productos..." autocomplete="off" data-i18n-placeholder="busq.placeholder">
             <div id="sugerencias-busqueda" class="sugerencias"></div>
         </div>
-        
+
         <div class="filtros-busqueda">
-            <h2>Filtros</h2>
+            <h2 data-i18n="busq.filters">Filtros</h2>
             <div class="filtro-item">
-                <label>Categoría</label>
-                <select class="filtro-avanzado" name="categoria">
-                    <option value="">Todas</option>
-                    <option value="Higiene">Higiene</option>
-                    <option value="Hogar">Hogar</option>
-                    <option value="Ropa">Ropa</option>
+                <label data-i18n="busq.category">Categoría</label>
+                <select class="filtro-avanzado" name="categoria" id="filtro-categoria">
+                    <option value="" data-i18n="busq.all">Todas</option>
                 </select>
             </div>
             <div class="filtro-item">
-                <label>Precio Mín</label>
-                <input type="number" class="filtro-avanzado" name="precio_min" value="0">
+                <label data-i18n="busq.price_min">Precio Mín</label>
+                <input type="number" class="filtro-avanzado" name="precio_min" value="0" min="0">
             </div>
             <div class="filtro-item">
-                <label>Precio Máx</label>
-                <input type="number" class="filtro-avanzado" name="precio_max" value="10000">
+                <label data-i18n="busq.price_max">Precio Máx</label>
+                <input type="number" class="filtro-avanzado" name="precio_max" value="10000" min="0">
             </div>
             <div class="filtro-item">
-                <label>Eco Score Mín</label>
+                <label data-i18n="busq.eco_min">Eco Score Mín</label>
                 <input type="range" class="filtro-avanzado" name="eco_score" min="0" max="10" value="0">
             </div>
         </div>
-        
+
+        <div id="resultados-busqueda" style="margin-bottom:30px"></div>
+
         <div class="historial-busqueda">
-            <h2>Historial de Búsquedas</h2>
+            <h2 data-i18n="busq.history">Historial de Búsquedas</h2>
             <div id="historial-busqueda"></div>
         </div>
     </div>
 </div>
+<script src="{{ url_for('static', filename='busqueda-avanzada.js') }}"></script>
+<script>
+// Cargar categorías reales en el filtro
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        const res = await fetch('/api/categorias');
+        const cats = await res.json();
+        const sel = document.getElementById('filtro-categoria');
+        (Array.isArray(cats) ? cats : []).forEach(c => {
+            const name = c.nombre || c.name || c;
+            const opt = document.createElement('option');
+            opt.value = name;
+            opt.textContent = name;
+            sel.appendChild(opt);
+        });
+    } catch (e) {}
+});
+</script>
 
 <style>
 .busqueda-container {

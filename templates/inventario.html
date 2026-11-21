@@ -4,38 +4,77 @@
 
 {% block content %}
 <div class="container">
-    <h1>Gestión de Inventario</h1>
-    
+    <h1 data-i18n="inv.title">Gestión de Inventario</h1>
+
     <div class="inventory-dashboard">
         <div class="estadisticas">
             <div class="stat-card">
-                <h3>Total Productos</h3>
+                <h3 data-i18n="inv.total">Total Productos</h3>
                 <p class="stat-valor" id="total-productos">0</p>
             </div>
             <div class="stat-card">
-                <h3>Stock Bajo</h3>
+                <h3 data-i18n="inv.low">Stock Bajo</h3>
                 <p class="stat-valor alerta" id="stock-bajo">0</p>
             </div>
             <div class="stat-card">
-                <h3>Sin Stock</h3>
+                <h3 data-i18n="inv.out">Sin Stock</h3>
                 <p class="stat-valor peligro" id="sin-stock">0</p>
             </div>
         </div>
-        
+
         <div class="inventario-acciones">
-            <h2>Acciones</h2>
-            <button class="btn btn-actualizar" onclick="actualizarInventario()">Actualizar Stock</button>
-            <button class="btn btn-reporte" onclick="generarReporte()">Generar Reporte</button>
+            <h2 data-i18n="inv.actions">Acciones</h2>
+            <button class="btn btn-actualizar" onclick="cargarInventario()" data-i18n="inv.refresh">Actualizar Stock</button>
+            <button class="btn btn-reporte" onclick="generarReporte()" data-i18n="inv.report">Generar Reporte</button>
         </div>
-        
+
         <div class="alertas-lista">
-            <h2>Alertas de Inventario</h2>
+            <h2 data-i18n="inv.alerts">Alertas de Inventario</h2>
             <div id="alertas-container">
-                <p>No hay alertas activas</p>
+                <p data-i18n="inv.no_alerts">No hay alertas activas</p>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+let inventarioData = null;
+
+async function cargarInventario() {
+    try {
+        const res = await fetch('/api/inventario/dashboard');
+        if (!res.ok) return;
+        inventarioData = await res.json();
+        document.getElementById('total-productos').textContent = inventarioData.total_productos;
+        document.getElementById('stock-bajo').textContent = inventarioData.stock_bajo;
+        document.getElementById('sin-stock').textContent = inventarioData.sin_stock;
+
+        const cont = document.getElementById('alertas-container');
+        if (inventarioData.alertas && inventarioData.alertas.length) {
+            cont.innerHTML = inventarioData.alertas.map(a => `
+                <div class="alerta-item" style="display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid #eee">
+                    <span><a href="/producto/${a.id}">${a.nombre}</a> <small>(${a.categoria || ''})</small></span>
+                    <strong style="color:${a.stock <= 0 ? '#dc3545' : '#ffc107'}">Stock: ${a.stock}</strong>
+                </div>
+            `).join('');
+        } else {
+            cont.innerHTML = '<p>No hay alertas activas</p>';
+        }
+    } catch (e) {}
+}
+
+function generarReporte() {
+    if (!inventarioData) { cargarInventario().then(() => setTimeout(generarReporte, 500)); return; }
+    const blob = new Blob([JSON.stringify(inventarioData, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'reporte-inventario-' + new Date().toISOString().slice(0, 10) + '.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+}
+
+document.addEventListener('DOMContentLoaded', cargarInventario);
+</script>
 
 <style>
 .inventory-dashboard {

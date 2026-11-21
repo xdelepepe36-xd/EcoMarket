@@ -5,43 +5,43 @@
 {% block content %}
 <div class="container">
     <div class="verificacion-container">
-        <h1>Verificación de Vendedor</h1>
+        <h1 data-i18n="verif.title">Verificación de Vendedor</h1>
         
         <div id="panel-verificacion">
             <!-- Se llena con JavaScript -->
         </div>
 
         <div class="verificacion-niveles">
-            <h2>Niveles de Verificación</h2>
+            <h2 data-i18n="verif.levels">Niveles de Verificación</h2>
             <div class="niveles-grid">
                 <div class="nivel-card">
                     <span class="badge-nivel" style="background-color: #6c757d;">📝</span>
-                    <h3>Básico</h3>
-                    <p>Email verificado</p>
+                    <h3 data-i18n="verif.l1">Básico</h3>
+                    <p data-i18n="verif.l1d">Email verificado</p>
                     <p>Confianza: ★☆☆☆☆</p>
                 </div>
                 <div class="nivel-card">
                     <span class="badge-nivel" style="background-color: #28a745;">✓</span>
-                    <h3>Confirmado</h3>
-                    <p>Email + Teléfono</p>
+                    <h3 data-i18n="verif.l2">Confirmado</h3>
+                    <p data-i18n="verif.l2d">Email + Teléfono</p>
                     <p>Confianza: ★★☆☆☆</p>
                 </div>
                 <div class="nivel-card">
                     <span class="badge-nivel" style="background-color: #007bff;">✓✓</span>
-                    <h3>Verificado</h3>
-                    <p>Email + Teléfono + Documento</p>
+                    <h3 data-i18n="verif.l3">Verificado</h3>
+                    <p data-i18n="verif.l3d">Email + Teléfono + Documento</p>
                     <p>Confianza: ★★★☆☆</p>
                 </div>
                 <div class="nivel-card">
                     <span class="badge-nivel" style="background-color: #ffc107;">⭐</span>
-                    <h3>Premium</h3>
-                    <p>+50 ventas exitosas</p>
+                    <h3 data-i18n="verif.l4">Premium</h3>
+                    <p data-i18n="verif.l4d">+50 ventas exitosas</p>
                     <p>Confianza: ★★★★☆</p>
                 </div>
                 <div class="nivel-card">
                     <span class="badge-nivel" style="background-color: #17a2b8;">🏆</span>
-                    <h3>Top Seller</h3>
-                    <p>+100 ventas + Rating 4.5+</p>
+                    <h3 data-i18n="verif.l5">Top Seller</h3>
+                    <p data-i18n="verif.l5d">+100 ventas + Rating 4.5+</p>
                     <p>Confianza: ★★★★★</p>
                 </div>
             </div>
@@ -147,4 +147,5 @@
     margin-bottom: 10px;
 }
 </style>
+<script src="{{ url_for('static', filename='ecomarket-verificacion-vendedores.js') }}"></script>
 {% endblock %}

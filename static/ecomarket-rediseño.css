@@ -2669,7 +2669,7 @@ html {
 }
 
 /* Evitar doble contenedor: base.html ya envuelve el contenido en .container */
-.container .container {
+.container .container:not(.auth-container):not(.perfil-container) {
     width: 100%;
     max-width: none;
     margin: 0;
@@ -3183,5 +3183,97 @@ html {
     }
     .producto-card > img {
         height: 160px;
+    }
+}
+
+/* ════════════════════════════════════════════════════════════
+   AUTH (login/registro) - header, icono, divisores
+   ════════════════════════════════════════════════════════════ */
+.container.auth-container {
+    width: min(450px, 94%);
+    padding: var(--spacing-xl, 3rem) var(--spacing-lg, 2rem);
+}
+
+.auth-card.form-card {
+    box-shadow: none;
+    border: none;
+    padding: 0;
+    background: transparent;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: var(--spacing-lg, 2rem);
+}
+
+.auth-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(46, 125, 50, 0.12), rgba(76, 175, 80, 0.2));
+    font-size: 1.8rem;
+    margin-bottom: var(--spacing-sm, 1rem);
+}
+
+.auth-header .section-title {
+    margin-bottom: var(--spacing-xs, 0.5rem);
+    font-size: 1.5rem;
+}
+
+.auth-header p {
+    color: var(--texto-sec, #666);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.auth-card form label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--texto, #1b3a1f);
+    margin-bottom: 6px;
+}
+
+.auth-card form label i {
+    color: var(--verde, #2e7d32);
+}
+
+.auth-card form input {
+    margin-bottom: var(--spacing-md, 1.5rem);
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm, 1rem);
+    margin: var(--spacing-md, 1.5rem) 0;
+    color: var(--texto-sec, #888);
+    font-size: 0.8rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(46, 125, 50, 0.15);
+}
+
+.google-login-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--spacing-sm, 1rem);
+    min-height: 44px;
+}
+
+@media (max-width: 640px) {
+    .container.auth-container {
+        padding: var(--spacing-lg, 2rem) var(--spacing-md, 1.5rem);
+        margin: var(--spacing-lg, 2rem) auto;
     }
 }

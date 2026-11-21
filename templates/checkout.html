@@ -117,6 +117,10 @@
                         <span data-i18n="checkout.shipping">Envío</span>
                         <span id="envioText" class="envio-gratis">Gratis 🎉</span>
                     </div>
+                    <div class="checkout-summary-line" id="descuentoRow" style="display:none;color:var(--verde,#2e7d32)">
+                        <span data-i18n="checkout.discount">Descuento</span>
+                        <span id="descuentoText">-S/. 0.00</span>
+                    </div>
                     {% if session.get('usuario_id') %}
                     <div class="checkout-coupon-section">
                         <input type="text" id="couponInput" class="form-input" placeholder="Código de cupón" data-i18n-placeholder="checkout.coupon_placeholder">
@@ -185,11 +189,42 @@ function renderCheckout() {
     }).join('');
 
     const envio = subtotal >= 150 ? 0 : 12;
-    const total = subtotal + envio;
+    const baseTotal = subtotal + envio;
+
+    const descuentoRow = document.getElementById('descuentoRow');
+    const cupon = window.EcoCart && EcoCart.getAppliedCoupon ? EcoCart.getAppliedCoupon() : '';
+
+    if (cupon) {
+        // Validar cupón contra el total real y mostrar el descuento
+        fetch('/api/cupon/validar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ codigo: cupon, total: baseTotal })
+        }).then(r => r.json()).then(d => {
+            let desc = 0;
+            if (d.valido) desc = d.descuento || 0;
+            const total = Math.max(baseTotal - desc, 0);
+            if (desc > 0) {
+                descuentoRow.style.display = 'flex';
+                document.getElementById('descuentoText').textContent = '-S/. ' + desc.toFixed(2);
+            } else {
+                descuentoRow.style.display = 'none';
+            }
+            document.getElementById('totalText').textContent = `S/. ${total.toFixed(2)}`;
+            document.getElementById('totalPagar').textContent = total.toFixed(2);
+        }).catch(() => {
+            descuentoRow.style.display = 'none';
+            document.getElementById('totalText').textContent = `S/. ${baseTotal.toFixed(2)}`;
+            document.getElementById('totalPagar').textContent = baseTotal.toFixed(2);
+        });
+    } else {
+        descuentoRow.style.display = 'none';
+        document.getElementById('totalText').textContent = `S/. ${baseTotal.toFixed(2)}`;
+        document.getElementById('totalPagar').textContent = baseTotal.toFixed(2);
+    }
+
     document.getElementById('subtotalText').textContent = `S/. ${subtotal.toFixed(2)}`;
     document.getElementById('envioText').textContent = envio === 0 ? 'Gratis 🎉' : `S/. ${envio.toFixed(2)}`;
-    document.getElementById('totalText').textContent = `S/. ${total.toFixed(2)}`;
-    document.getElementById('totalPagar').textContent = total.toFixed(2);
 }
 
 document.getElementById('checkoutForm').addEventListener('submit', function(e) {
@@ -281,15 +316,48 @@ document.getElementById('checkoutForm').addEventListener('submit', function(e) {
     });
 });
 
-// Cupón
+// Cupón: validar contra el servidor antes de aplicarlo
 var couponBtn = document.getElementById('applyCouponBtn');
 if (couponBtn) {
     couponBtn.addEventListener('click', function() {
         var input = document.getElementById('couponInput');
-        if (window.EcoCart && input) {
-            EcoCart.applyCoupon(input.value);
+        var status = document.querySelector('.coupon-status');
+        var code = (input.value || '').trim().toUpperCase();
+        if (!code) return;
+
+        // Total base actual para validar mínimo/descuento
+        var items = getCartItems();
+        var subtotal = items.reduce(function(s, i) { return s + (i.price || i.precio || 0) * (i.qty || i.cantidad || 1); }, 0);
+        var total = subtotal + (subtotal >= 150 ? 0 : 12);
+
+        couponBtn.disabled = true;
+        fetch('/api/cupon/validar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ codigo: code, total: total })
+        }).then(function(r) { return r.json(); }).then(function(d) {
+            couponBtn.disabled = false;
+            if (d.valido) {
+                EcoCart.applyCoupon(code);
+                if (status) {
+                    status.style.color = 'var(--verde,#2e7d32)';
+                    status.textContent = 'Cupón aplicado: -S/. ' + (d.descuento || 0).toFixed(2);
+                }
+                renderCheckout();
+            } else {
+                if (window.EcoCart && EcoCart.clearCoupon) EcoCart.clearCoupon();
+                if (status) {
+                    status.style.color = '#dc3545';
+                    status.textContent = d.error || 'Cupón inválido';
+                }
+                renderCheckout();
+            }
+        }).catch(function() {
+            couponBtn.disabled = false;
+            // Si la API falla, aplicar localmente (el backend valida al crear el pedido)
+            EcoCart.applyCoupon(code);
             renderCheckout();
-        }
+        });
     });
 }
 

@@ -3019,7 +3019,8 @@ const EcoI18n = {
             'inv.refresh': 'Actualizar Stock',
             'inv.report': 'Generar Reporte',
             'inv.alerts': 'Alertas de Inventario',
-            'inv.no_alerts': 'No hay alertas activas',
+            'inv.no_alerts': 'No hay alertas activas',            'checkout.discount': 'Descuento',
+
         },
         en: {
             'inv.title': 'Inventory Management',
@@ -3030,7 +3031,8 @@ const EcoI18n = {
             'inv.refresh': 'Refresh Stock',
             'inv.report': 'Generate Report',
             'inv.alerts': 'Inventory Alerts',
-            'inv.no_alerts': 'No active alerts',
+            'inv.no_alerts': 'No active alerts',            'checkout.discount': 'Discount',
+
         },
         pt: {
             'inv.title': 'Gestão de Inventário',
@@ -3041,7 +3043,8 @@ const EcoI18n = {
             'inv.refresh': 'Atualizar Estoque',
             'inv.report': 'Gerar Relatório',
             'inv.alerts': 'Alertas de Inventário',
-            'inv.no_alerts': 'Sem alertas ativas',
+            'inv.no_alerts': 'Sem alertas ativas',            'checkout.discount': 'Desconto',
+
         },
         fr: {
             'inv.title': 'Gestion des stocks',
@@ -3052,7 +3055,8 @@ const EcoI18n = {
             'inv.refresh': 'Actualiser le stock',
             'inv.report': 'Générer un rapport',
             'inv.alerts': 'Alertes de stock',
-            'inv.no_alerts': 'Aucune alerte active',
+            'inv.no_alerts': 'Aucune alerte active',            'checkout.discount': 'Remise',
+
         },
         de: {
             'inv.title': 'Bestandsverwaltung',
@@ -3063,7 +3067,8 @@ const EcoI18n = {
             'inv.refresh': 'Bestand aktualisieren',
             'inv.report': 'Bericht erstellen',
             'inv.alerts': 'Bestandswarnungen',
-            'inv.no_alerts': 'Keine aktiven Warnungen',
+            'inv.no_alerts': 'Keine aktiven Warnungen',            'checkout.discount': 'Rabatt',
+
         },
         it: {
             'inv.title': 'Gestione inventario',
@@ -3074,7 +3079,8 @@ const EcoI18n = {
             'inv.refresh': 'Aggiorna scorte',
             'inv.report': 'Genera report',
             'inv.alerts': 'Avvisi di inventario',
-            'inv.no_alerts': 'Nessun avviso attivo',
+            'inv.no_alerts': 'Nessun avviso attivo',            'checkout.discount': 'Sconto',
+
         },
     },
 

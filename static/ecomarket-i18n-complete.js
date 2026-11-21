@@ -3084,6 +3084,75 @@ const EcoI18n = {
         },
     },
 
+    qaI18n: {
+        es: {
+            'pd.tab_questions': 'Preguntas',
+            'pd.qa_title': 'Preguntas y respuestas',
+            'pd.qa_sub': 'Resuelve tus dudas antes de comprar. El vendedor responde directamente.',
+            'pd.qa_placeholder': 'Escribe tu pregunta sobre este producto...',
+            'pd.qa_send': 'Enviar pregunta',
+            'pd.qa_login': 'Inicia sesión para hacer preguntas',
+            'pd.qa_answer_title': 'Responder pregunta',
+            'pd.qa_answer_ph': 'Escribe tu respuesta...',
+            'pd.qa_answer_send': 'Responder',
+        },
+        en: {
+            'pd.tab_questions': 'Questions',
+            'pd.qa_title': 'Questions & answers',
+            'pd.qa_sub': 'Clear your doubts before buying. The seller answers directly.',
+            'pd.qa_placeholder': 'Write your question about this product...',
+            'pd.qa_send': 'Send question',
+            'pd.qa_login': 'Log in to ask questions',
+            'pd.qa_answer_title': 'Answer question',
+            'pd.qa_answer_ph': 'Write your answer...',
+            'pd.qa_answer_send': 'Answer',
+        },
+        pt: {
+            'pd.tab_questions': 'Perguntas',
+            'pd.qa_title': 'Perguntas e respostas',
+            'pd.qa_sub': 'Tire suas dúvidas antes de comprar. O vendedor responde diretamente.',
+            'pd.qa_placeholder': 'Escreva sua pergunta sobre este produto...',
+            'pd.qa_send': 'Enviar pergunta',
+            'pd.qa_login': 'Faça login para fazer perguntas',
+            'pd.qa_answer_title': 'Responder pergunta',
+            'pd.qa_answer_ph': 'Escreva sua resposta...',
+            'pd.qa_answer_send': 'Responder',
+        },
+        fr: {
+            'pd.tab_questions': 'Questions',
+            'pd.qa_title': 'Questions et réponses',
+            'pd.qa_sub': 'Éclaircissez vos doutes avant d\'acheter. Le vendeur répond directement.',
+            'pd.qa_placeholder': 'Écrivez votre question sur ce produit...',
+            'pd.qa_send': 'Envoyer la question',
+            'pd.qa_login': 'Connectez-vous pour poser des questions',
+            'pd.qa_answer_title': 'Répondre à la question',
+            'pd.qa_answer_ph': 'Écrivez votre réponse...',
+            'pd.qa_answer_send': 'Répondre',
+        },
+        de: {
+            'pd.tab_questions': 'Fragen',
+            'pd.qa_title': 'Fragen & Antworten',
+            'pd.qa_sub': 'Kläre deine Fragen vor dem Kauf. Der Verkäufer antwortet direkt.',
+            'pd.qa_placeholder': 'Schreibe deine Frage zu diesem Produkt...',
+            'pd.qa_send': 'Frage senden',
+            'pd.qa_login': 'Melde dich an, um Fragen zu stellen',
+            'pd.qa_answer_title': 'Frage beantworten',
+            'pd.qa_answer_ph': 'Schreibe deine Antwort...',
+            'pd.qa_answer_send': 'Antworten',
+        },
+        it: {
+            'pd.tab_questions': 'Domande',
+            'pd.qa_title': 'Domande e risposte',
+            'pd.qa_sub': 'Chiarisci i tuoi dubbi prima di acquistare. Il venditore risponde direttamente.',
+            'pd.qa_placeholder': 'Scrivi la tua domanda su questo prodotto...',
+            'pd.qa_send': 'Invia domanda',
+            'pd.qa_login': 'Accedi per fare domande',
+            'pd.qa_answer_title': 'Rispondi alla domanda',
+            'pd.qa_answer_ph': 'Scrivi la tua risposta...',
+            'pd.qa_answer_send': 'Rispondi',
+        },
+    },
+
     init() {
         for (const lang in this.homeI18n) {
             this.translations[lang] = Object.assign({}, this.translations[lang], this.homeI18n[lang]);
@@ -3117,6 +3186,9 @@ const EcoI18n = {
         }
         for (const lang in this.invI18n) {
             this.translations[lang] = Object.assign({}, this.translations[lang], this.invI18n[lang]);
+        }
+        for (const lang in this.qaI18n) {
+            this.translations[lang] = Object.assign({}, this.translations[lang], this.qaI18n[lang]);
         }
         // Fallback: idiomas secundarios heredan inglés para claves no traducidas
         ['pt', 'fr', 'de', 'it'].forEach(l => {

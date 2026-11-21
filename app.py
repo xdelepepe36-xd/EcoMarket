@@ -804,6 +804,20 @@ def init_db():
             activo INTEGER DEFAULT 1,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
+
+        CREATE TABLE IF NOT EXISTS preguntas (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            producto_id INTEGER NOT NULL,
+            usuario_id INTEGER NOT NULL,
+            pregunta TEXT NOT NULL,
+            respuesta TEXT,
+            helpful INTEGER DEFAULT 0,
+            fecha_respuesta TEXT,
+            created_at TEXT DEFAULT (datetime('now')),
+            FOREIGN KEY (producto_id) REFERENCES productos(id),
+            FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+        );
+        CREATE INDEX IF NOT EXISTS idx_preguntas_producto ON preguntas(producto_id);
     ''')
 
     # Seed productos si la tabla está vacía
@@ -5394,6 +5408,95 @@ def obtener_respuestas_resena(resena_id):
     except Exception as e:
         logger.error(f"Error obteniendo respuestas de reseña: {e}")
         return jsonify({'error': 'Error al obtener respuestas'}), 500
+    finally:
+        conn.close()
+
+# ── API Preguntas y Respuestas (Q&A de productos) ────────────────────────────
+
+def _pregunta_json(row, conn):
+    """Serializa una pregunta con datos de usuario/vendedor."""
+    u = conn.execute('SELECT nombre, avatar FROM usuarios WHERE id = ?', (row['usuario_id'],)).fetchone()
+    d = dict(row)
+    d['usuario'] = {'nombre': u['nombre'] if u else 'Usuario', 'avatar': (u['avatar'] if u else None) or None}
+    d['vendedor'] = None
+    if row['respuesta']:
+        p = conn.execute('SELECT p.usuario_id, u.nombre, u.avatar FROM preguntas pr JOIN productos p ON pr.producto_id = p.id JOIN usuarios u ON p.usuario_id = u.id WHERE pr.id = ?', (row['id'],)).fetchone()
+        d['vendedor'] = {'nombre': p['nombre'] if p else 'Vendedor', 'avatar': (p['avatar'] if p else None) or None}
+    d['fechaPregunta'] = row['created_at']
+    d['fechaRespuesta'] = row['fecha_respuesta']
+    d['esVendedor'] = False
+    return d
+
+@app.route('/api/productos/<int:producto_id>/preguntas', methods=['GET'])
+def api_preguntas_producto(producto_id):
+    """Lista preguntas de un producto."""
+    conn = get_db()
+    try:
+        offset = request.args.get('offset', 0, type=int)
+        rows = conn.execute(
+            'SELECT * FROM preguntas WHERE producto_id = ? ORDER BY created_at DESC LIMIT 20 OFFSET ?',
+            (producto_id, offset)
+        ).fetchall()
+        return jsonify({'preguntas': [_pregunta_json(r, conn) for r in rows]})
+    finally:
+        conn.close()
+
+@app.route('/api/productos/<int:producto_id>/preguntas', methods=['POST'])
+@login_required
+def api_crear_pregunta(producto_id):
+    """Crea una pregunta en un producto."""
+    data = request.get_json() or {}
+    pregunta = sanitize_string(data.get('pregunta', ''))[:500]
+    if len(pregunta) < 10:
+        return jsonify({'error': 'La pregunta debe tener al menos 10 caracteres'}), 400
+
+    conn = get_db()
+    try:
+        cur = conn.execute(
+            'INSERT INTO preguntas (producto_id, usuario_id, pregunta) VALUES (?,?,?)',
+            (producto_id, session['usuario_id'], pregunta)
+        )
+        conn.commit()
+        row = conn.execute('SELECT * FROM preguntas WHERE id = ?', (cur.lastrowid,)).fetchone()
+        return jsonify({'pregunta': _pregunta_json(row, conn)}), 201
+    finally:
+        conn.close()
+
+@app.route('/api/preguntas/<int:pregunta_id>/responder', methods=['POST'])
+@login_required
+def api_responder_pregunta(pregunta_id):
+    """El vendedor del producto responde una pregunta."""
+    data = request.get_json() or {}
+    respuesta = sanitize_string(data.get('respuesta', ''))[:1000]
+    if not respuesta:
+        return jsonify({'error': 'Respuesta vacía'}), 400
+
+    conn = get_db()
+    try:
+        pr = conn.execute('SELECT pr.*, p.usuario_id AS vendedor_id FROM preguntas pr JOIN productos p ON pr.producto_id = p.id WHERE pr.id = ?', (pregunta_id,)).fetchone()
+        if not pr:
+            return jsonify({'error': 'Pregunta no encontrada'}), 404
+        if pr['vendedor_id'] != session['usuario_id']:
+            return jsonify({'error': 'Solo el vendedor puede responder'}), 403
+        conn.execute(
+            "UPDATE preguntas SET respuesta = ?, fecha_respuesta = datetime('now') WHERE id = ?",
+            (respuesta, pregunta_id)
+        )
+        conn.commit()
+        row = conn.execute('SELECT * FROM preguntas WHERE id = ?', (pregunta_id,)).fetchone()
+        return jsonify({'respuesta': row['respuesta']})
+    finally:
+        conn.close()
+
+@app.route('/api/preguntas/<int:pregunta_id>/helpful', methods=['POST'])
+def api_pregunta_helpful(pregunta_id):
+    """Marca una pregunta como útil."""
+    conn = get_db()
+    try:
+        conn.execute('UPDATE preguntas SET helpful = helpful + 1 WHERE id = ?', (pregunta_id,))
+        conn.commit()
+        row = conn.execute('SELECT helpful FROM preguntas WHERE id = ?', (pregunta_id,)).fetchone()
+        return jsonify({'helpful': row['helpful'] if row else 0})
     finally:
         conn.close()
 

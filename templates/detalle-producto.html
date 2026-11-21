@@ -160,6 +160,7 @@
             <button class="detalle-tab" onclick="cambiarTab('especificaciones', this)"><i class="bi bi-list-check"></i> <span data-i18n="pd.tab_specs">Especificaciones</span></button>
             <button class="detalle-tab" onclick="cambiarTab('envio', this)"><i class="bi bi-truck"></i> <span data-i18n="pd.tab_shipping">Envío y devoluciones</span></button>
             <button class="detalle-tab" onclick="cambiarTab('resenas', this)"><i class="bi bi-star"></i> <span data-i18n="pd.tab_reviews">Reseñas</span> ({{ producto.total_resenas }})</button>
+            <button class="detalle-tab" onclick="cambiarTab('preguntas', this)"><i class="bi bi-chat-dots"></i> <span data-i18n="pd.tab_questions">Preguntas</span></button>
         </div>
 
         <!-- Tab: Descripción -->
@@ -295,6 +296,42 @@
                 </div>
             </div>
         </div>
+
+        <!-- Tab: Preguntas y Respuestas -->
+        <div class="detalle-tab-content" id="tab-preguntas">
+            <div class="detalle-tab-panel sistema-preguntas">
+                <h3><i class="bi bi-chat-dots"></i> <span data-i18n="pd.qa_title">Preguntas y respuestas</span></h3>
+                <p style="color:var(--texto-sec);font-size:0.88rem;margin:8px 0 20px" data-i18n="pd.qa_sub">Resuelve tus dudas antes de comprar. El vendedor responde directamente.</p>
+
+                {% if session.get('usuario_id') %}
+                <form id="form-nueva-pregunta" style="background:var(--blanco);border-radius:16px;padding:18px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08);margin-bottom:20px">
+                    <textarea id="texto-pregunta" placeholder="Escribe tu pregunta sobre este producto..." data-i18n-placeholder="pd.qa_placeholder" minlength="10" maxlength="500" required style="width:100%;padding:12px;border:1.5px solid rgba(46,125,50,0.18);border-radius:12px;font-family:inherit;font-size:0.88rem;resize:vertical;min-height:70px;outline:none;margin-bottom:10px"></textarea>
+                    <button type="submit" class="btn-principal" style="padding:10px 20px;font-size:0.88rem"><i class="bi bi-send"></i> <span data-i18n="pd.qa_send">Enviar pregunta</span></button>
+                </form>
+                {% else %}
+                <div style="background:var(--blanco);border-radius:16px;padding:18px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08);margin-bottom:20px;text-align:center">
+                    <a href="{{ url_for('login') }}" style="color:var(--verde);font-weight:600" data-i18n="pd.qa_login">Inicia sesión para hacer preguntas</a>
+                </div>
+                {% endif %}
+
+                <div id="contenedor-preguntas">
+                    <p style="text-align:center;color:var(--texto-sec);padding:30px">Cargando preguntas...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal responder pregunta (solo vendedor) -->
+    <div id="modal-responder-pregunta" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1070;align-items:center;justify-content:center;padding:20px">
+        <div style="background:var(--blanco,#fff);border-radius:16px;max-width:560px;width:100%;padding:24px;position:relative">
+            <button onclick="document.getElementById('modal-responder-pregunta').style.display='none'" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:1.4rem;cursor:pointer">&times;</button>
+            <h3 style="margin-bottom:14px;color:var(--verde,#2e7d32)"><span data-i18n="pd.qa_answer_title">Responder pregunta</span></h3>
+            <form id="form-respuesta">
+                <input type="hidden" id="pregunta-id-responder">
+                <textarea id="texto-respuesta" placeholder="Escribe tu respuesta..." data-i18n-placeholder="pd.qa_answer_ph" minlength="5" maxlength="1000" required style="width:100%;padding:12px;border:1.5px solid rgba(46,125,50,0.18);border-radius:12px;font-family:inherit;font-size:0.88rem;resize:vertical;min-height:90px;outline:none;margin-bottom:12px"></textarea>
+                <button type="submit" class="btn-principal" style="padding:10px 20px;font-size:0.88rem"><i class="bi bi-reply"></i> <span data-i18n="pd.qa_answer_send">Responder</span></button>
+            </form>
+        </div>
     </div>
 
     <!-- PRODUCTOS RELACIONADOS -->
@@ -425,5 +462,34 @@ function compartir(red) {
         window.open(shareUrl, '_blank', 'width=600,height=500');
     }
 }
+
+// Rol de vendedor para Q&A
+{% if session.get('usuario_id') and session.get('usuario_id') == producto.usuario_id %}
+document.body.dataset.rol = 'vendedor';
+{% endif %}
 </script>
+
+<style>
+.sin-preguntas { text-align:center; color:var(--texto-sec); padding:40px 20px; }
+.sin-preguntas i { font-size:2.2rem; display:block; margin-bottom:10px; opacity:.4; }
+.lista-preguntas { display:flex; flex-direction:column; gap:14px; }
+.item-pregunta { background:var(--blanco,#fff); border-radius:16px; padding:18px; box-shadow:var(--sombra); border:1px solid rgba(46,125,50,0.08); }
+.encabezado-pregunta { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.autor-pregunta, .autor-respuesta { display:flex; align-items:center; gap:10px; }
+.avatar-autor { width:36px; height:36px; border-radius:50%; object-fit:cover; background:var(--verde,#2e7d32); }
+.nombre-autor { font-size:.85rem; font-weight:700; }
+.fecha-pregunta, .fecha-respuesta { font-size:.72rem; color:var(--texto-sec,#888); }
+.badge-vendedor { background:#1976d2; color:#fff; font-size:.68rem; padding:2px 8px; border-radius:999px; font-weight:700; }
+.texto-pregunta { font-size:.9rem; line-height:1.6; margin-bottom:10px; }
+.acciones-pregunta { display:flex; gap:10px; }
+.btn-helpful { background:#f1f8e9; border:1px solid #c5e1a5; border-radius:8px; padding:5px 12px; font-size:.78rem; cursor:pointer; color:#558b2f; }
+.btn-responder { background:none; border:none; color:var(--verde,#2e7d32); font-size:.78rem; cursor:pointer; font-weight:600; }
+.respuesta-vendedor { background:#f0f7ff; border-left:3px solid #1976d2; border-radius:0 12px 12px 0; padding:14px 16px; margin-top:12px; }
+.texto-respuesta { font-size:.88rem; line-height:1.6; margin-top:8px; }
+.notificacion { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); padding:12px 24px; border-radius:10px; color:#fff; font-weight:600; opacity:0; transition:opacity .3s; z-index:3000; }
+.notificacion.visible { opacity:1; }
+.notificacion-exito, .notificacion-success { background:#2e7d32; }
+.notificacion-error { background:#dc3545; }
+</style>
+<script src="{{ url_for('static', filename='ecomarket-preguntas-respuestas.js') }}"></script>
 {% endblock %}

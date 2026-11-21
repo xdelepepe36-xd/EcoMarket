@@ -217,7 +217,7 @@ class SistemaPreguntasRespuestas {
                 <div class="item-pregunta">
                     <div class="encabezado-pregunta">
                         <div class="autor-pregunta">
-                            <img src="${p.usuario.avatar || '/static/assets/avatar-default.png'}" alt="${p.usuario.nombre}" class="avatar-autor">
+                            <img src="${p.usuario.avatar || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22%3E%3Ccircle cx=%2220%22 cy=%2220%22 r=%2220%22 fill=%22%232e7d32%22/%3E%3Ccircle cx=%2220%22 cy=%2215%22 r=%227%22 fill=%22%23fff%22/%3E%3Cpath d=%22M6 38c2-8 7-12 14-12s12 4 14 12%22 fill=%22%23fff%22/%3E%3C/svg%3E'}" alt="${p.usuario.nombre}" class="avatar-autor">
                             <div>
                                 <div class="nombre-autor">${p.usuario.nombre}</div>
                                 <div class="fecha-pregunta">${fechaPregunta}</div>
@@ -245,7 +245,7 @@ class SistemaPreguntasRespuestas {
                         <div class="respuesta-vendedor">
                             <div class="encabezado-respuesta">
                                 <div class="autor-respuesta">
-                                    <img src="${p.vendedor.avatar || '/static/assets/avatar-default.png'}" alt="${p.vendedor.nombre}" class="avatar-autor">
+                                    <img src="${p.vendedor.avatar || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22%3E%3Ccircle cx=%2220%22 cy=%2220%22 r=%2220%22 fill=%22%232e7d32%22/%3E%3Ccircle cx=%2220%22 cy=%2215%22 r=%227%22 fill=%22%23fff%22/%3E%3Cpath d=%22M6 38c2-8 7-12 14-12s12 4 14 12%22 fill=%22%23fff%22/%3E%3C/svg%3E'}" alt="${p.vendedor.nombre}" class="avatar-autor">
                                     <div>
                                         <div class="nombre-autor">${p.vendedor.nombre} <span class="badge-vendedor">Vendedor</span></div>
                                         <div class="fecha-respuesta">${fechaRespuesta}</div>
@@ -296,7 +296,7 @@ class SistemaPreguntasRespuestas {
         const fecha = new Date(fechaIso);
         const ahora = new Date();
         const diferencia = ahora - fecha;
-        const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
+        const dias = Math.max(0, Math.floor(diferencia / (1000 * 60 * 60 * 24)));
 
         if (dias === 0) return 'Hoy';
         if (dias === 1) return 'Ayer';

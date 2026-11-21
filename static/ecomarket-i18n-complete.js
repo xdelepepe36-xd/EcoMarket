@@ -2577,6 +2577,51 @@ const EcoI18n = {
         },
     },
 
+    aiI18n: {
+        es: {
+            'ai.generate': 'Generar con IA',
+            'ai.generating': 'Generando...',
+            'ai.done': 'Descripción generada',
+            'ai.error': 'No se pudo generar. Inténtalo de nuevo.',
+            'ai.need_fields': 'Completa nombre y categoría primero',
+        },
+        en: {
+            'ai.generate': 'Generate with AI',
+            'ai.generating': 'Generating...',
+            'ai.done': 'Description generated',
+            'ai.error': 'Could not generate. Try again.',
+            'ai.need_fields': 'Fill in name and category first',
+        },
+        pt: {
+            'ai.generate': 'Gerar com IA',
+            'ai.generating': 'Gerando...',
+            'ai.done': 'Descrição gerada',
+            'ai.error': 'Não foi possível gerar. Tente novamente.',
+            'ai.need_fields': 'Preencha nome e categoria primeiro',
+        },
+        fr: {
+            'ai.generate': 'Générer avec l'IA',
+            'ai.generating': 'Génération...',
+            'ai.done': 'Description générée',
+            'ai.error': 'Impossible de générer. Réessayez.',
+            'ai.need_fields': 'Remplissez d'abord nom et catégorie',
+        },
+        de: {
+            'ai.generate': 'Mit KI generieren',
+            'ai.generating': 'Generiere...',
+            'ai.done': 'Beschreibung generiert',
+            'ai.error': 'Generierung fehlgeschlagen. Erneut versuchen.',
+            'ai.need_fields': 'Fülle zuerst Name und Kategorie aus',
+        },
+        it: {
+            'ai.generate': 'Genera con IA',
+            'ai.generating': 'Generazione...',
+            'ai.done': 'Descrizione generata',
+            'ai.error': 'Impossibile generare. Riprova.',
+            'ai.need_fields': 'Compila prima nome e categoria',
+        },
+    },
+
     init() {
         for (const lang in this.homeI18n) {
             this.translations[lang] = Object.assign({}, this.translations[lang], this.homeI18n[lang]);
@@ -2589,6 +2634,9 @@ const EcoI18n = {
         }
         for (const lang in this.legalI18n) {
             this.translations[lang] = Object.assign({}, this.translations[lang], this.legalI18n[lang]);
+        }
+        for (const lang in this.aiI18n) {
+            this.translations[lang] = Object.assign({}, this.translations[lang], this.aiI18n[lang]);
         }
         this.currentLang = localStorage.getItem('ecomarket-lang') || 'es';
 

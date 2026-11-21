@@ -47,8 +47,14 @@
             </div>
 
             <div>
-                <label><span data-i18n="publicar.description_label">Descripción</span> <span style="color:#b91c1c">*</span></label>
-                <textarea name="descripcion" rows="4" required placeholder="Describe tu producto: materiales, beneficios, impacto ambiental..." data-i18n-placeholder="publicar.description_placeholder">{{ producto.descripcion if producto else '' }}</textarea>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+                    <label style="margin-bottom:0"><span data-i18n="publicar.description_label">Descripción</span> <span style="color:#b91c1c">*</span></label>
+                    <button type="button" id="aiDescBtn" onclick="generarDescripcionIA()" class="btn-secundario" style="padding:6px 14px;font-size:0.78rem;border-radius:999px">
+                        <i class="bi bi-stars"></i> <span data-i18n="ai.generate">Generar con IA</span>
+                    </button>
+                </div>
+                <textarea name="descripcion" id="descripcionField" rows="4" required placeholder="Describe tu producto: materiales, beneficios, impacto ambiental..." data-i18n-placeholder="publicar.description_placeholder">{{ producto.descripcion if producto else '' }}</textarea>
+                <small id="aiDescStatus" style="display:none;font-size:0.78rem;color:var(--texto-sec)"></small>
             </div>
 
             <div>
@@ -98,6 +104,52 @@
 </section>
 
 <script>
+async function generarDescripcionIA() {
+    const btn = document.getElementById('aiDescBtn');
+    const status = document.getElementById('aiDescStatus');
+    const field = document.getElementById('descripcionField');
+    const form = btn.closest('form');
+    const nombre = form.querySelector('[name="nombre"]').value.trim();
+    const categoria = form.querySelector('[name="categoria"]').value;
+    const precio = parseFloat(form.querySelector('[name="precio"]').value) || 0;
+
+    if (!nombre || !categoria) {
+        status.textContent = '⚠️ ' + (window.EcoI18n ? EcoI18n.t('ai.need_fields') : 'Completa nombre y categoría primero');
+        status.style.display = 'block';
+        status.style.color = '#b45309';
+        setTimeout(() => status.style.display = 'none', 3000);
+        return;
+    }
+
+    btn.disabled = true;
+    const originalHTML = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> ' + (window.EcoI18n ? EcoI18n.t('ai.generating') : 'Generando...');
+
+    try {
+        const resp = await fetch('/api/ai/generar-descripcion', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombre, categoria, precio })
+        });
+        const data = await resp.json();
+        if (data.descripcion) {
+            field.value = data.descripcion;
+            status.textContent = '✨ ' + (window.EcoI18n ? EcoI18n.t('ai.done') : 'Descripción generada');
+            status.style.color = '#2e7d32';
+        } else {
+            throw new Error(data.error || 'sin descripcion');
+        }
+    } catch (e) {
+        status.textContent = '⚠️ ' + (window.EcoI18n ? EcoI18n.t('ai.error') : 'No se pudo generar. Inténtalo de nuevo.');
+        status.style.color = '#b91c1c';
+    } finally {
+        status.style.display = 'block';
+        setTimeout(() => status.style.display = 'none', 4000);
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+    }
+}
+
 function previewFile(input) {
     const file = input.files[0];
     if (file) {

@@ -76,6 +76,9 @@
             
             <!-- Selector de idioma (EcoI18n lo rellena) -->
             <div class="lang-switcher"></div>
+
+            <!-- Selector de tema -->
+            <div data-theme-switcher class="theme-switcher" role="button" tabindex="0" aria-label="Cambiar tema" title="Cambiar tema"></div>
             
             <!-- Botón Menú Móvil -->
             <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Abrir menú">
@@ -99,6 +102,7 @@
                 <a href="{{ url_for('login') }}" class="mobile-nav-link" data-i18n="nav.login">Ingresar</a>
                 <a href="{{ url_for('registro') }}" class="mobile-nav-link" data-i18n="nav.register">Registrarse</a>
             {% endif %}
+            <div data-theme-switcher class="theme-switcher theme-switcher-mobile" role="button" tabindex="0" aria-label="Cambiar tema" title="Cambiar tema"></div>
         </div>
     </header>
 

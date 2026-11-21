@@ -3893,3 +3893,40 @@ html {
         display: block;
     }
 }
+
+/* ── Theme switcher ─────────────────────────────────────── */
+.theme-switcher {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    border: 1.5px solid rgba(46, 125, 50, 0.15);
+    background: rgba(46, 125, 50, 0.05);
+    color: var(--texto);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    user-select: none;
+}
+.theme-switcher:hover {
+    background: rgba(46, 125, 50, 0.12);
+    border-color: rgba(46, 125, 50, 0.25);
+    transform: translateY(-2px) rotate(15deg);
+}
+.theme-switcher:focus-visible {
+    outline: 3px solid var(--verde);
+    outline-offset: 2px;
+}
+.theme-switcher-mobile {
+    margin: 12px auto 4px;
+    display: flex;
+}
+[data-theme='dark'] .theme-switcher,
+[data-theme='midnight'] .theme-switcher {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.15);
+    color: #e4ebe6;
+}

@@ -21,7 +21,9 @@ const EcoMarket = {
     
     // Estado global
     state: {
-        theme: localStorage.getItem('ecomarket-theme') || 'light',
+        theme: ['light', 'dark'].includes(localStorage.getItem('ecomarket-theme'))
+            ? localStorage.getItem('ecomarket-theme')
+            : 'light',
         lang: localStorage.getItem('ecomarket-lang') || 'es',
         user: null
     },
@@ -48,9 +50,9 @@ const EcoMarket = {
         }
 
         // Fallback: implementación básica
-        const themeToggle = document.querySelector('[data-theme-switcher]');
-        
-        if (!themeToggle) {
+        const themeToggles = document.querySelectorAll('[data-theme-switcher]');
+
+        if (themeToggles.length === 0) {
             const headerActions = document.querySelector('.header-actions');
             if (headerActions) {
                 const toggleBtn = document.createElement('button');
@@ -60,24 +62,35 @@ const EcoMarket = {
                 toggleBtn.setAttribute('title', 'Cambiar tema');
                 toggleBtn.innerHTML = this.getThemeIcon(this.state.theme);
                 headerActions.insertBefore(toggleBtn, headerActions.firstChild);
-                
+
                 toggleBtn.addEventListener('click', () => this.toggleTheme());
             }
         } else {
-            themeToggle.addEventListener('click', () => this.toggleTheme());
+            themeToggles.forEach(t => {
+                t.innerHTML = this.getThemeIcon(this.state.theme);
+                t.addEventListener('click', () => this.toggleTheme());
+            });
         }
         
         document.documentElement.setAttribute('data-theme', this.state.theme);
         this.updateThemeIcon();
+        this.updateMetaThemeColor();
     },
     
     toggleTheme() {
-        const currentIndex = this.themes.indexOf(this.state.theme);
-        const nextIndex = (currentIndex + 1) % this.themes.length;
-        this.state.theme = this.themes[nextIndex];
+        // Solo modo claro/oscuro: el resto de temas no tienen cobertura CSS completa
+        this.state.theme = this.state.theme === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', this.state.theme);
         localStorage.setItem('ecomarket-theme', this.state.theme);
         this.updateThemeIcon();
+        this.updateMetaThemeColor();
+    },
+
+    updateMetaThemeColor() {
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) {
+            meta.setAttribute('content', this.state.theme === 'dark' ? '#171D1A' : '#2e7d32');
+        }
     },
     
     getThemeIcon(theme) {
@@ -95,11 +108,10 @@ const EcoMarket = {
     },
     
     updateThemeIcon() {
-        const toggleBtn = document.querySelector('[data-theme-switcher]');
-        if (toggleBtn) {
+        document.querySelectorAll('[data-theme-switcher]').forEach(toggleBtn => {
             toggleBtn.innerHTML = this.getThemeIcon(this.state.theme);
             toggleBtn.setAttribute('title', `Tema actual: ${this.state.theme}`);
-        }
+        });
     },
     
     // ── Language Toggle ─────────────────────────────────────

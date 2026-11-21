@@ -6,10 +6,10 @@
     <div class="container">
         <div class="section-head">
             <div>
-                <h2 class="section-title"><i class="bi bi-shield-check"></i> Panel de Administración</h2>
-                <p>Gestiona productos y usuarios registrados en EcoMarket.</p>
+                <h2 class="section-title"><i class="bi bi-shield-check"></i> <span data-i18n="admin.title">Panel de Administración</span></h2>
+                <p data-i18n="admin.subtitle">Gestiona productos y usuarios registrados en EcoMarket.</p>
             </div>
-            <a href="{{ url_for('publicar') }}" class="btn-principal"><i class="bi bi-plus-circle"></i> Nuevo producto</a>
+            <a href="{{ url_for('publicar') }}" class="btn-principal"><i class="bi bi-plus-circle"></i> <span data-i18n="admin.new_product">Nuevo producto</span></a>
         </div>
 
         <!-- Stats rápidas -->
@@ -17,12 +17,12 @@
             <div class="admin-stat-card">
                 <i class="bi bi-box-seam"></i>
                 <strong>{{ stats.total_productos }}</strong>
-                <span>Productos</span>
+                <span data-i18n="admin.products">Productos</span>
             </div>
             <div class="admin-stat-card">
                 <i class="bi bi-people"></i>
                 <strong>{{ stats.total_usuarios }}</strong>
-                <span>Usuarios</span>
+                <span data-i18n="admin.users">Usuarios</span>
             </div>
             <div class="admin-stat-card">
                 <i class="bi bi-star"></i>
@@ -32,31 +32,31 @@
             <div class="admin-stat-card">
                 <i class="bi bi-bag-check"></i>
                 <strong>{{ stats.total_pedidos }}</strong>
-                <span>Pedidos</span>
+                <span data-i18n="admin.orders">Pedidos</span>
             </div>
             <div class="admin-stat-card">
                 <i class="bi bi-eye"></i>
                 <strong>{{ stats.total_visitas }}</strong>
-                <span>Visitas</span>
+                <span data-i18n="admin.visits">Visitas</span>
             </div>
         </div>
 
         <!-- Tabla productos -->
         <div style="display:flex;align-items:center;gap:12px;margin:32px 0 16px">
             <i class="bi bi-box-seam" style="font-size:1.3rem;color:var(--verde)"></i>
-            <h3 style="color:var(--verde);margin:0">Productos ({{ productos|length }})</h3>
+            <h3 style="color:var(--verde);margin:0"><span data-i18n="admin.products_list">Productos</span> ({{ productos|length }})</h3>
         </div>
         <div class="admin-table-wrap">
             <table class="admin-table">
                 <thead>
                     <tr>
                         <th><i class="bi bi-hash"></i></th>
-                        <th><i class="bi bi-card-text"></i> Nombre</th>
-                        <th><i class="bi bi-tag"></i> Categoría</th>
-                        <th><i class="bi bi-currency-dollar"></i> Precio</th>
-                        <th><i class="bi bi-person"></i> Vendedor</th>
-                        <th><i class="bi bi-star"></i> Rating</th>
-                        <th><i class="bi bi-tools"></i> Acciones</th>
+                        <th><i class="bi bi-card-text"></i> <span data-i18n="admin.col_name">Nombre</span></th>
+                        <th><i class="bi bi-tag"></i> <span data-i18n="admin.col_cat">Categoría</span></th>
+                        <th><i class="bi bi-currency-dollar"></i> <span data-i18n="admin.col_price">Precio</span></th>
+                        <th><i class="bi bi-person"></i> <span data-i18n="admin.col_seller">Vendedor</span></th>
+                        <th><i class="bi bi-star"></i> <span data-i18n="admin.col_rating">Rating</span></th>
+                        <th><i class="bi bi-tools"></i> <span data-i18n="admin.col_actions">Acciones</span></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -66,7 +66,7 @@
                         <td><strong>{{ producto.nombre[:40] }}{% if producto.nombre|length > 40 %}...{% endif %}</strong></td>
                         <td><span class="badge badge-success">{{ producto.categoria }}</span></td>
                         <td><strong>S/. {{ '%.2f'|format(producto.precio) }}</strong></td>
-                        <td>{{ producto.vendedor_nombre or 'Anónimo' }}</td>
+                        <td>{% if producto.vendedor_nombre %}{{ producto.vendedor_nombre }}{% else %}<span data-i18n="admin.anon">Anónimo</span>{% endif %}</td>
                         <td>
                             <div style="display:flex;align-items:center;gap:4px;color:#f59e0b">
                                 <i class="bi bi-star-fill" style="font-size:0.8rem"></i>
@@ -75,12 +75,12 @@
                         </td>
                         <td class="admin-actions">
                             <a href="{{ url_for('producto_detalle', producto_id=producto.id) }}" class="btn-secundario btn-sm">
-                                <i class="bi bi-eye"></i> Ver
+                                <i class="bi bi-eye"></i> <span data-i18n="admin.view">Ver</span>
                             </a>
                             <form method="POST" action="{{ url_for('eliminar_producto_admin', producto_id=producto.id) }}" style="display:inline;" onsubmit="return confirm('¿Eliminar este producto?')">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit" class="btn-danger btn-sm">
-                                    <i class="bi bi-trash"></i> Eliminar
+                                    <i class="bi bi-trash"></i> <span data-i18n="admin.delete">Eliminar</span>
                                 </button>
                             </form>
                         </td>
@@ -93,7 +93,7 @@
         <!-- Tabla usuarios -->
         <div style="display:flex;align-items:center;gap:12px;margin:40px 0 16px">
             <i class="bi bi-people" style="font-size:1.3rem;color:var(--verde)"></i>
-            <h3 style="color:var(--verde);margin:0">Usuarios registrados ({{ usuarios|length }})</h3>
+            <h3 style="color:var(--verde);margin:0"><span data-i18n="admin.users_list">Usuarios registrados</span> ({{ usuarios|length }})</h3>
         </div>
         <div class="admin-table-wrap">
             <table class="admin-table">
@@ -101,9 +101,9 @@
                     <tr>
                         <th><i class="bi bi-hash"></i></th>
                         <th><i class="bi bi-person"></i> Nombre</th>
-                        <th><i class="bi bi-envelope"></i> Correo</th>
-                        <th><i class="bi bi-calendar"></i> Registro</th>
-                        <th><i class="bi bi-tools"></i> Acción</th>
+                        <th><i class="bi bi-envelope"></i> <span data-i18n="admin.col_email">Correo</span></th>
+                        <th><i class="bi bi-calendar"></i> <span data-i18n="admin.col_date">Registro</span></th>
+                        <th><i class="bi bi-tools"></i> <span data-i18n="admin.col_action">Acción</span></th>
                     </tr>
                 </thead>
                 <tbody>

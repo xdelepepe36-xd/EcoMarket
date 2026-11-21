@@ -3658,3 +3658,91 @@ html {
         margin-top: var(--spacing-md, 1.5rem);
     }
 }
+
+/* ════════════════════════════════════════════════════════════
+   TEMA OSCURO - variables del rediseño (este archivo carga al final,
+   por eso debe redefinir las vars aquí para que ganen)
+   ════════════════════════════════════════════════════════════ */
+[data-theme='dark'] {
+    --blanco: #171D1A;
+    --gris-verdoso: #0F1412;
+    --gris-oscuro: #E4EBE6;
+    --gris-secundario: #9AA79E;
+    --verde-claro: #1E3A24;
+    --verde-intenso: #4CAF50;
+    --verde-oscuro: #66BB6A;
+    --naranja: #FFB74D;
+    --sombra: 0 4px 18px rgba(0, 0, 0, 0.4);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme='dark'] body {
+    color: var(--gris-oscuro);
+}
+
+[data-theme='dark'] .producto-card,
+[data-theme='dark'] .checkout-form-card,
+[data-theme='dark'] .checkout-summary-card,
+[data-theme='dark'] .form-card,
+[data-theme='dark'] .contact-card,
+[data-theme='dark'] .admin-stat-card,
+[data-theme='dark'] .admin-table-wrap {
+    background: var(--blanco);
+    border-color: rgba(76, 175, 80, 0.18);
+}
+
+[data-theme='dark'] .nav-link,
+[data-theme='dark'] .mobile-nav-link {
+    color: var(--gris-oscuro);
+}
+
+[data-theme='dark'] .section-title,
+[data-theme='dark'] h1,
+[data-theme='dark'] h2,
+[data-theme='dark'] h3 {
+    color: var(--gris-oscuro);
+}
+
+[data-theme='dark'] .hero-description,
+[data-theme='dark'] .hero-badge {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+[data-theme='dark'] input,
+[data-theme='dark'] select,
+[data-theme='dark'] textarea,
+[data-theme='dark'] .form-input,
+[data-theme='dark'] .auth-form input {
+    background: #1E2622;
+    color: var(--gris-oscuro);
+    border-color: rgba(76, 175, 80, 0.25);
+}
+
+[data-theme='dark'] .footer {
+    background: #0B0F0D;
+    color: var(--gris-secundario);
+}
+
+[data-theme='dark'] .mobile-menu {
+    background: var(--blanco);
+}
+
+[data-theme='dark'] .mobile-nav-link {
+    border-bottom-color: rgba(76, 175, 80, 0.15);
+}
+
+[data-theme='dark'] .search-suggestions,
+[data-theme='dark'] #searchSuggestions .search-suggestions {
+    background: var(--blanco);
+}
+
+[data-theme='dark'] .suggestion-item {
+    color: var(--gris-oscuro);
+    border-bottom-color: rgba(76, 175, 80, 0.1);
+}
+
+[data-theme='dark'] .suggestion-item:hover {
+    background: rgba(76, 175, 80, 0.1);
+}

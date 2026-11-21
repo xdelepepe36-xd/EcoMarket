@@ -15,47 +15,47 @@
         <div class="hero-content">
             <div class="hero-badge">
                 <i class="bi bi-leaf"></i>
-                <span>Marketplace 100% ecológico</span>
+                <span data-i18n="hero.badge">Marketplace 100% ecológico</span>
             </div>
-            <h1 class="hero-title">Compra y vende productos sostenibles</h1>
-            <p class="hero-description">
+            <h1 class="hero-title" data-i18n="hero.title">Compra y vende productos sostenibles</h1>
+            <p class="hero-description" data-i18n="hero.subtitle">
                 Descubre miles de productos ecológicos de vendedores comprometidos con el planeta. 
                 Cada compra genera un impacto positivo real.
             </p>
             <div class="hero-stats-quick">
                 <div class="hero-stat-item">
                     <strong>{{ total_productos }}</strong>
-                    <span>Productos</span>
+                    <span data-i18n="home.stat_products">Productos</span>
                 </div>
                 <div class="hero-stat-item">
                     <strong>{{ total_categorias }}</strong>
-                    <span>Categorías</span>
+                    <span data-i18n="home.stat_categories">Categorías</span>
                 </div>
                 <div class="hero-stat-item">
                     <strong>{{ total_usuarios }}</strong>
-                    <span>Usuarios</span>
+                    <span data-i18n="home.stat_users">Usuarios</span>
                 </div>
             </div>
             <div class="hero-buttons">
                 <a href="{{ url_for('productos_view') }}" class="btn-principal btn-hero">
-                    <i class="bi bi-bag"></i> Explorar productos
+                    <i class="bi bi-bag"></i> <span data-i18n="hero.explore">Explorar productos</span>
                 </a>
                 <a href="{{ url_for('publicar') }}" class="btn-secundario btn-hero">
-                    <i class="bi bi-plus-lg"></i> Publicar gratis
+                    <i class="bi bi-plus-lg"></i> <span data-i18n="hero.publish">Publicar gratis</span>
                 </a>
             </div>
             <div class="hero-trust-badges">
                 <div class="trust-badge">
                     <i class="bi bi-truck"></i>
-                    <span>Envío gratis</span>
+                    <span data-i18n="hero.trust.shipping">Envío gratis</span>
                 </div>
                 <div class="trust-badge">
                     <i class="bi bi-shield-check"></i>
-                    <span>Pago seguro</span>
+                    <span data-i18n="hero.trust.payment">Pago seguro</span>
                 </div>
                 <div class="trust-badge">
                     <i class="bi bi-arrow-repeat"></i>
-                    <span>Devoluciones</span>
+                    <span data-i18n="hero.trust.returns">Devoluciones</span>
                 </div>
             </div>
         </div>
@@ -71,10 +71,10 @@
                     type="text" 
                     name="q" 
                     class="search-input" 
-                    placeholder="Buscar productos ecológicos..."
+                    placeholder="Buscar productos ecológicos..." data-i18n-placeholder="home.search_placeholder"
                     aria-label="Buscar productos"
                 >
-                <button type="submit" class="btn-principal">Buscar</button>
+                <button type="submit" class="btn-principal"><span data-i18n="home.search_button">Buscar</span></button>
             </form>
         </div>
     </div>
@@ -84,8 +84,8 @@
 <section class="categorias-section section">
     <div class="container">
         <div class="section-title">
-            <h2>Categorías de productos</h2>
-            <p>Explora nuestra variedad de productos sostenibles</p>
+            <h2 data-i18n="categories.title">Categorías de productos</h2>
+            <p data-i18n="home.categories_subtitle">Explora nuestra variedad de productos sostenibles</p>
         </div>
         <div class="categorias-grid">
             {% for cat in categorias %}
@@ -122,8 +122,8 @@
 <section class="productos-section section">
     <div class="container">
         <div class="section-title">
-            <h2>Productos destacados</h2>
-            <p>Los más vendidos esta semana</p>
+            <h2 data-i18n="home.featured_title">Productos destacados</h2>
+            <p data-i18n="home.featured_subtitle">Los más vendidos esta semana</p>
         </div>
         <div class="productos-grid">
             {% for producto in productos[:8] %}
@@ -143,9 +143,9 @@
                         <div class="product-categoria">{{ producto.categoria }}</div>
                         <h3 class="product-nombre">{{ producto.nombre }}</h3>
                         <div class="product-precio">S/. {{ '%.2f'|format(producto.precio) }}</div>
-                        <div class="product-disponibilidad disponible">Disponible</div>
+                        <div class="product-disponibilidad disponible" data-i18n="home.product_available">Disponible</div>
                         <div class="product-botones">
-                            <button class="btn-card btn-primary">Ver detalles</button>
+                            <button class="btn-card btn-primary" data-i18n="home.view_details">Ver detalles</button>
                         </div>
                     </div>
                 </article>
@@ -159,29 +159,29 @@
 <section class="section" style="background: var(--blanco);">
     <div class="container">
         <div class="section-title">
-            <h2>¿Cómo funciona EcoMarket?</h2>
-            <p>Comprar y vender productos sostenibles nunca fue tan fácil</p>
+            <h2 data-i18n="home.how_title">¿Cómo funciona EcoMarket?</h2>
+            <p data-i18n="home.how_subtitle">Comprar y vender productos sostenibles nunca fue tan fácil</p>
         </div>
         <div class="como-funciona-grid">
             <div class="como-funciona-card">
                 <div class="como-funciona-number">1</div>
-                <h3>Regístrate gratis</h3>
-                <p>Crea tu cuenta en segundos y empieza a explorar productos ecológicos.</p>
+                <h3 data-i18n="home.how1_title">Regístrate gratis</h3>
+                <p data-i18n="home.how1_desc">Crea tu cuenta en segundos y empieza a explorar productos ecológicos.</p>
             </div>
             <div class="como-funciona-card">
                 <div class="como-funciona-number">2</div>
-                <h3>Explora productos</h3>
-                <p>Encuentra artículos sostenibles que se adapten a tu estilo de vida.</p>
+                <h3 data-i18n="home.how2_title">Explora productos</h3>
+                <p data-i18n="home.how2_desc">Encuentra artículos sostenibles que se adapten a tu estilo de vida.</p>
             </div>
             <div class="como-funciona-card">
                 <div class="como-funciona-number">3</div>
-                <h3>Compra segura</h3>
-                <p>Paga de forma segura y recibe tus productos en casa.</p>
+                <h3 data-i18n="home.how3_title">Compra segura</h3>
+                <p data-i18n="home.how3_desc">Paga de forma segura y recibe tus productos en casa.</p>
             </div>
             <div class="como-funciona-card">
                 <div class="como-funciona-number">4</div>
-                <h3>Impacto real</h3>
-                <p>Cada compra contribuye a reducir residuos y proteger el planeta.</p>
+                <h3 data-i18n="home.how4_title">Impacto real</h3>
+                <p data-i18n="home.how4_desc">Cada compra contribuye a reducir residuos y proteger el planeta.</p>
             </div>
         </div>
     </div>
@@ -191,32 +191,32 @@
 <section class="section section-alt">
     <div class="container">
         <div class="section-title">
-            <h2>Beneficios para todos</h2>
-            <p>Tanto compradores como vendedores ganan en EcoMarket</p>
+            <h2 data-i18n="home.benefits_title">Beneficios para todos</h2>
+            <p data-i18n="home.benefits_subtitle">Tanto compradores como vendedores ganan en EcoMarket</p>
         </div>
         <div class="beneficios-grid">
             <div class="beneficio-card">
                 <div class="beneficio-icon">
                     <i class="bi bi-shield-check"></i>
                 </div>
-                <h3>Para compradores</h3>
+                <h3 data-i18n="home.buyers_title">Para compradores</h3>
                 <ul>
-                    <li>Productos verificados y de calidad</li>
-                    <li>Pagos seguros y protegidos</li>
-                    <li>Envíos confiables y rápidos</li>
-                    <li>Soporte 24/7</li>
+                    <li data-i18n="home.buyers1">Productos verificados y de calidad</li>
+                    <li data-i18n="home.buyers2">Pagos seguros y protegidos</li>
+                    <li data-i18n="home.buyers3">Envíos confiables y rápidos</li>
+                    <li data-i18n="home.buyers4">Soporte 24/7</li>
                 </ul>
             </div>
             <div class="beneficio-card">
                 <div class="beneficio-icon">
                     <i class="bi bi-currency-dollar"></i>
                 </div>
-                <h3>Para vendedores</h3>
+                <h3 data-i18n="home.sellers_title">Para vendedores</h3>
                 <ul>
-                    <li>Publica productos gratis</li>
-                    <li>Comisiones bajas</li>
-                    <li>Panel de control completo</li>
-                    <li>Alcance a miles de compradores</li>
+                    <li data-i18n="home.sellers1">Publica productos gratis</li>
+                    <li data-i18n="home.sellers2">Comisiones bajas</li>
+                    <li data-i18n="home.sellers3">Panel de control completo</li>
+                    <li data-i18n="home.sellers4">Alcance a miles de compradores</li>
                 </ul>
             </div>
         </div>
@@ -227,25 +227,25 @@
 <section class="impacto-section">
     <div class="container">
         <div class="section-title">
-            <h2 style="color: var(--verde-oscuro);">Nuestro impacto ambiental</h2>
-            <p style="color: var(--gris-secundario);">Cifras reales de nuestro compromiso con el planeta</p>
+            <h2 style="color: var(--verde-oscuro);" data-i18n="home.impact_title">Nuestro impacto ambiental</h2>
+            <p style="color: var(--gris-secundario);" data-i18n="home.impact_subtitle">Cifras reales de nuestro compromiso con el planeta</p>
         </div>
         <div class="impacto-stats">
             <div class="impacto-stat">
                 <div class="impacto-valor">1,240</div>
-                <div class="impacto-label">Árboles equivalentes salvados</div>
+                <div class="impacto-label" data-i18n="impact.trees">Árboles equivalentes salvados</div>
             </div>
             <div class="impacto-stat">
                 <div class="impacto-valor">85,600</div>
-                <div class="impacto-label">Litros de agua ahorrados</div>
+                <div class="impacto-label" data-i18n="impact.water">Litros de agua ahorrados</div>
             </div>
             <div class="impacto-stat">
                 <div class="impacto-valor">3,200</div>
-                <div class="impacto-label">Kg de plástico evitados</div>
+                <div class="impacto-label" data-i18n="impact.plastic">Kg de plástico evitados</div>
             </div>
             <div class="impacto-stat">
                 <div class="impacto-valor">4,800</div>
-                <div class="impacto-label">Familias impactadas</div>
+                <div class="impacto-label" data-i18n="impact.families">Familias impactadas</div>
             </div>
         </div>
     </div>
@@ -255,17 +255,17 @@
 <section class="cta-section">
     <div class="container">
         <div class="cta-content">
-            <h2>¿Tienes productos ecológicos?</h2>
-            <p>Publica gratis y llega a miles de compradores comprometidos con el planeta.</p>
+            <h2 data-i18n="cta.title">¿Tienes productos ecológicos?</h2>
+            <p data-i18n="cta.desc">Publica gratis y llega a miles de compradores comprometidos con el planeta.</p>
             <div class="cta-features">
-                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> Sin comisión los primeros 3 meses</div>
-                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> Panel de vendedor completo</div>
-                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> Pagos seguros y rápidos</div>
-                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> Soporte 7 días a la semana</div>
+                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> <span data-i18n="cta.feature.no_commission">Sin comisión los primeros 3 meses</span></div>
+                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> <span data-i18n="cta.feature.dashboard">Panel de vendedor completo</span></div>
+                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> <span data-i18n="cta.feature.payments">Pagos seguros y rápidos</span></div>
+                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> <span data-i18n="cta.feature.support">Soporte 7 días a la semana</span></div>
             </div>
             <div class="cta-buttons">
-                <a href="{{ url_for('publicar') }}" class="btn-principal">Publicar ahora</a>
-                <a href="{{ url_for('registro') }}" class="btn-secundario">Crear cuenta gratis</a>
+                <a href="{{ url_for('publicar') }}" class="btn-principal"><span data-i18n="cta.publish_now">Publicar ahora</span></a>
+                <a href="{{ url_for('registro') }}" class="btn-secundario"><span data-i18n="cta.create_account">Crear cuenta gratis</span></a>
             </div>
         </div>
     </div>
@@ -275,32 +275,32 @@
 <section class="section" style="background: var(--blanco);">
     <div class="container">
         <div class="section-title">
-            <h2>Lo que dicen nuestros usuarios</h2>
-            <p>Experiencias reales de nuestra comunidad</p>
+            <h2 data-i18n="home.testimonials_title">Lo que dicen nuestros usuarios</h2>
+            <p data-i18n="home.testimonials_subtitle">Experiencias reales de nuestra comunidad</p>
         </div>
         <div class="testimonios-grid">
             <div class="testimonio-card">
                 <div class="testimonio-stars">★★★★★</div>
-                <p>"Desde que compro en EcoMarket siento que mis decisiones de consumo realmente importan. Los productos son increíbles."</p>
+                <p data-i18n="home.test1_text">"Desde que compro en EcoMarket siento que mis decisiones de consumo realmente importan. Los productos son increíbles."</p>
                 <div class="testimonio-author">
-                    <strong>María García</strong>
-                    <span>Lima, Perú</span>
+                    <strong data-i18n="home.test1_name">María García</strong>
+                    <span data-i18n="home.test1_city">Lima, Perú</span>
                 </div>
             </div>
             <div class="testimonio-card">
                 <div class="testimonio-stars">★★★★★</div>
-                <p>"Publiqué mis productos artesanales y en un mes ya tenía 20 ventas. La plataforma es muy fácil de usar."</p>
+                <p data-i18n="home.test2_text">"Publiqué mis productos artesanales y en un mes ya tenía 20 ventas. La plataforma es muy fácil de usar."</p>
                 <div class="testimonio-author">
-                    <strong>Carlos López</strong>
-                    <span>Bogotá, Colombia</span>
+                    <strong data-i18n="home.test2_name">Carlos López</strong>
+                    <span data-i18n="home.test2_city">Bogotá, Colombia</span>
                 </div>
             </div>
             <div class="testimonio-card">
                 <div class="testimonio-stars">★★★★★</div>
-                <p>"Me encanta que puedo ver el impacto real de cada compra. Es motivador saber que estoy ayudando al planeta."</p>
+                <p data-i18n="home.test3_text">"Me encanta que puedo ver el impacto real de cada compra. Es motivador saber que estoy ayudando al planeta."</p>
                 <div class="testimonio-author">
-                    <strong>Ana Torres</strong>
-                    <span>Santiago, Chile</span>
+                    <strong data-i18n="home.test3_name">Ana Torres</strong>
+                    <span data-i18n="home.test3_city">Santiago, Chile</span>
                 </div>
             </div>
         </div>
@@ -311,25 +311,25 @@
 <section class="section">
     <div class="container">
         <div class="section-title">
-            <h2>Preguntas frecuentes</h2>
-            <p>Todo lo que necesitas saber sobre EcoMarket</p>
+            <h2 data-i18n="home.faq_title">Preguntas frecuentes</h2>
+            <p data-i18n="home.faq_subtitle">Todo lo que necesitas saber sobre EcoMarket</p>
         </div>
         <div class="faq-grid">
             <div class="faq-item">
-                <h3>¿Es gratis registrarse?</h3>
-                <p>Sí, el registro es completamente gratuito para compradores y vendedores.</p>
+                <h3 data-i18n="home.faq1_q">¿Es gratis registrarse?</h3>
+                <p data-i18n="home.faq1_a">Sí, el registro es completamente gratuito para compradores y vendedores.</p>
             </div>
             <div class="faq-item">
-                <h3>¿Cómo protegen mis pagos?</h3>
-                <p>Utilizamos sistemas de pago seguros con encriptación SSL y protecciones anti-fraude.</p>
+                <h3 data-i18n="home.faq2_q">¿Cómo protegen mis pagos?</h3>
+                <p data-i18n="home.faq2_a">Utilizamos sistemas de pago seguros con encriptación SSL y protecciones anti-fraude.</p>
             </div>
             <div class="faq-item">
-                <h3>¿Puedo devolver un producto?</h3>
-                <p>Sí, ofrecemos una política de devoluciones de 30 días para productos que no cumplan con lo esperado.</p>
+                <h3 data-i18n="home.faq3_q">¿Puedo devolver un producto?</h3>
+                <p data-i18n="home.faq3_a">Sí, ofrecemos una política de devoluciones de 30 días para productos que no cumplan con lo esperado.</p>
             </div>
             <div class="faq-item">
-                <h3>¿Cómo verifican a los vendedores?</h3>
-                <p>Implementamos un sistema de verificación en varios niveles para garantizar la confianza.</p>
+                <h3 data-i18n="home.faq4_q">¿Cómo verifican a los vendedores?</h3>
+                <p data-i18n="home.faq4_a">Implementamos un sistema de verificación en varios niveles para garantizar la confianza.</p>
             </div>
         </div>
     </div>

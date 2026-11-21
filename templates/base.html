@@ -55,22 +55,22 @@
             
             <!-- Navegación Desktop -->
             <nav class="navbar desktop-nav">
-                <a href="{{ url_for('index') }}" class="nav-link">Inicio</a>
-                <a href="{{ url_for('productos_view') }}" class="nav-link">Productos</a>
-                <a href="{{ url_for('favoritos_view') }}" class="nav-link">Favoritos</a>
+                <a href="{{ url_for('index') }}" class="nav-link" data-i18n="nav.home">Inicio</a>
+                <a href="{{ url_for('productos_view') }}" class="nav-link" data-i18n="nav.products">Productos</a>
+                <a href="{{ url_for('favoritos_view') }}" class="nav-link" data-i18n="nav.favorites">Favoritos</a>
                 <a href="{{ url_for('carrito_view') }}" class="nav-link">
-                    <i class="bi bi-cart3"></i> Carrito
+                    <i class="bi bi-cart3"></i> <span data-i18n="nav.cart">Carrito</span>
                     <span class="cart-badge" id="cartCount">0</span>
                 </a>
-                <a href="{{ url_for('impacto') }}" class="nav-link">Impacto</a>
+                <a href="{{ url_for('impacto') }}" class="nav-link" data-i18n="nav.impact">Impacto</a>
                 
                 {% if session.get('usuario_id') %}
-                    <a href="{{ url_for('perfil') }}" class="nav-link">Perfil</a>
-                    <a href="{{ url_for('publicar') }}" class="btn-principal">Publicar</a>
-                    <a href="{{ url_for('logout') }}" class="nav-link">Salir</a>
+                    <a href="{{ url_for('perfil') }}" class="nav-link" data-i18n="nav.profile">Perfil</a>
+                    <a href="{{ url_for('publicar') }}" class="btn-principal"><span data-i18n="nav.publish">Publicar</span></a>
+                    <a href="{{ url_for('logout') }}" class="nav-link" data-i18n="nav.logout">Salir</a>
                 {% else %}
-                    <a href="{{ url_for('login') }}" class="nav-link">Ingresar</a>
-                    <a href="{{ url_for('registro') }}" class="btn-principal">Registrarse</a>
+                    <a href="{{ url_for('login') }}" class="nav-link" data-i18n="nav.login">Ingresar</a>
+                    <a href="{{ url_for('registro') }}" class="btn-principal"><span data-i18n="nav.register">Registrarse</span></a>
                 {% endif %}
             </nav>
             
@@ -85,19 +85,19 @@
         
         <!-- Menú Móvil -->
         <div class="mobile-menu" id="mobileMenu">
-            <a href="{{ url_for('index') }}" class="mobile-nav-link">Inicio</a>
-            <a href="{{ url_for('productos_view') }}" class="mobile-nav-link">Productos</a>
-            <a href="{{ url_for('favoritos_view') }}" class="mobile-nav-link">Favoritos</a>
-            <a href="{{ url_for('carrito_view') }}" class="mobile-nav-link">Carrito</a>
-            <a href="{{ url_for('impacto') }}" class="mobile-nav-link">Impacto</a>
+            <a href="{{ url_for('index') }}" class="mobile-nav-link" data-i18n="nav.home">Inicio</a>
+            <a href="{{ url_for('productos_view') }}" class="mobile-nav-link" data-i18n="nav.products">Productos</a>
+            <a href="{{ url_for('favoritos_view') }}" class="mobile-nav-link" data-i18n="nav.favorites">Favoritos</a>
+            <a href="{{ url_for('carrito_view') }}" class="mobile-nav-link" data-i18n="nav.cart">Carrito</a>
+            <a href="{{ url_for('impacto') }}" class="mobile-nav-link" data-i18n="nav.impact">Impacto</a>
             
             {% if session.get('usuario_id') %}
-                <a href="{{ url_for('perfil') }}" class="mobile-nav-link">Perfil</a>
-                <a href="{{ url_for('publicar') }}" class="mobile-nav-link">Publicar</a>
-                <a href="{{ url_for('logout') }}" class="mobile-nav-link">Salir</a>
+                <a href="{{ url_for('perfil') }}" class="mobile-nav-link" data-i18n="nav.profile">Perfil</a>
+                <a href="{{ url_for('publicar') }}" class="mobile-nav-link" data-i18n="nav.publish">Publicar</a>
+                <a href="{{ url_for('logout') }}" class="mobile-nav-link" data-i18n="nav.logout">Salir</a>
             {% else %}
-                <a href="{{ url_for('login') }}" class="mobile-nav-link">Ingresar</a>
-                <a href="{{ url_for('registro') }}" class="mobile-nav-link">Registrarse</a>
+                <a href="{{ url_for('login') }}" class="mobile-nav-link" data-i18n="nav.login">Ingresar</a>
+                <a href="{{ url_for('registro') }}" class="mobile-nav-link" data-i18n="nav.register">Registrarse</a>
             {% endif %}
         </div>
     </header>
@@ -130,7 +130,7 @@
                     <a class="logo" href="{{ url_for('index') }}">
                         <i class="bi bi-flower2"></i> EcoMarket
                     </a>
-                    <p>Marketplace ecológico donde puedes comprar, vender y dar una segunda vida a productos reciclados y sostenibles.</p>
+                    <p data-i18n="footer.description">Marketplace ecológico donde puedes comprar, vender y dar una segunda vida a productos reciclados y sostenibles.</p>
                     <div class="footer-social">
                         <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
                         <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
@@ -140,43 +140,43 @@
                 </div>
                 
                 <div class="footer-col">
-                    <h4>Navegación</h4>
-                    <a href="{{ url_for('index') }}">Inicio</a>
-                    <a href="{{ url_for('productos_view') }}">Catálogo</a>
-                    <a href="{{ url_for('favoritos_view') }}">Favoritos</a>
-                    <a href="{{ url_for('impacto') }}">Impacto ambiental</a>
+                    <h4 data-i18n="footer.navigation">Navegación</h4>
+                    <a href="{{ url_for('index') }}" data-i18n="nav.home">Inicio</a>
+                    <a href="{{ url_for('productos_view') }}" data-i18n="nav.catalog">Catálogo</a>
+                    <a href="{{ url_for('favoritos_view') }}" data-i18n="nav.favorites">Favoritos</a>
+                    <a href="{{ url_for('impacto') }}" data-i18n="nav.impact">Impacto ambiental</a>
                 </div>
                 
                 <div class="footer-col">
-                    <h4>Mi cuenta</h4>
+                    <h4 data-i18n="footer.account">Mi cuenta</h4>
                     {% if session.get('usuario_id') %}
-                        <a href="{{ url_for('perfil') }}">Mi perfil</a>
-                        <a href="{{ url_for('publicar') }}">Publicar producto</a>
-                        <a href="{{ url_for('logout') }}">Cerrar sesión</a>
+                        <a href="{{ url_for('perfil') }}" data-i18n="footer.profile">Mi perfil</a>
+                        <a href="{{ url_for('publicar') }}" data-i18n="footer.publish">Publicar producto</a>
+                        <a href="{{ url_for('logout') }}" data-i18n="footer.logout">Cerrar sesión</a>
                     {% else %}
-                        <a href="{{ url_for('login') }}">Iniciar sesión</a>
-                        <a href="{{ url_for('registro') }}">Registrarse</a>
+                        <a href="{{ url_for('login') }}" data-i18n="footer.login">Iniciar sesión</a>
+                        <a href="{{ url_for('registro') }}" data-i18n="footer.register">Registrarse</a>
                     {% endif %}
-                    <a href="{{ url_for('carrito_view') }}">Mi carrito</a>
+                    <a href="{{ url_for('carrito_view') }}" data-i18n="footer.cart">Mi carrito</a>
                 </div>
                 
                 <div class="footer-col">
-                    <h4>Legal</h4>
-                    <a href="{{ url_for('terminos') }}">Términos y condiciones</a>
-                    <a href="{{ url_for('privacidad') }}">Política de privacidad</a>
-                    <a href="{{ url_for('contacto') }}">Contacto</a>
+                    <h4 data-i18n="footer.legal">Legal</h4>
+                    <a href="{{ url_for('terminos') }}" data-i18n="footer.terms">Términos y condiciones</a>
+                    <a href="{{ url_for('privacidad') }}" data-i18n="footer.privacy">Política de privacidad</a>
+                    <a href="{{ url_for('contacto') }}" data-i18n="footer.contact">Contacto</a>
                 </div>
                 
                 <div class="footer-col">
-                    <h4>Contacto</h4>
-                    <p><i class="bi bi-envelope"></i> hola@ecomarket.com</p>
-                    <p><i class="bi bi-telephone"></i> +51 999 888 777</p>
-                    <p><i class="bi bi-geo-alt"></i> Lima, Perú</p>
+                    <h4 data-i18n="footer.contact">Contacto</h4>
+                    <p><i class="bi bi-envelope"></i> <span data-i18n="footer.email">hola@ecomarket.com</span></p>
+                    <p><i class="bi bi-telephone"></i> <span data-i18n="footer.phone">+51 999 888 777</span></p>
+                    <p><i class="bi bi-geo-alt"></i> <span data-i18n="footer.location">Lima, Perú</span></p>
                 </div>
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2026 EcoMarket. Todos los derechos reservados.</p>
+                <p data-i18n="footer.copyright">&copy; 2026 EcoMarket. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>

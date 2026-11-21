@@ -2392,12 +2392,12 @@ html {
     
     .hero-section-enhanced {
         min-height: auto;
-        padding: var(--spacing-xl) 0;
+        padding: var(--spacing-lg) 0;
     }
     
     .hero-content-wrapper {
         grid-template-columns: 1fr;
-        gap: var(--spacing-xl);
+        gap: var(--spacing-md);
         text-align: center;
     }
     
@@ -2410,13 +2410,13 @@ html {
     }
     
     .hero-mascota-circle {
-        width: 120px;
-        height: 120px;
+        width: 96px;
+        height: 96px;
     }
     
     .hero-mascota-img {
-        width: 85px;
-        height: 85px;
+        width: 68px;
+        height: 68px;
     }
     
     .hero-mascota-speech {
@@ -2426,11 +2426,13 @@ html {
     }
     
     .hero-title {
-        font-size: 2rem;
+        font-size: 1.65rem;
+        margin-bottom: var(--spacing-sm);
     }
     
     .hero-description {
-        font-size: 1rem;
+        font-size: 0.95rem;
+        margin-bottom: var(--spacing-md);
     }
     
     .hero-stats-quick {
@@ -2442,8 +2444,16 @@ html {
         font-size: 1.5rem;
     }
     
+    .hero-badge {
+        padding: var(--spacing-xs) var(--spacing-md);
+        margin-bottom: var(--spacing-md);
+        font-size: 0.8rem;
+    }
+
     .hero-buttons {
         flex-direction: column;
+        gap: var(--spacing-sm);
+        margin-bottom: var(--spacing-md);
     }
     
     .hero-buttons .btn-principal,
@@ -2451,10 +2461,15 @@ html {
         width: 100%;
     }
     
+    .hero-stats-quick {
+        margin-bottom: var(--spacing-md);
+    }
+    
     .hero-trust-badges {
         flex-direction: column;
         gap: var(--spacing-sm);
         align-items: center;
+        margin-top: var(--spacing-xs);
     }
     
     .header-container {

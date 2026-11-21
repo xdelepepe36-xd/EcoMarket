@@ -1273,31 +1273,6 @@ def index():
     return render_template('index.html', productos=productos, categorias=categorias)
 
 
-@app.route('/premium')
-def index_premium():
-    """Ruta dedicada para el diseño premium con gradientes modernos."""
-    registrar_visita('premium')
-    conn = get_db()
-    productos = conn.execute('''
-        SELECT p.*, COALESCE(AVG(r.rating), 0) as rating_promedio
-        FROM productos p
-        LEFT JOIN resenas r ON p.id = r.producto_id
-        GROUP BY p.id
-        ORDER BY p.created_at DESC
-        LIMIT 12
-    ''').fetchall()
-    conn.close()
-    return render_template('index-premium.html', productos=productos)
-
-
-@app.route('/dashboard-premium')
-@login_required
-def dashboard_premium():
-    """Dashboard premium con todas las funcionalidades."""
-    registrar_visita('dashboard_premium')
-    return render_template('dashboard-premium.html')
-
-
 @app.route('/productos')
 def productos_view():
     registrar_visita('productos')

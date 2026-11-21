@@ -3631,3 +3631,30 @@ html {
     white-space: nowrap;
     flex-shrink: 0;
 }
+
+/* ════════════════════════════════════════════════════════════
+   FORM CONTAINER + CONTACTO responsive
+   ════════════════════════════════════════════════════════════ */
+.form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.form-container > .form-card,
+.form-container > form {
+    width: 100%;
+}
+
+@media (max-width: 900px) {
+    .contact-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .contact-grid {
+        gap: var(--spacing-md, 1.5rem);
+        margin-top: var(--spacing-md, 1.5rem);
+    }
+}

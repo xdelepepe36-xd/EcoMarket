@@ -3277,3 +3277,286 @@ html {
         margin: var(--spacing-lg, 2rem) auto;
     }
 }
+
+/* ════════════════════════════════════════════════════════════
+   SECTION HEAD - encabezado de sección con acción
+   ════════════════════════════════════════════════════════════ */
+.section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md, 1.5rem);
+    flex-wrap: wrap;
+    margin-bottom: var(--spacing-lg, 2rem);
+}
+
+.section-head .section-title {
+    margin-bottom: var(--spacing-xs, 0.5rem);
+}
+
+.section-head p {
+    margin: 0;
+    color: var(--texto-sec, #666);
+    font-size: 0.95rem;
+}
+
+/* ════════════════════════════════════════════════════════════
+   CONFIRMACIÓN DE PEDIDO
+   ════════════════════════════════════════════════════════════ */
+.confirmacion-container {
+    max-width: 640px;
+}
+
+.confirmacion-card {
+    text-align: center;
+    padding: var(--spacing-2xl, 4rem) var(--spacing-lg, 2rem);
+}
+
+.confirmacion-icon {
+    font-size: 3.5rem;
+    margin-bottom: var(--spacing-md, 1.5rem);
+    animation: confirmacionPop 0.5s ease;
+}
+
+@keyframes confirmacionPop {
+    0% { transform: scale(0.5); opacity: 0; }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.confirmacion-card .section-title {
+    margin-bottom: var(--spacing-sm, 1rem);
+}
+
+.confirmacion-card > p {
+    color: var(--texto-sec, #666);
+    font-size: 0.95rem;
+    max-width: 46ch;
+    margin: 0 auto var(--spacing-lg, 2rem);
+}
+
+.confirmacion-info {
+    text-align: left;
+}
+
+.confirmacion-step {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm, 1rem);
+    padding: var(--spacing-sm, 1rem) 0;
+    font-size: 0.9rem;
+    color: var(--texto-sec, #888);
+    border-bottom: 1px solid rgba(46, 125, 50, 0.06);
+}
+
+.confirmacion-step:last-child {
+    border-bottom: none;
+}
+
+.confirmacion-step i {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.confirmacion-step-completed {
+    color: var(--verde, #2e7d32);
+    font-weight: 600;
+}
+
+.confirmacion-step-completed i {
+    color: var(--verde, #2e7d32);
+}
+
+.confirmacion-step-pending i {
+    color: #ccc;
+}
+
+.confirmacion-actions {
+    display: flex;
+    gap: var(--spacing-sm, 1rem);
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: var(--spacing-lg, 2rem);
+}
+
+.confirmacion-actions .btn-principal,
+.confirmacion-actions .btn-secundario {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 24px;
+    text-decoration: none;
+}
+
+/* ════════════════════════════════════════════════════════════
+   PANEL ADMIN
+   ════════════════════════════════════════════════════════════ */
+.admin-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: var(--spacing-md, 1.5rem);
+    margin-bottom: var(--spacing-sm, 1rem);
+}
+
+.admin-stat-card {
+    background: var(--blanco, #fff);
+    border-radius: var(--border-radius-lg, 16px);
+    padding: var(--spacing-md, 1.5rem);
+    box-shadow: 0 4px 18px rgba(15, 92, 44, 0.07);
+    border: 1px solid rgba(46, 125, 50, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 4px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(15, 92, 44, 0.12);
+}
+
+.admin-stat-card i {
+    font-size: 1.5rem;
+    color: var(--verde, #2e7d32);
+    margin-bottom: 4px;
+}
+
+.admin-stat-card strong {
+    font-size: 1.6rem;
+    color: var(--texto, #1b3a1f);
+    line-height: 1.2;
+}
+
+.admin-stat-card span {
+    font-size: 0.8rem;
+    color: var(--texto-sec, #666);
+    font-weight: 600;
+}
+
+.admin-table-wrap {
+    overflow-x: auto;
+    background: var(--blanco, #fff);
+    border-radius: var(--border-radius-lg, 16px);
+    box-shadow: 0 4px 18px rgba(15, 92, 44, 0.07);
+    border: 1px solid rgba(46, 125, 50, 0.08);
+    margin-bottom: var(--spacing-lg, 2rem);
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    min-width: 640px;
+}
+
+.admin-table th {
+    text-align: left;
+    padding: 14px 16px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--texto-sec, #666);
+    background: var(--gris-muy-claro, #f8faf8);
+    border-bottom: 2px solid rgba(46, 125, 50, 0.1);
+    white-space: nowrap;
+}
+
+.admin-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(46, 125, 50, 0.06);
+    color: var(--texto, #1b3a1f);
+    vertical-align: middle;
+}
+
+.admin-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.admin-table tbody tr:hover {
+    background: rgba(46, 125, 50, 0.04);
+}
+
+.admin-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.admin-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.admin-actions form {
+    display: inline;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.78rem;
+    border-radius: 8px;
+}
+
+.btn-danger {
+    background: #d32f2f;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-danger:hover {
+    background: #b71c1c;
+    transform: translateY(-1px);
+}
+
+.badge-success {
+    background: rgba(46, 125, 50, 0.12);
+    color: var(--verde, #2e7d32);
+}
+
+/* ════════════════════════════════════════════════════════════
+   FAVORITOS - acciones en tarjeta
+   ════════════════════════════════════════════════════════════ */
+.card-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.favorite-btn:hover {
+    transform: scale(1.12);
+    background: #f8d7da !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   ADMIN / GESTIÓN responsive
+   ════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+    .admin-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-sm, 1rem);
+    }
+    .admin-stat-card {
+        padding: var(--spacing-sm, 1rem);
+    }
+    .admin-stat-card strong {
+        font-size: 1.3rem;
+    }
+    .confirmacion-card {
+        padding: var(--spacing-xl, 3rem) var(--spacing-md, 1.5rem);
+    }
+    .confirmacion-icon {
+        font-size: 2.8rem;
+    }
+}

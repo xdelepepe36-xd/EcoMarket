@@ -82,8 +82,8 @@
                     {% endfor %}
                 </div>
                 <strong>{{ '%.1f'|format(producto.rating_promedio) }}</strong>
-                <span>({{ producto.total_resenas }} reseñas)</span>
-                <span>· 👁️ {{ producto.vistas }} vistas</span>
+                <span>({{ producto.total_resenas }} <span data-i18n="pd.reviews">reseñas</span>)</span>
+                <span>· 👁️ {{ producto.vistas }} <span data-i18n="pd.views">vistas</span></span>
             </div>
 
             <div class="detalle-price-box">
@@ -96,15 +96,15 @@
                     </div>
                     {% endif %}
                 </div>
-                <div class="detalle-delivery-pill"><i class="bi bi-truck"></i> Envío gratis en Lima</div>
+                <div class="detalle-delivery-pill"><i class="bi bi-truck"></i> <span data-i18n="pd.free_shipping_lima">Envío gratis en Lima</span></div>
             </div>
 
             <div class="detalle-pills">
                 <span class="badge" style="background:{% if producto.stock > 0 %}#e8f5e9;color:#2e7d32{% else %}#fdecea;color:#b91c1c{% endif %}">
-                    {% if producto.stock > 0 %}✅ {{ producto.stock }} en stock{% else %}❌ Agotado{% endif %}
+                    {% if producto.stock > 0 %}✅ {{ producto.stock }} <span data-i18n="pd.in_stock">en stock</span>{% else %}❌ <span data-i18n="pd.out_of_stock">Agotado</span>{% endif %}
                 </span>
                 <span class="badge" style="background:#fff3e0;color:#e65100">
-                    {% if producto.condicion == 'nuevo' %}🆕 Nuevo{% else %}♻️ Usado{% endif %}
+                    {% if producto.condicion == 'nuevo' %}🆕 <span data-i18n="pd.new">Nuevo</span>{% else %}♻️ <span data-i18n="pd.used">Usado</span>{% endif %}
                 </span>
                 <span class="badge"><i class="bi bi-leaf"></i> Eco-friendly</span>
                 {% if producto.eco_score and producto.eco_score > 0 %}
@@ -120,8 +120,8 @@
             <div class="detalle-seller-box">
                 <div class="detalle-seller-avatar">{{ producto.vendedor_nombre[0] }}</div>
                 <div>
-                    <strong>Vendido por {{ producto.vendedor_nombre }}</strong>
-                    <div>{{ producto.total_vendedor_productos }} producto(s) publicado(s)</div>
+                    <strong><span data-i18n="pd.sold_by">Vendido por</span> {{ producto.vendedor_nombre }}</strong>
+                    <div>{{ producto.total_vendedor_productos }} <span data-i18n="pd.products_published">producto(s) publicado(s)</span></div>
                 </div>
             </div>
             {% endif %}
@@ -138,9 +138,9 @@
             </div>
 
             <div class="detalle-benefits">
-                <div class="benefit-item">♻️ Material sostenible</div>
-                <div class="benefit-item">🚚 Envío rápido disponible</div>
-                <div class="benefit-item">🔄 Devoluciones gratis</div>
+                <div class="benefit-item"><span data-i18n="pd.benefit_material">♻️ Material sostenible</span></div>
+                <div class="benefit-item"><span data-i18n="pd.benefit_shipping">🚚 Envío rápido disponible</span></div>
+                <div class="benefit-item"><span data-i18n="pd.benefit_returns">🔄 Devoluciones gratis</span></div>
             </div>
 
             <div class="detalle-share-row">
@@ -156,16 +156,16 @@
     <!-- PESTAÑAS DE INFORMACIÓN -->
     <div class="container" style="margin-top:48px">
         <div class="detalle-tabs">
-            <button class="detalle-tab active" onclick="cambiarTab('descripcion', this)"><i class="bi bi-file-text"></i> Descripción</button>
-            <button class="detalle-tab" onclick="cambiarTab('especificaciones', this)"><i class="bi bi-list-check"></i> Especificaciones</button>
-            <button class="detalle-tab" onclick="cambiarTab('envio', this)"><i class="bi bi-truck"></i> Envío y devoluciones</button>
-            <button class="detalle-tab" onclick="cambiarTab('resenas', this)"><i class="bi bi-star"></i> Reseñas ({{ producto.total_resenas }})</button>
+            <button class="detalle-tab active" onclick="cambiarTab('descripcion', this)"><i class="bi bi-file-text"></i> <span data-i18n="pd.tab_desc">Descripción</span></button>
+            <button class="detalle-tab" onclick="cambiarTab('especificaciones', this)"><i class="bi bi-list-check"></i> <span data-i18n="pd.tab_specs">Especificaciones</span></button>
+            <button class="detalle-tab" onclick="cambiarTab('envio', this)"><i class="bi bi-truck"></i> <span data-i18n="pd.tab_shipping">Envío y devoluciones</span></button>
+            <button class="detalle-tab" onclick="cambiarTab('resenas', this)"><i class="bi bi-star"></i> <span data-i18n="pd.tab_reviews">Reseñas</span> ({{ producto.total_resenas }})</button>
         </div>
 
         <!-- Tab: Descripción -->
         <div class="detalle-tab-content active" id="tab-descripcion">
             <div class="detalle-tab-panel">
-                <h3><i class="bi bi-info-circle"></i> Descripción del producto</h3>
+                <h3><i class="bi bi-info-circle"></i> <span data-i18n="pd.desc_title">Descripción del producto</span></h3>
                 <p>{{ producto.descripcion }}</p>
                 {% if producto.etiquetas %}
                 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
@@ -180,7 +180,7 @@
         <!-- Tab: Especificaciones -->
         <div class="detalle-tab-content" id="tab-especificaciones">
             <div class="detalle-tab-panel">
-                <h3><i class="bi bi-list-check"></i> Especificaciones técnicas</h3>
+                <h3><i class="bi bi-list-check"></i> <span data-i18n="pd.specs_title">Especificaciones técnicas</span></h3>
                 {% if especificaciones %}
                 <table class="spec-table">
                     {% for clave, valor in especificaciones.items() %}
@@ -191,7 +191,7 @@
                     {% endfor %}
                 </table>
                 {% else %}
-                <p style="color:var(--texto-sec)">No hay especificaciones detalladas para este producto.</p>
+                <p style="color:var(--texto-sec)"><span data-i18n="pd.no_specs">No hay especificaciones detalladas para este producto.</span></p>
                 {% endif %}
             </div>
         </div>
@@ -199,22 +199,22 @@
         <!-- Tab: Envío -->
         <div class="detalle-tab-content" id="tab-envio">
             <div class="detalle-tab-panel">
-                <h3><i class="bi bi-truck"></i> Envío y devoluciones</h3>
+                <h3><i class="bi bi-truck"></i> <span data-i18n="pd.shipping_title">Envío y devoluciones</span></h3>
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:16px">
                     <div class="envio-card">
                         <i class="bi bi-lightning-charge" style="font-size:1.8rem;color:var(--verde)"></i>
-                        <strong>Envío rápido</strong>
-                        <p>Entrega en 2-4 días hábiles en Lima Metropolitana.</p>
+                        <strong><span data-i18n="pd.ship_fast">Envío rápido</span></strong>
+                        <p><span data-i18n="pd.ship_fast_desc">Entrega en 2-4 días hábiles en Lima Metropolitana.</span></p>
                     </div>
                     <div class="envio-card">
                         <i class="bi bi-globe-americas" style="font-size:1.8rem;color:var(--verde)"></i>
-                        <strong>En todo el Perú</strong>
-                        <p>Envíos a nivel nacional con empresas de confianza.</p>
+                        <strong><span data-i18n="pd.ship_peru">En todo el Perú</span></strong>
+                        <p><span data-i18n="pd.ship_peru_desc">Envíos a nivel nacional con empresas de confianza.</span></p>
                     </div>
                     <div class="envio-card">
                         <i class="bi bi-arrow-repeat" style="font-size:1.8rem;color:var(--verde)"></i>
-                        <strong>Devoluciones gratis</strong>
-                        <p>30 días para devolver tu producto sin costo.</p>
+                        <strong><span data-i18n="pd.returns_free">Devoluciones gratis</span></strong>
+                        <p><span data-i18n="pd.returns_free_desc">30 días para devolver tu producto sin costo.</span></p>
                     </div>
                 </div>
             </div>
@@ -223,7 +223,7 @@
         <!-- Tab: Reseñas -->
         <div class="detalle-tab-content" id="tab-resenas">
             <div class="detalle-tab-panel">
-                <h3><i class="bi bi-star"></i> Reseñas y valoraciones</h3>
+                <h3><i class="bi bi-star"></i> <span data-i18n="pd.reviews_title">Reseñas y valoraciones</span></h3>
                 <div style="display:grid;grid-template-columns:280px 1fr;gap:28px;align-items:start;margin-top:20px">
                     <!-- Resumen de estrellas -->
                     <div style="background:var(--blanco);border-radius:20px;padding:24px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08);text-align:center">
@@ -233,7 +233,7 @@
                             <span>{% if i < (producto.rating_promedio|round) %}★{% else %}☆{% endif %}</span>
                             {% endfor %}
                         </div>
-                        <div style="font-size:0.9rem;color:var(--texto-sec);margin-bottom:16px">{{ producto.total_resenas }} reseña(s)</div>
+                        <div style="font-size:0.9rem;color:var(--texto-sec);margin-bottom:16px">{{ producto.total_resenas }} <span data-i18n="pd.review_count">reseña(s)</span></div>
 
                         {% for i in range(5,0,-1) %}
                         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:0.82rem">
@@ -252,14 +252,14 @@
                     <div>
                         {% if session.get('usuario_id') %}
                         <div style="background:var(--blanco);border-radius:18px;padding:20px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08);margin-bottom:20px">
-                            <h4 style="margin-bottom:12px">✍️ Escribe una reseña</h4>
+                            <h4 style="margin-bottom:12px"><span data-i18n="pd.write_review">✍️ Escribe una reseña</span></h4>
                             <div style="display:flex;gap:4px;font-size:1.5rem;margin-bottom:12px" id="starSelector">
                                 {% for i in range(1,6) %}
                                 <span onclick="setRating({{ i }})" onmouseover="hoverStars({{ i }})" onmouseout="resetStars()" style="cursor:pointer;color:#ddd;transition:color 0.2s" data-star="{{ i }}">★</span>
                                 {% endfor %}
                             </div>
-                            <textarea id="reviewComment" placeholder="Comparte tu experiencia..." style="width:100%;padding:12px;border:1.5px solid rgba(46,125,50,0.18);border-radius:12px;font-family:inherit;font-size:0.88rem;resize:vertical;min-height:80px;outline:none;margin-bottom:12px"></textarea>
-                            <button onclick="enviarResena({{ producto.id }})" class="btn-principal" style="padding:10px 20px;font-size:0.88rem"><i class="bi bi-send"></i> Enviar reseña</button>
+                            <textarea id="reviewComment" placeholder="Comparte tu experiencia..." data-i18n-placeholder="pd.review_placeholder" style="width:100%;padding:12px;border:1.5px solid rgba(46,125,50,0.18);border-radius:12px;font-family:inherit;font-size:0.88rem;resize:vertical;min-height:80px;outline:none;margin-bottom:12px"></textarea>
+                            <button onclick="enviarResena({{ producto.id }})" class="btn-principal" style="padding:10px 20px;font-size:0.88rem"><i class="bi bi-send"></i> <span data-i18n="pd.send_review">Enviar reseña</span></button>
                         </div>
                         {% endif %}
 
@@ -287,7 +287,7 @@
                             {% else %}
                             <div style="text-align:center;padding:40px 20px;color:var(--texto-sec)">
                                 <i class="bi bi-star" style="font-size:2.5rem;display:block;margin-bottom:12px;opacity:0.3"></i>
-                                <p>No hay reseñas aún. ¡Sé el primero en opinar!</p>
+                                <p><span data-i18n="pd.no_reviews">No hay reseñas aún. ¡Sé el primero en opinar!</span></p>
                             </div>
                             {% endif %}
                         </div>
@@ -300,7 +300,7 @@
     <!-- PRODUCTOS RELACIONADOS -->
     {% if relacionados %}
     <div class="container" style="margin-top:48px">
-        <h3 style="font-size:1.4rem;color:var(--verde);margin-bottom:24px">🔄 Productos relacionados</h3>
+        <h3 style="font-size:1.4rem;color:var(--verde);margin-bottom:24px"><span data-i18n="pd.related">🔄 Productos relacionados</span></h3>
         <div class="productos-grid">
             {% for r in relacionados %}
             <a href="{{ url_for('producto_detalle', producto_id=r.id) }}" class="producto-card" style="text-decoration:none;color:inherit">

@@ -6,12 +6,12 @@
     <div class="container confirmacion-container">
         <div class="confirmacion-card form-card fade-in">
             <div class="confirmacion-icon">✅</div>
-            <h2 class="section-title">¡Pedido confirmado!</h2>
+            <h2 class="section-title"><span data-i18n="conf.title">¡Pedido confirmado!</span></h2>
             <p data-i18n="confirmation.success_message">Gracias por confiar en EcoMarket. Tu pedido ha sido registrado y será procesado en las próximas horas.</p>
 
             {% if pedido %}
             <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:20px">
-                <span class="badge"><i class="bi bi-receipt"></i> Pedido #ECO-{{ pedido.id }}</span>
+                <span class="badge"><i class="bi bi-receipt"></i> <span data-i18n="conf.order">Pedido</span> #ECO-{{ pedido.id }}</span>
                 <span class="badge" style="background:#e8f5e9;color:#2e7d32;text-transform:capitalize"><i class="bi bi-check-circle"></i> {{ pedido.estado }}</span>
             </div>
 
@@ -24,17 +24,17 @@
                 </div>
                 {% endfor %}
                 <div style="display:flex;justify-content:space-between;padding:10px 0">
-                    <span><i class="bi bi-truck"></i> Envío</span>
-                    <span>{{ 'Gratis 🎉' if pedido.envio == 0 else 'S/. ' ~ '%.2f'|format(pedido.envio) }}</span>
+                    <span><i class="bi bi-truck"></i> <span data-i18n="conf.shipping">Envío</span></span>
+                    <span>{% if pedido.envio == 0 %}<span data-i18n="conf.free_shipping">Gratis 🎉</span>{% else %}S/. {{ '%.2f'|format(pedido.envio) }}{% endif %}</span>
                 </div>
                 {% if pedido.descuento and pedido.descuento > 0 %}
                 <div style="display:flex;justify-content:space-between;padding:10px 0;color:#2e7d32">
-                    <span><i class="bi bi-tag"></i> Descuento</span>
+                    <span><i class="bi bi-tag"></i> <span data-i18n="conf.discount">Descuento</span></span>
                     <span>- S/. {{ '%.2f'|format(pedido.descuento) }}</span>
                 </div>
                 {% endif %}
                 <div style="display:flex;justify-content:space-between;padding:12px 0;font-size:1.1rem;font-weight:800;border-top:1px solid rgba(46,125,50,0.1)">
-                    <span>Total</span>
+                    <span data-i18n="conf.total">Total</span>
                     <span style="color:var(--verde)">S/. {{ '%.2f'|format(pedido.total) }}</span>
                 </div>
             </div>
@@ -46,28 +46,28 @@
             {% set actual = order_index.get(pedido.estado, 0) %}
             {% if pedido.estado == 'cancelado' %}
             <div class="confirmacion-info" style="margin-top:8px;padding:12px;border-radius:12px;background:#fdecea">
-                <i class="bi bi-x-circle"></i> <strong>Este pedido fue cancelado.</strong>
+                <i class="bi bi-x-circle"></i> <strong><span data-i18n="conf.cancelled">Este pedido fue cancelado.</span></strong>
             </div>
             {% else %}
             <div class="confirmacion-info" style="margin-top:10px">
                 {% for paso in labels %}
                 <div class="confirmacion-step {{ 'confirmacion-step-completed' if loop.index0 <= actual else 'confirmacion-step-pending' }}">
                     <i class="bi {{ 'bi-check-circle-fill' if loop.index0 <= actual else 'bi-circle' }}"></i>
-                    <span>{{ paso }}</span>
+                    <span data-i18n="conf.step{{ loop.index }}">{{ paso }}</span>
                 </div>
                 {% endfor %}
             </div>
             {% endif %}
             {% else %}
-            <p>No se encontró información del pedido.</p>
+            <p><span data-i18n="conf.no_order">No se encontró información del pedido.</span></p>
             {% endif %}
 
             <div class="confirmacion-actions">
                 <a href="{{ url_for('productos_view') }}" class="btn-principal">
-                    <i class="bi bi-grid"></i> Seguir comprando
+                    <i class="bi bi-grid"></i> <span data-i18n="conf.continue">Seguir comprando</span>
                 </a>
                 <a href="{{ url_for('perfil') }}" class="btn-secundario">
-                    <i class="bi bi-person"></i> Mis pedidos
+                    <i class="bi bi-person"></i> <span data-i18n="conf.my_orders">Mis pedidos</span>
                 </a>
             </div>
         </div>

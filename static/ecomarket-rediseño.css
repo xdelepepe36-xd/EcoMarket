@@ -639,7 +639,7 @@ p {
 
 .productos-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: var(--spacing-lg);
     margin-top: var(--spacing-lg);
 }
@@ -2078,7 +2078,7 @@ html {
 /* Optimización de scroll en listas largas */
 .productos-grid,
 .favoritos-grid {
-    contain: strict;
+    contain: layout style paint;
 }
 
 /* CSS containment para mejor rendimiento */
@@ -2666,4 +2666,12 @@ html {
     background: #d1ecf1;
     color: #0c5460;
     border-left: 4px solid #17a2b8;
+}
+
+/* Evitar doble contenedor: base.html ya envuelve el contenido en .container */
+.container .container {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
 }

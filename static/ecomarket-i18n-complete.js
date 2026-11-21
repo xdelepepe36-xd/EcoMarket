@@ -2724,6 +2724,135 @@ const EcoI18n = {
         },
     },
 
+    nlI18n: {
+        es: {
+            'nl.title': 'Newsletter EcoMarket',
+            'nl.subscribe': 'Suscríbete',
+            'nl.subtitle': 'Recibe ofertas, novedades y tips ecológicos directamente en tu email.',
+            'nl.name': 'Nombre',
+            'nl.name_ph': 'Tu nombre',
+            'nl.email': 'Email',
+            'nl.preferences': 'Preferencias',
+            'nl.pref_offers': 'Ofertas y descuentos',
+            'nl.pref_new': 'Nuevos productos',
+            'nl.pref_tips': 'Tips ecológicos',
+            'nl.submit': 'Suscribirse',
+            'nl.why': '¿Por qué suscribirse?',
+            'nl.b1': '✓ Ofertas exclusivas cada semana',
+            'nl.b2': '✓ Descuentos secretos solo para suscriptores',
+            'nl.b3': '✓ Tips para vivir más sostenible',
+            'nl.b4': '✓ Primeras noticias de productos nuevos',            'nl.ok': '¡Suscripción exitosa! Revisa tu email.',
+            'nl.err': 'Error al suscribirse.',
+            'nl.conn_err': 'Error de conexión. Intenta de nuevo.',
+
+        },
+        en: {
+            'nl.title': 'EcoMarket Newsletter',
+            'nl.subscribe': 'Subscribe',
+            'nl.subtitle': 'Get offers, news and eco tips directly in your email.',
+            'nl.name': 'Name',
+            'nl.name_ph': 'Your name',
+            'nl.email': 'Email',
+            'nl.preferences': 'Preferences',
+            'nl.pref_offers': 'Offers and discounts',
+            'nl.pref_new': 'New products',
+            'nl.pref_tips': 'Eco tips',
+            'nl.submit': 'Subscribe',
+            'nl.why': 'Why subscribe?',
+            'nl.b1': '✓ Exclusive offers every week',
+            'nl.b2': '✓ Secret discounts only for subscribers',
+            'nl.b3': '✓ Tips to live more sustainably',
+            'nl.b4': '✓ First news about new products',            'nl.ok': 'Subscription successful! Check your email.',
+            'nl.err': 'Error subscribing.',
+            'nl.conn_err': 'Connection error. Try again.',
+
+        },
+        pt: {
+            'nl.title': 'Newsletter EcoMarket',
+            'nl.subscribe': 'Inscrever-se',
+            'nl.subtitle': 'Receba ofertas, novidades e dicas ecológicas diretamente no seu email.',
+            'nl.name': 'Nome',
+            'nl.name_ph': 'Seu nome',
+            'nl.email': 'Email',
+            'nl.preferences': 'Preferências',
+            'nl.pref_offers': 'Ofertas e descontos',
+            'nl.pref_new': 'Novos produtos',
+            'nl.pref_tips': 'Dicas ecológicas',
+            'nl.submit': 'Inscrever-se',
+            'nl.why': 'Por que se inscrever?',
+            'nl.b1': '✓ Ofertas exclusivas toda semana',
+            'nl.b2': '✓ Descontos secretos só para inscritos',
+            'nl.b3': '✓ Dicas para viver de forma mais sustentável',
+            'nl.b4': '✓ Primeiras novidades de produtos novos',            'nl.ok': 'Inscrição realizada! Verifique seu email.',
+            'nl.err': 'Erro ao se inscrever.',
+            'nl.conn_err': 'Erro de conexão. Tente novamente.',
+
+        },
+        fr: {
+            'nl.title': 'Newsletter EcoMarket',
+            'nl.subscribe': 'S'abonner',
+            'nl.subtitle': 'Recevez des offres, nouveautés et conseils éco directement dans votre email.',
+            'nl.name': 'Nom',
+            'nl.name_ph': 'Votre nom',
+            'nl.email': 'Email',
+            'nl.preferences': 'Préférences',
+            'nl.pref_offers': 'Offres et réductions',
+            'nl.pref_new': 'Nouveaux produits',
+            'nl.pref_tips': 'Conseils éco',
+            'nl.submit': 'S'abonner',
+            'nl.why': 'Pourquoi s'abonner?',
+            'nl.b1': '✓ Offres exclusives chaque semaine',
+            'nl.b2': '✓ Réductions secrètes réservées aux abonnés',
+            'nl.b3': '✓ Conseils pour vivre plus durablement',
+            'nl.b4': '✓ Premières nouvelles des nouveaux produits',            'nl.ok': 'Inscription réussie! Vérifiez votre email.',
+            'nl.err': 'Erreur lors de l'inscription.',
+            'nl.conn_err': 'Erreur de connexion. Réessayez.',
+
+        },
+        de: {
+            'nl.title': 'EcoMarket Newsletter',
+            'nl.subscribe': 'Abonnieren',
+            'nl.subtitle': 'Erhalte Angebote, Neuigkeiten und Öko-Tipps direkt per E-Mail.',
+            'nl.name': 'Name',
+            'nl.name_ph': 'Dein Name',
+            'nl.email': 'E-Mail',
+            'nl.preferences': 'Präferenzen',
+            'nl.pref_offers': 'Angebote und Rabatte',
+            'nl.pref_new': 'Neue Produkte',
+            'nl.pref_tips': 'Öko-Tipps',
+            'nl.submit': 'Abonnieren',
+            'nl.why': 'Warum abonnieren?',
+            'nl.b1': '✓ Exklusive Angebote jede Woche',
+            'nl.b2': '✓ Geheime Rabatte nur für Abonnenten',
+            'nl.b3': '✓ Tipps für ein nachhaltigeres Leben',
+            'nl.b4': '✓ Erste Nachrichten über neue Produkte',            'nl.ok': 'Anmeldung erfolgreich! Prüfe deine E-Mail.',
+            'nl.err': 'Fehler beim Abonnieren.',
+            'nl.conn_err': 'Verbindungsfehler. Versuche es erneut.',
+
+        },
+        it: {
+            'nl.title': 'Newsletter EcoMarket',
+            'nl.subscribe': 'Iscriviti',
+            'nl.subtitle': 'Ricevi offerte, novità e consigli eco direttamente nella tua email.',
+            'nl.name': 'Nome',
+            'nl.name_ph': 'Il tuo nome',
+            'nl.email': 'Email',
+            'nl.preferences': 'Preferenze',
+            'nl.pref_offers': 'Offerte e sconti',
+            'nl.pref_new': 'Nuovi prodotti',
+            'nl.pref_tips': 'Consigli eco',
+            'nl.submit': 'Iscriviti',
+            'nl.why': 'Perché iscriversi?',
+            'nl.b1': '✓ Offerte esclusive ogni settimana',
+            'nl.b2': '✓ Sconti segreti solo per iscritti',
+            'nl.b3': '✓ Consigli per vivere in modo più sostenibile',
+            'nl.b4': '✓ Prime notizie sui nuovi prodotti',            'nl.ok': 'Iscrizione riuscita! Controlla la tua email.',
+            'nl.err': 'Errore durante l'iscrizione.',
+            'nl.conn_err': 'Errore di connessione. Riprova.',
+
+        },
+    },
+
     init() {
         for (const lang in this.homeI18n) {
             this.translations[lang] = Object.assign({}, this.translations[lang], this.homeI18n[lang]);
@@ -2745,6 +2874,9 @@ const EcoI18n = {
         }
         for (const lang in this.offlineI18n) {
             this.translations[lang] = Object.assign({}, this.translations[lang], this.offlineI18n[lang]);
+        }
+        for (const lang in this.nlI18n) {
+            this.translations[lang] = Object.assign({}, this.translations[lang], this.nlI18n[lang]);
         }
         this.currentLang = localStorage.getItem('ecomarket-lang') || 'es';
 

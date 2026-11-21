@@ -4,40 +4,41 @@
 
 {% block content %}
 <div class="container">
-    <h1>Newsletter EcoMarket</h1>
+    <h1 data-i18n="nl.title">Newsletter EcoMarket</h1>
     
     <div class="newsletter-container">
         <div class="suscripcion">
-            <h2>Suscríbete</h2>
-            <p>Recibe ofertas, novedades y tips ecológicos directamente en tu email.</p>
+            <h2 data-i18n="nl.subscribe">Suscríbete</h2>
+            <p data-i18n="nl.subtitle">Recibe ofertas, novedades y tips ecológicos directamente en tu email.</p>
             <form id="newsletter-form">
                 <div class="form-group">
-                    <label>Nombre</label>
-                    <input type="text" id="newsletter-nombre" placeholder="Tu nombre">
+                    <label data-i18n="nl.name">Nombre</label>
+                    <input type="text" id="newsletter-nombre" placeholder="Tu nombre" data-i18n-placeholder="nl.name_ph">
                 </div>
                 <div class="form-group">
-                    <label>Email</label>
+                    <label data-i18n="nl.email">Email</label>
                     <input type="email" id="newsletter-email" required placeholder="tu@email.com">
                 </div>
                 <div class="form-group">
-                    <label>Preferencias</label>
+                    <label data-i18n="nl.preferences">Preferencias</label>
                     <div class="checkboxes">
-                        <label><input type="checkbox" value="ofertas" checked> Ofertas y descuentos</label>
-                        <label><input type="checkbox" value="nuevos"> Nuevos productos</label>
-                        <label><input type="checkbox" value="tips"> Tips ecológicos</label>
+                        <label><input type="checkbox" value="ofertas" checked> <span data-i18n="nl.pref_offers">Ofertas y descuentos</span></label>
+                        <label><input type="checkbox" value="nuevos"> <span data-i18n="nl.pref_new">Nuevos productos</span></label>
+                        <label><input type="checkbox" value="tips"> <span data-i18n="nl.pref_tips">Tips ecológicos</span></label>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-principal">Suscribirse</button>
+                <div id="newsletter-status" style="margin-top:14px;font-weight:600"></div>
+                <button type="submit" class="btn btn-principal" data-i18n="nl.submit">Suscribirse</button>
             </form>
         </div>
         
         <div class="suscripto-info">
-            <h2>¿Por qué suscribirse?</h2>
+            <h2 data-i18n="nl.why">¿Por qué suscribirse?</h2>
             <ul>
-                <li>✓ Ofertas exclusivas cada semana</li>
-                <li>✓ Descuentos secretos solo para suscriptores</li>
-                <li>✓ Tips para vivir más sostenible</li>
-                <li>✓ Primeras noticias de productos nuevos</li>
+                <li data-i18n="nl.b1">✓ Ofertas exclusivas cada semana</li>
+                <li data-i18n="nl.b2">✓ Descuentos secretos solo para suscriptores</li>
+                <li data-i18n="nl.b3">✓ Tips para vivir más sostenible</li>
+                <li data-i18n="nl.b4">✓ Primeras noticias de productos nuevos</li>
             </ul>
         </div>
     </div>
@@ -89,4 +90,37 @@
     border-bottom: 1px solid #dee2e6;
 }
 </style>
+<script>
+function nlT(key, fallback) {
+    return (window.EcoI18n && EcoI18n.getTranslation(key)) || fallback;
+}
+document.getElementById('newsletter-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const status = document.getElementById('newsletter-status');
+    const prefs = Array.from(document.querySelectorAll('#newsletter-form .checkboxes input:checked')).map(i => i.value);
+    try {
+        const res = await fetch('/api/newsletter/suscribir', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: document.getElementById('newsletter-email').value.trim(),
+                nombre: document.getElementById('newsletter-nombre').value.trim(),
+                preferencias: prefs
+            })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            status.style.color = 'var(--verde, #2e7d32)';
+            status.textContent = nlT('nl.ok', '¡Suscripción exitosa! Revisa tu email.');
+            this.reset();
+        } else {
+            status.style.color = '#dc3545';
+            status.textContent = data.error || nlT('nl.err', 'Error al suscribirse.');
+        }
+    } catch (err) {
+        status.style.color = '#dc3545';
+        status.textContent = nlT('nl.conn_err', 'Error de conexión. Intenta de nuevo.');
+    }
+});
+</script>
 {% endblock %}

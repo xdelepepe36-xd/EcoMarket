@@ -2649,6 +2649,81 @@ const EcoI18n = {
         },
     },
 
+    offlineI18n: {
+        es: {
+            'offline.title': 'Sin Conexión a Internet',
+            'offline.desc': 'Parece que no tienes conexión a internet en este momento. EcoMarket funciona mejor con conexión, pero algunas funciones están disponibles offline.',
+            'offline.retry': 'Reintentar',
+            'offline.go_home': 'Ir al Inicio',
+            'offline.features_title': '📱 Funciones Offline',
+            'offline.f1': '✅ Ver productos en caché',
+            'offline.f2': '✅ Navegar por páginas visitadas',
+            'offline.f3': '❌ Realizar compras',
+            'offline.f4': '❌ Publicar productos',
+            'offline.f5': '❌ Actualizar datos',
+        },
+        en: {
+            'offline.title': 'No Internet Connection',
+            'offline.desc': 'It seems you have no internet connection right now. EcoMarket works best with connection, but some features are available offline.',
+            'offline.retry': 'Retry',
+            'offline.go_home': 'Go to Home',
+            'offline.features_title': '📱 Offline Features',
+            'offline.f1': '✅ View cached products',
+            'offline.f2': '✅ Browse visited pages',
+            'offline.f3': '❌ Make purchases',
+            'offline.f4': '❌ Publish products',
+            'offline.f5': '❌ Update data',
+        },
+        pt: {
+            'offline.title': 'Sem Conexão com a Internet',
+            'offline.desc': 'Parece que você está sem conexão com a internet no momento. A EcoMarket funciona melhor com conexão, mas algumas funções estão disponíveis offline.',
+            'offline.retry': 'Tentar novamente',
+            'offline.go_home': 'Ir para o Início',
+            'offline.features_title': '📱 Funções Offline',
+            'offline.f1': '✅ Ver produtos em cache',
+            'offline.f2': '✅ Navegar por páginas visitadas',
+            'offline.f3': '❌ Realizar compras',
+            'offline.f4': '❌ Publicar produtos',
+            'offline.f5': '❌ Atualizar dados',
+        },
+        fr: {
+            'offline.title': 'Pas de connexion Internet',
+            'offline.desc': 'Il semble que vous n'ayez pas de connexion Internet pour le moment. EcoMarket fonctionne mieux avec une connexion, mais certaines fonctions sont disponibles hors ligne.',
+            'offline.retry': 'Réessayer',
+            'offline.go_home': 'Aller à l'accueil',
+            'offline.features_title': '📱 Fonctions hors ligne',
+            'offline.f1': '✅ Voir les produits en cache',
+            'offline.f2': '✅ Naviguer sur les pages visitées',
+            'offline.f3': '❌ Effectuer des achats',
+            'offline.f4': '❌ Publier des produits',
+            'offline.f5': '❌ Mettre à jour les données',
+        },
+        de: {
+            'offline.title': 'Keine Internetverbindung',
+            'offline.desc': 'Anscheinend hast du gerade keine Internetverbindung. EcoMarket funktioniert am besten mit Verbindung, aber einige Funktionen sind offline verfügbar.',
+            'offline.retry': 'Erneut versuchen',
+            'offline.go_home': 'Zur Startseite',
+            'offline.features_title': '📱 Offline-Funktionen',
+            'offline.f1': '✅ Zwischengespeicherte Produkte ansehen',
+            'offline.f2': '✅ Besuchte Seiten durchsuchen',
+            'offline.f3': '❌ Käufe tätigen',
+            'offline.f4': '❌ Produkte veröffentlichen',
+            'offline.f5': '❌ Daten aktualisieren',
+        },
+        it: {
+            'offline.title': 'Nessuna Connessione a Internet',
+            'offline.desc': 'Sembra che tu non abbia connessione a Internet al momento. EcoMarket funziona meglio con connessione, ma alcune funzioni sono disponibili offline.',
+            'offline.retry': 'Riprova',
+            'offline.go_home': 'Vai alla Home',
+            'offline.features_title': '📱 Funzioni Offline',
+            'offline.f1': '✅ Visualizza prodotti in cache',
+            'offline.f2': '✅ Naviga nelle pagine visitate',
+            'offline.f3': '❌ Effettuare acquisti',
+            'offline.f4': '❌ Pubblicare prodotti',
+            'offline.f5': '❌ Aggiornare i dati',
+        },
+    },
+
     init() {
         for (const lang in this.homeI18n) {
             this.translations[lang] = Object.assign({}, this.translations[lang], this.homeI18n[lang]);
@@ -2667,6 +2742,9 @@ const EcoI18n = {
         }
         for (const lang in this.recI18n) {
             this.translations[lang] = Object.assign({}, this.translations[lang], this.recI18n[lang]);
+        }
+        for (const lang in this.offlineI18n) {
+            this.translations[lang] = Object.assign({}, this.translations[lang], this.offlineI18n[lang]);
         }
         this.currentLang = localStorage.getItem('ecomarket-lang') || 'es';
 

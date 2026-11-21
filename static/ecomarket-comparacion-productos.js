@@ -215,7 +215,7 @@ class SistemaComparacion {
         html += '<div class="fila-comparacion">';
         html += '<div class="celda-etiqueta">Descripción</div>';
         this.productosComparando.forEach(p => {
-            html += `<div class="celda-valor descripcion">${p.descripcion.substring(0, 100)}...</div>`;
+            html += `<div class="celda-valor descripcion">${(p.descripcion || '').substring(0, 100)}${(p.descripcion || '').length > 100 ? '...' : ''}</div>`;
         });
         html += '</div>';
 

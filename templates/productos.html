@@ -67,7 +67,16 @@
         <div class="productos-grid" id="productosGrid">
             {% for producto in productos %}
             {% set img_src = producto.imagen if producto.imagen.startswith('http') else url_for('static', filename=producto.imagen) %}
-            <article class="producto-card">
+            <article class="producto-card"
+                data-id="{{ producto.id }}"
+                data-nombre="{{ producto.nombre }}"
+                data-categoria="{{ producto.categoria }}"
+                data-precio="{{ '%.2f'|format(producto.precio) }}"
+                data-eco-score="{{ producto.eco_score or 0 }}"
+                data-condicion="{{ producto.condicion or 'nuevo' }}"
+                data-stock="{{ producto.stock or 0 }}"
+                data-imagen="{{ img_src }}"
+                data-descripcion="{{ (producto.descripcion or '')[:200] }}">
                 <!-- Badge condición -->
                 <div style="position:absolute;top:12px;left:12px;z-index:2;background:{% if producto.condicion == 'nuevo' %}#2e7d32{% else %}#f59e0b{% endif %};color:#fff;padding:4px 10px;border-radius:999px;font-size:0.72rem;font-weight:700">
                     {{ producto.condicion|upper }}
@@ -115,8 +124,12 @@
                 <!-- Botones de acción -->
                 <div style="padding:0 18px 18px;display:flex;gap:8px">
                     <button class="add-favorite btn-secundario" style="flex:1;padding:8px;font-size:0.82rem;border:none;cursor:pointer" 
-                        data-producto-id="{{ producto.id }}">
+                        data-producto-id="{{ producto.id }}" title="Favorito">
                         <i class="bi bi-heart"></i>
+                    </button>
+                    <button class="btn-comparar btn-secundario" style="flex:1;padding:8px;font-size:0.82rem;border:none;cursor:pointer" 
+                        data-id="{{ producto.id }}" title="Comparar">
+                        <i class="bi bi-arrow-left-right"></i>
                     </button>
                     <button class="btn-principal add-cart" style="flex:2;padding:8px;font-size:0.82rem;border:none;cursor:pointer" 
                         data-producto-id="{{ producto.id }}" 
@@ -188,4 +201,47 @@ function aplicarFiltroUbicacion() {
     window.location = '{{ url_for('productos_view') }}?' + params.toString();
 }
 </script>
+
+<!-- Comparador de productos -->
+<button id="btn-abrir-comparacion" class="btn-principal" style="display:none;position:fixed;bottom:24px;right:24px;z-index:1050;padding:14px 22px;border-radius:50px;box-shadow:0 6px 20px rgba(0,0,0,.25)">
+    <i class="bi bi-arrow-left-right"></i> Comparar (<span id="contador-comparacion">0</span>/4)
+</button>
+
+<div id="modal-comparacion" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1060;align-items:center;justify-content:center;padding:20px">
+    <div style="background:var(--blanco,#fff);border-radius:16px;max-width:1000px;width:100%;max-height:85vh;overflow:auto;padding:24px;position:relative">
+        <button id="btn-cerrar-comparacion" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--texto-sec,#666)">&times;</button>
+        <h2 style="margin-bottom:16px;color:var(--verde,#2e7d32)"><i class="bi bi-arrow-left-right"></i> Comparar Productos</h2>
+        <div id="contenedor-comparacion"></div>
+        <div style="margin-top:16px;text-align:right">
+            <button id="btn-limpiar-comparacion" class="btn-secundario" style="padding:10px 18px;border:none;border-radius:8px;cursor:pointer">Limpiar</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.tabla-comparacion { width: 100%; border-collapse: collapse; }
+.fila-comparacion { display: flex; border-bottom: 1px solid #eee; }
+.fila-comparacion.header { border-bottom: 2px solid var(--verde,#2e7d32); }
+.celda-etiqueta { flex: 0 0 140px; padding: 12px; font-weight: 700; color: var(--texto-sec,#666); background: #f8f9fa; }
+.celda-producto { flex: 1; padding: 12px; text-align: center; position: relative; min-width: 0; }
+.celda-valor { flex: 1; padding: 12px; text-align: center; display:flex; align-items:center; justify-content:center; }
+.celda-valor.mejor { color: var(--verde,#2e7d32); font-weight: 800; }
+.celda-valor.disponible { color: var(--verde,#2e7d32); }
+.celda-valor.agotado { color: #dc3545; }
+.imagen-producto-comparacion { width: 90px; height: 90px; object-fit: cover; border-radius: 10px; margin-bottom: 8px; }
+.btn-eliminar-comparacion { position:absolute; top:8px; right:8px; background:#dc3545;color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:.75rem; }
+.btn-ver-producto { background:var(--verde,#2e7d32); color:#fff; padding:8px 14px; border-radius:8px; text-decoration:none; font-size:.85rem; }
+.btn-comparar.active { background: var(--verde,#2e7d32) !important; color:#fff !important; }
+.notificacion { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); padding:12px 24px; border-radius:10px; color:#fff; font-weight:600; opacity:0; transition:opacity .3s; z-index:2000; }
+.notificacion.visible { opacity:1; }
+.notificacion-success { background:#2e7d32; }
+.notificacion-warning { background:#f57c00; }
+.notificacion-info { background:#1976d2; }
+@media (max-width: 640px) {
+    .fila-comparacion { flex-direction: column; }
+    .celda-etiqueta { flex: none; }
+    .celda-producto, .celda-valor { flex: none; }
+}
+</style>
+<script src="{{ url_for('static', filename='ecomarket-comparacion-productos.js') }}"></script>
 {% endblock %}

@@ -2600,11 +2600,11 @@ const EcoI18n = {
             'ai.need_fields': 'Preencha nome e categoria primeiro',
         },
         fr: {
-            'ai.generate': 'Générer avec l'IA',
+            'ai.generate': 'Générer avec l\'IA',
             'ai.generating': 'Génération...',
             'ai.done': 'Description générée',
             'ai.error': 'Impossible de générer. Réessayez.',
-            'ai.need_fields': 'Remplissez d'abord nom et catégorie',
+            'ai.need_fields': 'Remplissez d\'abord nom et catégorie',
         },
         de: {
             'ai.generate': 'Mit KI generieren',
@@ -2619,6 +2619,33 @@ const EcoI18n = {
             'ai.done': 'Descrizione generata',
             'ai.error': 'Impossibile generare. Riprova.',
             'ai.need_fields': 'Compila prima nome e categoria',
+        },
+    },
+
+    recI18n: {
+        es: {
+            'rec.title': 'Recomendados para ti',
+            'rec.subtitle': 'Basado en tus favoritos y visitas',
+        },
+        en: {
+            'rec.title': 'Recommended for you',
+            'rec.subtitle': 'Based on your favorites and visits',
+        },
+        pt: {
+            'rec.title': 'Recomendados para você',
+            'rec.subtitle': 'Com base nos seus favoritos e visitas',
+        },
+        fr: {
+            'rec.title': 'Recommandés pour vous',
+            'rec.subtitle': 'Basé sur vos favoris et visites',
+        },
+        de: {
+            'rec.title': 'Für dich empfohlen',
+            'rec.subtitle': 'Basierend auf deinen Favoriten und Besuchen',
+        },
+        it: {
+            'rec.title': 'Consigliati per te',
+            'rec.subtitle': 'Basato sui tuoi preferiti e visite',
         },
     },
 
@@ -2637,6 +2664,9 @@ const EcoI18n = {
         }
         for (const lang in this.aiI18n) {
             this.translations[lang] = Object.assign({}, this.translations[lang], this.aiI18n[lang]);
+        }
+        for (const lang in this.recI18n) {
+            this.translations[lang] = Object.assign({}, this.translations[lang], this.recI18n[lang]);
         }
         this.currentLang = localStorage.getItem('ecomarket-lang') || 'es';
 

@@ -155,6 +155,17 @@
     </div>
 </section>
 
+<!-- 4b. RECOMENDADOS PARA TI (solo usuarios con sesión) -->
+<section id="recomendadosSection" class="productos-section section" style="display:none">
+    <div class="container">
+        <div class="section-title">
+            <h2 data-i18n="rec.title">Recomendados para ti</h2>
+            <p data-i18n="rec.subtitle">Basado en tus favoritos y visitas</p>
+        </div>
+        <div class="productos-grid" id="recomendadosGrid"></div>
+    </div>
+</section>
+
 <!-- 5. ¿CÓMO FUNCIONA ECOMARKET? -->
 <section class="section" style="background: var(--blanco);">
     <div class="container">
@@ -334,6 +345,42 @@
         </div>
     </div>
 </section>
+
+<script>
+// Recomendados para ti (solo si hay sesión)
+document.addEventListener('DOMContentLoaded', async () => {
+    const section = document.getElementById('recomendadosSection');
+    const grid = document.getElementById('recomendadosGrid');
+    if (!section || !grid) return;
+    try {
+        const resp = await fetch('/api/recommendations/ml?limit=8');
+        if (!resp.ok) return; // 401 invitados -> oculto
+        const data = await resp.json();
+        const items = data.recommendations || [];
+        if (!items.length) return;
+        grid.innerHTML = items.map(p => {
+            const img = (p.imagen && p.imagen !== 'uploads/placeholder.svg')
+                ? (p.imagen.startsWith('http') ? p.imagen : '/static/' + p.imagen)
+                : '';
+            return `<a href="/producto/${p.id}" class="product-card-link">
+                <article class="product-card">
+                    <div class="product-image-container">
+                        ${img ? `<img class="product-image" src="${img}" alt="${p.nombre}" loading="lazy">` : '<div class="product-image-placeholder"><i class="bi bi-box-seam"></i></div>'}
+                    </div>
+                    <div class="product-content">
+                        <div class="product-categoria">${p.categoria || ''}</div>
+                        <h3 class="product-nombre">${p.nombre}</h3>
+                        <div class="product-precio">S/. ${parseFloat(p.precio || 0).toFixed(2)}</div>
+                        <div class="product-disponibilidad disponible">Disponible</div>
+                        <div class="product-botones"><button class="btn-card btn-primary">Ver detalles</button></div>
+                    </div>
+                </article>
+            </a>`;
+        }).join('');
+        section.style.display = '';
+    } catch (e) { /* silencioso: sin recomendaciones no se muestra */ }
+});
+</script>
 
 {% endblock %}
 

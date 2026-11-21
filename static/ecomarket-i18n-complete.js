@@ -3112,6 +3112,10 @@ const EcoI18n = {
         for (const lang in this.invI18n) {
             this.translations[lang] = Object.assign({}, this.translations[lang], this.invI18n[lang]);
         }
+        // Fallback: idiomas secundarios heredan inglés para claves no traducidas
+        ['pt', 'fr', 'de', 'it'].forEach(l => {
+            this.translations[l] = Object.assign({}, this.translations['en'] || {}, this.translations[l] || {});
+        });
         this.currentLang = localStorage.getItem('ecomarket-lang') || 'es';
 
         this.initLanguageSelector();

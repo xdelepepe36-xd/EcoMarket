@@ -1270,7 +1270,17 @@ def index():
     registrar_visita('inicio')
     productos = get_productos_destacados(6)
     categorias = get_categorias()
-    return render_template('index.html', productos=productos, categorias=categorias)
+    conn = get_db()
+    total_productos = conn.execute('SELECT COUNT(*) FROM productos').fetchone()[0]
+    total_usuarios = conn.execute('SELECT COUNT(*) FROM usuarios').fetchone()[0]
+    total_pedidos = conn.execute('SELECT COUNT(*) FROM pedidos').fetchone()[0]
+    total_vendedores = conn.execute('SELECT COUNT(DISTINCT usuario_id) FROM productos WHERE usuario_id IS NOT NULL').fetchone()[0]
+    total_visitas = conn.execute('SELECT COUNT(*) FROM visitas').fetchone()[0]
+    conn.close()
+    return render_template('index.html', productos=productos, categorias=categorias,
+                           total_productos=total_productos, total_categorias=len(categorias),
+                           total_usuarios=total_usuarios, total_pedidos=total_pedidos,
+                           total_vendedores=total_vendedores, total_visitas=total_visitas)
 
 
 @app.route('/productos')

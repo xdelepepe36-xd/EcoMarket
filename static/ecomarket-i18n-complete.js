@@ -4608,6 +4608,72 @@ const EcoI18n = {
         },
     },
 
+    impactI18n: {
+        es: {
+            'impact.products': 'Productos publicados',
+            'impact.sellers': 'Vendedores activos',
+            'impact.orders': 'Pedidos completados',
+            'impact.members': 'Miembros de la comunidad',
+        },
+        en: {
+            'impact.products': 'Published products',
+            'impact.sellers': 'Active sellers',
+            'impact.orders': 'Completed orders',
+            'impact.members': 'Community members',
+        },
+        pt: {
+            'impact.products': 'Produtos publicados',
+            'impact.sellers': 'Vendedores ativos',
+            'impact.orders': 'Pedidos concluídos',
+            'impact.members': 'Membros da comunidade',
+        },
+        fr: {
+            'impact.products': 'Produits publiés',
+            'impact.sellers': 'Vendeurs actifs',
+            'impact.orders': 'Commandes terminées',
+            'impact.members': 'Membres de la communauté',
+        },
+        de: {
+            'impact.products': 'Veröffentlichte Produkte',
+            'impact.sellers': 'Aktive Verkäufer',
+            'impact.orders': 'Abgeschlossene Bestellungen',
+            'impact.members': 'Community-Mitglieder',
+        },
+        it: {
+            'impact.products': 'Prodotti pubblicati',
+            'impact.sellers': 'Venditori attivi',
+            'impact.orders': 'Ordini completati',
+            'impact.members': 'Membri della community',
+        },
+    },
+
+    impact2I18n: {
+        es: {
+            'impact.categories': 'Categorías disponibles',
+            'impact.visits': 'Visitas a la plataforma',
+        },
+        en: {
+            'impact.categories': 'Available categories',
+            'impact.visits': 'Platform visits',
+        },
+        pt: {
+            'impact.categories': 'Categorias disponíveis',
+            'impact.visits': 'Visitas à plataforma',
+        },
+        fr: {
+            'impact.categories': 'Catégories disponibles',
+            'impact.visits': 'Visites sur la plateforme',
+        },
+        de: {
+            'impact.categories': 'Verfügbare Kategorien',
+            'impact.visits': 'Besuche auf der Plattform',
+        },
+        it: {
+            'impact.categories': 'Categorie disponibili',
+            'impact.visits': 'Visite alla piattaforma',
+        },
+    },
+
     init() {
         for (const lang in this.homeI18n) {
             this.translations[lang] = Object.assign({}, this.translations[lang], this.homeI18n[lang]);
@@ -4668,6 +4734,12 @@ const EcoI18n = {
         }
         for (const lang in this.marqueeI18n) {
             this.translations[lang] = Object.assign({}, this.translations[lang], this.marqueeI18n[lang]);
+        }
+        for (const lang in this.impactI18n) {
+            this.translations[lang] = Object.assign({}, this.translations[lang], this.impactI18n[lang]);
+        }
+        for (const lang in this.impact2I18n) {
+            this.translations[lang] = Object.assign({}, this.translations[lang], this.impact2I18n[lang]);
         }
         // Fallback: idiomas secundarios heredan inglés para claves no traducidas
         ['pt', 'fr', 'de', 'it'].forEach(l => {

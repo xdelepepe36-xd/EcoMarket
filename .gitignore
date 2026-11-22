@@ -54,3 +54,12 @@ node_modules/
 Nose/
 Pvz Fusion/
 audit_shots/
+
+# Carpetas ajenas al proyecto (no trackear)
+Nose/
+Pvz Fusion/
+Baldi Bassics/
+Emulador/
+PIL/
+audit_shots/
+backups/

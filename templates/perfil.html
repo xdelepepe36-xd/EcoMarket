@@ -429,6 +429,17 @@ function removeFav(productoId) {
 }
 </script>
 
+<!-- Zona de peligro: eliminar cuenta -->
+<div style="background:var(--blanco);border-radius:20px;padding:22px;margin-top:28px;border:2px solid #fca5a5;">
+    <h3 style="color:#b91c1c;margin:0 0 8px;font-size:1rem;"><i class="bi bi-exclamation-triangle"></i> Zona de peligro</h3>
+    <p style="font-size:.85rem;color:var(--texto-sec,#666);margin-bottom:14px;">Eliminar tu cuenta anonimiza tu perfil permanentemente. Tus productos y pedidos se conservan pero ya no estarán asociados a ti.</p>
+    <form method="POST" action="{{ url_for('eliminar_cuenta') }}" onsubmit="return confirm('¿Eliminar tu cuenta permanentemente? Esta acción no se puede deshacer.')" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="password" name="password" placeholder="Tu contraseña para confirmar" required minlength="6" style="flex:1;min-width:200px;border:2px solid #fca5a5;border-radius:10px;padding:10px 14px;font-family:inherit;">
+        <button type="submit" class="btn-danger" style="padding:10px 20px;"><i class="bi bi-person-x"></i> Eliminar mi cuenta</button>
+    </form>
+</div>
+
 <style>
 .stats-grid {
     display: grid;

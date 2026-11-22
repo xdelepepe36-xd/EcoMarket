@@ -3272,6 +3272,31 @@ def cambiar_password():
     return redirect(url_for('perfil'))
 
 
+@app.route('/cuenta/eliminar', methods=['POST'])
+@login_required
+def eliminar_cuenta():
+    """Elimina la cuenta anonimizando datos personales (conserva integridad referencial)."""
+    password = request.form.get('password', '')
+    conn = get_db()
+    usuario = conn.execute('SELECT * FROM usuarios WHERE id = ?', (session['usuario_id'],)).fetchone()
+    if not usuario or not check_password_hash(usuario['password'], password):
+        conn.close()
+        flash_t('contrasena_actual_incorrecta', 'danger')
+        return redirect(url_for('perfil'))
+    uid = session['usuario_id']
+    anon_email = f"eliminado_{uid}@eliminado.local"
+    conn.execute('''
+        UPDATE usuarios SET nombre = 'Usuario eliminado', email = ?, password = ?,
+            avatar = '', banner = '', bio = '', rol = 'comprador'
+        WHERE id = ?
+    ''', (anon_email, generate_password_hash(secrets.token_hex(32)), uid))
+    conn.commit()
+    conn.close()
+    session.clear()
+    flash('Tu cuenta ha sido eliminada. Lamentamos verte partir. 🌱', 'info')
+    return redirect(url_for('index'))
+
+
 @app.route('/notificaciones/leer/<int:notif_id>', methods=['POST'])
 @login_required
 def marcar_notificacion_leida(notif_id):

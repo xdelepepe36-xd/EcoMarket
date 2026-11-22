@@ -2312,11 +2312,10 @@ main, .section { animation: ecoPageIn .45s cubic-bezier(.22,1,.36,1) both; }
 }
 .eco-kiosk-btn:hover { transform: scale(1.1); }
 body.eco-kiosk header, body.eco-kiosk nav, body.eco-kiosk footer,
-body.eco-kiosk .asistente-fab, body.eco-kiosk .eco-cursor, body.eco-kiosk .eco-back-top,
-body.eco-kiosk .eco-scroll-progress, body.eco-kiosk .eco-kiosk-btn ~ *:not(main):not(.flash-deal) {
+body.eco-kiosk .asistente-fab, body.eco-kiosk .eco-back-top,
+body.eco-kiosk .eco-scroll-progress, body.eco-kiosk .eco-kiosk-btn ~ *:not(main):not(.flash-deal):not(.eco-cursor) {
     display: none !important;
 }
-body.eco-kiosk { cursor: none; }
 body.eco-kiosk .eco-kiosk-btn { display: flex !important; }
 body.eco-kiosk main, body.eco-kiosk .section { animation: none; }
 

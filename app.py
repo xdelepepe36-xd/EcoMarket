@@ -5334,6 +5334,41 @@ def restore_backup():
     return jsonify({'success': False, 'error': 'Error restaurando backup'}), 500
 
 
+TABLAS_DEMO_TRANSACCIONALES = [
+    'pedido_items', 'pedidos', 'mensajes', 'notificaciones',
+    'favoritos', 'resenas', 'resena_votos', 'resena_respuestas',
+    'preguntas', 'reportes', 'visitas', 'historial_busquedas',
+    'historial_precios', 'seguidores',
+]
+
+
+@app.route('/api/demo/reset', methods=['POST'])
+@login_required
+@admin_required
+def demo_reset():
+    """Resetea el estado transaccional para una demo limpia (solo admin).
+
+    Conserva usuarios, productos y cupones; borra pedidos, mensajes,
+    reseñas, favoritos, notificaciones, etc., y marca productos como
+    no vendidos. Crea un backup de seguridad antes de tocar nada.
+    """
+    backup_manager.create_backup()
+    conn = get_db()
+    try:
+        for tabla in TABLAS_DEMO_TRANSACCIONALES:
+            conn.execute(f'DELETE FROM {tabla}')
+        conn.execute('UPDATE productos SET vendido = 0')
+        conn.commit()
+        logger.info('Demo reset completado por admin')
+        return jsonify({'success': True})
+    except Exception as e:
+        conn.rollback()
+        logger.error(f'Error en demo reset: {e}')
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        conn.close()
+
+
 @app.route('/api/semantic/search')
 def semantic_search_api():
     """API para búsqueda semántica."""

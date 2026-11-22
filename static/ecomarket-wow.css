@@ -2397,3 +2397,59 @@ body.eco-kiosk main, body.eco-kiosk .section { animation: none; }
     text-shadow: 0 1px 4px rgba(0,0,0,0.5);
 }
 .categoria-card strong { color: #fff; }
+
+/* ═══ Eco gallery — marquee de fotos reales ═══ */
+.eco-gallery {
+    overflow: hidden;
+    padding: 28px 0;
+    background: linear-gradient(90deg, #1b5e20, #2e7d32 40%, #558b2f);
+    position: relative;
+}
+.eco-gallery-track {
+    display: flex;
+    gap: 18px;
+    width: max-content;
+    animation: ecoGalleryScroll 36s linear infinite;
+}
+.eco-gallery:hover .eco-gallery-track { animation-play-state: paused; }
+.eco-gallery-item {
+    margin: 0;
+    width: 240px;
+    flex-shrink: 0;
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    transition: transform 0.35s ease;
+}
+.eco-gallery-item:hover { transform: translateY(-6px) scale(1.02); }
+.eco-gallery-item img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    display: block;
+}
+.eco-gallery-item figcaption {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 22px 12px 10px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(180deg, transparent, rgba(0,0,0,0.75));
+}
+@keyframes ecoGalleryScroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .eco-gallery-track { animation: none; flex-wrap: wrap; width: 100%; justify-content: center; }
+}
+[data-theme='dark'] .eco-gallery,
+[data-theme='nature'] .eco-gallery,
+[data-theme='midnight'] .eco-gallery { background: linear-gradient(90deg,#0d2818,#14532d 40%,#1a4d2e); }
+[data-theme='ocean'] .eco-gallery { background: linear-gradient(90deg,#0c4a6e,#0369a1 40%,#0284c7); }
+[data-theme='rose'] .eco-gallery { background: linear-gradient(90deg,#4c0519,#9f1239 40%,#be185d); }
+[data-theme='sepia'] .eco-gallery { background: linear-gradient(90deg,#78350f,#92400e 40%,#a16207); }
+[data-theme='high-contrast'] .eco-gallery { background: #000; }
+[data-theme='high-contrast'] .eco-gallery-item { border: 3px solid #000; box-shadow: none; }

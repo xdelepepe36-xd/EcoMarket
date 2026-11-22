@@ -94,6 +94,32 @@ sec.style.display='';
     </div>
 </section>
 
+<!-- GALERÍA ECO CON FOTOS REALES -->
+<section class="eco-gallery" aria-label="Galería de productos ecológicos">
+    <div class="eco-gallery-track">
+        {% set gal_fotos = [
+            ('photo-1542838132-92c53300491e', 'Mercados sostenibles'),
+            ('photo-1488459716781-31db52582fe9', 'Alimentos frescos'),
+            ('photo-1602143407151-7111542de6e8', 'Reutiliza y reduce'),
+            ('photo-1416879595882-3373a0480b5b', 'Vuelve a la naturaleza'),
+            ('photo-1542601906990-b4d3fb778b09', 'Comunidad EcoMarket'),
+            ('photo-1493770348161-369560ae357d', 'Come sano, compra eco')
+        ] %}
+        {% for foto, pie in gal_fotos %}
+        <figure class="eco-gallery-item">
+            <img src="https://images.unsplash.com/{{ foto }}?w=600&q=70&auto=format&fit=crop" alt="{{ pie }}" loading="lazy">
+            <figcaption>{{ pie }}</figcaption>
+        </figure>
+        {% endfor %}
+        {% for foto, pie in gal_fotos %}
+        <figure class="eco-gallery-item" aria-hidden="true">
+            <img src="https://images.unsplash.com/{{ foto }}?w=600&q=70&auto=format&fit=crop" alt="" loading="lazy">
+            <figcaption>{{ pie }}</figcaption>
+        </figure>
+        {% endfor %}
+    </div>
+</section>
+
 <!-- 2. BARRA DE BÚSQUEDA -->
 <!-- MARQUESINA DE PRODUCTOS -->
 <div class="prod-marquee" aria-hidden="true">

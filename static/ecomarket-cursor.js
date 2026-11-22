@@ -44,6 +44,23 @@
         requestAnimationFrame(loop);
     })();
 
+    // parallax suave: la mascota y decoraciones del hero siguen al mouse
+    var layers = document.querySelectorAll('.hero-mascot, .hero-illustrations .float-chip, .hero-blob, .hero-glyph');
+    var px = 0, py = 0, tpx = 0, tpy = 0;
+    if (layers.length) {
+        document.addEventListener('mousemove', function (e) {
+            tpx = (e.clientX / innerWidth - 0.5); tpy = (e.clientY / innerHeight - 0.5);
+        });
+        (function ploop() {
+            px += (tpx - px) * 0.06; py += (tpy - py) * 0.06;
+            layers.forEach(function (el, i) {
+                var d = (i % 3 + 1) * 6;
+                el.style.translate = (px * d) + 'px ' + (py * d) + 'px';
+            });
+            requestAnimationFrame(ploop);
+        })();
+    }
+
     // hover en links/botones -> la hoja crece y gira
     document.addEventListener('mouseover', function (e) {
         var t = e.target.closest('a,button,input,textarea,select,[role="button"],.product-card');

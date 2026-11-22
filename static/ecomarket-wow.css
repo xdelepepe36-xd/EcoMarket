@@ -2453,3 +2453,45 @@ body.eco-kiosk main, body.eco-kiosk .section { animation: none; }
 [data-theme='sepia'] .eco-gallery { background: linear-gradient(90deg,#78350f,#92400e 40%,#a16207); }
 [data-theme='high-contrast'] .eco-gallery { background: #000; }
 [data-theme='high-contrast'] .eco-gallery-item { border: 3px solid #000; box-shadow: none; }
+
+/* ═══ Hero a pantalla completa ═══ */
+.hero-section-enhanced {
+    min-height: 100vh;
+    min-height: 100svh;
+}
+.hero-content-wrapper {
+    min-height: inherit;
+    display: flex;
+    align-items: center;
+}
+@media (max-width: 768px) {
+    .hero-section-enhanced { min-height: 92svh; }
+}
+
+/* ═══ Splash screen por tema ═══ */
+[data-theme='light'] .splash-screen { background: linear-gradient(135deg,#1b5e20,#43a047 55%,#66bb6a); }
+[data-theme='dark'] .splash-screen { background: linear-gradient(135deg,#0d1f16,#14231b 60%,#1e3327); }
+[data-theme='nature'] .splash-screen { background: linear-gradient(135deg,#0a1a0f,#123020 55%,#1e4d2b); }
+[data-theme='ocean'] .splash-screen { background: linear-gradient(135deg,#041e33,#0a2d48 55%,#0369a1); }
+[data-theme='midnight'] .splash-screen { background: linear-gradient(135deg,#070718,#111126 55%,#1e1e3e); }
+[data-theme='rose'] .splash-screen { background: linear-gradient(135deg,#170a12,#2e1020 55%,#9f1239); }
+[data-theme='light'] .splash-loader, [data-theme='dark'] .splash-loader,
+[data-theme='nature'] .splash-loader, [data-theme='ocean'] .splash-loader,
+[data-theme='midnight'] .splash-loader, [data-theme='rose'] .splash-loader {
+    background: rgba(255,255,255,.18);
+}
+[data-theme='light'] .splash-loader-bar, [data-theme='dark'] .splash-loader-bar,
+[data-theme='nature'] .splash-loader-bar, [data-theme='ocean'] .splash-loader-bar,
+[data-theme='midnight'] .splash-loader-bar, [data-theme='rose'] .splash-loader-bar {
+    background: #fff;
+}
+
+/* ═══ Headers de página con más presencia ═══ */
+.productos-header-section {
+    min-height: 32vh;
+    display: flex;
+    align-items: center;
+}
+@media (max-width: 768px) {
+    .productos-header-section { min-height: 26vh; }
+}

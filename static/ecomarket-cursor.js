@@ -11,7 +11,9 @@
     var x = innerWidth / 2, y = innerHeight / 2, tx = x, ty = y, visible = false;
     function show() { if (!visible) { visible = true; cur.style.opacity = '1'; } }
     document.addEventListener('mousemove', function (e) { tx = e.clientX; ty = e.clientY; show(); });
+    document.addEventListener('pointermove', function (e) { tx = e.clientX; ty = e.clientY; show(); });
     document.addEventListener('mousedown', function (e) { tx = e.clientX; ty = e.clientY; show(); });
+    document.addEventListener('pointerdown', function (e) { tx = e.clientX; ty = e.clientY; show(); });
     document.addEventListener('mouseup', show);
     document.addEventListener('focusin', show);
     // Ocultar solo cuando el puntero sale REALMENTE de la ventana

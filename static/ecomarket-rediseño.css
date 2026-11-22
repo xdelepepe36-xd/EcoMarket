@@ -2020,8 +2020,8 @@ img {
     backface-visibility: hidden;
 }
 
-/* Lazy loading de imágenes */
-img[loading="lazy"] {
+/* Lazy loading de imágenes: solo oculta las que aún no tienen src real (data-src) */
+img[loading="lazy"][data-src]:not(.loaded) {
     opacity: 0;
     transition: opacity 0.3s ease;
 }

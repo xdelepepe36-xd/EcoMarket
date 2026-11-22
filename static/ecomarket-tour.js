@@ -43,8 +43,8 @@
             tip.style.cssText = 'position:fixed;left:' + tx + 'px;top:' + Math.max(ty, 12) + 'px;width:' + tw + 'px;z-index:99999;';
         }, 450);
     }
-    function start() { if (!overlay) build(); overlay.style.display = 'block'; show(0); }
-    function stop() { overlay.style.display = 'none'; }
+    function start() { if (!overlay) build(); document.body.classList.add('tour-active'); overlay.style.display = 'block'; show(0); }
+    function stop() { document.body.classList.remove('tour-active'); overlay.style.display = 'none'; }
     function next() { if (idx < PASOS.length - 1) show(idx + 1); else stop(); }
 
     window.EcoTour = { start: start, stop: stop };

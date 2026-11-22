@@ -2426,6 +2426,20 @@ def api_asistente():
     if not mensaje:
         return jsonify({'respuesta': 'Escribe tu pregunta y te ayudo.', 'sugerencias': []})
 
+    # Cerebro conversacional con memoria y búsqueda real
+    lang = session.get('lang', 'es')
+    conn = get_db()
+    try:
+        resp = _chat_respuesta(mensaje, lang, conn)
+    finally:
+        conn.close()
+    html = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', resp)
+    html = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', r'<a href="\2" class="asistente-link">\1</a>', html)
+    html = html.replace('\n', '<br>')
+    quick = (['productos baratos', 'Envíos', 'Cupones', 'Consejos eco', 'Mi cuenta'] if lang == 'es'
+             else ['cheap products', 'Shipping', 'Coupons', 'Eco tips', 'My account'])
+    return jsonify({'respuesta': html, 'sugerencias': quick})
+
     norm = ''.join(c for c in unicodedata.normalize('NFD', mensaje) if unicodedata.category(c) != 'Mn')
 
     # Búsqueda de productos por nombre/categoría
@@ -3091,6 +3105,7 @@ def _chat_respuesta(msg, lang, conn):
                 cab = f"🛒 **{len(prods)} productos de {cat or 'la tienda'}:**"
             lineas = '\n'.join(f'• {p["nombre"]} — S/.{p["precio"]:.2f}' for p in prods)
             continuacion = '\n\n¿Quieres ver alguno en detalle? 🙂' if lang == 'es' else '\n\nWant to see one in detail? 🙂'
+            session['chat_ctx'] = {'kind': 'products', 'cat': cat, 'baratos': False, 'shown': len(prods), 'items': prods}
             return cab + '\n' + lineas + continuacion
 
     # 2) Productos baratos / recomendaciones
@@ -3102,6 +3117,7 @@ def _chat_respuesta(msg, lang, conn):
             cab = '💰 **Los productos más baratos de la tienda:**'
         lineas = '\n'.join(f'• {p["nombre"]} — S/.{p["precio"]:.2f} · {p["categoria"]}' for p in prods)
         fin = '\n\n¿Te interesa alguno? Te ayudo a agregarlo al carrito 💚' if lang == 'es' else '\n\nInterested in one? I can help you add it to the cart 💚'
+        session['chat_ctx'] = {'kind': 'products', 'cat': None, 'baratos': True, 'shown': len(prods), 'items': prods}
         return cab + '\n' + lineas + fin
 
     # 3) Cupones (reales)
@@ -3111,6 +3127,40 @@ def _chat_respuesta(msg, lang, conn):
                     '• ENVIOFREE → Free shipping\n• BIENVENIDO → S/.15 OFF\nUse them at the cart or checkout.')
         return ('🎫 **Cupones activos:**\n• ECO10 → 10% OFF (mín. S/.30)\n• ECO20 → 20% OFF (mín. S/.80)\n'
                 '• ENVIOFREE → Envío gratis\n• BIENVENIDO → S/.15 OFF\nÚsalos en el carrito o durante el pago.')
+
+    # 3b) Seguimiento conversacional: "más", "otros", "el primero", "más barato"
+    prev = session.get('chat_ctx') or {}
+    if _kwhit(msg_n, ['mas opciones', 'otros', 'siguientes', 'ver mas', 'more', 'next', 'others']):
+        if prev.get('kind') == 'products':
+            prods = _chat_products(conn, categoria=prev.get('cat'), baratos=prev.get('baratos', False),
+                                   offset=prev.get('shown', 0), limite=4)
+            if prods:
+                session['chat_ctx'] = {**prev, 'shown': prev.get('shown', 0) + len(prods)}
+                lineas = '\n'.join(f'• [{p["nombre"]}](/producto/{p["id"]}) — S/.{p["precio"]:.2f}' for p in prods)
+                return ('✨ **Más opciones:**\n' if lang == 'es' else '✨ **More options:**\n') + lineas
+    if _kwhit(msg_n, ['el primero', 'la primera', 'ese', 'el segundo', 'la segunda', 'the first', 'the second']):
+        items = prev.get('items') or []
+        idx = 1 if _kwhit(msg_n, ['segundo', 'segunda', 'second']) else 0
+        if len(items) > idx:
+            p = items[idx]
+            if lang == 'es':
+                return f'➡️ **{p["nombre"]}** — S/.{p["precio"]:.2f}\n[Ver producto](/producto/{p["id"]})\n📦 Categoría: {p["categoria"]}'
+            return f'➡️ **{p["nombre"]}** — S/.{p["precio"]:.2f}\n[View product](/producto/{p["id"]})\n📦 Category: {p["categoria"]}'
+    if _kwhit(msg_n, ['mas barato', 'el mas economico', 'cheapest', 'lowest price']):
+        prods = _chat_products(conn, baratos=True, limite=3)
+        if prods:
+            lineas = '\n'.join(f'• [{p["nombre"]}](/producto/{p["id"]}) — S/.{p["precio"]:.2f}' for p in prods)
+            return ('💰 **Los más baratos ahora:**\n' if lang == 'es' else '💰 **Cheapest right now:**\n') + lineas
+
+    # 3c) Búsqueda por nombre: "tienes agua", "busco tomate"
+    kws = _chat_keywords(msg_n)
+    if len(kws) >= 1 and _kwhit(msg_n, ['tienes', 'hay', 'busco', 'busca', 'quiero', 'venden', 'find', 'have', 'search', 'looking']):
+        prods = _chat_products(conn, buscar=kws, limite=4)
+        if prods:
+            session['chat_ctx'] = {'kind': 'products', 'items': prods, 'shown': len(prods)}
+            lineas = '\n'.join(f'• [{p["nombre"]}](/producto/{p["id"]}) — S/.{p["precio"]:.2f} · {p["categoria"]}' for p in prods)
+            extra = '\n\n¿Quieres más opciones? Solo dime "otros" 🙂' if lang == 'es' else '\n\nWant more? Just say "more" 🙂'
+            return ('🔎 **Esto encontré para ti:**\n' if lang == 'es' else '🔎 **Here is what I found:**\n') + lineas + extra
 
     # 4) Intenciones fijas
     for intent in CHAT_INTENTS:

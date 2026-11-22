@@ -1931,3 +1931,4 @@ main, .main-content, [role='main'] {
     color: #F59E0B; font-size: .8rem; letter-spacing: 1px;
 }
 .product-card .rating-count { color: #9CA3AF; font-size: .72rem; margin-left: 4px; }
+.countup { font-variant-numeric: tabular-nums; }

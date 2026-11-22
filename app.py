@@ -2281,6 +2281,100 @@ def api_productos_destacados():
     return jsonify({'products': _productos_api_json(limit=8, exclude=excl.split(','))})
 
 
+# ── Asistente virtual de EcoMarket ───────────────────────────────────────────
+
+_ASISTENTE_REGLAS = [
+    # (patrones, respuesta, sugerencias)
+    (['hola', 'buenas', 'hi', 'hello', 'hey'],
+     '¡Hola! 👋 Soy el asistente de EcoMarket. Puedo ayudarte a encontrar productos, explicarte cómo comprar o vender, darte consejos ecológicos o resolver dudas sobre la plataforma.',
+     ['¿Cómo funciona?', 'Quiero vender', 'Consejos ecológicos', 'Cupones']),
+    (['como funciona', 'cómo funciona', 'how it works', 'que es', 'qué es'],
+     'EcoMarket es un mercado de segunda mano y productos sostenibles. Para comprar: explora el catálogo, agrega al carrito y confirma tu pedido. Para vender: ve a "Publicar", completa el formulario y tu producto queda visible al instante. ¡Todo con pago y envío coordinado entre usuarios!',
+     ['Quiero vender', 'Buscar productos', 'Cupones']),
+    (['vender', 'publicar', 'vendo', 'quiero vender'],
+     'Publicar es gratis y toma menos de 2 minutos: ve a la sección "Publicar", escribe nombre, descripción, precio y sube fotos. Te recomiendo usar el botón "Generar con IA" para crear una descripción atractiva automáticamente. ¿Ya tienes cuenta?',
+     ['¿Cómo funciona?', 'Consejos para vender', 'Cupones']),
+    (['cupon', 'descuento', 'oferta', 'promo'],
+     '¡Tenemos cupones activos! Los encuentras en tu perfil (sección Cupones) o aplicándolos en el checkout. Ejemplos: ECO10 (10% dto), ECO20 (20% dto), BIENVENIDO (S/.15 dto) y ENVIOFREE (envío gratis). ¡Revisa tu perfil para ver todos!',
+     ['Ver productos', 'Cómo comprar', 'Contacto']),
+    (['envio', 'envío', 'entrega', 'delivery', 'llega'],
+     'El envío lo coordinas directamente con el vendedor después de confirmar el pedido. Muchos vendedores ofrecen envío gratis en Lima y envío a todo el país. El costo aparece en el checkout antes de pagar.',
+     ['Cómo comprar', 'Cupones', 'Contacto']),
+    (['pago', 'pagar', 'tarjeta', 'efectivo', 'payment'],
+     'Por ahora los pagos se coordinan entre comprador y vendedor (efectivo o transferencia al recibir el producto). Estamos trabajando en integrar pasarela de pagos segura para compras 100% en línea.',
+     ['Cómo comprar', 'Cupones', 'Contacto']),
+    (['reciclar', 'reciclaje', 'compostar', 'compost', 'separar basura', 'residuos', 'eco tips', 'consejos'],
+     'Consejos ecológicos rápidos: ♻️ Separa papel, plástico, vidrio y orgánicos en contenedores distintos. 🌱 El compost casero convierte tus restos de comida en abono en 2-3 meses. 🚿 Duchas de 5 min ahorran ~75 litros de agua. 👜 Lleva tu propia bolsa siempre. ¿Quieres más tips?',
+     ['Más consejos', 'Productos ecológicos', 'Cómo funciona']),
+    (['mas consejos', 'más tips', 'otro consejo'],
+     'Más ideas verdes: usa botellas reutilizables (ahorras ~167 botellas de plástico al año), compra a granel para evitar empaques, repara antes de tirar, y dona lo que ya no uses — en EcoMarket puedes venderlo a alguien que lo necesita.',
+     ['Productos ecológicos', 'Vender mis cosas', 'Contacto']),
+    (['contacto', 'soporte', 'ayuda', 'problema', 'reclamo', 'hablar con alguien'],
+     'Para soporte humano puedes escribirnos desde la página de Contacto o abrir un ticket en Soporte (requiere iniciar sesión). Un equipo te responderá lo antes posible.',
+     ['/contacto', 'Preguntas frecuentes', 'Inicio']),
+    (['favorito', 'favoritos', 'wishlist', 'guardar producto'],
+     'Puedes marcar productos como favoritos con el corazón en cada tarjeta o en la página del producto. Los encuentras luego en tu sección Favoritos del menú para no perderlos.',
+     ['Ver productos', 'Cómo funciona']),
+    (['carrito', 'carro', 'comprar', 'pedido'],
+     'Para comprar: busca el producto, agrégalo al carrito, aplica un cupón si tienes, y confirma tus datos de envío. El vendedor coordina el pago y entrega contigo directamente.',
+     ['Cupones', 'Cómo funciona', 'Contacto']),
+    (['idioma', 'language', 'traducir', 'english'],
+     'Puedes cambiar el idioma desde el selector en la esquina superior del menú (español, inglés, portugués, francés, alemán e italiano). ¡Toda la plataforma se traduce automáticamente!',
+     ['Cómo funciona', 'Ver productos']),
+]
+
+_ASISTENTE_AYUDA = {
+    'es': ('¡Hola! 👋 Soy Eco, tu asistente virtual. Puedo ayudarte con compras, ventas, cupones y consejos ecológicos. ¿En qué te ayudo?',
+           ['¿Cómo funciona?', 'Quiero vender', 'Consejos ecológicos', 'Cupones']),
+}
+
+
+@app.route('/api/asistente', methods=['POST'])
+def api_asistente():
+    """Asistente virtual: intents por reglas + respuestas del sistema."""
+    data = request.get_json(silent=True) or {}
+    mensaje = (data.get('mensaje') or '').strip()[:500].lower()
+    if not mensaje:
+        return jsonify({'respuesta': 'Escribe tu pregunta y te ayudo.', 'sugerencias': []})
+
+    norm = ''.join(c for c in unicodedata.normalize('NFD', mensaje) if unicodedata.category(c) != 'Mn')
+
+    # Búsqueda de productos por nombre/categoría
+    if any(k in norm for k in ['buscar', 'encuentra', 'tienes', 'hay', 'muestra', 'quiero ver', 'venden']):
+        termino = re.sub(r'(buscar|encuentra|tienes|hay|muestra|quiero ver|venden|de|del|la|el|un|una|productos?|algo)\s*', ' ', norm).strip()
+        conn = get_db()
+        like = f'%{termino}%' if termino else '%'
+        rows = conn.execute(
+            "SELECT id, nombre, precio, categoria FROM productos WHERE nombre LIKE ? OR categoria LIKE ? OR descripcion LIKE ? LIMIT 4",
+            (like, like, like)
+        ).fetchall()
+        conn.close()
+        if rows:
+            items = ''.join(
+                f'<a href="/producto/{r["id"]}" class="asistente-link">{r["nombre"]} <small>S/.{r["precio"]:.2f}</small></a>'
+                for r in rows
+            )
+            return jsonify({'respuesta': f'Encontré {len(rows)} producto(s) para ti:<br>{items}', 'sugerencias': ['Más resultados', 'Otras categorías', 'Cupones']})
+        return jsonify({'respuesta': f'No encontré "{termino}" todavía, pero hay 332+ productos. ¿Probamos con otra palabra o navegas el catálogo?',
+                        'sugerencias': ['/productos', 'Categorías', 'Contacto']})
+
+    for patrones, respuesta, sugerencias in _ASISTENTE_REGLAS:
+        if any(p in norm for p in patrones):
+            return jsonify({'respuesta': respuesta, 'sugerencias': sugerencias})
+
+    # Sugerir categorías si menciona una
+    conn = get_db()
+    cats = [r['categoria'] for r in conn.execute('SELECT DISTINCT categoria FROM productos').fetchall()]
+    conn.close()
+    mencionada = next((c for c in cats if c.lower().replace('á','a').replace('é','e').replace('í','i').replace('ó','o').replace('ú','u') in norm), None)
+    if mencionada:
+        return jsonify({'respuesta': f'¡Buena elección! Tenemos productos de {mencionada}. Puedes verlos todos en el catálogo filtrado.',
+                        'sugerencias': [f'/productos?categoria={mencionada}', 'Ver todo', 'Cupones']})
+
+    return jsonify({'respuesta': 'Hmm, no estoy segura de eso 🤔. Puedo ayudarte con: cómo comprar/vender, cupones, envíos, pagos, consejos ecológicos o buscar productos. ¿Qué necesitas?',
+                    'sugerencias': ['¿Cómo funciona?', 'Quiero vender', 'Cupones', 'Consejos ecológicos']})
+
+
 @app.route('/api/categorias')
 def api_categorias():
     """Lista de categorías para filtros y prefetch del cache/PWA."""
@@ -2987,11 +3081,14 @@ def perfil():
 def actualizar_perfil():
     nombre = request.form.get('nombre', '').strip()
     bio = request.form.get('bio', '').strip()
+    avatar_color = request.form.get('avatar_color', '').strip()
+    if avatar_color and not re.fullmatch(r'#[0-9a-fA-F]{6}', avatar_color):
+        avatar_color = ''
 
     conn = get_db()
     if nombre:
-        conn.execute('UPDATE usuarios SET nombre = ?, bio = ? WHERE id = ?',
-                     (nombre, bio, session['usuario_id']))
+        conn.execute('UPDATE usuarios SET nombre = ?, bio = ?, avatar_color = COALESCE(NULLIF(?, \'\'), avatar_color) WHERE id = ?',
+                     (nombre, bio, avatar_color, session['usuario_id']))
         session['nombre'] = nombre
         conn.commit()
         flash_t('perfil_actualizado', 'success')

@@ -49,3 +49,8 @@ node_modules/
 # Archivos temporales
 *.tmp
 *.bak
+
+# Carpetas ajenas al proyecto (no trackear)
+Nose/
+Pvz Fusion/
+audit_shots/

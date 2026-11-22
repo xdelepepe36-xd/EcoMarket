@@ -323,6 +323,113 @@
         });
     }
 
+    /* ═══════════ 10. ALERTAS DE BAJADA DE PRECIO ═══════════ */
+    function initPriceAlerts() {
+        var KEY = 'ecomarket-alertas';
+        function getAll() { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { return []; } }
+        function setAll(a) { localStorage.setItem(KEY, JSON.stringify(a)); }
+        // Botón 🔔 en página de detalle
+        if (location.pathname.indexOf('/producto/') === 0) {
+            var match = location.pathname.match(/\/producto\/(\d+)/);
+            var id = match ? parseInt(match[1], 10) : null;
+            var precioEl = document.querySelector('.detalle-precio, .producto-precio, [class*="precio"] strong, h2 + div');
+            var nombreEl = document.querySelector('h1');
+            var priceText = document.body.textContent.match(/S\/\.\s*([\d.,]+)/);
+            if (!id || !priceText) return;
+            var precio = parseFloat(priceText[1].replace(',', '.'));
+            var nombre = nombreEl ? nombreEl.textContent.trim() : 'Producto';
+            var host = document.querySelector('.detalle-acciones, .add-cart') &&
+                (document.querySelector('.add-cart').closest('div') || document.body);
+            var btn = document.createElement('button');
+            btn.className = 'btn-secundario eco-price-alert-btn';
+            btn.style.cssText = 'width:100%;margin-top:8px';
+            function paint() {
+                var on = getAll().some(function (a) { return a.id === id; });
+                btn.innerHTML = on ? '🔔 <span data-i18n="pd.alert_on">Avisándote si baja</span>' : '🔕 <span data-i18n="pd.alert_off">Avisarme si baja el precio</span>';
+                btn.style.background = on ? '#fff8e1' : '';
+                btn.style.borderColor = on ? '#F59E0B' : '';
+            }
+            btn.addEventListener('click', function () {
+                var all = getAll();
+                var i = all.findIndex(function (a) { return a.id === id; });
+                if (i >= 0) { all.splice(i, 1); }
+                else { all.push({ id: id, nombre: nombre, precio: precio, url: location.pathname }); }
+                setAll(all); paint();
+                if (window.EcoToast) EcoToast.show(i >= 0 ? 'Alerta eliminada' : '🔔 Alerta activada', i >= 0 ? 'Ya no te avisaremos' : 'Te avisaremos si ' + nombre.slice(0, 20) + ' baja de S/. ' + precio.toFixed(2), 'success', 3500);
+                else alert(i >= 0 ? 'Alerta eliminada' : 'Alerta activada');
+            });
+            paint();
+            var anchor = document.querySelector('#favBtn');
+            if (anchor && anchor.parentElement) anchor.parentElement.appendChild(btn);
+            else if (host) host.appendChild(btn);
+        }
+        // Verificador periódico de precios
+        function check() {
+            var all = getAll();
+            if (!all.length) return;
+            fetch('/api/precios').then(function (r) { return r.json(); }).then(function (d) {
+                var map = d.precios || {};
+                var changed = false, cur = getAll();
+                cur.forEach(function (a) {
+                    var precio = map[String(a.id)];
+                    if (precio !== undefined && +precio < a.precio - 0.004) {
+                        a.precio = +precio; changed = true;
+                        if (window.EcoToast) EcoToast.show('📉 ¡Bajó de precio!', a.nombre.slice(0, 30) + ' ahora S/. ' + (+precio).toFixed(2), 'success', 8000);
+                        if (window.ecoConfetti) ecoConfetti(innerWidth / 2, innerHeight / 3, 24);
+                    }
+                });
+                if (changed) setAll(cur);
+            }).catch(function () {});
+        }
+        setTimeout(check, 8000);
+        setInterval(check, 120000);
+    }
+
+    /* ═══════════ 11. BADGE "ÚLTIMAS UNIDADES" ═══════════ */
+    function initLowStock() {
+        document.querySelectorAll('.producto-card[data-stock]').forEach(function (card) {
+            var stock = parseInt(card.getAttribute('data-stock'), 10);
+            if (stock > 0 && stock <= 5) {
+                var badges = card.querySelector('.card-badges');
+                if (!badges) { badges = document.createElement('div'); badges.className = 'card-badges'; card.prepend(badges); }
+                var b = document.createElement('span');
+                b.className = 'card-badge badge-stock';
+                b.textContent = '🔥 ¡Quedan ' + stock + '!';
+                badges.appendChild(b);
+            } else if (stock === 0) {
+                card.style.opacity = '.75';
+            }
+        });
+    }
+
+    /* ═══════════ 12. ANALYTICS: scroll depth + tiempo en página ═══════════ */
+    function initEngagementAnalytics() {
+        var fired = {};
+        function track(ev, props) {
+            try {
+                fetch('/api/analytics/track', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ event: ev, properties: props || {} }), keepalive: true
+                }).catch(function () {});
+            } catch (e) {}
+        }
+        var marks = [25, 50, 75, 100];
+        window.addEventListener('scroll', function () {
+            var h = document.documentElement;
+            var pct = Math.round((window.scrollY / (h.scrollHeight - h.clientHeight || 1)) * 100);
+            marks.forEach(function (m) {
+                if (pct >= m && !fired[m]) { fired[m] = true; track('scroll_depth', { depth: m, path: location.pathname }); }
+            });
+        }, { passive: true });
+        var t0 = Date.now(), sent = false;
+        function sendTime() {
+            if (sent) return; sent = true;
+            track('time_on_page', { seconds: Math.round((Date.now() - t0) / 1000), path: location.pathname });
+        }
+        document.addEventListener('visibilitychange', function () { if (document.hidden) sendTime(); });
+        window.addEventListener('pagehide', sendTime);
+    }
+
     /* ═══════════ INIT ═══════════ */
     document.addEventListener('DOMContentLoaded', function () {
         initParticles();
@@ -334,5 +441,8 @@
         initActivityTicker();
         initTendencias();
         init404Game();
+        initPriceAlerts();
+        initLowStock();
+        initEngagementAnalytics();
     });
 })();

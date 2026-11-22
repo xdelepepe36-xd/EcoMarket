@@ -2600,6 +2600,15 @@ def api_health():
                     'version': '3.2', 'time': datetime.now().isoformat()})
 
 
+@app.route('/api/precios')
+def api_precios():
+    """Mapa id->precio de todos los productos (para alertas de bajada de precio)."""
+    conn = get_db()
+    rows = conn.execute('SELECT id, precio FROM productos').fetchall()
+    conn.close()
+    return jsonify({'precios': {str(r['id']): r['precio'] for r in rows}})
+
+
 @app.route('/api/tendencias')
 def api_tendencias():
     """Productos tendencia: más vistos esta semana."""

@@ -2573,3 +2573,26 @@ main, .section { animation: ecoPageIn .45s cubic-bezier(.22,1,.36,1) both; }
     border: none; border-radius: 999px; padding: 8px 22px; cursor: pointer;
     background: linear-gradient(135deg,#166534,#22C55E); color: #fff; font-weight: 700;
 }
+
+/* ===== Modo impresión: limpio para tríptico / PDF ===== */
+@media print {
+    header, nav, footer, .eco-activity-ticker, .eco-scroll-progress,
+    .eco-back-top, .eco-cursor, .eco-cursor-leaf, #ecoParticles,
+    .eco-particles, .eco-game404, .eco-simulator, .eco-lb-card,
+    .eco-tendencias, .btn-principal, .btn-secundario, .share-btn,
+    .add-cart, .add-favorite, .btn-comparar, form, .eco-chat-fab,
+    .asistente-flotante, .eco-price-alert-btn, .skip-nav, .eco-tour-overlay {
+        display: none !important;
+    }
+    body { background: #fff !important; color: #111 !important; }
+    .section, .productos-section, .section-alt { background: #fff !important; padding: 12px 0 !important; }
+    .container { max-width: 100% !important; }
+    .producto-card, .producto-card * { color: #111 !important; }
+    .producto-img-container img { max-height: 160px; object-fit: contain; }
+    .producto-card { break-inside: avoid; box-shadow: none !important; border: 1px solid #ddd !important; }
+    .producto-grid, .productos-grid { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 10px !important; }
+    .section-title h2 { font-size: 1.4rem !important; }
+    a { text-decoration: none; color: inherit; }
+    h1, h2, h3 { break-after: avoid; }
+    img { max-width: 100%; }
+}

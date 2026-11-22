@@ -2114,11 +2114,12 @@ def validar_cupon():
     elif cupon['tipo'] == 'fixed':
         descuento = cupon['descuento']
     elif cupon['tipo'] == 'shipping':
-        descuento = cupon['descuento']
+        descuento = float(data.get('envio', 0))
 
     conn.close()
     return jsonify({
         'valido': True,
+        'tipo': cupon['tipo'],
         'descuento': round(descuento, 2),
         'total_final': round(total - descuento, 2),
         'codigo': cupon['codigo'],
@@ -2255,7 +2256,7 @@ def api_cupones_disponibles():
     return jsonify([
         {
             'codigo': r['codigo'],
-            'tipo': r['tipo'] if r['tipo'] == '%' else 'fixed',
+            'tipo': r['tipo'],
             'descuento': r['descuento'],
             'minimo': r['minimo'],
         }

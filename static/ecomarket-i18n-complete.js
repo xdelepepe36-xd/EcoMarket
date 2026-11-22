@@ -4482,6 +4482,93 @@ const EcoI18n = {
         },
     },
 
+    couponI18n: {
+        es: {
+            'coupon.title': 'Cupones de descuento',
+            'coupon.applied': 'Cupón aplicado',
+            'coupon.remove': 'Quitar',
+            'coupon.placeholder': 'Ingresa código de cupón',
+            'coupon.apply': 'Aplicar',
+            'coupon.min': 'Mínimo',
+            'coupon.validating': 'Validando...',
+            'coupon.valid': 'Cupón válido',
+            'coupon.invalid': 'Cupón inválido',
+            'coupon.error': 'Error de conexión',
+            'coupon.free_shipping': 'Envío gratis',
+            'checkout.free_shipping': 'Envío gratis',
+        },
+        en: {
+            'coupon.title': 'Discount coupons',
+            'coupon.applied': 'Coupon applied',
+            'coupon.remove': 'Remove',
+            'coupon.placeholder': 'Enter coupon code',
+            'coupon.apply': 'Apply',
+            'coupon.min': 'Minimum',
+            'coupon.validating': 'Validating...',
+            'coupon.valid': 'Valid coupon',
+            'coupon.invalid': 'Invalid coupon',
+            'coupon.error': 'Connection error',
+            'coupon.free_shipping': 'Free shipping',
+            'checkout.free_shipping': 'Free shipping',
+        },
+        pt: {
+            'coupon.title': 'Cupons de desconto',
+            'coupon.applied': 'Cupom aplicado',
+            'coupon.remove': 'Remover',
+            'coupon.placeholder': 'Insira o código do cupom',
+            'coupon.apply': 'Aplicar',
+            'coupon.min': 'Mínimo',
+            'coupon.validating': 'Validando...',
+            'coupon.valid': 'Cupom válido',
+            'coupon.invalid': 'Cupom inválido',
+            'coupon.error': 'Erro de conexão',
+            'coupon.free_shipping': 'Frete grátis',
+            'checkout.free_shipping': 'Frete grátis',
+        },
+        fr: {
+            'coupon.title': 'Codes promo',
+            'coupon.applied': 'Code appliqué',
+            'coupon.remove': 'Retirer',
+            'coupon.placeholder': 'Entrez le code promo',
+            'coupon.apply': 'Appliquer',
+            'coupon.min': 'Minimum',
+            'coupon.validating': 'Validation...',
+            'coupon.valid': 'Code valide',
+            'coupon.invalid': 'Code invalide',
+            'coupon.error': 'Erreur de connexion',
+            'coupon.free_shipping': 'Livraison offerte',
+            'checkout.free_shipping': 'Livraison offerte',
+        },
+        de: {
+            'coupon.title': 'Rabattgutscheine',
+            'coupon.applied': 'Gutschein angewendet',
+            'coupon.remove': 'Entfernen',
+            'coupon.placeholder': 'Gutscheincode eingeben',
+            'coupon.apply': 'Anwenden',
+            'coupon.min': 'Mindestbetrag',
+            'coupon.validating': 'Wird geprüft...',
+            'coupon.valid': 'Gültiger Gutschein',
+            'coupon.invalid': 'Ungültiger Gutschein',
+            'coupon.error': 'Verbindungsfehler',
+            'coupon.free_shipping': 'Kostenloser Versand',
+            'checkout.free_shipping': 'Kostenloser Versand',
+        },
+        it: {
+            'coupon.title': 'Coupon di sconto',
+            'coupon.applied': 'Coupon applicato',
+            'coupon.remove': 'Rimuovi',
+            'coupon.placeholder': 'Inserisci il codice coupon',
+            'coupon.apply': 'Applica',
+            'coupon.min': 'Minimo',
+            'coupon.validating': 'Validazione...',
+            'coupon.valid': 'Coupon valido',
+            'coupon.invalid': 'Coupon non valido',
+            'coupon.error': 'Errore di connessione',
+            'coupon.free_shipping': 'Spedizione gratuita',
+            'checkout.free_shipping': 'Spedizione gratuita',
+        },
+    },
+
     init() {
         for (const lang in this.homeI18n) {
             this.translations[lang] = Object.assign({}, this.translations[lang], this.homeI18n[lang]);
@@ -4536,6 +4623,9 @@ const EcoI18n = {
         }
         for (const lang in this.catI18n) {
             this.translations[lang] = Object.assign({}, this.translations[lang], this.catI18n[lang]);
+        }
+        for (const lang in this.couponI18n) {
+            this.translations[lang] = Object.assign({}, this.translations[lang], this.couponI18n[lang]);
         }
         // Fallback: idiomas secundarios heredan inglés para claves no traducidas
         ['pt', 'fr', 'de', 'it'].forEach(l => {

@@ -192,21 +192,27 @@ function renderCheckout() {
     const baseTotal = subtotal + envio;
 
     const descuentoRow = document.getElementById('descuentoRow');
-    const cupon = window.EcoCart && EcoCart.getAppliedCoupon ? EcoCart.getAppliedCoupon() : '';
+    const cupon = localStorage.getItem('ecomarket_coupon') || '';
 
     if (cupon) {
         // Validar cupón contra el total real y mostrar el descuento
         fetch('/api/cupon/validar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ codigo: cupon, total: baseTotal })
+            body: JSON.stringify({ codigo: cupon, total: baseTotal, envio: envio })
         }).then(r => r.json()).then(d => {
             let desc = 0;
-            if (d.valido) desc = d.descuento || 0;
+            if (d.valido) {
+                desc = d.descuento || 0;
+                if (d.tipo === 'shipping') document.getElementById('envioText').textContent = 'Gratis 🎉';
+            }
             const total = Math.max(baseTotal - desc, 0);
             if (desc > 0) {
                 descuentoRow.style.display = 'flex';
-                document.getElementById('descuentoText').textContent = '-S/. ' + desc.toFixed(2);
+                const lbl = (d.tipo === 'shipping')
+                    ? ((window.EcoI18n && EcoI18n.getTranslation('checkout.free_shipping')) || 'Envío gratis')
+                    : '-S/. ';
+                document.getElementById('descuentoText').textContent = (d.tipo === 'shipping') ? lbl : lbl + desc.toFixed(2);
             } else {
                 descuentoRow.style.display = 'none';
             }
@@ -284,7 +290,7 @@ document.getElementById('checkoutForm').addEventListener('submit', function(e) {
             ciudad: ciudad,
             items: items,
             metodo_pago: metodoPago ? metodoPago.value : '',
-            coupon: window.EcoCart ? (window.EcoCart.getAppliedCoupon ? (EcoCart.getAppliedCoupon() || '') : '') : ''
+            coupon: localStorage.getItem('ecomarket_coupon') || ''
         })
     })
     .then(r => r.json())
@@ -334,14 +340,16 @@ if (couponBtn) {
         fetch('/api/cupon/validar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ codigo: code, total: total })
+            body: JSON.stringify({ codigo: code, total: total, envio: subtotal >= 150 ? 0 : 12 })
         }).then(function(r) { return r.json(); }).then(function(d) {
             couponBtn.disabled = false;
             if (d.valido) {
                 EcoCart.applyCoupon(code);
                 if (status) {
                     status.style.color = 'var(--verde,#2e7d32)';
-                    status.textContent = 'Cupón aplicado: -S/. ' + (d.descuento || 0).toFixed(2);
+                    status.textContent = (d.tipo === 'shipping')
+                        ? ((window.EcoI18n && EcoI18n.getTranslation('checkout.free_shipping')) || 'Envío gratis')
+                        : 'Cupón aplicado: -S/. ' + (d.descuento || 0).toFixed(2);
                 }
                 renderCheckout();
             } else {

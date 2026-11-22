@@ -2,17 +2,8 @@
 {% block title %}EcoMarket - Mi Perfil{% endblock %}
 
 {% block content %}
-<!-- Contenedores de funcionalidades nuevas -->
-<div id="dashboardContainer"></div>
-<div id="chatContainer"></div>
-<div id="calificacionVendedorForm" data-vendedor-id="{{ session.get('usuario_id') }}"></div>
-<div id="suscripcionesPanel"></div>
-<div id="breadcrumbsContainer"></div>
-<div id="cuponInputContainer"></div>
-<div id="impactoCalculadora"></div>
-<div id="alertasPrecioPanel"></div>
-<div id="comparacionVisualPanel"></div>
-<div id="filtrosAvanzadosContainer"></div>
+<!-- Widget de cupones -->
+<div id="cuponInputContainer" class="cupones-widget"></div>
 
 <section class="section">
     <div class="container">
@@ -291,6 +282,117 @@
         </div>
     </div>
 </section>
+
+<style>
+.cupones-widget { max-width: 720px; margin: 0 auto 24px; padding: 0 16px; }
+.cupones-widget .cupon-box { background: var(--card-bg, #fff); border: 1px solid var(--borde, #e5e7eb); border-radius: 14px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
+.cupones-widget h3 { margin: 0 0 12px; font-size: 1.05rem; display: flex; align-items: center; gap: 8px; }
+.cupones-widget .cupon-form { display: flex; gap: 10px; margin-bottom: 14px; }
+.cupones-widget input { flex: 1; padding: 10px 14px; border: 1px solid var(--borde, #d1d5db); border-radius: 10px; font-size: .95rem; background: var(--input-bg, #fff); color: var(--texto, #1f2937); }
+.cupones-widget button { padding: 10px 18px; border: none; border-radius: 10px; background: var(--verde, #2e7d32); color: #fff; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.cupones-widget button:hover { filter: brightness(1.08); }
+.cupones-widget .cupon-msg { font-size: .85rem; margin: -6px 0 12px; min-height: 1.2em; }
+.cupones-widget .cupon-msg.ok { color: var(--verde, #2e7d32); }
+.cupones-widget .cupon-msg.err { color: #b91c1c; }
+.cupones-widget .cupon-aplicado { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; font-size: .9rem; }
+.cupones-widget .cupon-aplicado button { background: transparent; color: #047857; padding: 4px 10px; font-size: .8rem; }
+.cupones-widget .cupon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.cupones-widget .cupon-card { border: 1px dashed var(--verde, #2e7d32); border-radius: 10px; padding: 10px 12px; background: rgba(46,125,50,.04); }
+.cupones-widget .cupon-codigo { font-weight: 700; color: var(--verde, #2e7d32); letter-spacing: .5px; }
+.cupones-widget .cupon-descuento { font-size: .85rem; margin-top: 2px; }
+.cupones-widget .cupon-min { font-size: .75rem; color: var(--texto-sec, #6b7280); }
+</style>
+
+<script>
+function initCuponesWidget() {
+    const container = document.getElementById('cuponInputContainer');
+    if (!container) return;
+
+    const t = (key, fallback) => {
+        const tr = window.EcoI18n && EcoI18n.getTranslation ? EcoI18n.getTranslation(key) : null;
+        return tr || fallback;
+    };
+
+    const cartSubtotal = () => {
+        try {
+            const items = JSON.parse(localStorage.getItem('ecomarket-cart') || '[]');
+            return items.reduce((s, i) => s + (parseFloat(i.price) || 0) * (parseInt(i.qty) || 1), 0);
+        } catch (e) { return 0; }
+    };
+
+    const fmtDescuento = c => {
+        if (c.tipo === 'shipping') return t('coupon.free_shipping', 'Envío gratis');
+        return c.tipo === '%' ? c.descuento + '% OFF' : 'S/.' + c.descuento + ' OFF';
+    };
+
+    function render(cupones) {
+        const aplicado = (window.EcoCart && EcoCart.getAppliedCoupon) ? EcoCart.getAppliedCoupon() : '';
+        container.innerHTML = `
+            <div class="cupon-box">
+                <h3><i class="bi bi-ticket-perforated"></i> ${t('coupon.title', 'Cupones de descuento')}</h3>
+                ${aplicado ? `<div class="cupon-aplicado">
+                    <span><i class="bi bi-check-circle-fill"></i> ${t('coupon.applied', 'Cupón aplicado')}: <strong>${aplicado}</strong></span>
+                    <button type="button" id="quitarCupon">${t('coupon.remove', 'Quitar')}</button>
+                </div>` : ''}
+                <div class="cupon-form">
+                    <input type="text" id="cuponInput" placeholder="${t('coupon.placeholder', 'Ingresa código de cupón')}" maxlength="30">
+                    <button type="button" id="aplicarCupon">${t('coupon.apply', 'Aplicar')}</button>
+                </div>
+                <div class="cupon-msg" id="cuponMsg"></div>
+                ${cupones.length ? `<div class="cupon-grid">${cupones.map(c => `
+                    <div class="cupon-card">
+                        <div class="cupon-codigo">${c.codigo}</div>
+                        <div class="cupon-descuento">${fmtDescuento(c)}</div>
+                        <div class="cupon-min">${t('coupon.min', 'Mínimo')}: S/.${c.minimo.toFixed(2)}</div>
+                    </div>`).join('')}</div>` : ''}
+            </div>`;
+
+        container.querySelector('#quitarCupon')?.addEventListener('click', () => {
+            EcoCart.clearCoupon();
+            render(cupones);
+        });
+
+        const aplicar = async () => {
+            const input = container.querySelector('#cuponInput');
+            const msg = container.querySelector('#cuponMsg');
+            const codigo = (input.value || '').trim().toUpperCase();
+            if (!codigo) return;
+            msg.className = 'cupon-msg';
+            msg.textContent = t('coupon.validating', 'Validando...');
+            try {
+                const res = await fetch('/api/cupon/validar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ codigo, total: cartSubtotal() })
+                });
+                const data = await res.json();
+                if (data.valido) {
+                    EcoCart.applyCoupon(codigo);
+                    msg.className = 'cupon-msg ok';
+                    msg.textContent = `${t('coupon.valid', 'Cupón válido')}: -S/.${data.descuento.toFixed(2)}`;
+                    setTimeout(() => render(cupones), 900);
+                } else {
+                    msg.className = 'cupon-msg err';
+                    msg.textContent = data.error || t('coupon.invalid', 'Cupón inválido');
+                }
+            } catch (e) {
+                msg.className = 'cupon-msg err';
+                msg.textContent = t('coupon.error', 'Error de conexión');
+            }
+        };
+
+        container.querySelector('#aplicarCupon').addEventListener('click', aplicar);
+        container.querySelector('#cuponInput').addEventListener('keypress', e => { if (e.key === 'Enter') aplicar(); });
+    }
+
+    fetch('/api/cupones/disponibles')
+        .then(r => r.json())
+        .then(render)
+        .catch(() => {});
+}
+
+document.addEventListener('DOMContentLoaded', initCuponesWidget);
+</script>
 
 <script>
 function setTab(e, tab) {

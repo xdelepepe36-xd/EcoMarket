@@ -21,10 +21,15 @@ const EcoMarket = {
     
     // Estado global
     state: {
-        theme: ['light','dark','sepia','nature','ocean','midnight','rose','high-contrast']
-            .includes(localStorage.getItem('ecomarket-theme'))
-            ? localStorage.getItem('ecomarket-theme')
-            : 'light',
+        theme: (function () {
+            var saved = localStorage.getItem('ecomarket-theme');
+            var ok = ['light','dark','sepia','nature','ocean','midnight','rose','high-contrast'];
+            if (saved && ok.indexOf(saved) !== -1) return saved;
+            var h = new Date().getHours();
+            if (h >= 20 || h < 6) return 'midnight';
+            if (h >= 17 && h < 20) return 'ocean';
+            return 'light';
+        })(),
         lang: localStorage.getItem('ecomarket-lang') || 'es',
         user: null
     },

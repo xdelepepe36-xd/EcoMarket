@@ -4,9 +4,9 @@
 {% block content %}
 <section class="section">
     <div class="container auth-container">
-        <div class="auth-card form-card">
+        <div class="auth-card form-card"><span class="auth-blob auth-blob-1"></span><span class="auth-blob auth-blob-2"></span>
             <div class="auth-header">
-                <span class="auth-icon">🌿</span>
+                <img src="{{ url_for('static', filename='assets/mascota.svg') }}" class="auth-mascot" alt="Eco">
                 <h2 class="section-title" data-i18n="auth.reset_title">Nueva contraseña</h2>
                 <p data-i18n="auth.reset_desc">Elige una contraseña segura para tu cuenta.</p>
             </div>

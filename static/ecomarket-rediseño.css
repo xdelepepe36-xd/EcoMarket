@@ -3812,7 +3812,7 @@ html {
     padding: 6px;
     display: none;
     flex-direction: column;
-    z-index: 100;
+    z-index: 3000;
 }
 
 .lang-dropdown-menu.active {

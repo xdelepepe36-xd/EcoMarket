@@ -15,7 +15,8 @@
         ocean:    { n: 24, color: '100,181,246', shape: 'bubble', speed: 0.5 },
         midnight: { n: 40, color: '165,180,252', shape: 'star',  speed: 0.3 },
         rose:     { n: 18, color: '240,98,146', shape: 'petal', speed: 0.45 },
-        autumn:   { n: 24, color: '245,124,0',  shape: 'leaf',  speed: 0.6 }
+        autumn:   { n: 24, color: '245,124,0',  shape: 'leaf',  speed: 0.6 },
+        christmas:{ n: 46, color: '255,255,255', shape: 'snow',  speed: 0.9 }
     };
 
     var canvas = null, ctx = null, parts = [], rafId = null, themeKey = '';
@@ -33,10 +34,13 @@
         p.vy = cfg.speed * (0.6 + Math.random() * 0.8);
         p.size = cfg.shape === 'bubble' ? 2 + Math.random() * 5
               : cfg.shape === 'star'  ? 1 + Math.random() * 2
+              : cfg.shape === 'snow'  ? 2 + Math.random() * 4
               : 4 + Math.random() * 6;
         p.rot = Math.random() * Math.PI * 2;
         p.vr = (Math.random() - 0.5) * 0.03;
-        p.alpha = cfg.shape === 'firefly' ? 0.3 + Math.random() * 0.5 : 0.35 + Math.random() * 0.4;
+        p.alpha = cfg.shape === 'firefly' ? 0.3 + Math.random() * 0.5
+                : cfg.shape === 'snow' ? 0.7 + Math.random() * 0.3
+                : 0.35 + Math.random() * 0.4;
         p.ph = Math.random() * Math.PI * 2;
     }
 
@@ -52,6 +56,8 @@
             ctx.beginPath(); ctx.arc(0, 0, p.size, 0, Math.PI * 2); ctx.stroke();
         } else if (cfg.shape === 'star') {
             ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+        } else if (cfg.shape === 'snow') {
+            ctx.beginPath(); ctx.arc(0, 0, p.size, 0, Math.PI * 2); ctx.fill();
         } else {
             // hoja/pétalo: dos arcos
             ctx.beginPath();
@@ -636,6 +642,111 @@
         load();
     }
 
+    /* ═══════════ OFERTAS FLASH (home) ═══════════ */
+    function initFlashOffers() {
+        if (location.pathname !== '/') return;
+        var sec = document.getElementById('flashSection');
+        if (!sec) return;
+        function esc(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+        fetch('/api/ofertas-flash').then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (d) {
+                var strip = document.getElementById('flashStrip');
+                if (!d || !d.ofertas || !d.ofertas.length) { sec.style.display = 'none'; return; }
+                strip.innerHTML = d.ofertas.map(function (p) {
+                    var pct = p.precio_original ? Math.round((1 - p.precio / p.precio_original) * 100) : 0;
+                    var img = (p.imagen || '').startsWith('assets/') ? '/static/' + p.imagen
+                        : (p.imagen && p.imagen.indexOf('http') === 0 ? p.imagen : '/static/assets/product-placeholder.svg');
+                    return '<a href="/producto/' + p.id + '" class="eco-flash-card">' +
+                        '<span class="eco-flash-badge">-' + pct + '%</span>' +
+                        '<img src="' + img + '" alt="' + esc(p.nombre) + '" loading="lazy" onerror="this.src=\'/static/assets/product-placeholder.svg\'">' +
+                        '<div class="eco-flash-info"><strong>' + esc(String(p.nombre).slice(0, 30)) + '</strong>' +
+                        '<span class="eco-flash-price">S/. ' + (+p.precio).toFixed(2) + ' <s>S/. ' + (+p.precio_original).toFixed(2) + '</s></span></div></a>';
+                }).join('');
+                sec.style.display = 'block';
+            }).catch(function () { sec.style.display = 'none'; });
+    }
+
+    /* ═══════════ QUIZ SEMANAL (home) ═══════════ */
+    function initQuiz() {
+        if (location.pathname !== '/') return;
+        var card = document.getElementById('quizCard');
+        if (!card) return;
+        var sec = document.getElementById('quizSection');
+        function esc(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+        sec.style.display = 'block';
+        if (!window.__ECOMARKET_AUTH__) {
+            card.innerHTML = '<div class="quiz-login"><p>🔒 Inicia sesión para participar y ganar pts eco.</p><a href="/login" class="btn-principal">Entrar</a></div>';
+            return;
+        }
+        fetch('/api/quiz').then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (d) {
+                if (!d || !d.preguntas || !d.preguntas.length) { sec.style.display = 'none'; return; }
+                var html = '';
+                d.preguntas.forEach(function (q, i) {
+                    html += '<div class="quiz-q" data-idx="' + i + '"><p class="quiz-p"><b>' + (i + 1) + '.</b> ' + esc(q.p) + '</p><div class="quiz-opts">';
+                    q.o.forEach(function (op, j) {
+                        html += '<label class="quiz-opt"><input type="radio" name="quiz' + i + '" value="' + j + '"><span>' + esc(op) + '</span></label>';
+                    });
+                    html += '</div></div>';
+                });
+                html += '<button class="btn-principal quiz-submit" id="quizSubmit">Responder y ganar pts</button><div id="quizResult"></div>';
+                card.innerHTML = html;
+                document.getElementById('quizSubmit').addEventListener('click', function () {
+                    var resp = [], faltan = false;
+                    d.preguntas.forEach(function (_, i) {
+                        var sel = card.querySelector('input[name="quiz' + i + '"]:checked');
+                        if (!sel) faltan = true;
+                        resp.push(sel ? parseInt(sel.value, 10) : -1);
+                    });
+                    if (faltan) { if (window.EcoToast) EcoToast.show('⚠️', 'Responde las 5 preguntas', 'warning'); return; }
+                    var btn = this; btn.disabled = true; btn.textContent = 'Calificando…';
+                    fetch('/api/quiz/responder', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ respuestas: resp, ids: d.ids })
+                    }).then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j }; }); })
+                        .then(function (res) {
+                            var out = document.getElementById('quizResult');
+                            if (res.j.success) {
+                                out.innerHTML = '<div class="quiz-result-ok">🎉 Acertaste <b>' + res.j.correctas + '/5</b> — ganaste <b>' + res.j.premio + ' pts eco</b> 🌱</div>';
+                                if (res.j.correctas >= 4 && window.ecoConfetti) window.ecoConfetti(innerWidth / 2, innerHeight / 3, 80);
+                            } else {
+                                out.innerHTML = '<div class="quiz-result-err">' + esc(res.j.error || 'Error') + '</div>';
+                            }
+                        }).catch(function () { document.getElementById('quizResult').innerHTML = '<div class="quiz-result-err">Error de conexión</div>'; });
+                });
+            }).catch(function () { sec.style.display = 'none'; });
+    }
+
+    /* ═══════════ LOGROS: check automático + panel en perfil ═══════════ */
+    function initLogrosCheck() {
+        if (!window.__ECOMARKET_AUTH__) return;
+        fetch('/api/logros/check', { method: 'POST' }).then(function (r) { return r.json(); })
+            .then(function (d) {
+                if (d && d.nuevos && d.nuevos.length && window.EcoToast) {
+                    EcoToast.show('🏅 ¡Logro desbloqueado!', 'Revisa tu perfil para ver tus insignias', 'success');
+                    if (window.ecoConfetti) setTimeout(function () { window.ecoConfetti(innerWidth / 2, innerHeight / 3, 60); }, 400);
+                }
+            }).catch(function () {});
+    }
+
+    function initLogrosPanel() {
+        if (location.pathname.indexOf('/perfil') !== 0) return;
+        var box = document.getElementById('logrosGrid');
+        if (!box) return;
+        function esc(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+        fetch('/api/logros').then(function (r) { return r.json(); }).then(function (d) {
+            if (!d || !d.logros) return;
+            box.innerHTML = d.logros.map(function (l) {
+                return '<div class="logro-card ' + (l.desbloqueado ? 'logro-on' : 'logro-off') + '">' +
+                    '<span class="logro-emoji">' + l.emoji + '</span>' +
+                    '<strong>' + esc(l.nombre) + '</strong>' +
+                    '<small>' + esc(l.desc) + '</small>' +
+                    (l.desbloqueado ? '<em>✓ ' + (l.fecha || '').slice(0, 10) + '</em>' : '<em>🔒 bloqueado</em>') +
+                    '</div>';
+            }).join('');
+        }).catch(function () {});
+    }
+
     /* ═══════════ INIT ═══════════ */
     document.addEventListener('DOMContentLoaded', function () {
         initParticles();
@@ -655,5 +766,9 @@
         initMonedero();
         initBusquedasRecientes();
         initAgradecimientos();
+        initFlashOffers();
+        initQuiz();
+        initLogrosCheck();
+        initLogrosPanel();
     });
 })();

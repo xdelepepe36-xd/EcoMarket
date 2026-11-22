@@ -96,6 +96,7 @@
             <button class="tab-btn" onclick="setTab(event,'resenas')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-star"></i> <span data-i18n="profile.tab_reviews">Mis reseñas</span> ({{ resenas|length }})</button>
             <button class="tab-btn" onclick="setTab(event,'pedidos')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-bag-check"></i> <span data-i18n="profile.tab_orders">Pedidos</span> ({{ pedidos|length }})</button>
             <button class="tab-btn" onclick="setTab(event,'notificaciones')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-bell"></i> <span data-i18n="profile.tab_notifications">Notificaciones</span> {% if notificaciones %}<span style="background:#e53935;color:#fff;border-radius:999px;font-size:.68rem;padding:1px 7px">{{ notificaciones|length }}</span>{% endif %}</button>
+            <button class="tab-btn" onclick="setTab(event,'logros')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-trophy"></i> Logros</button>
             <button class="tab-btn" onclick="setTab(event,'config')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-gear"></i> <span data-i18n="profile.tab_settings">Configuración</span></button>
         </div>
 
@@ -305,6 +306,13 @@
                     <span data-i18n="profile.no_notifications">No tienes notificaciones nuevas</span>
                 </div>
                 {% endif %}
+            </div>
+        </div>
+        <div id="tab-logros" class="tab-content" style="display:none">
+            <div style="background:var(--blanco);border-radius:20px;padding:24px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
+                <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:6px"><i class="bi bi-trophy-fill" style="color:#f9a825"></i> Mis logros e insignias</h3>
+                <p style="color:var(--texto-sec);font-size:.85rem;margin-bottom:18px">Se desbloquean solas conforme usas EcoMarket — compras, vendes, invitas y exploras.</p>
+                <div id="logrosGrid" class="logros-grid"><p style="color:var(--texto-sec)">Cargando…</p></div>
             </div>
         </div>
         <div id="tab-config" class="tab-content" style="display:none">

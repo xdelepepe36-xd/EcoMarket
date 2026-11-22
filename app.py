@@ -1096,6 +1096,13 @@ def init_db():
     except sqlite3.OperationalError:
         pass
 
+    # Mensaje de regalo en pedidos
+    try:
+        conn.execute('ALTER TABLE pedidos ADD COLUMN regalo_mensaje TEXT DEFAULT ""')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
     # Muro de agradecimientos
     try:
         conn.execute('''CREATE TABLE IF NOT EXISTS agradecimientos (
@@ -1776,6 +1783,7 @@ def checkout():
         ciudad = data.get('ciudad', '').strip()
         items = data.get('items', [])
         metodo_pago = data.get('metodo_pago', '')
+        regalo_mensaje = sanitize_string(data.get('regalo', ''), max_length=200).strip()
 
         # ── Validación robusta de datos de envío ──
         nombre_comp = f"{nombre} {apellido}".strip()
@@ -1879,8 +1887,8 @@ def checkout():
 
         conn = get_db()
         cursor = conn.execute(
-            'INSERT INTO pedidos (usuario_id, nombre, email, direccion, total, metodo_pago, ciudad, telefono, envio, descuento) VALUES (?,?,?,?,?,?,?,?,?,?)',
-            (session['usuario_id'], nombre_comp or nombre, email, direccion, total_final, metodo_pago, ciudad, telefono, envio, descuento)
+            'INSERT INTO pedidos (usuario_id, nombre, email, direccion, total, metodo_pago, ciudad, telefono, envio, descuento, regalo_mensaje) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+            (session['usuario_id'], nombre_comp or nombre, email, direccion, total_final, metodo_pago, ciudad, telefono, envio, descuento, regalo_mensaje)
         )
         pedido_id = cursor.lastrowid
 
@@ -2928,6 +2936,147 @@ def api_agradecimiento_crear():
     conn.commit()
     conn.close()
     return jsonify({'success': True})
+
+
+# ── Motor de logros e insignias ────────────────────────────────────
+
+LOGROS = {
+    'primera_compra':  ('🛍️', 'Primera compra', 'Completa tu primer pedido'),
+    'eco_semilla':     ('🌱', 'Eco Semilla', 'Consigue 50 pts eco'),
+    'eco_guardiana':   ('🌿', 'Eco Guardiana', 'Consigue 200 pts eco'),
+    'vendiendo':       ('🏪', 'Ya vendo', 'Publica tu primer producto'),
+    'vendedor_pro':    ('🌳', 'Vendedor Pro', 'Publica 5 productos'),
+    'cliente_fiel':    ('💚', 'Cliente Fiel', 'Haz 3 compras'),
+    'compartiendo':    ('🎁', 'Corazón verde', 'Invita a 3 amigos con tu código'),
+    'explorador':      ('🧭', 'Explorador', 'Busca 10 productos distintos'),
+}
+
+
+def _evaluar_logros(conn, uid):
+    """Devuelve los logro_id que el usuario YA tiene."""
+    rows = conn.execute('SELECT logro_id FROM logros WHERE usuario_id=?', (uid,)).fetchall()
+    return {r['logro_id'] for r in rows}
+
+
+@app.route('/api/logros/check', methods=['POST'])
+@login_required
+def api_logros_check():
+    """Evalúa condiciones y desbloquea logros nuevos."""
+    uid = session['usuario_id']
+    conn = get_db()
+    u = conn.execute('SELECT COALESCE(eco_puntos,0) pts FROM usuarios WHERE id=?', (uid,)).fetchone()
+    pts = u['pts'] if u else 0
+    compras = conn.execute("SELECT COUNT(*) FROM pedidos WHERE usuario_id=?", (uid,)).fetchone()[0]
+    productos = conn.execute("SELECT COUNT(*) FROM productos WHERE usuario_id=?", (uid,)).fetchone()[0]
+    referidos = conn.execute("SELECT COUNT(*) FROM referidos WHERE referente_id=?", (uid,)).fetchone()[0]
+    busquedas = conn.execute("SELECT COUNT(DISTINCT termino) FROM historial_busquedas WHERE usuario_id=?", (uid,)).fetchone()[0]
+    ya = _evaluar_logros(conn, uid)
+    nuevos = []
+    condiciones = {
+        'primera_compra': compras >= 1,
+        'eco_semilla': pts >= 50,
+        'eco_guardiana': pts >= 200,
+        'vendiendo': productos >= 1,
+        'vendedor_pro': productos >= 5,
+        'cliente_fiel': compras >= 3,
+        'compartiendo': referidos >= 3,
+        'explorador': busquedas >= 10,
+    }
+    for lid, ok in condiciones.items():
+        if ok and lid not in ya:
+            conn.execute('INSERT INTO logros (usuario_id, logro_id) VALUES (?,?)', (uid, lid))
+            nuevos.append(lid)
+    conn.commit()
+    conn.close()
+    for lid in nuevos:
+        emoji, nombre, desc = LOGROS[lid]
+        add_notificacion(uid, f'{emoji} ¡Logro desbloqueado: {nombre}!', desc, 'success')
+    return jsonify({'nuevos': nuevos, 'total': len(ya) + len(nuevos)})
+
+
+@app.route('/api/logros')
+@login_required
+def api_logros():
+    """Mis logros desbloqueados."""
+    conn = get_db()
+    rows = conn.execute('SELECT logro_id, created_at FROM logros WHERE usuario_id=? ORDER BY created_at',
+                        (session['usuario_id'],)).fetchall()
+    conn.close()
+    ids = {r['logro_id'] for r in rows}
+    return jsonify({'logros': [
+        {'id': lid, 'emoji': v[0], 'nombre': v[1], 'desc': v[2],
+         'desbloqueado': lid in ids, 'fecha': next((r['created_at'] for r in rows if r['logro_id'] == lid), None)}
+        for lid, v in LOGROS.items()]})
+
+
+# ── Quiz semanal ecológico ─────────────────────────────────────────
+
+QUIZ_PREGUNTAS = [
+    {'p': '¿Cuánto tarda una botella plástica en degradarse?', 'o': ['10 años', '100 años', '450 años', '1 año'], 'r': 2},
+    {'p': '¿Qué material es el más reciclable?', 'o': ['Plástico', 'Vidrio', 'Teléfono móvil', 'Papel mojado'], 'r': 1},
+    {'p': '¿Cuántos litros de agua se ahorran con una botella reutilizable al año?', 'o': ['50 L', '100 L', '217 L', '500 L'], 'r': 2},
+    {'p': '¿Qué es el compostaje?', 'o': ['Quemar basura', 'Descomponer orgánicos en abono', 'Enterrar plástico', 'Pintar reciclaje'], 'r': 1},
+    {'p': '¿Cuál es el mayor contaminante de océanos?', 'o': ['Petróleo', 'Plástico', 'Vidrio', 'Papel'], 'r': 1},
+    {'p': '¿Qué significa el código ♻️?', 'o': ['Reducir, Reutilizar, Reciclar', 'Reparar, Ropa, Rueda', 'Rápido, Rico, Real', 'Raíz, Rama, Roca'], 'r': 0},
+    {'p': '¿Cuántas bolsas plásticas usa una persona promedio al año?', 'o': ['10', '100', '300', '500'], 'r': 2},
+    {'p': '¿Qué es la huella de carbono?', 'o': ['El peso de una persona', 'Emisiones de CO₂ de una actividad', 'La marca del zapato', 'Un tipo de energía'], 'r': 1},
+    {'p': '¿Por qué el bambú es un material ecológico popular?', 'o': ['Es un metal', 'Es resistente y biodegradable', 'No se puede reciclar', 'Es un plástico'], 'r': 1},
+    {'p': '¿Cada cuánto conviene revisar la presión de llantas para ahorrar gasolina?', 'o': ['Nunca', 'Cada 6 meses', 'Cada mes', 'Cada día'], 'r': 2},
+]
+
+
+@app.route('/api/quiz')
+def api_quiz_preguntas():
+    """5 preguntas aleatorias del quiz (sin respuestas)."""
+    import random as _rnd
+    qs = _rnd.sample(QUIZ_PREGUNTAS, 5)
+    return jsonify({'preguntas': [{'p': q['p'], 'o': q['o']} for q in qs],
+                    'ids': [QUIZ_PREGUNTAS.index(q) for q in qs]})
+
+
+@app.route('/api/quiz/responder', methods=['POST'])
+@login_required
+def api_quiz_responder():
+    """Califica el quiz; premio de pts eco una vez por semana ISO."""
+    data = request.get_json(silent=True) or {}
+    respuestas = data.get('respuestas', [])
+    ids = data.get('ids', [])
+    uid = session['usuario_id']
+    conn = get_db()
+    # Una semana por usuario (claves por año-semana en tabla logros como 'quiz_YYYY_WW')
+    iso = datetime.now().isocalendar()
+    clave = f'quiz_{iso[0]}_{iso[1]}'
+    ya = conn.execute('SELECT 1 FROM logros WHERE usuario_id=? AND logro_id=?', (uid, clave)).fetchone()
+    if ya:
+        conn.close()
+        return jsonify({'error': 'Ya participaste esta semana. ¡Vuelve el próximo lunes!'}), 429
+    correctas = 0
+    for idx, resp in zip(ids, respuestas):
+        if 0 <= idx < len(QUIZ_PREGUNTAS) and resp == QUIZ_PREGUNTAS[idx]['r']:
+            correctas += 1
+    premio = correctas * 20  # 20 pts por acierto
+    conn.execute('INSERT INTO logros (usuario_id, logro_id) VALUES (?,?)', (uid, clave))
+    conn.execute('UPDATE usuarios SET eco_puntos = COALESCE(eco_puntos,0) + ? WHERE id=?', (premio, uid))
+    conn.commit()
+    conn.close()
+    add_notificacion(uid, '🎓 ¡Quiz completado!', f'Acertaste {correctas}/5 — ganaste {premio} pts eco', 'success')
+    return jsonify({'success': True, 'correctas': correctas, 'total': 5, 'premio': premio})
+
+
+# ── Ofertas flash (mayor descuento del catálogo) ───────────────────
+
+@app.route('/api/ofertas-flash')
+def api_ofertas_flash():
+    """Productos con mayor % de descuento."""
+    conn = get_db()
+    rows = conn.execute('''
+        SELECT id, nombre, precio, precio_original, imagen, categoria, eco_score
+        FROM productos
+        WHERE COALESCE(vendido,0)=0 AND precio_original IS NOT NULL AND precio_original > precio
+        ORDER BY (precio_original - precio) / precio_original DESC LIMIT 8
+    ''').fetchall()
+    conn.close()
+    return jsonify({'ofertas': [dict(r) for r in rows]})
 
 
 # ── Monedero EcoCoins: canje de puntos por cupones ─────────────────

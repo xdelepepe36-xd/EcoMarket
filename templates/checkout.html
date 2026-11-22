@@ -94,6 +94,14 @@
                         </label>
                     </div>
 
+                    <div style="margin:14px 0">
+                        <label style="display:flex;align-items:center;gap:8px;font-weight:600;font-size:.88rem;cursor:pointer;margin-bottom:8px">
+                            <input type="checkbox" id="esRegalo" style="width:18px;height:18px;accent-color:#e53935">
+                            🎁 <span data-i18n="checkout.gift">Es un regalo</span>
+                        </label>
+                        <textarea id="regaloMsg" maxlength="200" placeholder="Dedicatoria (opcional): 'Feliz cumple, te quiero'" style="display:none;width:100%;padding:12px;border:1.5px solid rgba(229,57,53,.25);border-radius:12px;font-family:inherit;min-height:70px;resize:vertical;background:#fff5f5"></textarea>
+                    </div>
+
                     <button type="submit" class="btn-principal checkout-submit-btn">
                         <i class="bi bi-lock-fill"></i> <span data-i18n="checkout.pay">Pagar S/. </span><span id="totalPagar">0.00</span>
                     </button>
@@ -290,7 +298,8 @@ document.getElementById('checkoutForm').addEventListener('submit', function(e) {
             ciudad: ciudad,
             items: items,
             metodo_pago: metodoPago ? metodoPago.value : '',
-            coupon: localStorage.getItem('ecomarket_coupon') || ''
+            coupon: localStorage.getItem('ecomarket_coupon') || '',
+            regalo: (function(){ var c=document.getElementById('esRegalo'); return c && c.checked ? document.getElementById('regaloMsg').value.trim() : ''; })()
         })
     })
     .then(r => r.json())
@@ -320,6 +329,11 @@ document.getElementById('checkoutForm').addEventListener('submit', function(e) {
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<i class="bi bi-lock-fill"></i> Pagar S/. ' + document.getElementById('totalPagar').textContent;
     });
+});
+
+// Toggle dedicatoria de regalo
+document.getElementById('esRegalo').addEventListener('change', function() {
+    document.getElementById('regaloMsg').style.display = this.checked ? 'block' : 'none';
 });
 
 // Cupón: validar contra el servidor antes de aplicarlo

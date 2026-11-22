@@ -2678,3 +2678,53 @@ main, .section { animation: ecoPageIn .45s cubic-bezier(.22,1,.36,1) both; }
 .eco-thanks-card span { font-size: .78rem; font-weight: 700; color: #b45309; }
 .eco-thanks-form { display: flex; gap: 10px; max-width: 640px; margin: 0 auto; }
 @media (max-width: 640px) { .eco-thanks-form { flex-direction: column; } }
+
+/* ── Ofertas Flash strip ── */
+#flashSection { background: linear-gradient(135deg, rgba(229,57,53,.06), rgba(255,193,7,.08)); }
+#flashStrip { scrollbar-width: thin; }
+.eco-flash-card {
+    position: relative; flex: 0 0 170px; scroll-snap-align: start;
+    background: var(--blanco, #fff); border-radius: 16px; overflow: hidden;
+    border: 1px solid rgba(229,57,53,.18); text-decoration: none; color: inherit;
+    box-shadow: 0 4px 14px rgba(0,0,0,.06); transition: transform .2s;
+}
+.eco-flash-card:hover { transform: translateY(-4px); }
+.eco-flash-card img { width: 100%; height: 110px; object-fit: cover; display: block; }
+.eco-flash-badge {
+    position: absolute; top: 8px; left: 8px; background: #e53935; color: #fff;
+    font-weight: 800; font-size: .78rem; padding: 3px 9px; border-radius: 999px;
+    box-shadow: 0 2px 8px rgba(229,57,53,.4);
+}
+.eco-flash-info { padding: 10px 12px; }
+.eco-flash-info strong { display: block; font-size: .82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.eco-flash-price { font-size: .85rem; font-weight: 700; color: #e53935; }
+.eco-flash-price s { color: var(--texto-sec, #999); font-weight: 400; font-size: .78rem; }
+@media (max-width: 640px) { .eco-flash-card { flex-basis: 140px; } }
+
+/* ── Quiz semanal ── */
+.quiz-card { background: var(--blanco, #fff); border-radius: 20px; padding: 24px; box-shadow: var(--sombra, 0 4px 20px rgba(0,0,0,.06)); border: 1px solid rgba(46,125,50,.1); }
+.quiz-q { margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px dashed rgba(46,125,50,.15); }
+.quiz-q:last-of-type { border-bottom: none; }
+.quiz-p { font-weight: 600; margin: 0 0 10px; font-size: .95rem; }
+.quiz-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.quiz-opt { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 1.5px solid rgba(46,125,50,.2); border-radius: 12px; cursor: pointer; font-size: .85rem; transition: all .15s; }
+.quiz-opt:hover { border-color: #2e7d32; background: rgba(46,125,50,.05); }
+.quiz-opt input { accent-color: #2e7d32; }
+.quiz-opt:has(input:checked) { border-color: #2e7d32; background: rgba(46,125,50,.12); font-weight: 600; }
+.quiz-submit { width: 100%; margin-top: 8px; }
+.quiz-result-ok { margin-top: 16px; padding: 14px; border-radius: 12px; background: rgba(46,125,50,.12); color: #1b5e20; font-weight: 700; text-align: center; }
+.quiz-result-err { margin-top: 16px; padding: 14px; border-radius: 12px; background: rgba(229,57,53,.1); color: #c62828; font-weight: 600; text-align: center; }
+.quiz-login { text-align: center; padding: 12px; }
+.quiz-login a { display: inline-block; margin-top: 10px; }
+@media (max-width: 560px) { .quiz-opts { grid-template-columns: 1fr; } }
+
+/* ── Logros grid ── */
+.logros-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.logro-card { border-radius: 14px; padding: 14px; text-align: center; border: 1px solid rgba(46,125,50,.15); background: rgba(46,125,50,.04); display: flex; flex-direction: column; gap: 4px; }
+.logro-card .logro-emoji { font-size: 1.8rem; }
+.logro-card strong { font-size: .88rem; }
+.logro-card small { color: var(--texto-sec, #666); font-size: .76rem; line-height: 1.4; }
+.logro-card em { font-style: normal; font-size: .72rem; font-weight: 700; margin-top: 4px; }
+.logro-off { opacity: .45; filter: grayscale(.6); }
+.logro-on { background: linear-gradient(135deg, rgba(249,168,37,.14), rgba(46,125,50,.1)); border-color: rgba(249,168,37,.5); }
+.logro-on em { color: #b45309; }

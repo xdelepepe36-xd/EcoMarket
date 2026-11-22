@@ -40,6 +40,14 @@
             </div>
             {% endif %}
 
+            {% if pedido.regalo_mensaje %}
+            <div style="margin-top:18px;padding:16px;border-radius:14px;background:linear-gradient(135deg,#fff5f5,#ffe0e0);border:1.5px dashed #e53935;text-align:center">
+                <div style="font-size:1.6rem">🎁</div>
+                <div style="font-weight:700;color:#c62828;margin:6px 0">¡Es un regalo!</div>
+                <p style="font-style:italic;color:#5d4037;margin:0">"{{ pedido.regalo_mensaje }}"</p>
+            </div>
+            {% endif %}
+
             <!-- Timeline de estado -->
             {% set labels = ['Pedido recibido', 'Confirmado', 'Enviado', 'Entregado'] %}
             {% set order_index = {'pendiente':0,'confirmado':1,'pagado':1,'enviado':2,'entregado':3} %}

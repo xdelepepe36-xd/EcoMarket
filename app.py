@@ -3130,11 +3130,23 @@ def _chat_respuesta(msg, lang, conn):
 
     # 3b) Seguimiento conversacional: "más", "otros", "el primero", "más barato"
     prev = session.get('chat_ctx') or {}
-    if _kwhit(msg_n, ['mas opciones', 'otros', 'siguientes', 'ver mas', 'more', 'next', 'others']):
+    if _kwhit(msg_n, ['mas opciones', 'otros', 'siguientes', 'ver mas', 'more', 'next', 'others', 'cuentame mas', 'tell me more', 'que mas hay', 'y que mas']):
         if prev.get('kind') == 'products':
-            prods = _chat_products(conn, categoria=prev.get('cat'), baratos=prev.get('baratos', False),
-                                   offset=prev.get('shown', 0), limite=4)
-            if prods:
+            if prev.get('buscar'):
+                prods = _chat_products(conn, buscar=prev['buscar'], limite=4, offset=prev.get('shown', 0))
+            else:
+                prods = _chat_products(conn, categoria=prev.get('cat'), baratos=prev.get('baratos', False),
+                                       offset=prev.get('shown', 0), limite=4)
+            if not prods:
+                # se acabaron los resultados del filtro: ofrecer los más vistos como alternativa
+                prods = _chat_products(conn, limite=4)
+                if prods and lang == 'es':
+                    lineas = '\n'.join(f'• [{p["nombre"]}](/producto/{p["id"]}) — S/.{p["precio"]:.2f}' for p in prods)
+                    return '🤷 No hay más de eso por ahora, pero mira los más populares:\n' + lineas
+                if prods:
+                    lineas = '\n'.join(f'• [{p["nombre"]}](/producto/{p["id"]}) — S/.{p["precio"]:.2f}' for p in prods)
+                    return '🤷 Nothing more on that for now, but check the most popular:\n' + lineas
+            else:
                 session['chat_ctx'] = {**prev, 'shown': prev.get('shown', 0) + len(prods)}
                 lineas = '\n'.join(f'• [{p["nombre"]}](/producto/{p["id"]}) — S/.{p["precio"]:.2f}' for p in prods)
                 return ('✨ **Más opciones:**\n' if lang == 'es' else '✨ **More options:**\n') + lineas
@@ -3157,10 +3169,18 @@ def _chat_respuesta(msg, lang, conn):
     if len(kws) >= 1 and _kwhit(msg_n, ['tienes', 'hay', 'busco', 'busca', 'quiero', 'venden', 'find', 'have', 'search', 'looking']):
         prods = _chat_products(conn, buscar=kws, limite=4)
         if prods:
-            session['chat_ctx'] = {'kind': 'products', 'items': prods, 'shown': len(prods)}
+            session['chat_ctx'] = {'kind': 'products', 'items': prods, 'shown': len(prods), 'buscar': kws}
             lineas = '\n'.join(f'• [{p["nombre"]}](/producto/{p["id"]}) — S/.{p["precio"]:.2f} · {p["categoria"]}' for p in prods)
             extra = '\n\n¿Quieres más opciones? Solo dime "otros" 🙂' if lang == 'es' else '\n\nWant more? Just say "more" 🙂'
             return ('🔎 **Esto encontré para ti:**\n' if lang == 'es' else '🔎 **Here is what I found:**\n') + lineas + extra
+
+    # 3d) Precio del último producto mencionado: "cuánto cuesta", "precio", "how much"
+    items = prev.get('items') or []
+    if items and _kwhit(msg_n, ['cuanto cuesta', 'cuanto vale', 'precio', 'price', 'how much', 'cost']):
+        p = items[0]
+        if lang == 'es':
+            return f'💵 **{p["nombre"]}** cuesta **S/.{p["precio"]:.2f}** (categoría: {p["categoria"]}).\n[Ver producto](/producto/{p["id"]})'
+        return f'💵 **{p["nombre"]}** costs **S/.{p["precio"]:.2f}** (category: {p["categoria"]}).\n[View product](/producto/{p["id"]})'
 
     # 4) Intenciones fijas
     for intent in CHAT_INTENTS:

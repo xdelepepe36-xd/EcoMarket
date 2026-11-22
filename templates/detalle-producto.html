@@ -413,6 +413,53 @@ function cambiarImagen(btn, src) {
     btn.classList.add('active');
 }
 
+// ── Lightbox con zoom ────────────────────────────
+(function initLightbox(){
+    var main = document.getElementById('mainImage');
+    if(!main) return;
+    var urls = [main.src];
+    document.querySelectorAll('.gallery-thumb img').forEach(function(im){ if(im.src && urls.indexOf(im.src)===-1) urls.push(im.src); });
+    var lb = document.createElement('div');
+    lb.id = 'ecoLightbox';
+    lb.innerHTML = '<div class="lb-backdrop"></div>' +
+        '<button class="lb-close" aria-label="Cerrar">✕</button>' +
+        '<button class="lb-nav lb-prev" aria-label="Anterior">‹</button>' +
+        '<img class="lb-img" alt="">' +
+        '<button class="lb-nav lb-next" aria-label="Siguiente">›</button>' +
+        '<div class="lb-counter"></div>';
+    document.body.appendChild(lb);
+    var lbImg = lb.querySelector('.lb-img'), counter = lb.querySelector('.lb-counter');
+    var idx = 0;
+    function show(i){
+        idx = (i + urls.length) % urls.length;
+        lbImg.src = urls[idx];
+        counter.textContent = (idx+1) + ' / ' + urls.length;
+    }
+    function open(){ lb.classList.add('open'); show(urls.indexOf(main.src) > -1 ? urls.indexOf(main.src) : 0); }
+    function close(){ lb.classList.remove('open'); }
+    main.style.cursor = 'zoom-in';
+    main.addEventListener('click', open);
+    lb.querySelector('.lb-backdrop').addEventListener('click', close);
+    lb.querySelector('.lb-close').addEventListener('click', close);
+    lb.querySelector('.lb-prev').addEventListener('click', function(e){ e.stopPropagation(); show(idx-1); });
+    lb.querySelector('.lb-next').addEventListener('click', function(e){ e.stopPropagation(); show(idx+1); });
+    document.addEventListener('keydown', function(e){
+        if(!lb.classList.contains('open')) return;
+        if(e.key==='Escape') close();
+        if(e.key==='ArrowLeft') show(idx-1);
+        if(e.key==='ArrowRight') show(idx+1);
+    });
+    // zoom con rueda del mouse dentro del lightbox
+    lbImg.addEventListener('wheel', function(e){
+        e.preventDefault();
+        var z = parseFloat(lbImg.style.transform.replace(/scale\(([^)]+)\)/,'$1')) || 1;
+        z = Math.min(4, Math.max(1, z + (e.deltaY < 0 ? 0.25 : -0.25)));
+        lbImg.style.transform = 'scale(' + z + ')';
+        if(z===1) lbImg.style.transform='';
+    }, {passive:false});
+    lbImg.addEventListener('dblclick', function(){ lbImg.style.transform=''; });
+})();
+
 // ── Pestañas ─────────────────────────────────────
 function cambiarTab(tabId, btn) {
     document.querySelectorAll('.detalle-tab').forEach(t => t.classList.remove('active'));

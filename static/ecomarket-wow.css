@@ -2321,3 +2321,31 @@ body.eco-kiosk .eco-scroll-progress, body.eco-kiosk .eco-kiosk-btn ~ *:not(main)
 body.eco-kiosk { cursor: none; }
 body.eco-kiosk .eco-kiosk-btn { display: flex !important; }
 body.eco-kiosk main, body.eco-kiosk .section { animation: none; }
+
+/* ===== Lightbox galería ===== */
+#ecoLightbox { position: fixed; inset: 0; z-index: 10000; display: none; align-items: center; justify-content: center; }
+#ecoLightbox.open { display: flex; }
+#ecoLightbox .lb-backdrop { position: absolute; inset: 0; background: rgba(5,15,8,.92); backdrop-filter: blur(6px); }
+#ecoLightbox .lb-img {
+    position: relative; max-width: 88vw; max-height: 84vh; object-fit: contain;
+    border-radius: 18px; box-shadow: 0 30px 80px rgba(0,0,0,.5);
+    transition: transform .18s ease; cursor: zoom-in;
+}
+#ecoLightbox .lb-close, #ecoLightbox .lb-nav {
+    position: absolute; z-index: 2; border: none; cursor: pointer;
+    background: rgba(255,255,255,.12); color: #fff; font-size: 1.6rem;
+    width: 48px; height: 48px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s, transform .2s;
+}
+#ecoLightbox .lb-close:hover, #ecoLightbox .lb-nav:hover { background: rgba(34,197,94,.5); transform: scale(1.08); }
+#ecoLightbox .lb-close { top: 24px; right: 28px; }
+#ecoLightbox .lb-prev { left: 26px; top: 50%; transform: translateY(-50%); }
+#ecoLightbox .lb-next { right: 26px; top: 50%; transform: translateY(-50%); }
+#ecoLightbox .lb-prev:hover { transform: translateY(-50%) scale(1.08); }
+#ecoLightbox .lb-next:hover { transform: translateY(-50%) scale(1.08); }
+#ecoLightbox .lb-counter {
+    position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,.5); color: #fff; padding: 6px 16px; border-radius: 99px;
+    font-size: .85rem; font-weight: 600;
+}

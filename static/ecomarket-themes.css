@@ -347,3 +347,118 @@
 [data-theme='dark'] .float-chip .fc-cat, [data-theme='nature'] .float-chip .fc-cat,
 [data-theme='ocean'] .float-chip .fc-cat, [data-theme='midnight'] .float-chip .fc-cat,
 [data-theme='rose'] .float-chip .fc-cat { color: rgba(220,232,220,.6); }
+
+/* ═══ SUPERFICIES oscuras para temas de color (nature/ocean/midnight/rose) ═══ */
+/* Variables raíz: todos los componentes que usan var(--blanco)/var(--texto) se adaptan */
+[data-theme='nature'] {
+    --blanco: rgba(18,48,32,.92); --fondo:#0C1F12; --fondo-alt:#123020;
+    --texto:#DFF0DC; --texto-sec:#A9CBA9; --gris-oscuro:#EAF6E6; --gris-secundario:#B7D4B0;
+    --gris-claro:#1E4028; --sombra: rgba(0,0,0,.45);
+}
+[data-theme='ocean'] {
+    --blanco: rgba(10,45,72,.92); --fondo:#041E33; --fondo-alt:#0A2D48;
+    --texto:#DCEFFE; --texto-sec:#A5C8E8; --gris-oscuro:#E8F6FF; --gris-secundario:#B3D4EE;
+    --gris-claro:#123A5C; --sombra: rgba(0,0,0,.45);
+}
+[data-theme='midnight'] {
+    --blanco: rgba(17,17,38,.94); --fondo:#0A0A18; --fondo-alt:#111126;
+    --texto:#E6E8F5; --texto-sec:#A9AECF; --gris-oscuro:#F0F1FA; --gris-secundario:#B9BEDC;
+    --gris-claro:#1E1E3E; --sombra: rgba(0,0,0,.5);
+}
+[data-theme='rose'] {
+    --blanco: rgba(58,16,34,.92); --fondo:#170A12; --fondo-alt:#2E1020;
+    --texto:#FBE4EC; --texto-sec:#D8A8BC; --gris-oscuro:#FFF0F5; --gris-secundario:#E4BCCD;
+    --gris-claro:#3D1630; --sombra: rgba(0,0,0,.45);
+}
+
+/* Componentes con fondo #fff hardcodeado → superficie del tema */
+[data-theme='nature'] .faq-item, [data-theme='nature'] .como-funciona-card,
+[data-theme='nature'] .search-bar, [data-theme='nature'] .impacto-card,
+[data-theme='nature'] .impacto-stat, [data-theme='nature'] .impacto-card-item,
+[data-theme='nature'] .stat-card, [data-theme='nature'] .profile-stat-card,
+[data-theme='nature'] .testimonio-card, [data-theme='nature'] .testimonio,
+[data-theme='nature'] .contact-card, [data-theme='nature'] .carrito-item,
+[data-theme='nature'] .carrito-resumen, [data-theme='nature'] .resumen-card,
+[data-theme='nature'] .modal, [data-theme='nature'] .toast,
+[data-theme='nature'] .no-results, [data-theme='nature'] .hero-stat-item,
+[data-theme='nature'] .hero-badge, [data-theme='nature'] .catalog-filter-panel,
+[data-theme='nature'] .filter-pills, [data-theme='nature'] .recompensa-card,
+[data-theme='nature'] .referral-stat, [data-theme='nature'] .perfil-header,
+[data-theme='nature'] .perfil-tabs, [data-theme='nature'] .checkout-step-circle,
+[data-theme='nature'] .detalle-tab-panel, [data-theme='nature'] .detalles-info-card {
+    background: rgba(18,48,32,.92); border-color: rgba(74,222,128,.22); color: #DFF0DC;
+}
+[data-theme='ocean'] .faq-item, [data-theme='ocean'] .como-funciona-card,
+[data-theme='ocean'] .search-bar, [data-theme='ocean'] .impacto-card,
+[data-theme='ocean'] .impacto-stat, [data-theme='ocean'] .impacto-card-item,
+[data-theme='ocean'] .stat-card, [data-theme='ocean'] .profile-stat-card,
+[data-theme='ocean'] .testimonio-card, [data-theme='ocean'] .testimonio,
+[data-theme='ocean'] .contact-card, [data-theme='ocean'] .carrito-item,
+[data-theme='ocean'] .carrito-resumen, [data-theme='ocean'] .resumen-card,
+[data-theme='ocean'] .modal, [data-theme='ocean'] .toast,
+[data-theme='ocean'] .no-results, [data-theme='ocean'] .hero-stat-item,
+[data-theme='ocean'] .hero-badge, [data-theme='ocean'] .catalog-filter-panel,
+[data-theme='ocean'] .filter-pills, [data-theme='ocean'] .recompensa-card,
+[data-theme='ocean'] .referral-stat, [data-theme='ocean'] .perfil-header,
+[data-theme='ocean'] .perfil-tabs, [data-theme='ocean'] .checkout-step-circle,
+[data-theme='ocean'] .detalle-tab-panel, [data-theme='ocean'] .detalles-info-card {
+    background: rgba(10,45,72,.92); border-color: rgba(56,189,248,.25); color: #DCEFFE;
+}
+[data-theme='midnight'] .faq-item, [data-theme='midnight'] .como-funciona-card,
+[data-theme='midnight'] .search-bar, [data-theme='midnight'] .impacto-card,
+[data-theme='midnight'] .impacto-stat, [data-theme='midnight'] .impacto-card-item,
+[data-theme='midnight'] .stat-card, [data-theme='midnight'] .profile-stat-card,
+[data-theme='midnight'] .testimonio-card, [data-theme='midnight'] .testimonio,
+[data-theme='midnight'] .contact-card, [data-theme='midnight'] .carrito-item,
+[data-theme='midnight'] .carrito-resumen, [data-theme='midnight'] .resumen-card,
+[data-theme='midnight'] .modal, [data-theme='midnight'] .toast,
+[data-theme='midnight'] .no-results, [data-theme='midnight'] .hero-stat-item,
+[data-theme='midnight'] .hero-badge, [data-theme='midnight'] .catalog-filter-panel,
+[data-theme='midnight'] .filter-pills, [data-theme='midnight'] .recompensa-card,
+[data-theme='midnight'] .referral-stat, [data-theme='midnight'] .perfil-header,
+[data-theme='midnight'] .perfil-tabs, [data-theme='midnight'] .checkout-step-circle,
+[data-theme='midnight'] .detalle-tab-panel, [data-theme='midnight'] .detalles-info-card {
+    background: rgba(17,17,38,.94); border-color: rgba(165,180,252,.2); color: #E6E8F5;
+}
+[data-theme='rose'] .faq-item, [data-theme='rose'] .como-funciona-card,
+[data-theme='rose'] .search-bar, [data-theme='rose'] .impacto-card,
+[data-theme='rose'] .impacto-stat, [data-theme='rose'] .impacto-card-item,
+[data-theme='rose'] .stat-card, [data-theme='rose'] .profile-stat-card,
+[data-theme='rose'] .testimonio-card, [data-theme='rose'] .testimonio,
+[data-theme='rose'] .contact-card, [data-theme='rose'] .carrito-item,
+[data-theme='rose'] .carrito-resumen, [data-theme='rose'] .resumen-card,
+[data-theme='rose'] .modal, [data-theme='rose'] .toast,
+[data-theme='rose'] .no-results, [data-theme='rose'] .hero-stat-item,
+[data-theme='rose'] .hero-badge, [data-theme='rose'] .catalog-filter-panel,
+[data-theme='rose'] .filter-pills, [data-theme='rose'] .recompensa-card,
+[data-theme='rose'] .referral-stat, [data-theme='rose'] .perfil-header,
+[data-theme='rose'] .perfil-tabs, [data-theme='rose'] .checkout-step-circle,
+[data-theme='rose'] .detalle-tab-panel, [data-theme='rose'] .detalles-info-card {
+    background: rgba(58,16,34,.92); border-color: rgba(251,207,232,.22); color: #FBE4EC;
+}
+
+/* Textos dentro de esas tarjetas: forzar colores legibles del tema */
+[data-theme='nature'] .faq-item h3, [data-theme='nature'] .como-funciona-card h3,
+[data-theme='nature'] .impacto-card h3, [data-theme='nature'] .stat-card h3,
+[data-theme='nature'] .testimonio-card h3, [data-theme='nature'] .contact-card h3 { color:#EAF6E6; }
+[data-theme='nature'] .faq-item p, [data-theme='nature'] .como-funciona-card p,
+[data-theme='nature'] .impacto-card p, [data-theme='nature'] .stat-card p,
+[data-theme='nature'] .testimonio-card p, [data-theme='nature'] .contact-card p { color:#B7D4B0; }
+[data-theme='ocean'] .faq-item h3, [data-theme='ocean'] .como-funciona-card h3,
+[data-theme='ocean'] .impacto-card h3, [data-theme='ocean'] .stat-card h3,
+[data-theme='ocean'] .testimonio-card h3, [data-theme='ocean'] .contact-card h3 { color:#E8F6FF; }
+[data-theme='ocean'] .faq-item p, [data-theme='ocean'] .como-funciona-card p,
+[data-theme='ocean'] .impacto-card p, [data-theme='ocean'] .stat-card p,
+[data-theme='ocean'] .testimonio-card p, [data-theme='ocean'] .contact-card p { color:#B3D4EE; }
+[data-theme='midnight'] .faq-item h3, [data-theme='midnight'] .como-funciona-card h3,
+[data-theme='midnight'] .impacto-card h3, [data-theme='midnight'] .stat-card h3,
+[data-theme='midnight'] .testimonio-card h3, [data-theme='midnight'] .contact-card h3 { color:#F0F1FA; }
+[data-theme='midnight'] .faq-item p, [data-theme='midnight'] .como-funciona-card p,
+[data-theme='midnight'] .impacto-card p, [data-theme='midnight'] .stat-card p,
+[data-theme='midnight'] .testimonio-card p, [data-theme='midnight'] .contact-card p { color:#B9BEDC; }
+[data-theme='rose'] .faq-item h3, [data-theme='rose'] .como-funciona-card h3,
+[data-theme='rose'] .impacto-card h3, [data-theme='rose'] .stat-card h3,
+[data-theme='rose'] .testimonio-card h3, [data-theme='rose'] .contact-card h3 { color:#FFF0F5; }
+[data-theme='rose'] .faq-item p, [data-theme='rose'] .como-funciona-card p,
+[data-theme='rose'] .impacto-card p, [data-theme='rose'] .stat-card p,
+[data-theme='rose'] .testimonio-card p, [data-theme='rose'] .contact-card p { color:#E4BCCD; }

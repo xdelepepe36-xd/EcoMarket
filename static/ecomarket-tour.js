@@ -54,6 +54,8 @@
         if (overlay) overlay.style.display = 'none';
         // limpieza extra: por si quedó alguna sombra/overlay residual
         document.querySelectorAll('.tour-hole').forEach(function (h) { h.removeAttribute('style'); });
+        // volver arriba: el último paso deja el scroll en el footer (oscuro)
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     function next() { if (idx < PASOS.length - 1) show(idx + 1); else stop(); }
 

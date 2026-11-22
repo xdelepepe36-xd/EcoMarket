@@ -105,6 +105,13 @@ localStorage.setItem('eco_vistos',JSON.stringify(v.slice(0,8)));
                     {% endif %}
                 </div>
                 <div class="detalle-delivery-pill"><i class="bi bi-truck"></i> <span data-i18n="pd.free_shipping_lima">Envío gratis en Lima</span></div>
+                {% if precio_historial %}
+                <div class="detalle-price-history" title="Historial de precios">
+                    <i class="bi bi-graph-down-arrow"></i>
+                    {% if producto.precio <= precio_historial.min %}¡Precio más bajo registrado!{% else %}Antes costaba hasta S/. {{ '%.2f'|format(precio_historial.max) }} · mínimo histórico S/. {{ '%.2f'|format(precio_historial.min) }}{% endif %}
+                    <small>({{ precio_historial.cambios }} cambios)</small>
+                </div>
+                {% endif %}
             </div>
 
             <div class="detalle-pills">

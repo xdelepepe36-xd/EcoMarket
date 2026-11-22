@@ -691,6 +691,14 @@ def init_db():
             FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE CASCADE
         );
         
+        CREATE TABLE IF NOT EXISTS historial_precios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            producto_id INTEGER NOT NULL,
+            precio REAL NOT NULL,
+            fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE CASCADE
+        );
+
         CREATE TABLE IF NOT EXISTS resenas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             producto_id INTEGER NOT NULL,
@@ -1512,18 +1520,26 @@ def producto_detalle(producto_id):
         return redirect(url_for('productos_view'))
 
     es_favorito = False
+    precio_hist = None
+    conn = get_db()
     if 'usuario_id' in session:
-        conn = get_db()
         fav = conn.execute(
             'SELECT id FROM favoritos WHERE usuario_id = ? AND producto_id = ?',
             (session['usuario_id'], producto_id)
         ).fetchone()
         es_favorito = fav is not None
-        conn.close()
+    hist = conn.execute(
+        'SELECT MIN(precio) AS min_p, MAX(precio) AS max_p, COUNT(*) AS n FROM historial_precios WHERE producto_id = ?',
+        (producto_id,)
+    ).fetchone()
+    if hist and hist['n'] and hist['n'] > 1:
+        precio_hist = {'min': hist['min_p'], 'max': hist['max_p'], 'cambios': hist['n']}
+    conn.close()
 
     return render_template('detalle-producto.html',
                            **data,
                            es_favorito=es_favorito,
+                           precio_historial=precio_hist,
                            ahora=datetime.now())
 
 
@@ -1886,6 +1902,7 @@ def publicar():
             (nombre, categoria, precio_valor, descripcion, imagen, imagen_thumb, stock_valor, condicion, especificaciones_json, session['usuario_id'], ubicacion)
         )
         producto_id = cursor.lastrowid
+        conn.execute('INSERT INTO historial_precios (producto_id, precio) VALUES (?,?)', (producto_id, precio_valor))
 
         # Subir imágenes adicionales (galería)
         if 'imagenes_extra' in request.files:
@@ -1958,10 +1975,13 @@ def editar_producto(producto_id):
                 especificaciones_json = json.dumps(specs, ensure_ascii=False)
 
         if all([nombre, categoria, precio, descripcion]):
+            viejo = conn.execute('SELECT precio FROM productos WHERE id = ?', (producto_id,)).fetchone()
             conn.execute(
                 'UPDATE productos SET nombre=?, categoria=?, precio=?, descripcion=?, stock=?, especificaciones=? WHERE id=?',
                 (nombre, categoria, float(precio), descripcion, int(stock), especificaciones_json, producto_id)
             )
+            if viejo and abs((viejo['precio'] or 0) - float(precio)) > 0.001:
+                conn.execute('INSERT INTO historial_precios (producto_id, precio) VALUES (?,?)', (producto_id, float(precio)))
             conn.commit()
             flash_t('producto_actualizado', 'success')
         conn.close()

@@ -2292,3 +2292,14 @@ main, .section { animation: ecoPageIn .45s cubic-bezier(.22,1,.36,1) both; }
 @media (prefers-reduced-motion: reduce) {
     main, .section, .product-card, .categoria-card { animation: none; }
 }
+
+/* ===== Historial de precios ===== */
+.detalle-price-history {
+    margin-top: 10px; font-size: .82rem; font-weight: 600; color: #166534;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.detalle-price-history i { color: #22C55E; }
+.detalle-price-history small { color: #6b7280; font-weight: 500; }
+[data-theme='dark'] .detalle-price-history, [data-theme='nature'] .detalle-price-history,
+[data-theme='ocean'] .detalle-price-history, [data-theme='midnight'] .detalle-price-history,
+[data-theme='rose'] .detalle-price-history { color: #86EFAC; }

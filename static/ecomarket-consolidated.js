@@ -23,7 +23,7 @@ const EcoMarket = {
         user: null
     },
     
-    themes: ['light', 'dark', 'nature', 'ocean', 'midnight', 'rose'],
+    themes: ['light', 'dark', 'nature', 'ocean', 'midnight', 'rose', 'autumn'],
     
     init() {
         this.initTheme();

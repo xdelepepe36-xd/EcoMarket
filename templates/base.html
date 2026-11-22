@@ -4,7 +4,7 @@
 <head>
     <script>
     // Aplicar tema guardado antes del primer paint (evita flash claro)
-    (function(){try{var t=localStorage.getItem('ecomarket-theme');var ok=['light','dark','nature','ocean','midnight','rose'];if(t&&ok.indexOf(t)!==-1){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();
+    (function(){try{var t=localStorage.getItem('ecomarket-theme');var ok=['light','dark','nature','ocean','midnight','rose','autumn'];if(t&&ok.indexOf(t)!==-1){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,12 +38,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-rediseño.css') }}?v=30">
     <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-dark-mode.css') }}?v=30">
     <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-wow.css') }}?v=34">
-    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-themes.css') }}?v=30">
+    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-themes.css') }}?v=31">
     <link rel="stylesheet" href="{{ url_for('static', filename='accessibility.css') }}?v=30">
     
     <!-- JS esencial: final.js expone toda la API que usan las plantillas
          (EcoCart.getSummary, EcoFavorites, EcoToast, etc.) -->
-    <script src="{{ url_for('static', filename='ecomarket-final.js') }}?v=30" defer></script>
+    <script src="{{ url_for('static', filename='ecomarket-final.js') }}?v=31" defer></script>
     <script src="{{ url_for('static', filename='ecomarket-security-enhanced.js') }}?v=30" defer></script>
     <script src="{{ url_for('static', filename='ecomarket-i18n-complete.js') }}?v=30" defer></script>
     <script src="{{ url_for('static', filename='ecomarket-validation.js') }}?v=30" defer></script>
@@ -53,7 +53,7 @@
     <script src="{{ url_for('static', filename='ecomarket-tour.js') }}?v=32" defer></script>
     <script src="{{ url_for('static', filename='ecomarket-cursor.js') }}?v=30" defer></script>
     <script src="{{ url_for('static', filename='ecomarket-extras.js') }}?v=32" defer></script>
-    <script src="{{ url_for('static', filename='ecomarket-pro.js') }}?v=8" defer></script>
+    <script src="{{ url_for('static', filename='ecomarket-pro.js') }}?v=9" defer></script>
     
     {% block head %}{% endblock %}
 </head>

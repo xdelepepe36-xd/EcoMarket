@@ -23,7 +23,7 @@ const EcoMarket = {
     state: {
         theme: (function () {
             var saved = localStorage.getItem('ecomarket-theme');
-            var ok = ['light','dark','nature','ocean','midnight','rose'];
+            var ok = ['light','dark','nature','ocean','midnight','rose','autumn'];
             if (saved && ok.indexOf(saved) !== -1) return saved;
             var h = new Date().getHours();
             if (h >= 20 || h < 6) return 'midnight';
@@ -35,7 +35,7 @@ const EcoMarket = {
     },
     
     // Todos los temas disponibles
-    themes: ['light', 'dark', 'nature', 'ocean', 'midnight', 'rose'],
+    themes: ['light', 'dark', 'nature', 'ocean', 'midnight', 'rose', 'autumn'],
     
     // Inicialización
     init() {
@@ -97,7 +97,7 @@ const EcoMarket = {
     updateMetaThemeColor() {
         const meta = document.querySelector('meta[name="theme-color"]');
         if (meta) {
-            const themeColors = { dark:'#171D1A', midnight:'#0F0F1A', ocean:'#1565C0', sepia:'#8B7355', nature:'#2D5A27', rose:'#EC407A', 'high-contrast':'#000000' };
+            const themeColors = { dark:'#171D1A', midnight:'#0F0F1A', ocean:'#1565C0', sepia:'#8B7355', nature:'#2D5A27', rose:'#EC407A', autumn:'#E65100', 'high-contrast':'#000000' };
             meta.setAttribute('content', themeColors[this.state.theme] || '#2e7d32');
         }
     },
@@ -111,6 +111,7 @@ const EcoMarket = {
             'ocean': '<i class="bi bi-water"></i>',
             'midnight': '<i class="bi bi-stars"></i>',
             'rose': '<i class="bi bi-heart"></i>',
+            'autumn': '<i class="bi bi-tree-fill"></i>',
             'high-contrast': '<i class="bi bi-eye"></i>'
         };
         return icons[theme] || '<i class="bi bi-palette"></i>';

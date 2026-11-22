@@ -35,6 +35,11 @@ const EcoThemes = {
             name: 'Rosa',
             icon: 'bi-heart',
             description: 'Tema pastel rosa'
+        },
+        autumn: {
+            name: 'Otoño',
+            icon: 'bi-tree-fill',
+            description: 'Tonos ámbar y naranja'
         }
     },
 

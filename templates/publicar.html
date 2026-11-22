@@ -78,6 +78,13 @@
             </div>
 
             <div>
+                <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+                    <input type="checkbox" name="es_digital" value="1" {% if producto and producto.es_digital %}checked{% endif %} style="width:18px;height:18px;accent-color:#2e7d32">
+                    <span>📥 <span data-i18n="publicar.digital">Producto digital</span> <small style="color:var(--texto-sec);font-weight:400">(PDF, guía, plantilla — se entrega por mensaje, sin envío)</small></span>
+                </label>
+            </div>
+
+            <div>
                 <label><span data-i18n="publicar.specs_label">Especificaciones técnicas</span></label>
 <textarea name="especificaciones" rows="4" data-i18n-placeholder="publicar.specs_placeholder" placeholder="Formato: clave: valor (una por línea)&#10;Ej:&#10;Material: Acero inoxidable&#10;Capacidad: 750ml&#10;Peso: 300g">{% if producto and producto.especificaciones %}{% set specs = producto.especificaciones|fromjson %}{% for k, v in specs.items() %}{{ k }}: {{ v }}
 {% endfor %}{% endif %}</textarea>

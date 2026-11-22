@@ -1089,6 +1089,26 @@ def init_db():
     except sqlite3.OperationalError:
         pass
 
+    # Productos digitales (PDF, guías, plantillas descargables)
+    try:
+        conn.execute('ALTER TABLE productos ADD COLUMN es_digital INTEGER DEFAULT 0')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
+    # Muro de agradecimientos
+    try:
+        conn.execute('''CREATE TABLE IF NOT EXISTS agradecimientos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            usuario_id INTEGER,
+            mensaje TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
+        )''')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
     # Agregar columna imagen_thumb a producto_imagenes si no existe
     try:
         conn.execute('ALTER TABLE producto_imagenes ADD COLUMN imagen_thumb TEXT DEFAULT ""')
@@ -1921,6 +1941,7 @@ def publicar():
         condicion = request.form.get('condicion', 'nuevo').strip()
         especificaciones_raw = request.form.get('especificaciones', '').strip()
         ubicacion = request.form.get('ubicacion', '').strip()
+        es_digital = 1 if request.form.get('es_digital') else 0
         imagen = get_product_image(categoria)
 
         # Subir imagen principal si se proporcionó
@@ -1979,8 +2000,8 @@ def publicar():
                 especificaciones_json = json.dumps(specs, ensure_ascii=False)
 
         cursor = conn.execute(
-            'INSERT INTO productos (nombre, categoria, precio, descripcion, imagen, imagen_thumb, stock, condicion, especificaciones, usuario_id, ubicacion) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
-            (nombre, categoria, precio_valor, descripcion, imagen, imagen_thumb, stock_valor, condicion, especificaciones_json, session['usuario_id'], ubicacion)
+            'INSERT INTO productos (nombre, categoria, precio, descripcion, imagen, imagen_thumb, stock, condicion, especificaciones, usuario_id, ubicacion, es_digital) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
+            (nombre, categoria, precio_valor, descripcion, imagen, imagen_thumb, stock_valor, condicion, especificaciones_json, session['usuario_id'], ubicacion, es_digital)
         )
         producto_id = cursor.lastrowid
         conn.execute('INSERT INTO historial_precios (producto_id, precio) VALUES (?,?)', (producto_id, precio_valor))
@@ -2195,6 +2216,17 @@ def impacto():
     total_usuarios = conn.execute('SELECT COUNT(*) FROM usuarios').fetchone()[0]
     total_visitas = conn.execute('SELECT COUNT(*) FROM visitas').fetchone()[0]
     total_pedidos = conn.execute('SELECT COUNT(*) FROM pedidos').fetchone()[0]
+    # CO₂ evitado por mes (aprox: eco_score × 0.4 kg por unidad vendida)
+    co2_rows = conn.execute('''
+        SELECT strftime('%Y-%m', pe.created_at) AS mes, COALESCE(SUM(p.eco_score),0) AS pts
+        FROM pedido_items pi
+        JOIN pedidos pe ON pe.id = pi.pedido_id
+        JOIN productos p ON p.id = pi.producto_id
+        WHERE pe.created_at >= date('now', '-6 months')
+        GROUP BY mes ORDER BY mes
+    ''').fetchall()
+    co2_mensual = [{'mes': r['mes'], 'co2': round(r['pts'] * 0.4, 1)} for r in co2_rows]
+    co2_total = round(sum(m['co2'] for m in co2_mensual), 1)
     conn.close()
     return render_template('impacto.html',
                            total_productos=total,
@@ -2202,7 +2234,9 @@ def impacto():
                            total_resenas=total_resenas,
                            total_usuarios=total_usuarios,
                            total_visitas=total_visitas,
-                           total_pedidos=total_pedidos)
+                           total_pedidos=total_pedidos,
+                           co2_mensual=co2_mensual,
+                           co2_total=co2_total)
 
 
 # ── API Dashboard ────────────────────────────────────────────────────────────
@@ -2864,6 +2898,36 @@ def api_notificaciones():
         (session['usuario_id'],)).fetchone()[0]
     conn.close()
     return jsonify({'notificaciones': [dict(r) for r in rows], 'no_leidas': no_leidas})
+
+
+# ── Muro de agradecimientos ────────────────────────────────────────
+
+@app.route('/api/agradecimientos')
+def api_agradecimientos():
+    """Mensajes públicos de agradecimiento a la comunidad."""
+    conn = get_db()
+    rows = conn.execute('''
+        SELECT a.mensaje, a.created_at, u.nombre
+        FROM agradecimientos a LEFT JOIN usuarios u ON u.id = a.usuario_id
+        ORDER BY a.created_at DESC LIMIT 12
+    ''').fetchall()
+    conn.close()
+    return jsonify({'mensajes': [dict(r) for r in rows]})
+
+
+@app.route('/api/agradecimientos', methods=['POST'])
+@login_required
+def api_agradecimiento_crear():
+    data = request.get_json(silent=True) or {}
+    mensaje = sanitize_string(data.get('mensaje', ''), max_length=280)
+    if len(mensaje.strip()) < 5:
+        return jsonify({'error': 'Escribe algo (mínimo 5 caracteres)'}), 400
+    conn = get_db()
+    conn.execute('INSERT INTO agradecimientos (usuario_id, mensaje) VALUES (?,?)',
+                 (session['usuario_id'], mensaje.strip()))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
 
 
 # ── Monedero EcoCoins: canje de puntos por cupones ─────────────────

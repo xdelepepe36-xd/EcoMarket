@@ -14,7 +14,8 @@
         nature:   { n: 26, color: '76,175,80',  shape: 'leaf',  speed: 0.55 },
         ocean:    { n: 24, color: '100,181,246', shape: 'bubble', speed: 0.5 },
         midnight: { n: 40, color: '165,180,252', shape: 'star',  speed: 0.3 },
-        rose:     { n: 18, color: '240,98,146', shape: 'petal', speed: 0.45 }
+        rose:     { n: 18, color: '240,98,146', shape: 'petal', speed: 0.45 },
+        autumn:   { n: 24, color: '245,124,0',  shape: 'leaf',  speed: 0.6 }
     };
 
     var canvas = null, ctx = null, parts = [], rafId = null, themeKey = '';
@@ -596,6 +597,45 @@
         }).catch(function () {});
     }
 
+    /* ═══════════ 17. MURO DE AGRADECIMIENTOS ═══════════ */
+    function initAgradecimientos() {
+        if (location.pathname !== '/') return;
+        if (document.getElementById('ecoThanks')) return;
+        var section = document.createElement('section');
+        section.id = 'ecoThanks';
+        section.className = 'section';
+        section.innerHTML = '<div class="container"><div class="section-title"><h2>💛 Muro de agradecimientos</h2><p>Lo que dice la comunidad de EcoMarket</p></div>' +
+            '<div class="eco-thanks-grid" id="ecoThanksGrid"><p style="color:var(--texto-sec)">Cargando…</p></div>' +
+            (document.body.dataset.userId ? '<div class="eco-thanks-form"><input id="ecoThanksInput" maxlength="280" placeholder="Escribe un agradecimiento…" style="flex:1;padding:12px 16px;border:1.5px solid rgba(46,125,50,.2);border-radius:12px;font-family:inherit"><button class="btn-principal" id="ecoThanksSend" style="padding:12px 22px">Enviar 💌</button></div>' : '') +
+            '</div>';
+        var footer = document.querySelector('footer');
+        if (footer && footer.parentNode) footer.parentNode.insertBefore(section, footer);
+        else document.body.appendChild(section);
+        function esc(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+        function load() {
+            fetch('/api/agradecimientos').then(function (r) { return r.json(); }).then(function (d) {
+                var msgs = d.mensajes || [];
+                var grid = document.getElementById('ecoThanksGrid');
+                if (!msgs.length) { grid.innerHTML = '<p style="text-align:center;color:var(--texto-sec)">Sé el primero en agradecer 💚</p>'; return; }
+                grid.innerHTML = msgs.map(function (m) {
+                    return '<div class="eco-thanks-card"><p>“' + esc(m.mensaje) + '”</p><span>— ' + esc((m.nombre || 'Anónimo').split(' ')[0]) + '</span></div>';
+                }).join('');
+            }).catch(function () {});
+        }
+        var send = document.getElementById('ecoThanksSend');
+        if (send) send.addEventListener('click', function () {
+            var inp = document.getElementById('ecoThanksInput');
+            var msg = inp.value.trim();
+            if (msg.length < 5) return;
+            fetch('/api/agradecimientos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mensaje: msg }) })
+                .then(function (r) { return r.json(); }).then(function (d) {
+                    if (d.success) { inp.value = ''; load(); if (window.EcoToast) EcoToast.show('💌 ¡Gracias!', 'Tu mensaje ya está en el muro', 'success'); }
+                    else alert(d.error || 'Error');
+                }).catch(function () { alert('Error de conexión'); });
+        });
+        load();
+    }
+
     /* ═══════════ INIT ═══════════ */
     document.addEventListener('DOMContentLoaded', function () {
         initParticles();
@@ -614,5 +654,6 @@
         initReferidos();
         initMonedero();
         initBusquedasRecientes();
+        initAgradecimientos();
     });
 })();

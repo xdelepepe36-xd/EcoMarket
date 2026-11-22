@@ -10,6 +10,18 @@
     background-attachment: fixed;
 }
 
+/* ── OTOÑO: crema cálido con ámbar ── */
+[data-theme='autumn'] body {
+    background:
+        radial-gradient(55% 35% at 88% -5%, rgba(245,124,0,.14), transparent 60%),
+        radial-gradient(45% 30% at 4% 8%, rgba(191,54,12,.10), transparent 60%),
+        linear-gradient(180deg, #FFF8F0 0%, #FFEFD9 100%);
+    background-attachment: fixed;
+}
+[data-theme='autumn'] .section-title h2 { background:linear-gradient(100deg,#E65100,#FF9800 60%,#BF360C); -webkit-background-clip:text; background-clip:text; color:transparent; }
+[data-theme='autumn'] .btn-principal { background:linear-gradient(135deg,#E65100,#FF9800); }
+[data-theme='autumn'] .hero-section-enhanced { background: linear-gradient(120deg, rgba(255,248,240,.92), rgba(255,239,217,.85)); }
+
 /* ── SEPIA: papel antiguo ── */
 [data-theme='sepia'] body {
     background:

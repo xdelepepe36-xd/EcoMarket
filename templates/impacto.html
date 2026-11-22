@@ -132,6 +132,24 @@ nums.forEach(function(n){io.observe(n);});
                     <div class="legend-item"><span style="background: #81c784;"></span> <span data-i18n="imp2.legend_returning">Recurrentes (20%)</span></div>
                 </div>
             </div>
+            <div class="impact-chart-card" style="grid-column: 1 / -1">
+                <h3>🌍 CO₂ evitado por mes <small style="font-weight:400;color:var(--texto-sec,#666)">(kg · estimado con eco-score de ventas reales)</small></h3>
+                {% set max_co2 = (co2_mensual|map(attribute='co2')|max) if co2_mensual else 1 %}
+                <div class="chart-bars">
+                    {% for m in co2_mensual %}
+                    <div class="chart-bar-item">
+                        <span class="chart-label">{{ m.mes[5:] }}/{{ m.mes[:4] }}</span>
+                        <div class="chart-bar">
+                            <div class="chart-fill" style="width: {{ ((m.co2 / (max_co2 or 1)) * 100)|round(0, 'floor') if m.co2 else 4 }}%; background: linear-gradient(90deg,#166534,#22C55E);" data-animate-progress="{{ ((m.co2 / (max_co2 or 1)) * 100)|round(0, 'floor') if m.co2 else 4 }}"></div>
+                        </div>
+                        <span class="chart-value">{{ m.co2 }} kg</span>
+                    </div>
+                    {% else %}
+                    <p style="color:var(--texto-sec);text-align:center;padding:20px">Aún no hay ventas este semestre — ¡sé el primero!</p>
+                    {% endfor %}
+                </div>
+                {% if co2_total %}<p style="text-align:center;font-weight:700;color:#166534;margin-top:14px">Total último semestre: <b>{{ co2_total }} kg de CO₂ evitados</b> ≈ {{ (co2_total / 21)|round(1) }} árboles plantados 🌳</p>{% endif %}
+            </div>
         </div>
     </div>
 </section>

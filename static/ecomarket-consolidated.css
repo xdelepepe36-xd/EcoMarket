@@ -221,6 +221,16 @@
     --gradiente-principal: linear-gradient(135deg, #EC407A, #F48FB1);
 }
 
+[data-theme='autumn'] {
+    --verde: #E65100;
+    --azul: #BF360C;
+    --blanco: #FFF8F0;
+    --texto: #5D4037;
+    --fondo: #FFF8F0;
+    --fondo-alt: #FFEFD9;
+    --gradiente-principal: linear-gradient(135deg, #E65100, #FFB74D);
+}
+
 [data-theme='high-contrast'] {
     --verde: #00FF00;
     --blanco: #FFFFFF;

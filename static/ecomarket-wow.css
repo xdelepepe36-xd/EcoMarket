@@ -2661,3 +2661,20 @@ main, .section { animation: ecoPageIn .45s cubic-bezier(.22,1,.36,1) both; }
 .eco-ref-btn.ghost { background: #fff; color: #166534; border: 1.5px solid #86efac; }
 .eco-ref-stats { display: flex; gap: 18px; margin-top: 14px; font-size: .85rem; color: #166534; }
 .eco-ref-stats b { font-size: 1.1rem; display: block; }
+
+/* ===== Muro de agradecimientos ===== */
+.eco-thanks-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px; margin-bottom: 20px;
+}
+.eco-thanks-card {
+    background: var(--blanco, #fff); border: 1px solid rgba(245,158,11,.25);
+    border-radius: 16px; padding: 16px 18px;
+    box-shadow: 0 4px 14px rgba(245,158,11,.08);
+    transition: transform .2s;
+}
+.eco-thanks-card:hover { transform: translateY(-3px); }
+.eco-thanks-card p { margin: 0 0 10px; font-size: .88rem; line-height: 1.6; color: var(--texto, #333); font-style: italic; }
+.eco-thanks-card span { font-size: .78rem; font-weight: 700; color: #b45309; }
+.eco-thanks-form { display: flex; gap: 10px; max-width: 640px; margin: 0 auto; }
+@media (max-width: 640px) { .eco-thanks-form { flex-direction: column; } }

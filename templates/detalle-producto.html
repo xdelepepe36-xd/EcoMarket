@@ -189,6 +189,12 @@ localStorage.setItem('eco_vistos',JSON.stringify(v.slice(0,8)));
                 <div class="benefit-item"><span data-i18n="pd.benefit_returns">🔄 Devoluciones gratis</span></div>
             </div>
 
+            {% if producto.es_digital %}
+            <div class="eco-digital-pill" style="margin-top:10px;padding:10px 14px;border-radius:12px;background:#eff6ff;border:1px solid #93c5fd66;font-size:.85rem;color:#1e40af">
+                <i class="bi bi-download"></i> <strong>Producto digital</strong> — se entrega por mensaje después de la compra, sin costo de envío 📥
+            </div>
+            {% endif %}
+
             {% if producto.reservado_hasta %}
             <div class="eco-reserva-pill" style="margin-top:10px;padding:10px 14px;border-radius:12px;background:#fff8e1;border:1px solid #F59E0B66;font-size:.85rem;color:#92400e">
                 <i class="bi bi-bookmark-check-fill"></i> ⏳ <strong>Reservado</strong> hasta {{ producto.reservado_hasta[:16] }}

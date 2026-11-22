@@ -78,18 +78,21 @@ const EcoMarket = {
     },
     
     toggleTheme() {
-        // Solo modo claro/oscuro: el resto de temas no tienen cobertura CSS completa
-        this.state.theme = this.state.theme === 'dark' ? 'light' : 'dark';
+        const list = this.themes && this.themes.length ? this.themes : ['light','dark'];
+        const i = Math.max(0, list.indexOf(this.state.theme));
+        this.state.theme = list[(i + 1) % list.length];
         document.documentElement.setAttribute('data-theme', this.state.theme);
         localStorage.setItem('ecomarket-theme', this.state.theme);
         this.updateThemeIcon();
         this.updateMetaThemeColor();
+        document.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: this.state.theme } }));
     },
 
     updateMetaThemeColor() {
         const meta = document.querySelector('meta[name="theme-color"]');
         if (meta) {
-            meta.setAttribute('content', this.state.theme === 'dark' ? '#171D1A' : '#2e7d32');
+            const themeColors = { dark:'#171D1A', midnight:'#0F0F1A', ocean:'#1565C0', sepia:'#8B7355', nature:'#2D5A27', rose:'#EC407A', 'high-contrast':'#000000' };
+            meta.setAttribute('content', themeColors[this.state.theme] || '#2e7d32');
         }
     },
     

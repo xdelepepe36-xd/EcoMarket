@@ -1,5 +1,15 @@
 {% extends 'base.html' %}
-{% block title %}EcoMarket - Impacto{% endblock %}
+{% block title %}EcoMarket - Impacto<script>
+(function(){
+var nums=document.querySelectorAll('.countup');
+if(!nums.length)return;
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;io.unobserve(e.target);var t=parseInt(e.target.dataset.target,10)||0,dur=1400,st=null;
+function step(ts){if(!st)st=ts;var p=Math.min((ts-st)/dur,1);e.target.textContent=Math.round(t*(1-Math.pow(1-p,3))).toLocaleString('es-PE');if(p<1)requestAnimationFrame(step);}
+requestAnimationFrame(step);});},{threshold:.4});
+nums.forEach(function(n){io.observe(n);});
+})();
+</script>
+{% endblock %}
 
 {% block content %}
 <section class="section impacto-hero">
@@ -14,27 +24,27 @@
         <!-- Stats reales de la plataforma -->
         <div class="stats-grid" style="margin-bottom:32px">
             <div class="stat-card">
-                <strong>{{ total_productos }}</strong>
+                <strong><span class="countup" data-target="{{ total_productos }}">0</span></strong>
                 <span><i class="bi bi-box-seam"></i> <span data-i18n="imp2.stat_products">Productos ecológicos</span></span>
             </div>
             <div class="stat-card">
-                <strong>{{ total_categorias }}</strong>
+                <strong><span class="countup" data-target="{{ total_categorias }}">0</span></strong>
                 <span><i class="bi bi-tags"></i> <span data-i18n="imp2.stat_categories">Categorías</span></span>
             </div>
             <div class="stat-card">
-                <strong>{{ total_usuarios }}</strong>
+                <strong><span class="countup" data-target="{{ total_usuarios }}">0</span></strong>
                 <span><i class="bi bi-people"></i> <span data-i18n="imp2.stat_users">Usuarios</span></span>
             </div>
             <div class="stat-card">
-                <strong>{{ total_resenas }}</strong>
+                <strong><span class="countup" data-target="{{ total_resenas }}">0</span></strong>
                 <span><i class="bi bi-star"></i> <span data-i18n="imp2.stat_reviews">Reseñas</span></span>
             </div>
             <div class="stat-card">
-                <strong>{{ total_pedidos }}</strong>
+                <strong><span class="countup" data-target="{{ total_pedidos }}">0</span></strong>
                 <span><i class="bi bi-bag-check"></i> <span data-i18n="imp2.stat_orders">Pedidos</span></span>
             </div>
             <div class="stat-card">
-                <strong>{{ total_visitas }}</strong>
+                <strong><span class="countup" data-target="{{ total_visitas }}">0</span></strong>
                 <span><i class="bi bi-eye"></i> <span data-i18n="imp2.stat_visits">Visitas</span></span>
             </div>
         </div>
@@ -112,7 +122,7 @@
                     <div class="donut-segment" style="background: #4caf50; clip-path: polygon(50% 50%, 100% 0%, 100% 100%, 50% 100%);"></div>
                     <div class="donut-segment" style="background: #81c784; clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%);"></div>
                     <div class="donut-center">
-                        <strong>{{ total_usuarios }}</strong>
+                        <strong><span class="countup" data-target="{{ total_usuarios }}">0</span></strong>
                         <span data-i18n="imp2.stat_users">Usuarios</span>
                     </div>
                 </div>

@@ -30,22 +30,22 @@
     
     <!-- CSS: final.css como base (cubre todas las clases de las plantillas)
          + rediseño.css encima (nuevo diseño gana donde define estilos) -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-final.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-rediseño.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-wow.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='accessibility.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-final.css') }}?v=7">
+    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-rediseño.css') }}?v=7">
+    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-wow.css') }}?v=7">
+    <link rel="stylesheet" href="{{ url_for('static', filename='accessibility.css') }}?v=7">
     
     <!-- JS esencial: final.js expone toda la API que usan las plantillas
          (EcoCart.getSummary, EcoFavorites, EcoToast, etc.) -->
-    <script src="{{ url_for('static', filename='ecomarket-final.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='ecomarket-security-enhanced.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='ecomarket-i18n-complete.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='ecomarket-validation.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='ecomarket-wow.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='ecomarket-asistente.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='ecomarket-flycart.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='ecomarket-tour.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='ecomarket-cursor.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='ecomarket-final.js') }}?v=7" defer></script>
+    <script src="{{ url_for('static', filename='ecomarket-security-enhanced.js') }}?v=7" defer></script>
+    <script src="{{ url_for('static', filename='ecomarket-i18n-complete.js') }}?v=7" defer></script>
+    <script src="{{ url_for('static', filename='ecomarket-validation.js') }}?v=7" defer></script>
+    <script src="{{ url_for('static', filename='ecomarket-wow.js') }}?v=7" defer></script>
+    <script src="{{ url_for('static', filename='ecomarket-asistente.js') }}?v=7" defer></script>
+    <script src="{{ url_for('static', filename='ecomarket-flycart.js') }}?v=7" defer></script>
+    <script src="{{ url_for('static', filename='ecomarket-tour.js') }}?v=7" defer></script>
+    <script src="{{ url_for('static', filename='ecomarket-cursor.js') }}?v=7" defer></script>
     
     {% block head %}{% endblock %}
 </head>

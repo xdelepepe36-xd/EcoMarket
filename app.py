@@ -699,6 +699,19 @@ def init_db():
             FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE CASCADE
         );
 
+        CREATE TABLE IF NOT EXISTS trueques (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            producto_id INTEGER NOT NULL,
+            producto_mio INTEGER NOT NULL,
+            propuesto_por INTEGER NOT NULL,
+            mensaje TEXT DEFAULT '',
+            estado TEXT DEFAULT 'pendiente',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE CASCADE,
+            FOREIGN KEY (producto_mio) REFERENCES productos(id) ON DELETE CASCADE,
+            FOREIGN KEY (propuesto_por) REFERENCES usuarios(id) ON DELETE CASCADE
+        );
+
         CREATE TABLE IF NOT EXISTS resenas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             producto_id INTEGER NOT NULL,
@@ -1046,6 +1059,19 @@ def init_db():
     except sqlite3.OperationalError:
         pass
 
+    # Reserva temporal 24h en productos
+    try:
+        conn.execute('ALTER TABLE productos ADD COLUMN reservado_hasta TEXT DEFAULT ""')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
+    try:
+        conn.execute('ALTER TABLE productos ADD COLUMN reservado_por INTEGER DEFAULT 0')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
     # Agregar columna imagen_thumb a producto_imagenes si no existe
     try:
         conn.execute('ALTER TABLE producto_imagenes ADD COLUMN imagen_thumb TEXT DEFAULT ""')
@@ -1385,6 +1411,7 @@ def productos_view():
         condicion = request.args.get('condicion', '')
         eco_score_min = request.args.get('eco_score_min', '')
         etiquetas = request.args.get('etiquetas', '')
+        ofertas = request.args.get('ofertas', '')
         pagina = int(request.args.get('pagina', 1))
 
         query = '''
@@ -1440,6 +1467,9 @@ def productos_view():
             count_query += ' AND p.etiquetas LIKE ?'
             params.extend([f'%{etiquetas}%'])
             count_params.extend([f'%{etiquetas}%'])
+        if ofertas:
+            query += ' AND p.precio_original IS NOT NULL AND p.precio_original > p.precio'
+            count_query += ' AND p.precio_original IS NOT NULL AND p.precio_original > p.precio'
 
         query += ' GROUP BY p.id'
         count_query += ')'
@@ -2669,6 +2699,171 @@ def api_leaderboard():
     ''').fetchall()
     conn.close()
     return jsonify({'top': [dict(r, puntos=r['eco_puntos'] or 0) for r in rows]})
+
+
+# ── Trueque, reservas y precio sugerido ──────────────────────────────
+
+@app.route('/api/trueque', methods=['POST'])
+@login_required
+def api_trueque_crear():
+    """Propone un trueque: ofrezco producto_mio a cambio de producto_id."""
+    data = request.get_json(silent=True) or {}
+    producto_id = int(data.get('producto_id') or 0)
+    producto_mio = int(data.get('producto_mio') or 0)
+    mensaje = sanitize_string(data.get('mensaje', ''))[:500]
+    if not producto_id or not producto_mio or producto_id == producto_mio:
+        return jsonify({'error': 'Selección inválida'}), 400
+    conn = get_db()
+    target = conn.execute('SELECT usuario_id, nombre FROM productos WHERE id = ? AND COALESCE(vendido,0)=0 AND usuario_id IS NOT NULL', (producto_id,)).fetchone()
+    mio = conn.execute('SELECT usuario_id FROM productos WHERE id = ? AND usuario_id = ? AND COALESCE(vendido,0)=0',
+                       (producto_mio, session['usuario_id'])).fetchone()
+    if not target or not mio or target['usuario_id'] == session['usuario_id']:
+        conn.close()
+        return jsonify({'error': 'No puedes proponer ese trueque'}), 400
+    existe = conn.execute(
+        "SELECT id FROM trueques WHERE producto_id=? AND producto_mio=? AND propuesto_por=? AND estado='pendiente'",
+        (producto_id, producto_mio, session['usuario_id'])).fetchone()
+    if existe:
+        conn.close()
+        return jsonify({'error': 'Ya enviaste esa propuesta'}), 400
+    cur = conn.execute(
+        'INSERT INTO trueques (producto_id, producto_mio, propuesto_por, mensaje) VALUES (?,?,?,?)',
+        (producto_id, producto_mio, session['usuario_id'], mensaje))
+    conn.commit()
+    trueque_id = cur.lastrowid
+    usuario = conn.execute('SELECT nombre FROM usuarios WHERE id=?', (session['usuario_id'],)).fetchone()
+    quien = (usuario['nombre'] if usuario else 'Alguien').split(' ')[0]
+    if target['usuario_id']:
+        add_notificacion(target['usuario_id'], '🔄 Nueva propuesta de trueque',
+                         f'{quien} quiere cambiar su producto por el tuyo "{target["nombre"][:40]}"', 'success')
+    conn.close()
+    return jsonify({'success': True, 'id': trueque_id})
+
+
+@app.route('/api/trueques')
+@login_required
+def api_trueques():
+    """Mis trueques enviados y recibidos."""
+    uid = session['usuario_id']
+    conn = get_db()
+    recibidas = conn.execute('''
+        SELECT t.*, p.nombre AS prod_nombre, p.precio AS prod_precio,
+               pm.nombre AS mio_nombre, pm.precio AS mio_precio, pm.id AS mio_id,
+               u.nombre AS de_quien
+        FROM trueques t
+        JOIN productos p ON p.id = t.producto_id
+        JOIN productos pm ON pm.id = t.producto_mio
+        JOIN usuarios u ON u.id = t.propuesto_por
+        WHERE p.usuario_id = ? ORDER BY t.created_at DESC LIMIT 20
+    ''', (uid,)).fetchall()
+    enviadas = conn.execute('''
+        SELECT t.*, p.nombre AS prod_nombre, p.precio AS prod_precio,
+               pm.nombre AS mio_nombre, pm.precio AS mio_precio,
+               u.nombre AS dueno
+        FROM trueques t
+        JOIN productos p ON p.id = t.producto_id
+        JOIN productos pm ON pm.id = t.producto_mio
+        JOIN usuarios u ON u.id = p.usuario_id
+        WHERE t.propuesto_por = ? ORDER BY t.created_at DESC LIMIT 20
+    ''', (uid,)).fetchall()
+    conn.close()
+    return jsonify({
+        'recibidas': [dict(r) for r in recibidas],
+        'enviadas': [dict(r) for r in enviadas],
+    })
+
+
+@app.route('/api/trueque/<int:trueque_id>/estado', methods=['POST'])
+@login_required
+def api_trueque_estado(trueque_id):
+    """Aceptar/rechazar una propuesta de trueque (solo el dueño del producto)."""
+    data = request.get_json(silent=True) or {}
+    estado = data.get('estado')
+    if estado not in ('aceptado', 'rechazado'):
+        return jsonify({'error': 'Estado inválido'}), 400
+    conn = get_db()
+    t = conn.execute('''
+        SELECT t.*, p.usuario_id AS dueno_id, p.nombre AS prod_nombre, pm.nombre AS mio_nombre
+        FROM trueques t JOIN productos p ON p.id = t.producto_id JOIN productos pm ON pm.id = t.producto_mio
+        WHERE t.id = ?''', (trueque_id,)).fetchone()
+    if not t or t['dueno_id'] != session['usuario_id']:
+        conn.close()
+        return jsonify({'error': 'No autorizado'}), 403
+    conn.execute('UPDATE trueques SET estado = ? WHERE id = ?', (estado, trueque_id))
+    conn.commit()
+    if estado == 'aceptado':
+        add_notificacion(t['propuesto_por'], '🎉 ¡Trueque aceptado!',
+                         f'"{t["prod_nombre"][:35]}" es tuyo — coordina el cambio con el vendedor', 'success')
+    conn.close()
+    return jsonify({'success': True})
+
+
+@app.route('/api/reservar/<int:producto_id>', methods=['POST'])
+@login_required
+def api_reservar(producto_id):
+    """Reserva un producto por 24h."""
+    conn = get_db()
+    p = conn.execute('SELECT usuario_id, nombre, vendido, reservado_hasta, reservado_por FROM productos WHERE id=?', (producto_id,)).fetchone()
+    if not p or p['vendido']:
+        conn.close()
+        return jsonify({'error': 'Producto no disponible'}), 404
+    if p['usuario_id'] == session['usuario_id']:
+        conn.close()
+        return jsonify({'error': 'No puedes reservar tu propio producto'}), 400
+    ahora = datetime.now()
+    if p['reservado_hasta'] and p['reservado_por'] != session['usuario_id']:
+        try:
+            hasta = datetime.strptime(p['reservado_hasta'], '%Y-%m-%d %H:%M:%S')
+            if ahora < hasta:
+                conn.close()
+                return jsonify({'error': 'Este producto ya está reservado'}), 409
+        except ValueError:
+            pass
+    hasta_str = (ahora + timedelta(hours=24)).strftime('%Y-%m-%d %H:%M:%S')
+    conn.execute('UPDATE productos SET reservado_hasta=?, reservado_por=? WHERE id=?',
+                 (hasta_str, session['usuario_id'], producto_id))
+    conn.commit()
+    u = conn.execute('SELECT nombre FROM usuarios WHERE id=?', (session['usuario_id'],)).fetchone()
+    quien = (u['nombre'] if u else 'Alguien').split(' ')[0]
+    if p['usuario_id']:
+        add_notificacion(p['usuario_id'], '📦 Producto reservado',
+                         f'{quien} reservó "{p["nombre"][:40]}" por 24h', 'info')
+    conn.close()
+    return jsonify({'success': True, 'hasta': hasta_str})
+
+
+@app.route('/api/mis-productos')
+@login_required
+def api_mis_productos():
+    """Productos del usuario logueado (para trueque y herramientas)."""
+    conn = get_db()
+    rows = conn.execute('''
+        SELECT id, nombre, precio, imagen, categoria FROM productos
+        WHERE usuario_id = ? AND COALESCE(vendido,0)=0 ORDER BY created_at DESC LIMIT 50
+    ''', (session['usuario_id'],)).fetchall()
+    conn.close()
+    return jsonify({'productos': [dict(r) for r in rows]})
+
+
+@app.route('/api/precio-sugerido/<categoria>')
+def api_precio_sugerido(categoria):
+    """Precio sugerido por IA: mediana de la categoría."""
+    conn = get_db()
+    precios = [r[0] for r in conn.execute(
+        'SELECT precio FROM productos WHERE categoria = ? AND COALESCE(vendido,0)=0 AND precio > 0',
+        (categoria,)).fetchall()]
+    conn.close()
+    if len(precios) < 3:
+        return jsonify({'sugerido': None, 'muestras': len(precios)})
+    precios.sort()
+    mediana = precios[len(precios) // 2]
+    return jsonify({'sugerido': round(mediana, 2), 'muestras': len(precios)})
+
+
+@app.route('/trueques')
+@login_required
+def trueques_page():
+    return render_template('trueques.html')
 
 
 @app.route('/api/categorias')

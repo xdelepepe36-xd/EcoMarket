@@ -173,6 +173,14 @@ localStorage.setItem('eco_vistos',JSON.stringify(v.slice(0,8)));
             <button class="btn-secundario" onclick="reportarProducto()" style="width:100%;margin-top:8px;font-size:.82rem;color:#b91c1c;">
                 <i class="bi bi-flag"></i> <span data-i18n="pd.report">Reportar publicación</span>
             </button>
+            {% if not producto.vendido %}
+            <button class="btn-secundario" onclick="abrirTrueque()" style="width:100%;margin-top:8px;background:#f0fdf4;border-color:#86efac;color:#166534;font-weight:600">
+                <i class="bi bi-arrow-left-right"></i> <span data-i18n="pd.swap">Proponer trueque</span>
+            </button>
+            <button class="btn-secundario" onclick="reservarProducto()" id="btnReservar" style="width:100%;margin-top:8px">
+                <i class="bi bi-bookmark-check"></i> <span data-i18n="pd.reserve">Reservar 24h</span>
+            </button>
+            {% endif %}
             {% endif %}
 
             <div class="detalle-benefits">
@@ -180,6 +188,22 @@ localStorage.setItem('eco_vistos',JSON.stringify(v.slice(0,8)));
                 <div class="benefit-item"><span data-i18n="pd.benefit_shipping">🚚 Envío rápido disponible</span></div>
                 <div class="benefit-item"><span data-i18n="pd.benefit_returns">🔄 Devoluciones gratis</span></div>
             </div>
+
+            {% if producto.reservado_hasta %}
+            <div class="eco-reserva-pill" style="margin-top:10px;padding:10px 14px;border-radius:12px;background:#fff8e1;border:1px solid #F59E0B66;font-size:.85rem;color:#92400e">
+                <i class="bi bi-bookmark-check-fill"></i> ⏳ <strong>Reservado</strong> hasta {{ producto.reservado_hasta[:16] }}
+            </div>
+            {% endif %}
+
+            <details class="eco-faq" style="margin-top:14px">
+                <summary style="cursor:pointer;font-weight:700;color:var(--verde,#2e7d32);font-size:.92rem">❓ <span data-i18n="pd.faq">Preguntas frecuentes</span></summary>
+                <div style="margin-top:10px;display:grid;gap:8px;font-size:.86rem;color:var(--texto-sec,#555)">
+                    <details style="padding:8px 12px;background:var(--blanco,#fff);border-radius:10px"><summary style="cursor:pointer;font-weight:600">🚚 ¿Cómo funciona el envío?</summary><p style="margin:6px 0 0">Coordinas el envío directamente con {{ producto.vendedor_nombre or 'el vendedor' }}. Envío gratis en Lima para compras verificadas.</p></details>
+                    <details style="padding:8px 12px;background:var(--blanco,#fff);border-radius:10px"><summary style="cursor:pointer;font-weight:600">♻️ ¿Puedo comprarlo de segunda mano?</summary><p style="margin:6px 0 0">¡Claro! EcoMarket promueve la reutilización. Si el producto tiene desgaste, el vendedor debe indicarlo en la descripción.</p></details>
+                    <details style="padding:8px 12px;background:var(--blanco,#fff);border-radius:10px"><summary style="cursor:pointer;font-weight:600">🔄 ¿Y si quiero devolverlo?</summary><p style="margin:6px 0 0">Tienes 7 días para devolver si el producto no coincide con la descripción. El reembolso es gratis.</p></details>
+                    <details style="padding:8px 12px;background:var(--blanco,#fff);border-radius:10px"><summary style="cursor:pointer;font-weight:600">💱 ¿Aceptan trueque?</summary><p style="margin:6px 0 0">¡Sí! Usa el botón "Proponer trueque" para ofrecer uno de tus productos a cambio de este.</p></details>
+                </div>
+            </details>
 
             <div class="detalle-share-row">
                 <span><i class="bi bi-share"></i> <span data-i18n="share">Compartir</span>:</span>
@@ -673,6 +697,93 @@ function enviarMensajeVendedor() {
 document.getElementById('modalMensajeVendedor').addEventListener('click', function(e) {
     if (e.target === this) this.style.display = 'none';
 });
+
+// ── Trueque ─────────────────────────────────────
+let truequeProductos = [];
+async function abrirTrueque() {
+    let modal = document.getElementById('modalTrueque');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modalTrueque';
+        modal.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;padding:20px';
+        modal.innerHTML = `
+        <div style="background:var(--blanco,#fff);border-radius:20px;max-width:460px;width:100%;max-height:80vh;overflow-y:auto;padding:24px">
+            <h3 style="margin:0 0 6px">🔄 Proponer trueque</h3>
+            <p style="font-size:.85rem;color:var(--texto-sec,#666);margin:0 0 14px">¿Qué producto ofreces a cambio de <strong>{{ producto.nombre }}</strong>?</p>
+            <div id="truequeLista" style="display:grid;gap:8px;margin-bottom:14px"><p style="color:var(--texto-sec)">Cargando tus productos…</p></div>
+            <textarea id="truequeMsg" placeholder="Mensaje opcional (ej: puedo entregarlo esta semana)" style="width:100%;padding:10px;border:1.5px solid rgba(46,125,50,.2);border-radius:12px;font-family:inherit;min-height:70px;resize:vertical;margin-bottom:14px"></textarea>
+            <div style="display:flex;gap:10px;justify-content:flex-end">
+                <button class="btn-secundario" onclick="document.getElementById('modalTrueque').style.display='none'">Cancelar</button>
+                <button class="btn-principal" id="truequeEnviar" disabled>Enviar propuesta</button>
+            </div>
+        </div>`;
+        document.body.appendChild(modal);
+        modal.addEventListener('click', function(e){ if(e.target===this) this.style.display='none'; });
+        document.getElementById('truequeEnviar').addEventListener('click', enviarTrueque);
+    }
+    modal.style.display = 'flex';
+    const r = await fetch('/api/mis-productos');
+    const d = await r.json();
+    truequeProductos = (d.productos || []).filter(p => p.id !== {{ producto.id }});
+    const lista = document.getElementById('truequeLista');
+    if (!truequeProductos.length) {
+        lista.innerHTML = '<p style="color:var(--texto-sec)">No tienes productos publicados. <a href="{{ url_for("publicar") }}">Publica uno</a> para proponer un trueque.</p>';
+    } else {
+        lista.innerHTML = truequeProductos.map(p => `
+            <label style="display:flex;align-items:center;gap:10px;padding:10px;border:1.5px solid rgba(46,125,50,.15);border-radius:12px;cursor:pointer">
+                <input type="radio" name="truequePick" value="${p.id}" style="width:18px;height:18px">
+                <span style="flex:1;font-size:.88rem;font-weight:600">${p.nombre}</span>
+                <span style="font-size:.82rem;color:#2e7d32;font-weight:700">S/. ${(+p.precio).toFixed(2)}</span>
+            </label>`).join('');
+        lista.querySelectorAll('input[type=radio]').forEach(r => r.addEventListener('change', () => {
+            document.getElementById('truequeEnviar').disabled = false;
+        }));
+    }
+    document.getElementById('truequeEnviar').disabled = true;
+    document.getElementById('truequeMsg').value = '';
+}
+async function enviarTrueque() {
+    const pick = document.querySelector('input[name="truequePick"]:checked');
+    if (!pick) return;
+    const r = await fetch('/api/trueque', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ producto_id: {{ producto.id }}, producto_mio: parseInt(pick.value), mensaje: document.getElementById('truequeMsg').value.trim() })
+    });
+    const d = await r.json();
+    if (d.success) {
+        document.getElementById('modalTrueque').style.display = 'none';
+        if (window.EcoToast) EcoToast.show('🔄 Trueque propuesto', 'El vendedor recibirá tu oferta', 'success');
+    } else {
+        alert(d.error || 'No se pudo enviar');
+    }
+}
+
+// ── Reserva 24h ─────────────────────────────────
+async function reservarProducto() {
+    const r = await fetch('/api/reservar/{{ producto.id }}', { method: 'POST' });
+    const d = await r.json();
+    if (d.success) {
+        if (window.EcoToast) EcoToast.show('📦 ¡Reservado!', 'Tienes 24h para coordinar la compra', 'success');
+        location.reload();
+    } else {
+        alert(d.error || 'No se pudo reservar');
+    }
+}
+
+// ── Precio sugerido (solo dueño) ────────────────
+{% if session.get('usuario_id') == producto.usuario_id %}
+fetch('/api/precio-sugerido/{{ producto.categoria }}').then(r=>r.json()).then(d=>{
+    if (d.sugerido) {
+        const host = document.querySelector('.detalle-price-history')?.parentElement || document.querySelector('.detalle-benefits');
+        if (host) {
+            const pill = document.createElement('div');
+            pill.style.cssText = 'margin-top:10px;padding:10px 14px;border-radius:12px;background:#f0fdf4;border:1px solid #86efac;font-size:.85rem;color:#166534';
+            pill.innerHTML = '💡 <strong>Precio sugerido por IA:</strong> S/. ' + d.sugerido + ' <small style="color:#16653499">(mediana de ' + d.muestras + ' productos de ' + '{{ producto.categoria }}' + ')</small>';
+            host.appendChild(pill);
+        }
+    }
+}).catch(()=>{});
+{% endif %}
 </script>
 {% endif %}
 {% endblock %}

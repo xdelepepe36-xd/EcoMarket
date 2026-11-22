@@ -60,7 +60,8 @@
         </div>
 
         <div class="filter-pills">
-            <a href="{{ url_for('productos_view') }}" class="filter-pill {{ 'active' if not categoria_sel }}"><span data-i18n="products.filter_all">Todas</span></a>
+            <a href="{{ url_for('productos_view') }}" class="filter-pill {{ 'active' if not categoria_sel and not request.args.get('ofertas') }}"><span data-i18n="products.filter_all">Todas</span></a>
+            <a href="{{ url_for('productos_view', ofertas=1) }}" class="filter-pill {{ 'active' if request.args.get('ofertas') }}" style="background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;border-color:transparent">🏷️ <span data-i18n="products.filter_deals">Ofertas</span></a>
             {% for cat in categorias %}
             <a href="{{ url_for('productos_view', categoria=cat) }}" class="filter-pill {{ 'active' if categoria_sel == cat }}">{{ cat }}</a>
             {% endfor %}

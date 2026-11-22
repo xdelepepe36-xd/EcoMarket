@@ -1,6 +1,14 @@
 {% extends 'base.html' %}
 {% set imagen_principal = producto.imagen if producto.imagen.startswith('http') else url_for('static', filename=producto.imagen) %}
-{% block title %}EcoMarket - {{ producto.nombre }}{% endblock %}
+{% block title %}EcoMarket - {{ producto.nombre }}<script>
+(function(){try{
+var v=JSON.parse(localStorage.getItem('eco_vistos')||'[]');
+v=v.filter(function(x){return x.id!=={{ producto.id }};});
+v.unshift({id:{{ producto.id }},nombre:{{ producto.nombre|tojson }},precio:{{ '%.2f'|format(producto.precio) }},imagen:{{ (producto.imagen or '')|tojson }}});
+localStorage.setItem('eco_vistos',JSON.stringify(v.slice(0,8)));
+}catch(e){}})();
+</script>
+{% endblock %}
 
 {% block head %}
 <meta name="description" content="{{ producto.descripcion[:160] }}">

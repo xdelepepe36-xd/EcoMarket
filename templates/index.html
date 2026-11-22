@@ -1,5 +1,19 @@
 {% extends 'base.html' %}
 {% block title %}EcoMarket - Marketplace Ecológico<script src="{{ url_for('static', filename='ecomarket-autocomplete.js') }}"></script>
+<script>
+(function(){try{
+var v=JSON.parse(localStorage.getItem('eco_vistos')||'[]');
+if(!v.length)return;
+var sec=document.getElementById('vistosSection'),grid=document.getElementById('vistosGrid');
+if(!sec||!grid)return;
+grid.innerHTML=v.map(function(p){
+ var img=(p.imagen&&(p.imagen.indexOf('http')===0||p.imagen.indexOf('/')===0))?p.imagen:(p.imagen?'/static/'+p.imagen:'');
+ return '<a href="/producto/'+p.id+'" class="product-card-link"><article class="product-card"><div class="product-image-container">'+
+ (img?'<img class="product-image" src="'+img+'" alt="'+p.nombre+'" loading="lazy" onerror="this.src='/static/assets/product-placeholder.svg'">':'<div class="product-image-placeholder"><i class="bi bi-box-seam"></i></div>')+
+ '</div><div class="product-content"><h3 class="product-nombre">'+p.nombre+'</h3><div class="product-precio">S/. '+p.precio+'</div></div></article></a>';}).join('');
+sec.style.display='';
+}catch(e){}})();
+</script>
 {% endblock %}
 
 {% block content %}
@@ -177,6 +191,17 @@
 </section>
 
 <!-- 4. PRODUCTOS DESTACADOS -->
+<!-- VISTOS RECIENTEMENTE -->
+<section class="productos-section section" id="vistosSection" style="display:none">
+    <div class="container">
+        <div class="section-title">
+            <h2 data-i18n="home.recently_title">Vistos recientemente</h2>
+            <p data-i18n="home.recently_subtitle">Retoma donde lo dejaste</p>
+        </div>
+        <div class="productos-grid" id="vistosGrid"></div>
+    </div>
+</section>
+
 <section class="productos-section section">
     <div class="container">
         <div class="section-title">

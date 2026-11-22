@@ -97,3 +97,78 @@
 [data-theme='high-contrast'] .btn-principal, [data-theme='high-contrast'] .btn-secundario { background:#000; color:#fff; border:2px solid #FFE600; }
 [data-theme='high-contrast'] img { filter:contrast(1.1); }
 [data-theme='high-contrast'] ::selection { background:#FFE600; color:#000; }
+
+/* ===== Secciones y hero: sin rectángulos claros en temas oscuros ===== */
+[data-theme='dark'] .section, [data-theme='dark'] .section-alt, [data-theme='dark'] .productos-section,
+[data-theme='dark'] .categorias-section, [data-theme='dark'] .impacto-section, [data-theme='dark'] .cta-section,
+[data-theme='dark'] .search-bar-section, [data-theme='dark'] .hero-section-enhanced {
+    background: transparent !important;
+}
+[data-theme='nature'] .section, [data-theme='nature'] .section-alt, [data-theme='nature'] .productos-section,
+[data-theme='nature'] .categorias-section, [data-theme='nature'] .impacto-section, [data-theme='nature'] .cta-section,
+[data-theme='nature'] .search-bar-section, [data-theme='nature'] .hero-section-enhanced {
+    background: transparent !important;
+}
+[data-theme='ocean'] .section, [data-theme='ocean'] .section-alt, [data-theme='ocean'] .productos-section,
+[data-theme='ocean'] .categorias-section, [data-theme='ocean'] .impacto-section, [data-theme='ocean'] .cta-section,
+[data-theme='ocean'] .search-bar-section, [data-theme='ocean'] .hero-section-enhanced {
+    background: transparent !important;
+}
+[data-theme='midnight'] .section, [data-theme='midnight'] .section-alt, [data-theme='midnight'] .productos-section,
+[data-theme='midnight'] .categorias-section, [data-theme='midnight'] .impacto-section, [data-theme='midnight'] .cta-section,
+[data-theme='midnight'] .search-bar-section, [data-theme='midnight'] .hero-section-enhanced {
+    background: transparent !important;
+}
+[data-theme='rose'] .section, [data-theme='rose'] .section-alt, [data-theme='rose'] .productos-section,
+[data-theme='rose'] .categorias-section, [data-theme='rose'] .impacto-section, [data-theme='rose'] .cta-section,
+[data-theme='rose'] .search-bar-section, [data-theme='rose'] .hero-section-enhanced {
+    background: transparent !important;
+}
+[data-theme='sepia'] .section-alt { background: rgba(139,115,85,.10) !important; }
+
+/* Hero: la foto de fondo se oculta en temas oscuros y se usa degradado temático */
+[data-theme='dark'] .hero-bg-image, [data-theme='nature'] .hero-bg-image, [data-theme='ocean'] .hero-bg-image,
+[data-theme='midnight'] .hero-bg-image, [data-theme='rose'] .hero-bg-image { display: none; }
+[data-theme='dark'] .hero-overlay, [data-theme='nature'] .hero-overlay, [data-theme='ocean'] .hero-overlay,
+[data-theme='midnight'] .hero-overlay, [data-theme='rose'] .hero-overlay { background: transparent; }
+[data-theme='dark'] .hero-section-enhanced { background: linear-gradient(120deg, rgba(10,31,18,.9), rgba(20,60,38,.75)); }
+[data-theme='nature'] .hero-section-enhanced { background: linear-gradient(120deg, rgba(12,31,18,.92), rgba(18,48,32,.8)); }
+[data-theme='ocean'] .hero-section-enhanced { background: linear-gradient(120deg, rgba(4,30,48,.92), rgba(10,61,92,.8)); }
+[data-theme='midnight'] .hero-section-enhanced { background: linear-gradient(120deg, rgba(5,5,16,.94), rgba(11,11,30,.85)); }
+[data-theme='rose'] .hero-section-enhanced { background: linear-gradient(120deg, rgba(32,8,18,.93), rgba(61,16,36,.82)); }
+
+/* Títulos y textos dentro de secciones oscuras */
+[data-theme='dark'] .section-title p, [data-theme='nature'] .section-title p,
+[data-theme='ocean'] .section-title p, [data-theme='midnight'] .section-title p,
+[data-theme='rose'] .section-title p { color: rgba(230,240,230,.65); }
+[data-theme='nature'] .section-title p, [data-theme='ocean'] .section-title p,
+[data-theme='midnight'] .section-title p, [data-theme='rose'] .section-title p,
+[data-theme='dark'] .section-title p { color: rgba(230,240,230,.65); }
+
+/* Encabezado/nav/footer oscuros en temas oscuros */
+[data-theme='nature'] header, [data-theme='ocean'] header, [data-theme='midnight'] header,
+[data-theme='rose'] header, [data-theme='nature'] nav, [data-theme='ocean'] nav,
+[data-theme='midnight'] nav, [data-theme='rose'] nav {
+    background: rgba(10,16,12,.85) !important;
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255,255,255,.08);
+}
+[data-theme='ocean'] header, [data-theme='ocean'] nav { background: rgba(4,20,32,.85) !important; }
+[data-theme='midnight'] header, [data-theme='midnight'] nav { background: rgba(5,5,16,.88) !important; }
+[data-theme='rose'] header, [data-theme='rose'] nav { background: rgba(26,6,14,.87) !important; }
+[data-theme='nature'] footer, [data-theme='ocean'] footer, [data-theme='midnight'] footer, [data-theme='rose'] footer {
+    background: rgba(6,12,9,.95) !important; color: rgba(230,240,230,.7);
+}
+[data-theme='ocean'] footer { background: rgba(3,16,26,.95) !important; }
+[data-theme='midnight'] footer { background: rgba(4,4,12,.96) !important; }
+[data-theme='rose'] footer { background: rgba(18,5,11,.95) !important; }
+
+/* Texto general legible en temas oscuros */
+[data-theme='nature'] h1, [data-theme='nature'] h2, [data-theme='nature'] h3,
+[data-theme='ocean'] h1, [data-theme='ocean'] h2, [data-theme='ocean'] h3,
+[data-theme='midnight'] h1, [data-theme='midnight'] h2, [data-theme='midnight'] h3,
+[data-theme='rose'] h1, [data-theme='rose'] h2, [data-theme='rose'] h3 { color: #F2F7F0; }
+[data-theme='nature'] p, [data-theme='ocean'] p, [data-theme='midnight'] p, [data-theme='rose'] p { color: rgba(230,240,230,.78); }
+[data-theme='nature'] label, [data-theme='ocean'] label, [data-theme='midnight'] label, [data-theme='rose'] label { color: #DCE8DC; }
+[data-theme='nature'] .texto-secundario, [data-theme='ocean'] .texto-secundario, [data-theme='midnight'] .texto-secundario, [data-theme='rose'] .texto-secundario,
+[data-theme='nature'] .text-muted, [data-theme='ocean'] .text-muted, [data-theme='midnight'] .text-muted, [data-theme='rose'] .text-muted { color: rgba(200,220,200,.6) !important; }

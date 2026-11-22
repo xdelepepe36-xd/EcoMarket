@@ -21,7 +21,8 @@ const EcoMarket = {
     
     // Estado global
     state: {
-        theme: ['light', 'dark'].includes(localStorage.getItem('ecomarket-theme'))
+        theme: ['light','dark','sepia','nature','ocean','midnight','rose','high-contrast']
+            .includes(localStorage.getItem('ecomarket-theme'))
             ? localStorage.getItem('ecomarket-theme')
             : 'light',
         lang: localStorage.getItem('ecomarket-lang') || 'es',

@@ -23,6 +23,7 @@
                     <p class="resumen-line"><span data-i18n="cart.shipping">Envío</span>: <span id="cartShipping">S/. 0.00</span></p>
                     <p class="resumen-line"><span data-i18n="cart.discount">Descuento</span>: <span id="cartDiscount" style="color:#2e7d32">-S/. 0.00</span></p>
                     <p class="resumen-line resumen-total"><span data-i18n="cart.total">Total</span>: <strong id="cartTotal">S/. 0.00</strong></p>
+                    <div id="couponHint" class="coupon-hint" style="display:none"></div>
                     <button class="btn-principal" id="checkoutButton" disabled data-i18n="cart.checkout_button">Proceder al pago</button>
                     <p class="cart-note" data-i18n="cart.note">El carrito se guarda localmente en tu navegador.</p>
                 </div>
@@ -226,6 +227,21 @@ document.addEventListener('DOMContentLoaded', function() {
         cartShipping.textContent = summary.shipping === 0 ? 'Gratis' : 'S/. ' + summary.shipping.toFixed(2);
         cartDiscount.textContent = summary.discount > 0 ? '-S/. ' + summary.discount.toFixed(2) : '-S/. 0.00';
         cartTotal.textContent = 'S/. ' + summary.total.toFixed(2);
+        const hint = document.getElementById('couponHint');
+        if (hint) {
+            const sub = summary.subtotal || 0;
+            const cands = [];
+            if (sub >= 80) cands.push(['ECO20','20% de descuento']);
+            if (sub >= 30) cands.push(['ECO10','10% de descuento']);
+            if ((summary.shipping || 0) > 0) cands.push(['ENVIOFREE','envío gratis']);
+            cands.push(['BIENVENIDO','S/.15 de descuento']);
+            if (cands.length) {
+                const best = cands[0];
+                hint.innerHTML = '🎟️ Cupón sugerido: <strong>' + best[0] + '</strong> — ' + best[1] +
+                    (cands.length > 1 ? ' · también: ' + cands.slice(1).map(c => c[0]).join(', ') : '');
+                hint.style.display = 'block';
+            } else hint.style.display = 'none';
+        }
 
         cartItems.innerHTML = items.map(item => {
             const imgSrc = item.image ? (item.image.startsWith('http') || item.image.startsWith('/') ? item.image : '/static/' + item.image) : '';

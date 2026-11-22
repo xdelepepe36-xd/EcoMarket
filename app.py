@@ -846,6 +846,18 @@ def init_db():
         );
         CREATE INDEX IF NOT EXISTS idx_mensajes_para ON mensajes(para_id, leido);
         CREATE INDEX IF NOT EXISTS idx_mensajes_hilo ON mensajes(de_id, para_id, producto_id);
+
+        CREATE TABLE IF NOT EXISTS reportes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            producto_id INTEGER NOT NULL,
+            usuario_id INTEGER NOT NULL,
+            motivo TEXT NOT NULL,
+            estado TEXT DEFAULT 'pendiente',
+            created_at TEXT DEFAULT (datetime('now')),
+            FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE CASCADE,
+            FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+        );
+        CREATE INDEX IF NOT EXISTS idx_reportes_estado ON reportes(estado);
     ''')
 
     # Seed productos si la tabla está vacía
@@ -5699,6 +5711,35 @@ def api_pregunta_helpful(pregunta_id):
     finally:
         conn.close()
 
+@app.route('/api/producto/<int:producto_id>/reportar', methods=['POST'])
+@login_required
+def api_reportar_producto(producto_id):
+    """Reporta un producto sospechoso."""
+    data = request.get_json(silent=True) or request.form
+    motivo = (data.get('motivo') or '').strip()[:300]
+    if not motivo:
+        return jsonify({'error': 'Describe el motivo del reporte'}), 400
+    conn = get_db()
+    prod = conn.execute('SELECT id FROM productos WHERE id = ?', (producto_id,)).fetchone()
+    if not prod:
+        conn.close()
+        return jsonify({'error': 'Producto no encontrado'}), 404
+    ya = conn.execute(
+        'SELECT id FROM reportes WHERE producto_id = ? AND usuario_id = ?',
+        (producto_id, session['usuario_id'])
+    ).fetchone()
+    if ya:
+        conn.close()
+        return jsonify({'error': 'Ya reportaste este producto'}), 400
+    conn.execute(
+        'INSERT INTO reportes (producto_id, usuario_id, motivo) VALUES (?,?,?)',
+        (producto_id, session['usuario_id'], motivo)
+    )
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
+
+
 # ── Mensajería privada comprador ↔ vendedor ─────────────────────────────────────
 
 @app.route('/mensajes')
@@ -5954,6 +5995,16 @@ def admin():
 
     usuarios = conn.execute('SELECT * FROM usuarios ORDER BY id DESC').fetchall()
 
+    reportes = conn.execute('''
+        SELECT r.*, p.nombre AS producto_nombre, u.nombre AS reportante
+        FROM reportes r
+        JOIN productos p ON p.id = r.producto_id
+        JOIN usuarios u ON u.id = r.usuario_id
+        WHERE r.estado = 'pendiente'
+        ORDER BY r.created_at DESC
+        LIMIT 50
+    ''').fetchall()
+
     stats = {
         'total_productos': conn.execute('SELECT COUNT(*) FROM productos').fetchone()[0],
         'total_usuarios': conn.execute('SELECT COUNT(*) FROM usuarios').fetchone()[0],
@@ -5962,7 +6013,20 @@ def admin():
         'total_visitas': conn.execute('SELECT COUNT(*) FROM visitas').fetchone()[0],
     }
     conn.close()
-    return render_template('admin.html', productos=productos, usuarios=usuarios, stats=stats)
+    return render_template('admin.html', productos=productos, usuarios=usuarios, stats=stats,
+                           reportes=[dict(r) for r in reportes])
+
+
+@app.route('/admin/reporte/<int:reporte_id>/resolver', methods=['POST'])
+@login_required
+@admin_required
+def resolver_reporte(reporte_id):
+    conn = get_db()
+    conn.execute("UPDATE reportes SET estado = 'resuelto' WHERE id = ?", (reporte_id,))
+    conn.commit()
+    conn.close()
+    flash('Reporte marcado como resuelto', 'success')
+    return redirect(url_for('admin'))
 
 
 @app.route('/admin/eliminar/<int:producto_id>', methods=['POST'])

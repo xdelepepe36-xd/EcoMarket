@@ -44,6 +44,35 @@
             </div>
         </div>
 
+        {% if reportes %}
+        <!-- Reportes pendientes -->
+        <div style="display:flex;align-items:center;gap:12px;margin:32px 0 16px">
+            <i class="bi bi-flag" style="font-size:1.3rem;color:#b91c1c"></i>
+            <h3 style="color:#b91c1c;margin:0">Reportes pendientes ({{ reportes|length }})</h3>
+        </div>
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead><tr><th>Producto</th><th>Reportado por</th><th>Motivo</th><th>Fecha</th><th></th></tr></thead>
+                <tbody>
+                    {% for r in reportes %}
+                    <tr>
+                        <td>{{ r.producto_nombre }}</td>
+                        <td>{{ r.reportante }}</td>
+                        <td style="max-width:280px">{{ r.motivo }}</td>
+                        <td>{{ r.created_at[:10] }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('resolver_reporte', reporte_id=r.id) }}" style="display:inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn-secundario btn-sm"><i class="bi bi-check"></i> Resolver</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
         <!-- Tabla productos -->
         <div style="display:flex;align-items:center;gap:12px;margin:32px 0 16px">
             <i class="bi bi-box-seam" style="font-size:1.3rem;color:var(--verde)"></i>

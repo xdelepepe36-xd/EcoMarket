@@ -1990,3 +1990,16 @@ body.tour-active .hero-mascot { filter: drop-shadow(0 0 34px rgba(34,197,94,.7))
 .eco-has-cursor input, .eco-has-cursor textarea, .eco-has-cursor select {
     cursor: none !important;
 }
+
+/* ===== Tour pro ===== */
+.tour-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.tour-head strong { font-size: .95rem; color: #FDE68A; }
+.tour-head span { font-size: .72rem; color: rgba(255,255,255,.6); font-weight: 700; }
+.tour-dots { display: flex; gap: 6px; margin: 10px 0 4px; }
+.tour-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.25); transition: all .3s; }
+.tour-dot.on { background: #F59E0B; transform: scale(1.3); }
+.tour-btns { display: flex; gap: 8px; }
+.tour-btns .tour-prev { background: rgba(255,255,255,.15); color: #fff; }
+.tour-btns .tour-next { margin-left: auto; background: #F59E0B; color: #fff; }
+.tour-btns .tour-skip { background: transparent; color: rgba(255,255,255,.55); }
+.tour-fab { font-size: .9rem; padding: 13px 22px; letter-spacing: .3px; }

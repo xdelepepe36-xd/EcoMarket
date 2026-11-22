@@ -111,7 +111,7 @@
                     {% elif cat == 'Muebles' %}<i class="bi bi-lamp"></i>
                     {% else %}<i class="bi bi-box-seam"></i>{% endif %}
                 </div>
-                <div class="categoria-nombre">{{ cat }}</div>
+                <div class="categoria-nombre" data-category="{{ cat }}">{{ cat }}</div>
             </a>
             {% endfor %}
         </div>
@@ -140,7 +140,7 @@
                         {% endif %}
                     </div>
                     <div class="product-content">
-                        <div class="product-categoria">{{ producto.categoria }}</div>
+                        <div class="product-categoria" data-category="{{ producto.categoria }}">{{ producto.categoria }}</div>
                         <h3 class="product-nombre">{{ producto.nombre }}</h3>
                         <div class="product-precio">S/. {{ '%.2f'|format(producto.precio) }}</div>
                         <div class="product-disponibilidad disponible" data-i18n="home.product_available">Disponible</div>

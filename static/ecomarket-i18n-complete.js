@@ -4395,6 +4395,93 @@ const EcoI18n = {
         },
     },
 
+    catI18n: {
+        es: {
+            'category.arte': 'Arte',
+            'category.bebes': 'Bebés',
+            'category.deportes': 'Deportes',
+            'category.electrodomesticos': 'Electrodomésticos',
+            'category.herramientas': 'Herramientas',
+            'category.juguetes': 'Juguetes',
+            'category.libros': 'Libros',
+            'category.mascotas': 'Mascotas',
+            'category.muebles': 'Muebles',
+            'category.musica': 'Música',
+            'category.papeleria': 'Papelería',
+            'category.tecnologia': 'Tecnología',
+        },
+        en: {
+            'category.arte': 'Art',
+            'category.bebes': 'Baby',
+            'category.deportes': 'Sports',
+            'category.electrodomesticos': 'Appliances',
+            'category.herramientas': 'Tools',
+            'category.juguetes': 'Toys',
+            'category.libros': 'Books',
+            'category.mascotas': 'Pets',
+            'category.muebles': 'Furniture',
+            'category.musica': 'Music',
+            'category.papeleria': 'Stationery',
+            'category.tecnologia': 'Technology',
+        },
+        pt: {
+            'category.arte': 'Arte',
+            'category.bebes': 'Bebês',
+            'category.deportes': 'Esportes',
+            'category.electrodomesticos': 'Eletrodomésticos',
+            'category.herramientas': 'Ferramentas',
+            'category.juguetes': 'Brinquedos',
+            'category.libros': 'Livros',
+            'category.mascotas': 'Pets',
+            'category.muebles': 'Móveis',
+            'category.musica': 'Música',
+            'category.papeleria': 'Papelaria',
+            'category.tecnologia': 'Tecnologia',
+        },
+        fr: {
+            'category.arte': 'Art',
+            'category.bebes': 'Bébé',
+            'category.deportes': 'Sports',
+            'category.electrodomesticos': 'Électroménager',
+            'category.herramientas': 'Outils',
+            'category.juguetes': 'Jouets',
+            'category.libros': 'Livres',
+            'category.mascotas': 'Animaux',
+            'category.muebles': 'Meubles',
+            'category.musica': 'Musique',
+            'category.papeleria': 'Papeterie',
+            'category.tecnologia': 'Technologie',
+        },
+        de: {
+            'category.arte': 'Kunst',
+            'category.bebes': 'Baby',
+            'category.deportes': 'Sport',
+            'category.electrodomesticos': 'Haushaltsgeräte',
+            'category.herramientas': 'Werkzeuge',
+            'category.juguetes': 'Spielzeug',
+            'category.libros': 'Bücher',
+            'category.mascotas': 'Haustiere',
+            'category.muebles': 'Möbel',
+            'category.musica': 'Musik',
+            'category.papeleria': 'Schreibwaren',
+            'category.tecnologia': 'Technik',
+        },
+        it: {
+            'category.arte': 'Arte',
+            'category.bebes': 'Bambino',
+            'category.deportes': 'Sport',
+            'category.electrodomesticos': 'Elettrodomestici',
+            'category.herramientas': 'Attrezzi',
+            'category.juguetes': 'Giochi',
+            'category.libros': 'Libri',
+            'category.mascotas': 'Animali',
+            'category.muebles': 'Mobili',
+            'category.musica': 'Musica',
+            'category.papeleria': 'Cancelleria',
+            'category.tecnologia': 'Tecnologia',
+        },
+    },
+
     init() {
         for (const lang in this.homeI18n) {
             this.translations[lang] = Object.assign({}, this.translations[lang], this.homeI18n[lang]);
@@ -4446,6 +4533,9 @@ const EcoI18n = {
         }
         for (const lang in this.core4I18n) {
             this.translations[lang] = Object.assign({}, this.translations[lang], this.core4I18n[lang]);
+        }
+        for (const lang in this.catI18n) {
+            this.translations[lang] = Object.assign({}, this.translations[lang], this.catI18n[lang]);
         }
         // Fallback: idiomas secundarios heredan inglés para claves no traducidas
         ['pt', 'fr', 'de', 'it'].forEach(l => {
@@ -4635,8 +4725,9 @@ const EcoI18n = {
     
     // Obtener traducción de categoría
     getCategoryTranslation(category) {
-        const key = `category.${category.toLowerCase()}`;
-        return this.getTranslation(key);
+        const slug = category.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '');
+
+        return this.getTranslation(`category.${slug}`) || this.getTranslation(`category.${category.toLowerCase()}`);
     },
     
     // Obtener traducción de producto

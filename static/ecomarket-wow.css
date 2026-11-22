@@ -1888,3 +1888,16 @@ main, .main-content, [role='main'] {
     border: 1.5px dashed #F59E0B; font-size: .82rem; color: #92400E;
 }
 [data-theme='dark'] .coupon-hint { background: rgba(245,158,11,.12); border-color: #F59E0B; color: #FDE68A; }
+
+/* ===== Loader de página con la hoja ===== */
+.eco-loader {
+    position: fixed; inset: 0; z-index: 99999; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 14px;
+    background: linear-gradient(160deg, #FFF9EC, #E9F5DC);
+    transition: opacity .45s ease, visibility .45s;
+}
+.eco-loader img { width: 110px; animation: mascotFloat 1.6s ease-in-out infinite; filter: drop-shadow(0 12px 18px rgba(20,83,45,.25)); }
+.eco-loader span { font-family: Poppins, sans-serif; font-weight: 600; color: #14532D; font-size: .95rem; letter-spacing: .5px; }
+.eco-loader.done { opacity: 0; visibility: hidden; }
+[data-theme='dark'] .eco-loader { background: linear-gradient(160deg, #0E1F16, #122B1C); }
+[data-theme='dark'] .eco-loader span { color: #BBF7D0; }

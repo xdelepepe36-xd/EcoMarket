@@ -47,6 +47,7 @@
     
     {% block head %}{% endblock %}
 </head>
+<div class="eco-loader" id="ecoLoader"><img src="{{ url_for('static', filename='assets/mascota.svg') }}" alt="Cargando"><span>Cargando EcoMarket…</span></div>
 <body data-user-id="{{ session.get('usuario_id', '') }}">
     <!-- Skip Navigation para accesibilidad -->
     <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
@@ -216,5 +217,9 @@
             }
         });
     </script>
+<script>
+window.addEventListener('load',function(){var l=document.getElementById('ecoLoader');if(l){l.classList.add('done');setTimeout(function(){l.remove()},500);}});
+setTimeout(function(){var l=document.getElementById('ecoLoader');if(l)l.remove();},4000);
+</script>
 </body>
 </html>

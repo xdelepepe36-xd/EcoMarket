@@ -1968,3 +1968,25 @@ body.tour-active #asistenteBtn,
 body.tour-active #asistentePanel,
 body.tour-active .eco-loader { display: none !important; }
 body.tour-active .hero-mascot { filter: drop-shadow(0 0 34px rgba(34,197,94,.7)) !important; }
+
+/* ===== Cursor animado de hojita ===== */
+.eco-cursor {
+    position: fixed; left: 0; top: 0; z-index: 999999; pointer-events: none;
+    opacity: 0; transition: opacity .3s ease; will-change: transform;
+    filter: drop-shadow(0 4px 8px rgba(20,83,45,.4));
+}
+.eco-cursor svg { display: block; animation: cursorBob 2.4s ease-in-out infinite; transform-origin: center; }
+@keyframes cursorBob {
+    0%,100% { transform: rotate(-8deg) translateY(0); }
+    50% { transform: rotate(8deg) translateY(-3px); }
+}
+.eco-cursor.eco-cursor-hover svg { animation: cursorHappy .5s ease; }
+@keyframes cursorHappy {
+    0%,100% { transform: scale(1) rotate(0); }
+    40% { transform: scale(1.35) rotate(-14deg); }
+    70% { transform: scale(1.2) rotate(10deg); }
+}
+.eco-has-cursor, .eco-has-cursor a, .eco-has-cursor button,
+.eco-has-cursor input, .eco-has-cursor textarea, .eco-has-cursor select {
+    cursor: none !important;
+}

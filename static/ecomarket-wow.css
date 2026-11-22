@@ -1729,3 +1729,30 @@ main, .main-content, [role='main'] {
 
 /* El overlay del hero es decorativo: nunca debe tapar clics del menú */
 .hero-overlay, .hero-background { pointer-events: none; }
+
+/* ===== Chips de producto flotantes en el hero ===== */
+.float-chip {
+    position: absolute; display: flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,.92); backdrop-filter: blur(8px);
+    border: 2px solid #14532D; border-radius: 18px; padding: 10px 14px;
+    box-shadow: 5px 6px 0 rgba(20,83,45,.85); pointer-events: none; z-index: 3;
+    animation: chipFloat 5s ease-in-out infinite;
+}
+.float-chip .chip-emoji { font-size: 1.7rem; }
+.float-chip strong { display: block; font-size: .82rem; color: #14532D; }
+.float-chip small { font-size: .75rem; color: #6B7280; font-weight: 600; }
+.float-chip .chip-badge {
+    background: #F59E0B; color: #fff; font-size: .62rem; font-weight: 800;
+    padding: 3px 7px; border-radius: 999px; letter-spacing: .5px;
+}
+.float-chip .chip-badge.eco { background: #22C55E; }
+.chip-1 { top: 14%; left: 4%; transform: rotate(-6deg); animation-delay: .4s; }
+.chip-2 { top: 46%; right: 2%; transform: rotate(5deg); animation-delay: 1.6s; }
+.chip-3 { bottom: 12%; left: 14%; transform: rotate(-3deg); animation-delay: 2.8s; }
+@keyframes chipFloat {
+    0%,100% { translate: 0 0; }
+    50% { translate: 0 -12px; }
+}
+[data-theme='dark'] .float-chip { background: rgba(20,40,28,.92); border-color: #34D399; box-shadow: 5px 6px 0 rgba(0,0,0,.5); }
+[data-theme='dark'] .float-chip strong { color: #BBF7D0; }
+@media (max-width: 991px) { .float-chip { display: none; } }

@@ -293,6 +293,7 @@ localStorage.setItem('eco_vistos',JSON.stringify(v.slice(0,8)));
                                 {% endfor %}
                             </div>
                             <textarea id="reviewComment" placeholder="Comparte tu experiencia..." data-i18n-placeholder="pd.review_placeholder" style="width:100%;padding:12px;border:1.5px solid rgba(46,125,50,0.18);border-radius:12px;font-family:inherit;font-size:0.88rem;resize:vertical;min-height:80px;outline:none;margin-bottom:12px"></textarea>
+                            <input type="file" id="reviewFoto" accept="image/*" style="font-size:.8rem;margin-bottom:10px;display:block">
                             <button onclick="enviarResena({{ producto.id }})" class="btn-principal" style="padding:10px 20px;font-size:0.88rem"><i class="bi bi-send"></i> <span data-i18n="pd.send_review">Enviar reseña</span></button>
                         </div>
                         {% endif %}
@@ -315,6 +316,9 @@ localStorage.setItem('eco_vistos',JSON.stringify(v.slice(0,8)));
                                 </div>
                                 {% if r.comentario %}
                                 <p style="font-size:0.85rem;color:var(--texto-sec);line-height:1.7">{{ r.comentario }}</p>
+                                {% endif %}
+                                {% if r.foto %}
+                                <a href="{{ url_for('static', filename=r.foto) }}" target="_blank"><img src="{{ url_for('static', filename=r.foto) }}" alt="Foto de la reseña" style="margin-top:10px;max-width:180px;max-height:140px;border-radius:12px;object-fit:cover;display:block;border:1px solid rgba(46,125,50,.15)"></a>
                                 {% endif %}
                             </div>
                             {% endfor %}
@@ -479,7 +483,15 @@ function enviarResena(productoId) {
     .then(r => r.json())
     .then(d => {
         if (d.success) {
-            location.reload();
+            var fi = document.getElementById('reviewFoto');
+            if (fi && fi.files && fi.files[0] && d.resena_id) {
+                var fd = new FormData();
+                fd.append('foto', fi.files[0]);
+                fetch('/api/resena/' + d.resena_id + '/foto', {method:'POST', body:fd})
+                    .finally(() => location.reload());
+            } else {
+                location.reload();
+            }
         }
     });
 }

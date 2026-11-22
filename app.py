@@ -966,6 +966,13 @@ def init_db():
     except sqlite3.OperationalError:
         pass
 
+    # Columna foto en resenas (fotos de compradores)
+    try:
+        conn.execute('ALTER TABLE resenas ADD COLUMN foto TEXT DEFAULT ""')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
     # Agregar columnas envio y descuento a pedidos si no existen
     try:
         conn.execute('ALTER TABLE pedidos ADD COLUMN envio REAL DEFAULT 0')
@@ -1607,6 +1614,33 @@ def agregar_resena_api(producto_id):
     conn.close()
     add_xp(session['usuario_id'], 10)
     return jsonify({'success': True, 'resena_id': resena_id})
+
+
+@app.route('/api/resena/<int:resena_id>/foto', methods=['POST'])
+@login_required
+def subir_foto_resena(resena_id):
+    """Adjunta una foto a una reseña propia (comprador verificado o no)."""
+    conn = get_db()
+    resena = conn.execute('SELECT usuario_id FROM resenas WHERE id = ?', (resena_id,)).fetchone()
+    if not resena or resena['usuario_id'] != session['usuario_id']:
+        conn.close()
+        return jsonify({'error': 'No autorizado'}), 403
+    f = request.files.get('foto')
+    if not f or not f.filename:
+        conn.close()
+        return jsonify({'error': 'Sin archivo'}), 400
+    ext = f.filename.rsplit('.', 1)[-1].lower() if '.' in f.filename else ''
+    if ext not in ('jpg', 'jpeg', 'png', 'webp', 'gif'):
+        conn.close()
+        return jsonify({'error': 'Formato no válido (jpg, png, webp, gif)'}), 400
+    import uuid as _uuid
+    nombre_archivo = f'resena_{resena_id}_{_uuid.uuid4().hex[:10]}.{ext}'
+    ruta = os.path.join(app.static_folder, 'uploads', nombre_archivo)
+    f.save(ruta)
+    conn.execute('UPDATE resenas SET foto = ? WHERE id = ?', (f'uploads/{nombre_archivo}', resena_id))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True, 'foto': f'/static/uploads/{nombre_archivo}'})
 
 
 @app.route('/favoritos')
@@ -2623,7 +2657,7 @@ def api_reviews_sync():
             return jsonify({'reviews': [], 'average_rating': 0, 'rating_distribution': {}, 'user_review': None})
         conn = get_db()
         rows = conn.execute(
-            "SELECT r.id, r.usuario_id, r.nombre, r.rating, r.comentario, r.compra_verificada, r.created_at, "
+            "SELECT r.id, r.usuario_id, r.nombre, r.rating, r.comentario, r.compra_verificada, r.created_at, r.foto, "
             "COALESCE(SUM(CASE WHEN rv.voto = 1 THEN 1 ELSE 0 END), 0) AS votes_helpful, "
             "COALESCE(SUM(CASE WHEN rv.voto = -1 THEN 1 ELSE 0 END), 0) AS votes_not_helpful "
             "FROM resenas r LEFT JOIN resena_votos rv ON rv.resena_id = r.id "
@@ -2651,7 +2685,7 @@ def api_reviews_sync():
                 'comentario': row['comentario'] or '',
                 'compra_verificada': bool(row['compra_verificada']),
                 'recomienda': None,
-                'fotos': [],
+                'fotos': [('/static/' + row['foto'])] if row['foto'] else [],
                 'video': None,
                 'respuesta': None,
                 'votes_helpful': row['votes_helpful'] or 0,

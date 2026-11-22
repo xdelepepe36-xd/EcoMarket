@@ -462,3 +462,24 @@
 [data-theme='rose'] .faq-item p, [data-theme='rose'] .como-funciona-card p,
 [data-theme='rose'] .impacto-card p, [data-theme='rose'] .stat-card p,
 [data-theme='rose'] .testimonio-card p, [data-theme='rose'] .contact-card p { color:#E4BCCD; }
+
+/* Inputs de filtros del catálogo: legibles en todos los temas */
+[data-theme='light'] .catalog-filter-panel input,
+[data-theme='light'] .catalog-filter-panel select {
+    background: #fff; color: #1f2d1a; border-color: rgba(46,125,50,.25);
+}
+[data-theme='dark'] .catalog-filter-panel input,
+[data-theme='dark'] .catalog-filter-panel select,
+[data-theme='dark'] input[type='number'], [data-theme='dark'] input[type='text'],
+[data-theme='dark'] input[type='search'], [data-theme='dark'] input[type='email'],
+[data-theme='dark'] input:not([type]) {
+    background: rgba(22,40,30,.9); color: #E8F0E8; border-color: rgba(102,187,106,.3);
+}
+[data-theme='nature'] .catalog-filter-panel input,
+[data-theme='nature'] .catalog-filter-panel select { background: rgba(10,30,18,.9); color:#EAF6E6; border-color:rgba(74,222,128,.3); }
+[data-theme='ocean'] .catalog-filter-panel input,
+[data-theme='ocean'] .catalog-filter-panel select { background: rgba(6,30,50,.9); color:#E8F6FF; border-color:rgba(56,189,248,.35); }
+[data-theme='midnight'] .catalog-filter-panel input,
+[data-theme='midnight'] .catalog-filter-panel select { background: rgba(15,15,35,.92); color:#E6E8F5; border-color:rgba(165,180,252,.3); }
+[data-theme='rose'] .catalog-filter-panel input,
+[data-theme='rose'] .catalog-filter-panel select { background: rgba(45,14,28,.9); color:#FFF0F5; border-color:rgba(251,207,232,.32); }

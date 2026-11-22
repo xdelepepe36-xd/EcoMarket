@@ -9,7 +9,10 @@
                 <h2 class="section-title"><i class="bi bi-shield-check"></i> <span data-i18n="admin.title">Panel de Administración</span></h2>
                 <p data-i18n="admin.subtitle">Gestiona productos y usuarios registrados en EcoMarket.</p>
             </div>
-            <a href="{{ url_for('publicar') }}" class="btn-principal"><i class="bi bi-plus-circle"></i> <span data-i18n="admin.new_product">Nuevo producto</span></a>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <a href="{{ url_for('admin_backup') }}" class="btn-secundario"><i class="bi bi-download"></i> <span data-i18n="admin.backup">Backup BD</span></a>
+                <a href="{{ url_for('publicar') }}" class="btn-principal"><i class="bi bi-plus-circle"></i> <span data-i18n="admin.new_product">Nuevo producto</span></a>
+            </div>
         </div>
 
         <!-- Stats rápidas -->

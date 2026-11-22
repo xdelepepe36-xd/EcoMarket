@@ -3,7 +3,7 @@ EcoMarket - Marketplace Ecológico v3.2
 Backend completo con SQLite, subida de imágenes, API REST, dashboard y más.
 Optimizado con mejor manejo de errores, caching, seguridad y accesibilidad.
 """
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory, send_file
 from whitenoise import WhiteNoise
 import sqlite3
 import os
@@ -5912,6 +5912,29 @@ def api_recomendaciones():
 
 
 # ── Admin ─────────────────────────────────────────────────────────────────────
+
+@app.route('/admin/backup')
+@login_required
+@admin_required
+def admin_backup():
+    """Crea una copia de seguridad de la base de datos y la descarga."""
+    try:
+        backup_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'backups')
+        os.makedirs(backup_dir, exist_ok=True)
+        nombre = f"ecomarket_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
+        ruta = os.path.join(backup_dir, nombre)
+        src = sqlite3.connect(DB_PATH)
+        dst = sqlite3.connect(ruta)
+        src.backup(dst)
+        dst.close()
+        src.close()
+        logger.info(f"Backup creado: {ruta}")
+        return send_file(ruta, as_attachment=True, download_name=nombre)
+    except Exception as e:
+        logger.error(f"Error en backup: {e}")
+        flash('Error al crear la copia de seguridad', 'danger')
+        return redirect(url_for('admin'))
+
 
 @app.route('/admin')
 @login_required

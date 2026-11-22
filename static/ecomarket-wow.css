@@ -2039,10 +2039,11 @@ body.tour-active .hero-mascot { filter: drop-shadow(0 0 34px rgba(34,197,94,.7))
 }
 
 /* ===== Auth split-screen (estilo universidad) ===== */
-.auth-container {
+.container.auth-container {
     display: grid; grid-template-columns: 1.05fr 1fr; gap: 0;
-    max-width: 1180px; padding: 0; align-items: stretch;
-    min-height: calc(100vh - 190px);
+    width: 100% !important; max-width: 1240px; padding: 0;
+    margin: 0 auto; align-items: stretch;
+    min-height: calc(100vh - 170px);
 }
 .auth-brand {
     position: relative; overflow: hidden; border-radius: 26px 0 0 26px;
@@ -2068,11 +2069,11 @@ body.tour-active .hero-mascot { filter: drop-shadow(0 0 34px rgba(34,197,94,.7))
 .auth-brand-stats div { display: flex; flex-direction: column; }
 .auth-brand-stats strong { font-size: 1.5rem; color: #FBBF24; font-family: 'Playfair Display', serif; }
 .auth-brand-stats span { font-size: .8rem; opacity: .75; text-transform: uppercase; letter-spacing: .8px; }
-.auth-card { align-self: center; width: 100%; max-width: 520px; margin: 0 auto; padding: 42px 40px !important; border-radius: 0 26px 26px 0; box-shadow: -14px 14px 0 rgba(20,83,45,.10); }
+.auth-card { align-self: center; width: 100%; max-width: none; margin: 0; padding: 42px 40px !important; border-radius: 0 26px 26px 0; box-shadow: -14px 14px 0 rgba(20,83,45,.10); }
 .auth-card input[type='email'], .auth-card input[type='password'], .auth-card input[type='text'], .auth-card input[type='tel'] {
-    font-size: 1.04rem; padding: 14px 16px; border-radius: 14px;
+    font-size: 1.08rem; padding: 17px 18px; border-radius: 16px;
 }
-.auth-card .btn-principal { padding: 15px; font-size: 1.05rem; border-radius: 14px; }
+.auth-card .btn-principal, .auth-card .btn-secundario { padding: 17px; font-size: 1.08rem; border-radius: 16px; letter-spacing: .3px; }
 @media (max-width: 960px) {
     .auth-container { grid-template-columns: 1fr; min-height: auto; }
     .auth-brand { display: none; }

@@ -178,3 +178,15 @@
     }, { threshold: 0.4 });
     els.forEach(el => io.observe(el));
 })();
+
+/* Toggle ver/ocultar contraseña (delegado, funciona en login/registro) */
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.pw-toggle');
+    if (!btn) return;
+    const input = document.getElementById(btn.dataset.target);
+    if (!input) return;
+    const show = input.type === 'password';
+    input.type = show ? 'text' : 'password';
+    btn.querySelector('i').className = show ? 'bi bi-eye-slash' : 'bi bi-eye';
+    btn.setAttribute('aria-label', show ? 'Ocultar contraseña' : 'Mostrar contraseña');
+});

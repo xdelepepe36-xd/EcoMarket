@@ -15,7 +15,10 @@
                 <label for="email"><i class="bi bi-envelope"></i> <span data-i18n="auth.email">Correo electrónico</span></label>
                 <input type="email" id="email" name="email" placeholder="tu@correo.com" data-i18n-placeholder="auth.email_placeholder" required autofocus>
                 <label for="password"><i class="bi bi-lock"></i> <span data-i18n="auth.password">Contraseña</span></label>
-                <input type="password" id="password" name="password" placeholder="Tu contraseña" data-i18n-placeholder="auth.password_placeholder" required>
+                <div class="pw-wrap">
+                    <input type="password" id="password" name="password" placeholder="Tu contraseña" data-i18n-placeholder="auth.password_placeholder" required>
+                    <button type="button" class="pw-toggle" data-target="password" tabindex="-1" aria-label="Mostrar contraseña"><i class="bi bi-eye"></i></button>
+                </div>
                 <button class="btn-principal" type="submit" style="width:100%; margin-top:8px;">
                     <i class="bi bi-box-arrow-in-right"></i> <span data-i18n="auth.login_button">Ingresar</span>
                 </button>

@@ -4674,6 +4674,27 @@ const EcoI18n = {
         },
     },
 
+    miscI18n: {
+        es: {
+            'pd.contact_seller': 'Contactar vendedor',
+        },
+        en: {
+            'pd.contact_seller': 'Contact seller',
+        },
+        pt: {
+            'pd.contact_seller': 'Contactar vendedor',
+        },
+        fr: {
+            'pd.contact_seller': 'Contacter le vendeur',
+        },
+        de: {
+            'pd.contact_seller': 'Verkäufer kontaktieren',
+        },
+        it: {
+            'pd.contact_seller': 'Contatta il venditore',
+        },
+    },
+
     init() {
         for (const lang in this.homeI18n) {
             this.translations[lang] = Object.assign({}, this.translations[lang], this.homeI18n[lang]);
@@ -4740,6 +4761,9 @@ const EcoI18n = {
         }
         for (const lang in this.impact2I18n) {
             this.translations[lang] = Object.assign({}, this.translations[lang], this.impact2I18n[lang]);
+        }
+        for (const lang in this.miscI18n) {
+            this.translations[lang] = Object.assign({}, this.translations[lang], this.miscI18n[lang]);
         }
         // Fallback: idiomas secundarios heredan inglés para claves no traducidas
         ['pt', 'fr', 'de', 'it'].forEach(l => {

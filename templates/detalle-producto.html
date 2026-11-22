@@ -137,6 +137,10 @@
                 {% endif %}
             </div>
 
+            <button class="btn-secundario" onclick="contactarVendedor()" style="width:100%;margin-top:10px">
+                <i class="bi bi-chat-dots"></i> <span data-i18n="pd.contact_seller">Contactar vendedor</span>
+            </button>
+
             <div class="detalle-benefits">
                 <div class="benefit-item"><span data-i18n="pd.benefit_material">♻️ Material sostenible</span></div>
                 <div class="benefit-item"><span data-i18n="pd.benefit_shipping">🚚 Envío rápido disponible</span></div>
@@ -382,6 +386,20 @@ function cambiarTab(tabId, btn) {
     document.querySelectorAll('.detalle-tab-content').forEach(c => c.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('tab-' + tabId).classList.add('active');
+}
+
+function contactarVendedor() {
+    const tabs = document.querySelectorAll('.detalle-tab');
+    const btn = [...tabs].find(t => t.getAttribute('onclick') && t.getAttribute('onclick').includes('preguntas'));
+    if (btn) cambiarTab('preguntas', btn);
+    setTimeout(() => {
+        const panel = document.getElementById('tab-preguntas');
+        if (panel) {
+            panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            const input = panel.querySelector('input[type="text"], textarea, input:not([type])');
+            if (input) input.focus({ preventScroll: true });
+        }
+    }, 350);
 }
 
 // ── Reseñas ──────────────────────────────────────

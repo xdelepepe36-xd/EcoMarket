@@ -256,6 +256,13 @@
                             <label class="form-label">Biografía</label>
                             <textarea name="bio" class="form-input" rows="3" placeholder="Cuéntanos sobre ti..." data-i18n-placeholder="profile.bio_placeholder">{{ usuario.bio if usuario else '' }}</textarea>
                         </div>
+                        <div class="form-group">
+                            <label class="form-label"><i class="bi bi-palette"></i> Color del avatar</label>
+                            <div style="display:flex;align-items:center;gap:12px">
+                                <input type="color" name="avatar_color" value="{{ usuario.avatar_color if usuario and usuario.avatar_color else '#2e7d32' }}" style="width:52px;height:44px;border:none;border-radius:10px;cursor:pointer;background:none;padding:0">
+                                <span style="font-size:0.82rem;color:var(--texto-sec)">Se usa en tu foto de perfil</span>
+                            </div>
+                        </div>
                         <button type="submit" class="btn-principal"><i class="bi bi-check-lg"></i> Guardar cambios</button>
                     </form>
                 </div>

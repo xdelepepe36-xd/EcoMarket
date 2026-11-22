@@ -50,6 +50,21 @@
             </div>
         </div>
 
+        <!-- Barra de progreso XP -->
+        {% set _xp = usuario.xp if usuario else 0 %}
+        {% set _nivel = usuario.nivel if usuario and usuario.nivel else (1 + (_xp // 100)) %}
+        {% set _prog = ((_xp % 100) / 100 * 100)|round(0)|int %}
+        <div class="xp-card">
+            <div class="xp-card-top">
+                <div class="xp-level-badge">Nv. {{ _nivel }}</div>
+                <div class="xp-info">
+                    <strong>{{ _xp }} XP</strong>
+                    <span>{% if _nivel >= 50 %}¡Nivel máximo! 🏆{% else %}{{ 100 - (_xp % 100) }} XP para Nv. {{ _nivel + 1 }}{% endif %}</span>
+                </div>
+            </div>
+            <div class="xp-bar"><div class="xp-fill" style="width: {{ _prog }}%"></div></div>
+        </div>
+
         <!-- Stats rápidas -->
         <div class="stats-grid" style="margin-bottom:28px">
             <div class="stat-card" style="text-align:center;padding:20px;border-radius:20px;background:var(--blanco);box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">

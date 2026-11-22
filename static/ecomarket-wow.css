@@ -1839,3 +1839,27 @@ main, .main-content, [role='main'] {
 [data-theme='dark'] .search-ac-box { background: #122B1C; border-color: #34D399; }
 [data-theme='dark'] .search-ac-item:hover, [data-theme='dark'] .search-ac-all { background: #1B3A28; }
 [data-theme='dark'] .search-ac-info strong { color: #BBF7D0; }
+
+/* ===== Barra de XP en perfil ===== */
+.xp-card {
+    background: linear-gradient(135deg, #14532D, #166534);
+    border-radius: 20px; padding: 18px 22px; margin-bottom: 24px;
+    box-shadow: 0 14px 34px rgba(20,60,35,.3); color: #fff;
+}
+.xp-card-top { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+.xp-level-badge {
+    background: linear-gradient(135deg, #F59E0B, #D97706); color: #fff;
+    font-weight: 800; font-size: .85rem; padding: 8px 14px; border-radius: 999px;
+    box-shadow: 0 4px 12px rgba(245,158,11,.4); white-space: nowrap;
+}
+.xp-info { display: flex; flex-direction: column; }
+.xp-info strong { font-size: 1.05rem; }
+.xp-info span { font-size: .78rem; color: #BBF7D0; }
+.xp-bar { height: 12px; background: rgba(255,255,255,.18); border-radius: 999px; overflow: hidden; }
+.xp-fill {
+    height: 100%; border-radius: 999px;
+    background: linear-gradient(90deg, #F59E0B, #FDE68A, #22C55E);
+    background-size: 200% 100%; animation: xpShine 3s linear infinite;
+    transition: width 1s cubic-bezier(.22,1,.36,1);
+}
+@keyframes xpShine { to { background-position: -200% 0; } }

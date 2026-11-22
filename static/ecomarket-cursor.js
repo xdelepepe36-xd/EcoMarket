@@ -12,6 +12,32 @@
     document.addEventListener('mousemove', function (e) { tx = e.clientX; ty = e.clientY; if (!visible) { visible = true; cur.style.opacity = '1'; } });
     document.addEventListener('mouseleave', function () { cur.style.opacity = '0'; });
 
+    // CLICK: la hoja hace "pop" + estalla en mini-hojas (estilo toy factory)
+    document.addEventListener('mousedown', function (e) {
+        if (e.button !== 0) return;
+        cur.classList.add('eco-cursor-pop');
+        setTimeout(function () { cur.classList.remove('eco-cursor-pop'); }, 260);
+        spawnBurst(e.clientX, e.clientY);
+    });
+
+    function spawnBurst(bx, by) {
+        var burst = document.createElement('div');
+        burst.className = 'eco-click-burst';
+        burst.style.left = bx + 'px'; burst.style.top = by + 'px';
+        for (var i = 0; i < 6; i++) {
+            var p = document.createElement('i');
+            var ang = (Math.PI * 2 * i) / 6 + Math.random() * 0.6;
+            var dist = 26 + Math.random() * 22;
+            p.style.setProperty('--dx', Math.cos(ang) * dist + 'px');
+            p.style.setProperty('--dy', (Math.sin(ang) * dist - 14) + 'px');
+            p.style.animationDelay = (i * 0.015) + 's';
+            p.style.background = i % 2 ? '#22C55E' : '#F59E0B';
+            burst.appendChild(p);
+        }
+        document.body.appendChild(burst);
+        setTimeout(function () { burst.remove(); }, 700);
+    }
+
     (function loop() {
         x += (tx - x) * 0.22; y += (ty - y) * 0.22;
         cur.style.transform = 'translate(' + (x - 15) + 'px,' + (y - 15) + 'px) rotate(' + ((tx - x) * 0.6) + 'deg)';

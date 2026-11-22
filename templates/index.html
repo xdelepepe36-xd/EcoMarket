@@ -196,11 +196,20 @@
                             <i class="bi bi-box-seam"></i>
                         </div>
                         {% endif %}
+                        {% if producto.precio_original and producto.precio_original > producto.precio %}
+                        <span class="card-offer-ribbon">-{{ ((1 - producto.precio / producto.precio_original) * 100)|round }}%</span>
+                        {% endif %}
+                        {% if producto.eco_score and producto.eco_score >= 70 %}
+                        <span class="card-eco-dot" title="EcoScore {{ producto.eco_score }}"><i class="bi bi-recycle"></i></span>
+                        {% endif %}
                     </div>
                     <div class="product-content">
                         <div class="product-categoria" data-category="{{ producto.categoria }}">{{ producto.categoria }}</div>
                         <h3 class="product-nombre">{{ producto.nombre }}</h3>
-                        <div class="product-precio">S/. {{ '%.2f'|format(producto.precio) }}</div>
+                        <div class="product-precio">
+                            {% if producto.precio_original and producto.precio_original > producto.precio %}<s>S/. {{ '%.2f'|format(producto.precio_original) }}</s>{% endif %}
+                            S/. {{ '%.2f'|format(producto.precio) }}
+                        </div>
                         <div class="product-disponibilidad disponible" data-i18n="home.product_available">Disponible</div>
                         <div class="product-botones">
                             <button class="btn-card btn-primary" data-i18n="home.view_details">Ver detalles</button>

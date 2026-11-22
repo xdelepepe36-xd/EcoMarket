@@ -23,6 +23,11 @@
                     <i class="bi bi-box-arrow-in-right"></i> <span data-i18n="auth.login_button">Ingresar</span>
                 </button>
             </form>
+            <div style="text-align:center; margin: 4px 0 10px;">
+                <a href="{{ url_for('recuperar_password') }}" style="font-size:.88rem; color:#2e7d32; font-weight:600; text-decoration:none;">
+                    <i class="bi bi-key"></i> <span data-i18n="auth.forgot">¿Olvidaste tu contraseña?</span>
+                </a>
+            </div>
             <div class="auth-divider"><span data-i18n="auth.or">o</span></div>
             <div class="google-login-wrap" data-eco-google-btn></div>
             <div class="auth-divider"><span data-i18n="auth.no_account">¿No tienes cuenta?</span></div>

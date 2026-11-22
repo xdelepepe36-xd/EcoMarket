@@ -9,7 +9,7 @@ import sqlite3
 import os
 import json
 from functools import wraps
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
@@ -490,6 +490,8 @@ FLASH_MSGS = {
     'contrasena_actualizada': {'es': 'Contraseña actualizada correctamente.', 'en': 'Password updated successfully.'},
     'contrasena_actual_incorrecta': {'es': 'Contraseña actual incorrecta.', 'en': 'Current password is incorrect.'},
     'campos_incompletos': {'es': 'Completa todos los campos.', 'en': 'Complete all the fields.'},
+    'password_corta': {'es': 'La contraseña debe tener al menos 8 caracteres.', 'en': 'Password must be at least 8 characters.'},
+    'password_actualizada': {'es': 'Contraseña actualizada. Ya puedes iniciar sesión.', 'en': 'Password updated. You can now log in.'},
     'producto_publicado': {'es': '¡Producto publicado con éxito!', 'en': 'Product published successfully!'},
     'producto_actualizado': {'es': 'Producto actualizado.', 'en': 'Product updated.'},
     'producto_eliminado': {'es': 'Producto eliminado.', 'en': 'Product deleted.'},
@@ -818,6 +820,17 @@ def init_db():
             FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
         );
         CREATE INDEX IF NOT EXISTS idx_preguntas_producto ON preguntas(producto_id);
+
+        CREATE TABLE IF NOT EXISTS password_resets (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            usuario_id INTEGER NOT NULL,
+            token_hash TEXT NOT NULL,
+            expires_at TEXT NOT NULL,
+            used INTEGER DEFAULT 0,
+            created_at TEXT DEFAULT (datetime('now')),
+            FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+        );
+        CREATE INDEX IF NOT EXISTS idx_resets_token ON password_resets(token_hash);
     ''')
 
     # Seed productos si la tabla está vacía
@@ -2618,6 +2631,80 @@ def login():
             restantes = 5 - session['login_intentos']
             flash_t('login_restantes', 'danger', restantes=restantes)
     return render_template('login.html')
+
+
+@app.route('/recuperar', methods=['GET', 'POST'])
+def recuperar_password():
+    """Solicita restablecer contraseña. Sin SMTP configurado, muestra el enlace (modo demo)."""
+    if 'usuario_id' in session:
+        return redirect(url_for('index'))
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+        conn = get_db()
+        usuario = conn.execute('SELECT id, nombre FROM usuarios WHERE email = ?', (email,)).fetchone()
+        enlace_demo = None
+        if usuario:
+            token = secrets.token_urlsafe(32)
+            token_hash = hashlib.sha256(token.encode()).hexdigest()
+            expires = (datetime.now(timezone.utc) + timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
+            conn.execute(
+                'INSERT INTO password_resets (usuario_id, token_hash, expires_at) VALUES (?,?,?)',
+                (usuario['id'], token_hash, expires)
+            )
+            conn.commit()
+            if not os.environ.get('SMTP_HOST'):
+                enlace_demo = url_for('restablecer_password', token=token, _external=True)
+        conn.close()
+        # Mensaje genérico: no revelar si el correo existe
+        return render_template('recuperar.html', enviado=True, enlace_demo=enlace_demo)
+    return render_template('recuperar.html')
+
+
+@app.route('/restablecer', methods=['GET', 'POST'])
+def restablecer_password():
+    token = request.args.get('token', '')
+    if request.method == 'POST':
+        token = request.form.get('token', '')
+        password = request.form.get('password', '')
+        password2 = request.form.get('password2', '')
+        if not token or not password:
+            flash_t('datos_incompletos', 'danger')
+            return render_template('restablecer.html', token=token)
+        if len(password) < 8:
+            flash_t('password_corta', 'danger')
+            return render_template('restablecer.html', token=token)
+        if password != password2:
+            flash('Las contraseñas no coinciden', 'danger')
+            return render_template('restablecer.html', token=token)
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+        conn = get_db()
+        reset = conn.execute(
+            "SELECT * FROM password_resets WHERE token_hash = ? AND used = 0 AND expires_at > datetime('now')",
+            (token_hash,)
+        ).fetchone()
+        if not reset:
+            conn.close()
+            flash('El enlace es inválido o expiró. Solicita uno nuevo.', 'danger')
+            return redirect(url_for('recuperar_password'))
+        conn.execute('UPDATE usuarios SET password = ? WHERE id = ?',
+                     (generate_password_hash(password), reset['usuario_id']))
+        conn.execute('UPDATE password_resets SET used = 1 WHERE id = ?', (reset['id'],))
+        conn.commit()
+        conn.close()
+        flash_t('password_actualizada', 'success')
+        return redirect(url_for('login'))
+    # GET: validar token
+    token_hash = hashlib.sha256(token.encode()).hexdigest() if token else ''
+    conn = get_db()
+    valido = conn.execute(
+        "SELECT id FROM password_resets WHERE token_hash = ? AND used = 0 AND expires_at > datetime('now')",
+        (token_hash,)
+    ).fetchone() is not None
+    conn.close()
+    if not valido:
+        flash('El enlace es inválido o expiró. Solicita uno nuevo.', 'danger')
+        return redirect(url_for('recuperar_password'))
+    return render_template('restablecer.html', token=token)
 
 
 @app.route('/registro', methods=['GET', 'POST'])

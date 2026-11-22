@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}EcoMarket - Recuperar contraseña{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container auth-container">
+        <div class="auth-card form-card">
+            <div class="auth-header">
+                <span class="auth-icon">🔑</span>
+                <h2 class="section-title" data-i18n="auth.recover_title">Recuperar contraseña</h2>
+                <p data-i18n="auth.recover_desc">Ingresa tu correo y te enviaremos un enlace para restablecerla.</p>
+            </div>
+            {% if enviado %}
+                <div class="alert alert-success" role="alert">
+                    <i class="bi bi-check-circle"></i>
+                    <span data-i18n="auth.recover_sent">Si el correo existe, recibirás un enlace de restablecimiento en los próximos minutos.</span>
+                </div>
+                {% if enlace_demo %}
+                    <div class="alert alert-info" role="alert" style="word-break:break-all;">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Modo demo (sin SMTP):</strong> tu enlace de restablecimiento es:
+                        <a href="{{ enlace_demo }}">{{ enlace_demo }}</a>
+                    </div>
+                {% endif %}
+            {% else %}
+            <form method="POST" action="{{ url_for('recuperar_password') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <label for="email"><i class="bi bi-envelope"></i> <span data-i18n="auth.email">Correo electrónico</span></label>
+                <input type="email" id="email" name="email" placeholder="tu@correo.com" data-i18n-placeholder="auth.email_placeholder" required autofocus>
+                <button class="btn-principal" type="submit" style="width:100%; margin-top:8px;">
+                    <i class="bi bi-send"></i> <span data-i18n="auth.recover_button">Enviar enlace</span>
+                </button>
+            </form>
+            {% endif %}
+            <div class="auth-divider"><span data-i18n="auth.remembered">¿Recordaste tu contraseña?</span></div>
+            <a href="{{ url_for('login') }}" class="btn-secundario" style="width:100%; text-align:center;">
+                <i class="bi bi-box-arrow-in-right"></i> <span data-i18n="auth.login_button">Ingresar</span>
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

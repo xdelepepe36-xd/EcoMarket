@@ -831,6 +831,21 @@ def init_db():
             FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
         );
         CREATE INDEX IF NOT EXISTS idx_resets_token ON password_resets(token_hash);
+
+        CREATE TABLE IF NOT EXISTS mensajes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            producto_id INTEGER,
+            de_id INTEGER NOT NULL,
+            para_id INTEGER NOT NULL,
+            mensaje TEXT NOT NULL,
+            leido INTEGER DEFAULT 0,
+            created_at TEXT DEFAULT (datetime('now')),
+            FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE SET NULL,
+            FOREIGN KEY (de_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+            FOREIGN KEY (para_id) REFERENCES usuarios(id) ON DELETE CASCADE
+        );
+        CREATE INDEX IF NOT EXISTS idx_mensajes_para ON mensajes(para_id, leido);
+        CREATE INDEX IF NOT EXISTS idx_mensajes_hilo ON mensajes(de_id, para_id, producto_id);
     ''')
 
     # Seed productos si la tabla está vacía
@@ -5656,6 +5671,119 @@ def api_pregunta_helpful(pregunta_id):
         return jsonify({'helpful': row['helpful'] if row else 0})
     finally:
         conn.close()
+
+# ── Mensajería privada comprador ↔ vendedor ─────────────────────────────────────
+
+@app.route('/mensajes')
+@login_required
+def mensajes_view():
+    """Bandeja de entrada: conversaciones agrupadas por usuario + producto."""
+    uid = session['usuario_id']
+    conn = get_db()
+    hilos = conn.execute('''
+        SELECT
+            CASE WHEN m.de_id = ? THEN m.para_id ELSE m.de_id END AS otro_id,
+            u.nombre AS otro_nombre,
+            u.avatar_color AS otro_color,
+            m.producto_id,
+            p.nombre AS producto_nombre,
+            MAX(m.created_at) AS ultimo,
+            COUNT(*) AS total,
+            SUM(CASE WHEN m.para_id = ? AND m.leido = 0 THEN 1 ELSE 0 END) AS no_leidos
+        FROM mensajes m
+        JOIN usuarios u ON u.id = CASE WHEN m.de_id = ? THEN m.para_id ELSE m.de_id END
+        LEFT JOIN productos p ON p.id = m.producto_id
+        WHERE m.de_id = ? OR m.para_id = ?
+        GROUP BY otro_id, m.producto_id
+        ORDER BY ultimo DESC
+    ''', (uid, uid, uid, uid, uid)).fetchall()
+    conn.close()
+    return render_template('mensajes.html', hilos=[dict(h) for h in hilos])
+
+
+@app.route('/api/mensajes', methods=['POST'])
+@login_required
+def api_mensaje_enviar():
+    """Envía un mensaje privado (opcionalmente asociado a un producto)."""
+    data = request.get_json(silent=True) or request.form
+    para_id = int(data.get('para_id') or 0)
+    producto_id = data.get('producto_id') or None
+    texto = (data.get('mensaje') or '').strip()
+    uid = session['usuario_id']
+
+    if para_id == uid:
+        return jsonify({'error': 'No puedes escribirte a ti mismo'}), 400
+    if not texto or len(texto) > 1000:
+        return jsonify({'error': 'Mensaje vacío o demasiado largo'}), 400
+
+    conn = get_db()
+    destinatario = conn.execute('SELECT id, nombre FROM usuarios WHERE id = ?', (para_id,)).fetchone()
+    if not destinatario:
+        conn.close()
+        return jsonify({'error': 'Destinatario no encontrado'}), 404
+    if producto_id:
+        prod = conn.execute('SELECT nombre, usuario_id FROM productos WHERE id = ?', (producto_id,)).fetchone()
+        if not prod:
+            conn.close()
+            return jsonify({'error': 'Producto no encontrado'}), 404
+        # Solo se permite escribir al dueño del producto (o hilo ya existente)
+        if prod['usuario_id'] and prod['usuario_id'] != para_id:
+            conn.close()
+            return jsonify({'error': 'Destinatario incorrecto'}), 400
+    conn.execute(
+        'INSERT INTO mensajes (producto_id, de_id, para_id, mensaje) VALUES (?,?,?,?)',
+        (producto_id, uid, para_id, texto)
+    )
+    conn.commit()
+    conn.close()
+
+    nombre_prod = ''
+    if producto_id:
+        conn = get_db()
+        p = conn.execute('SELECT nombre FROM productos WHERE id = ?', (producto_id,)).fetchone()
+        nombre_prod = p['nombre'] if p else ''
+        conn.close()
+    add_notificacion(
+        para_id,
+        '💬 Nuevo mensaje',
+        f'{session["nombre"]} te escribió' + (f' sobre "{nombre_prod}"' if nombre_prod else '') + '.',
+        'info'
+    )
+    return jsonify({'success': True})
+
+
+@app.route('/api/mensajes/hilo')
+@login_required
+def api_mensajes_hilo():
+    """Devuelve los mensajes de una conversación y los marca como leídos."""
+    otro_id = int(request.args.get('con', 0))
+    producto_id = request.args.get('producto')
+    uid = session['usuario_id']
+    if not otro_id or otro_id == uid:
+        return jsonify({'error': 'Conversación inválida'}), 400
+    conn = get_db()
+    query = '''
+        SELECT m.id, m.mensaje, m.created_at, m.de_id, u.nombre AS de_nombre
+        FROM mensajes m JOIN usuarios u ON u.id = m.de_id
+        WHERE ((m.de_id = ? AND m.para_id = ?) OR (m.de_id = ? AND m.para_id = ?))
+    '''
+    params = [uid, otro_id, otro_id, uid]
+    if producto_id:
+        query += ' AND m.producto_id = ?'
+        params.append(int(producto_id))
+    else:
+        query += ' AND m.producto_id IS NULL'
+    query += ' ORDER BY m.created_at ASC LIMIT 200'
+    rows = conn.execute(query, params).fetchall()
+    # marcar como leídos los recibidos
+    conn.execute(
+        'UPDATE mensajes SET leido = 1 WHERE para_id = ? AND de_id = ? AND leido = 0',
+        (uid, otro_id)
+    )
+    conn.commit()
+    conn.close()
+    return jsonify({'mensajes': [dict(r) for r in rows]})
+
 
 # ── Sistema de Recomendaciones ────────────────────────────────────────────────────
 

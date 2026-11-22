@@ -389,6 +389,8 @@ function cambiarTab(tabId, btn) {
 }
 
 function contactarVendedor() {
+    const modal = document.getElementById('modalMensajeVendedor');
+    if (modal) { modal.style.display = 'flex'; return; }
     const tabs = document.querySelectorAll('.detalle-tab');
     const btn = [...tabs].find(t => t.getAttribute('onclick') && t.getAttribute('onclick').includes('preguntas'));
     if (btn) cambiarTab('preguntas', btn);
@@ -510,4 +512,58 @@ document.body.dataset.rol = 'vendedor';
 .notificacion-error { background:#dc3545; }
 </style>
 <script src="{{ url_for('static', filename='ecomarket-preguntas-respuestas.js') }}"></script>
+
+{% if producto.usuario_id and producto.usuario_id != session.get('usuario_id') %}
+<!-- Modal mensaje privado al vendedor -->
+<div id="modalMensajeVendedor" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:4000;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:var(--blanco,#fff);border-radius:20px;max-width:440px;width:100%;padding:26px;box-shadow:0 24px 60px rgba(0,0,0,.25);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <h3 style="margin:0;font-size:1.15rem;">💬 <span data-i18n="pd.msg_title">Escribir al vendedor</span></h3>
+            <button onclick="document.getElementById('modalMensajeVendedor').style.display='none'" style="background:none;border:none;font-size:1.4rem;cursor:pointer;" aria-label="Cerrar">×</button>
+        </div>
+        <p style="font-size:.85rem;color:var(--texto-sec,#666);margin-bottom:14px;">
+            {{ producto.vendedor_nombre }} · {{ producto.nombre }}
+        </p>
+        <textarea id="msgTexto" rows="4" maxlength="1000" style="width:100%;border:2px solid rgba(46,125,50,.2);border-radius:12px;padding:12px;font-family:inherit;font-size:.92rem;resize:vertical;" data-i18n-placeholder="pd.msg_placeholder" placeholder="Escribe tu mensaje..."></textarea>
+        <div style="display:flex;gap:10px;margin-top:14px;">
+            <button class="btn-principal" onclick="enviarMensajeVendedor()" style="flex:1;">
+                <i class="bi bi-send"></i> <span data-i18n="pd.msg_send">Enviar</span>
+            </button>
+            <button class="btn-secundario" onclick="document.getElementById('modalMensajeVendedor').style.display='none'">
+                <span data-i18n="common.cancel">Cancelar</span>
+            </button>
+        </div>
+        <p id="msgError" style="color:#dc3545;font-size:.82rem;margin-top:10px;display:none;"></p>
+    </div>
+</div>
+<script>
+function enviarMensajeVendedor() {
+    const texto = document.getElementById('msgTexto').value.trim();
+    const err = document.getElementById('msgError');
+    err.style.display = 'none';
+    if (!texto) { err.textContent = 'Escribe un mensaje primero'; err.style.display = 'block'; return; }
+    fetch('/api/mensajes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            para_id: {{ producto.usuario_id }},
+            producto_id: {{ producto.id }},
+            mensaje: texto
+        })
+    }).then(r => r.json()).then(d => {
+        if (d.success) {
+            document.getElementById('modalMensajeVendedor').style.display = 'none';
+            document.getElementById('msgTexto').value = '';
+            if (window.EcoCart && EcoCart.showToast) EcoCart.showToast('¡Mensaje enviado!', 'success');
+        } else {
+            err.textContent = d.error || 'Error al enviar';
+            err.style.display = 'block';
+        }
+    }).catch(() => { err.textContent = 'Error de conexión'; err.style.display = 'block'; });
+}
+document.getElementById('modalMensajeVendedor').addEventListener('click', function(e) {
+    if (e.target === this) this.style.display = 'none';
+});
+</script>
+{% endif %}
 {% endblock %}

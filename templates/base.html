@@ -68,6 +68,7 @@
                 <a href="{{ url_for('impacto') }}" class="nav-link" data-i18n="nav.impact">Impacto</a>
                 
                 {% if session.get('usuario_id') %}
+                    <a href="{{ url_for('mensajes_view') }}" class="nav-link" data-i18n="nav.messages">Mensajes</a>
                     <a href="{{ url_for('perfil') }}" class="nav-link" data-i18n="nav.profile">Perfil</a>
                     <a href="{{ url_for('publicar') }}" class="btn-principal"><span data-i18n="nav.publish">Publicar</span></a>
                     <a href="{{ url_for('logout') }}" class="nav-link" data-i18n="nav.logout">Salir</a>
@@ -98,6 +99,7 @@
             <a href="{{ url_for('impacto') }}" class="mobile-nav-link" data-i18n="nav.impact">Impacto</a>
             
             {% if session.get('usuario_id') %}
+                <a href="{{ url_for('mensajes_view') }}" class="mobile-nav-link" data-i18n="nav.messages">Mensajes</a>
                 <a href="{{ url_for('perfil') }}" class="mobile-nav-link" data-i18n="nav.profile">Perfil</a>
                 <a href="{{ url_for('publicar') }}" class="mobile-nav-link" data-i18n="nav.publish">Publicar</a>
                 <a href="{{ url_for('logout') }}" class="mobile-nav-link" data-i18n="nav.logout">Salir</a>

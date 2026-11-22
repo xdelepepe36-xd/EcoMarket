@@ -25,7 +25,7 @@
         var p = PASOS[i];
         var el = document.querySelector(p.sel);
         if (!el) { next(); return; }
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.scrollIntoView({ behavior: 'auto', block: 'center' });
         setTimeout(function () {
             var r = el.getBoundingClientRect();
             hole.style.cssText = 'position:fixed;left:' + (r.left - 8) + 'px;top:' + (r.top - 8) +

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}EcoMarket - Novedades{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container" style="max-width:720px">
+        <div class="section-title">
+            <h2>🌱 Novedades de EcoMarket</h2>
+            <p>Todo lo que fuimos construyendo para ti</p>
+        </div>
+        <div class="eco-changelog">
+            <div class="cl-item"><span class="cl-ver">v3.2</span><div><strong>WOW Package</strong><p>Partículas por tema, estela del cursor, simulador de impacto, leaderboard ecológico, feed de actividad en vivo y tendencias semanales.</p></div></div>
+            <div class="cl-item"><span class="cl-ver">v3.1</span><div><strong>IA Pro</strong><p>Asistente con memoria conversacional, comparador por chat ("compara X e Y"), búsquedas por intención ("para regalar", "para niños") y auto-descripción al publicar.</p></div></div>
+            <div class="cl-item"><span class="cl-ver">v3.0</span><div><strong>Marketplace completo</strong><p>Historial de precios, alertas de bajada en favoritos, reseñas con foto, chat en tiempo real, comparador visual, cupones automáticos, XP y logros.</p></div></div>
+            <div class="cl-item"><span class="cl-ver">v2.5</span><div><strong>Seguridad & datos</strong><p>Backups automáticos diarios con restauración, CSRF en todos los formularios, validación estricta, 6 idiomas completos y modo offline PWA.</p></div></div>
+            <div class="cl-item"><span class="cl-ver">v2.0</span><div><strong>Marketplace ecológico</strong><p>Registro, perfiles, catálogo con 300+ productos, carrito, pedidos, favoritos, mensajes y sistema de reseñas.</p></div></div>
+            <div class="cl-item"><span class="cl-ver">v1.0</span><div><strong>Lanzamiento</strong><p>Primer marketplace con identidad EcoMarket y la mascota Eco, la hoja amigable.</p></div></div>
+        </div>
+    </div>
+</section>
+<style>
+.eco-changelog { display:grid; gap:14px; }
+.cl-item { display:flex; gap:16px; padding:18px 20px; background:var(--blanco,#fff); border:1px solid rgba(46,125,50,.12); border-radius:16px; }
+.cl-ver { flex-shrink:0; font-weight:800; color:#fff; background:linear-gradient(135deg,#166534,#22C55E); padding:6px 14px; border-radius:999px; height:fit-content; font-size:.85rem; }
+.cl-item strong { color:var(--verde-oscuro,#1b5e20); }
+.cl-item p { margin:4px 0 0; font-size:.88rem; color:var(--texto-sec,#555); line-height:1.6; }
+</style>
+{% endblock %}

@@ -2524,3 +2524,52 @@ main, .section { animation: ecoPageIn .45s cubic-bezier(.22,1,.36,1) both; }
     .eco-sim-results { grid-template-columns: 1fr; }
     .eco-sim-card { padding: 20px; }
 }
+
+/* ===== EcoMarket Pro 2: ticker, tendencias, juego 404 ===== */
+.eco-activity-ticker {
+    position: fixed; left: 18px; bottom: 18px; z-index: 8000;
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(20,60,35,.9); color: #d9f7e3;
+    padding: 10px 16px; border-radius: 999px; font-size: .8rem;
+    box-shadow: 0 10px 26px rgba(0,0,0,.3); backdrop-filter: blur(6px);
+    max-width: 320px;
+}
+.eco-tick-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ADE80; animation: tickPulse 1.6s infinite; flex-shrink:0; }
+@keyframes tickPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+.eco-tick-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.eco-tick-pop { animation: tickPop .4s ease; }
+@keyframes tickPop { 0%{transform:scale(1)} 40%{transform:scale(1.06)} 100%{transform:scale(1)} }
+[data-theme='dark'] .eco-activity-ticker, [data-theme='nature'] .eco-activity-ticker,
+[data-theme='ocean'] .eco-activity-ticker, [data-theme='midnight'] .eco-activity-ticker,
+[data-theme='rose'] .eco-activity-ticker { background: rgba(10,20,14,.85); }
+
+.eco-tendencias { padding: var(--spacing-lg) 0; }
+.eco-tend-row { display: flex; gap: 14px; overflow-x: auto; padding: 8px 4px 16px; scroll-snap-type: x mandatory; }
+.eco-tend-card {
+    flex: 0 0 150px; scroll-snap-align: start; text-decoration: none; color: inherit;
+    background: var(--blanco,#fff); border-radius: 14px; overflow: hidden;
+    border: 1px solid rgba(46,125,50,.12); transition: transform .25s ease, box-shadow .25s ease;
+}
+.eco-tend-card:hover { transform: translateY(-5px); box-shadow: 0 14px 30px rgba(20,60,35,.15); }
+.eco-tend-card img { width: 100%; height: 110px; object-fit: cover; display: block; }
+.eco-tend-card div { padding: 10px 12px; }
+.eco-tend-card strong { display: block; font-size: .82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.eco-tend-card span { font-size: .85rem; color: #2e7d32; font-weight: 700; }
+
+.eco-game404 { margin-top: 26px; }
+.eco-game-title { font-weight: 700; color: var(--verde,#2e7d32); margin-bottom: 10px; }
+.eco-game-field {
+    position: relative; width: min(420px, 90vw); height: 150px; margin: 0 auto;
+    border: 2px dashed rgba(46,125,50,.35); border-radius: 16px; overflow: hidden;
+    background: rgba(46,125,50,.05);
+}
+.eco-game-leaf {
+    position: absolute; left: 0; top: 0; font-size: 34px; cursor: pointer;
+    user-select: none; -webkit-user-select: none; touch-action: none;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,.2));
+}
+.eco-game-bar { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 12px; font-size: .9rem; }
+.eco-game-btn {
+    border: none; border-radius: 999px; padding: 8px 22px; cursor: pointer;
+    background: linear-gradient(135deg,#166534,#22C55E); color: #fff; font-weight: 700;
+}

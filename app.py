@@ -2582,6 +2582,70 @@ def api_asistente():
                     'sugerencias': ['¿Cómo funciona?', 'Quiero vender', 'Cupones', 'Consejos ecológicos']})
 
 
+@app.route('/changelog')
+def changelog_page():
+    return render_template('changelog.html')
+
+
+@app.route('/api/health')
+def api_health():
+    """Health check público para monitoreo y footer."""
+    conn = get_db()
+    try:
+        productos = conn.execute('SELECT COUNT(*) FROM productos').fetchone()[0]
+        usuarios = conn.execute('SELECT COUNT(*) FROM usuarios').fetchone()[0]
+    finally:
+        conn.close()
+    return jsonify({'status': 'ok', 'productos': productos, 'usuarios': usuarios,
+                    'version': '3.2', 'time': datetime.now().isoformat()})
+
+
+@app.route('/api/tendencias')
+def api_tendencias():
+    """Productos tendencia: más vistos esta semana."""
+    conn = get_db()
+    rows = conn.execute('''
+        SELECT id, nombre, precio, imagen, categoria, eco_score, vistas
+        FROM productos WHERE vendido = 0
+        ORDER BY vistas DESC LIMIT 6
+    ''').fetchall()
+    conn.close()
+    return jsonify({'tendencias': [dict(r) for r in rows]})
+
+
+@app.route('/api/actividad')
+def api_actividad():
+    """Feed de actividad reciente para el ticker del home (solo primer nombre)."""
+    conn = get_db()
+    eventos = []
+    prods = conn.execute('''
+        SELECT p.nombre, p.categoria, u.nombre AS vendedor, p.created_at
+        FROM productos p LEFT JOIN usuarios u ON u.id = p.usuario_id
+        ORDER BY p.created_at DESC LIMIT 4
+    ''').fetchall()
+    for r in prods:
+        vend = (r['vendedor'] or 'Alguien').split(' ')[0]
+        eventos.append({'tipo': 'publico', 'texto': f'{vend} publicó "{r["nombre"][:30]}"', 'hora': r['created_at']})
+    vendidos = conn.execute('''
+        SELECT p.nombre, u.nombre AS comprador, pe.created_at AS ts
+        FROM pedido_items pi
+        JOIN pedidos pe ON pe.id = pi.pedido_id
+        JOIN productos p ON p.id = pi.producto_id
+        LEFT JOIN usuarios u ON u.id = pe.usuario_id
+        ORDER BY pe.created_at DESC LIMIT 4
+    ''').fetchall()
+    for r in vendidos:
+        comp = (r['comprador'] or 'Alguien').split(' ')[0]
+        eventos.append({'tipo': 'vendo', 'texto': f'"{r["nombre"][:30]}" voló a las manos de {comp}', 'hora': r['ts']})
+    conn.close()
+    return jsonify({'eventos': eventos[:8]})
+
+
+@app.route('/leaderboard')
+def leaderboard_page():
+    return render_template('leaderboard.html')
+
+
 @app.route('/api/leaderboard')
 def api_leaderboard():
     """Leaderboard ecológico: usuarios con más puntos + actividad de ventas."""
@@ -2595,7 +2659,7 @@ def api_leaderboard():
         LIMIT 10
     ''').fetchall()
     conn.close()
-    return jsonify({'top': [dict(r) for r in rows]})
+    return jsonify({'top': [dict(r, puntos=r['eco_puntos'] or 0) for r in rows]})
 
 
 @app.route('/api/categorias')

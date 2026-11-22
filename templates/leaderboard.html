@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}EcoMarket - Héroes del Planeta{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container" style="max-width:760px">
+        <div class="section-title">
+            <h2>🏆 Héroes del Planeta</h2>
+            <p>Los miembros que más reutilizan, venden y cuidan el entorno en EcoMarket</p>
+        </div>
+        <div id="lbFull" class="eco-lb-full">
+            <p style="text-align:center;color:var(--texto-sec)">Cargando ranking…</p>
+        </div>
+    </div>
+</section>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    const host = document.getElementById('lbFull');
+    try {
+        const r = await fetch('/api/leaderboard');
+        const data = await r.json();
+        const medals = ['🥇','🥈','🥉'];
+        host.innerHTML = '<ol class="eco-lb-ol">' + (data.top||[]).map((u,i)=>`
+            <li class="${i<3?'top':''}">
+                <span class="medal">${medals[i]||'<b>'+(i+1)+'</b>'}</span>
+                <div class="info">
+                    <strong>${(u.nombre||'EcoUsuario').split(' ')[0]}</strong>
+                    <span>Nivel ${u.nivel||1} · ${u.puntos||0} pts eco</span>
+                </div>
+                <div class="stats">
+                    <span>📦 ${u.productos||0}</span>
+                    <span>✅ ${u.ventas||0} ventas</span>
+                </div>
+            </li>`).join('') + '</ol>';
+    } catch(e) {
+        host.innerHTML = '<p style="text-align:center">No se pudo cargar el ranking.</p>';
+    }
+});
+</script>
+<style>
+.eco-lb-ol { list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+.eco-lb-ol li { display:flex; align-items:center; gap:14px; padding:14px 18px; border-radius:14px; background:var(--blanco,#fff); border:1px solid rgba(46,125,50,.12); }
+.eco-lb-ol li.top { background:linear-gradient(135deg,rgba(254,243,199,.6),rgba(220,252,231,.6)); border-color:#F59E0B66; }
+.eco-lb-ol .medal { font-size:1.4rem; min-width:2ch; text-align:center; }
+.eco-lb-ol .info { display:flex; flex-direction:column; }
+.eco-lb-ol .info span { font-size:.78rem; color:var(--texto-sec,#666); }
+.eco-lb-ol .stats { margin-left:auto; display:flex; gap:14px; font-size:.85rem; color:var(--texto-sec,#666); }
+</style>
+{% endblock %}

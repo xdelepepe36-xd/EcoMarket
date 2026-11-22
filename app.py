@@ -3959,6 +3959,22 @@ class BackupManager:
 # Instancia global de backup
 backup_manager = BackupManager()
 
+
+def _backup_loop(intervalo_seg=24 * 3600):
+    """Crea un backup automático cada `intervalo_seg` segundos (hilo daemon)."""
+    import threading
+    import time as _time
+
+    def _run():
+        while True:
+            try:
+                backup_manager.create_backup()
+            except Exception as e:
+                logger.error(f"Backup automático falló: {e}")
+            _time.sleep(intervalo_seg)
+
+    threading.Thread(target=_run, daemon=True).start()
+
 # ── Sistema de Monitoring y Alertas ───────────────────────────────────────────────────
 
 class MonitoringSystem:
@@ -5283,6 +5299,41 @@ def create_backup():
         return jsonify({'success': True, 'backup_file': backup_file})
     return jsonify({'success': False, 'error': 'Error creando backup'}), 500
 
+
+@app.route('/api/backup/list')
+@login_required
+@admin_required
+def list_backups():
+    """Lista los backups disponibles (solo admin)."""
+    backups = sorted(
+        [f for f in os.listdir(backup_manager.backup_dir)
+         if f.startswith('ecomarket_backup_') and f.endswith('.db')],
+        reverse=True,
+    )
+    return jsonify({'backups': backups})
+
+
+@app.route('/api/backup/restore', methods=['POST'])
+@login_required
+@admin_required
+def restore_backup():
+    """Restaura un backup por nombre de archivo (solo admin).
+
+    Body JSON: {"backup": "ecomarket_backup_YYYYMMDD_HHMMSS.db"}
+    """
+    nombre = (request.get_json(silent=True) or {}).get('backup', '')
+    if not nombre or '/' in nombre or '\\' in nombre or not nombre.endswith('.db'):
+        return jsonify({'success': False, 'error': 'Nombre de backup inválido'}), 400
+    ruta = os.path.join(backup_manager.backup_dir, nombre)
+    if not os.path.isfile(ruta):
+        return jsonify({'success': False, 'error': 'Backup no encontrado'}), 404
+    # Crear un backup de seguridad del estado actual antes de restaurar
+    backup_manager.create_backup()
+    if backup_manager.restore_backup(ruta):
+        return jsonify({'success': True, 'restored': nombre})
+    return jsonify({'success': False, 'error': 'Error restaurando backup'}), 500
+
+
 @app.route('/api/semantic/search')
 def semantic_search_api():
     """API para búsqueda semántica."""
@@ -6571,6 +6622,7 @@ def server_error(e):
 
 # Inicializar la base de datos al importar el módulo
 init_db()
+_backup_loop()
 
 if __name__ == '__main__':
     debug_mode = os.environ.get('FLASK_DEBUG', '0') == '1'

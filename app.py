@@ -1981,7 +1981,23 @@ def editar_producto(producto_id):
                 (nombre, categoria, float(precio), descripcion, int(stock), especificaciones_json, producto_id)
             )
             if viejo and abs((viejo['precio'] or 0) - float(precio)) > 0.001:
-                conn.execute('INSERT INTO historial_precios (producto_id, precio) VALUES (?,?)', (producto_id, float(precio)))
+                nuevo_precio = float(precio)
+                conn.execute('INSERT INTO historial_precios (producto_id, precio) VALUES (?,?)', (producto_id, nuevo_precio))
+                # alerta de baja de precio a quienes tienen el producto en favoritos
+                if viejo['precio'] and nuevo_precio < viejo['precio']:
+                    fans = conn.execute(
+                        'SELECT usuario_id FROM favoritos WHERE producto_id = ? AND usuario_id != ?',
+                        (producto_id, session.get('usuario_id'))
+                    ).fetchall()
+                    prod_nom = conn.execute('SELECT nombre FROM productos WHERE id = ?', (producto_id,)).fetchone()
+                    nom = prod_nom['nombre'] if prod_nom else 'un producto'
+                    for f in fans:
+                        conn.execute(
+                            'INSERT INTO notificaciones (usuario_id, titulo, mensaje, tipo) VALUES (?,?,?,?)',
+                            (f['usuario_id'], '¡Bajó de precio! 📉',
+                             f'"{nom}" bajó de S/.{viejo["precio"]:.2f} a S/.{nuevo_precio:.2f} — está en tus favoritos.',
+                             'precio')
+                        )
             conn.commit()
             flash_t('producto_actualizado', 'success')
         conn.close()

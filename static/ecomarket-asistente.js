@@ -34,7 +34,7 @@
         panel.setAttribute('aria-label', t().title);
         panel.innerHTML = `
             <div class="asistente-header">
-                <div class="asistente-avatar"><i class="bi bi-robot"></i></div>
+                <div class="asistente-avatar"><img src="/static/assets/mascota.svg" alt="Eco" style="width:32px;height:32px;object-fit:contain"></div>
                 <div>
                     <strong>${t().title}</strong>
                     <small><span class="asistente-status"></span> ${t().ai}</small>

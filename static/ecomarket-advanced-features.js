@@ -472,7 +472,7 @@ const EcoAdvanced = {
         mejorarContraste() {
             // Detectar preferencia del sistema
             if (window.matchMedia('(prefers-contrast: more)').matches) {
-                document.documentElement.setAttribute('data-theme', 'high-contrast');
+                document.documentElement.setAttribute('data-theme', 'dark');
             }
         },
 

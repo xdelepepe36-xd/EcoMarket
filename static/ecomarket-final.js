@@ -23,7 +23,7 @@ const EcoMarket = {
     state: {
         theme: (function () {
             var saved = localStorage.getItem('ecomarket-theme');
-            var ok = ['light','dark','sepia','nature','ocean','midnight','rose','high-contrast'];
+            var ok = ['light','dark','nature','ocean','midnight','rose'];
             if (saved && ok.indexOf(saved) !== -1) return saved;
             var h = new Date().getHours();
             if (h >= 20 || h < 6) return 'midnight';
@@ -35,7 +35,7 @@ const EcoMarket = {
     },
     
     // Todos los temas disponibles
-    themes: ['light', 'dark', 'sepia', 'nature', 'ocean', 'midnight', 'rose', 'high-contrast'],
+    themes: ['light', 'dark', 'nature', 'ocean', 'midnight', 'rose'],
     
     // Inicialización
     init() {

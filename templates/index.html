@@ -107,13 +107,13 @@ sec.style.display='';
         ] %}
         {% for foto, pie in gal_fotos %}
         <figure class="eco-gallery-item">
-            <img src="https://images.unsplash.com/{{ foto }}?w=600&q=70&auto=format&fit=crop" alt="{{ pie }}" loading="lazy">
+            <img src="https://images.unsplash.com/{{ foto }}?w=600&q=70&auto=format&fit=crop" alt="{{ pie }}" loading="eager">
             <figcaption>{{ pie }}</figcaption>
         </figure>
         {% endfor %}
         {% for foto, pie in gal_fotos %}
         <figure class="eco-gallery-item" aria-hidden="true">
-            <img src="https://images.unsplash.com/{{ foto }}?w=600&q=70&auto=format&fit=crop" alt="" loading="lazy">
+            <img src="https://images.unsplash.com/{{ foto }}?w=600&q=70&auto=format&fit=crop" alt="" loading="eager">
             <figcaption>{{ pie }}</figcaption>
         </figure>
         {% endfor %}

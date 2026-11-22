@@ -23,7 +23,7 @@ const EcoMarket = {
         user: null
     },
     
-    themes: ['light', 'dark', 'sepia', 'nature', 'ocean', 'midnight', 'rose', 'high-contrast'],
+    themes: ['light', 'dark', 'nature', 'ocean', 'midnight', 'rose'],
     
     init() {
         this.initTheme();
@@ -74,12 +74,10 @@ const EcoMarket = {
         const icons = {
             'light': '<i class="bi bi-sun"></i>',
             'dark': '<i class="bi bi-moon"></i>',
-            'sepia': '<i class="bi bi-book"></i>',
             'nature': '<i class="bi bi-tree"></i>',
             'ocean': '<i class="bi bi-water"></i>',
             'midnight': '<i class="bi bi-stars"></i>',
-            'rose': '<i class="bi bi-heart"></i>',
-            'high-contrast': '<i class="bi bi-eye"></i>'
+            'rose': '<i class="bi bi-heart"></i>'
         };
         return icons[theme] || '<i class="bi bi-palette"></i>';
     },

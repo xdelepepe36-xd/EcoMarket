@@ -16,11 +16,6 @@ const EcoThemes = {
             icon: 'bi-moon',
             description: 'Modo oscuro mejorado'
         },
-        sepia: {
-            name: 'Sepia',
-            icon: 'bi-book',
-            description: 'Tonos cálidos como papel antiguo'
-        },
         nature: {
             name: 'Naturaleza',
             icon: 'bi-tree',
@@ -40,11 +35,6 @@ const EcoThemes = {
             name: 'Rosa',
             icon: 'bi-heart',
             description: 'Tema pastel rosa'
-        },
-        'high-contrast': {
-            name: 'Alto Contraste',
-            icon: 'bi-eye',
-            description: 'Para accesibilidad'
         }
     },
 

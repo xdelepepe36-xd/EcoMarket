@@ -697,3 +697,330 @@ main#main-content, .header, .footer {
 }
 .productos-header-section h1 { color: #fff; }
 .productos-header-section .productos-subtitle { color: rgba(255,255,255,.8); }
+
+/* ══ CAPA WOW-3: página de detalle ═════════════════════════════ */
+
+/* Marco de galería con gradiente */
+.detalle-gallery-main {
+    border-radius: 20px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #E8F5E9, #F1F8E9);
+    border: 1px solid rgba(46,125,50,.12);
+    box-shadow: 0 14px 40px rgba(20,60,35,.14);
+    position: relative;
+}
+.detalle-gallery-main img {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    transition: transform .6s cubic-bezier(.22,1,.36,1);
+}
+.detalle-gallery-main:hover img { transform: scale(1.05); }
+[data-theme='dark'] .detalle-gallery-main {
+    background: linear-gradient(135deg, #1E2B23, #16211B);
+    border-color: rgba(102,187,106,.2);
+}
+
+/* Thumbnails redondeados con anillo activo */
+.gallery-thumb {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    transition: all .3s ease;
+    background: #fff;
+    padding: 0;
+    cursor: pointer;
+}
+.gallery-thumb img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+.gallery-thumb.active,
+.gallery-thumb:hover {
+    border-color: var(--verde-intenso, #2E7D32);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(46,125,50,.25);
+}
+[data-theme='dark'] .gallery-thumb { background: #1B2620; }
+
+/* Columna de info sticky en desktop */
+@media (min-width: 992px) {
+    .detalle-info {
+        position: sticky;
+        top: 96px;
+        align-self: start;
+    }
+}
+
+/* Breadcrumb elegante */
+.breadcrumb-nav a {
+    transition: color .25s ease;
+}
+.breadcrumb-nav a:hover { color: var(--verde-intenso); }
+.breadcrumb-current {
+    color: var(--gris-secundario);
+    font-weight: 500;
+}
+
+/* Caja de precio elevada */
+.detalle-price-box {
+    border-radius: 16px;
+    padding: 20px 24px;
+    background: linear-gradient(135deg, rgba(232,245,233,.9), rgba(200,230,201,.6));
+    border: 1px solid rgba(46,125,50,.15);
+}
+[data-theme='dark'] .detalle-price-box {
+    background: linear-gradient(135deg, rgba(30,60,40,.6), rgba(23,45,30,.5));
+    border-color: rgba(102,187,106,.2);
+}
+.detalle-precio {
+    font-size: 2.1rem;
+    background: linear-gradient(135deg, #1B5E20, #43A047);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Pills del producto más vivas */
+.detalle-pills .badge {
+    border-radius: 999px;
+    padding: 7px 16px;
+    font-size: .82rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    backdrop-filter: blur(4px);
+}
+
+/* Tabs del detalle con indicador deslizante */
+.detalle-tab.active {
+    position: relative;
+}
+.detalle-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 15%; right: 15%;
+    height: 3px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #66BB6A, #FFB74D);
+}
+
+/* Relacionados: cards compactas con hover */
+.relacionados-grid .producto-card,
+.relacionados-grid .product-card {
+    font-size: .9rem;
+}
+
+/* ══ CAPA WOW-4: autenticación ═════════════════════════════════ */
+
+.auth-container {
+    min-height: calc(100vh - 200px);
+    display: flex;
+    align-items: center;
+}
+.auth-card {
+    border-radius: 22px;
+    box-shadow: 0 24px 70px rgba(20,60,35,.18);
+    border: 1px solid rgba(46,125,50,.12);
+    overflow: hidden;
+    position: relative;
+}
+.auth-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #66BB6A, #4FC3F7, #FFB74D, #66BB6A);
+}
+.auth-header {
+    text-align: center;
+    padding-bottom: 8px;
+}
+.auth-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 10px;
+    animation: iconFloat 3s ease-in-out infinite;
+}
+@keyframes iconFloat {
+    0%,100% { transform: translateY(0) rotate(-4deg); }
+    50% { transform: translateY(-8px) rotate(4deg); }
+}
+.auth-card input:focus {
+    border-color: var(--verde-intenso, #2E7D32) !important;
+    box-shadow: 0 0 0 4px rgba(102,187,106,.18) !important;
+    outline: none;
+}
+.auth-card .btn-principal {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 1rem;
+    letter-spacing: .3px;
+}
+
+/* Fondo de auth con glow sutil */
+body:has(.auth-card) {
+    background:
+        radial-gradient(ellipse 60% 40% at 50% 0%, rgba(102,187,106,.12), transparent 60%),
+        var(--gris-verdoso, #F8FAF8);
+}
+[data-theme='dark'] body:has(.auth-card) {
+    background:
+        radial-gradient(ellipse 60% 40% at 50% 0%, rgba(46,125,50,.18), transparent 60%),
+        linear-gradient(180deg, #0A100D, #0F1713);
+}
+
+/* ══ CAPA WOW-5: carrito y checkout ═════════════════════════════ */
+.carrito-section .carrito-card,
+.checkout-form-card {
+    border-radius: 18px;
+}
+#checkoutItems .checkout-item {
+    transition: background .25s ease;
+    border-radius: 10px;
+}
+#checkoutItems .checkout-item:hover {
+    background: rgba(102,187,106,.06);
+}
+
+/* Empty states amigables */
+.checkout-empty-msg, .empty-cart-message, .empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--gris-secundario);
+}
+.empty-cart-icon, .checkout-empty-msg::before {
+    font-size: 3.4rem;
+    display: block;
+    margin-bottom: 14px;
+    opacity: .8;
+}
+
+/* ══ CAPA WOW-6: footer, publicar, transiciones ════════════════ */
+
+/* Footer con degradado sutil */
+.footer {
+    background:
+        radial-gradient(ellipse 50% 80% at 50% 0%, rgba(102,187,106,.14), transparent 60%),
+        linear-gradient(180deg, #12291B, #0B1A10);
+    border-top: 3px solid transparent;
+    border-image: linear-gradient(90deg, #66BB6A, #FFB74D, #4FC3F7, #66BB6A) 1;
+}
+.footer-col a { transition: color .25s ease, transform .25s ease; }
+.footer-col a:hover { color: #A5D6A7; transform: translateX(4px); }
+.footer-social a {
+    display: inline-flex;
+    width: 38px; height: 38px;
+    align-items: center; justify-content: center;
+    border-radius: 10px;
+    background: rgba(255,255,255,.07);
+    margin-right: 8px;
+    transition: all .3s ease;
+}
+.footer-social a:hover {
+    background: var(--verde-intenso, #22C55E);
+    transform: translateY(-3px);
+}
+
+/* Formulario de publicar como card elevada */
+.publicar-form {
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(20,60,35,.14);
+    border: 1px solid rgba(46,125,50,.1);
+    padding: clamp(24px, 4vw, 48px);
+}
+.publicar-form h2 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.publicar-form input:focus,
+.publicar-form select:focus,
+.publicar-form textarea:focus {
+    border-color: var(--verde-intenso, #2E7D32) !important;
+    box-shadow: 0 0 0 4px rgba(102,187,106,.15) !important;
+    outline: none;
+}
+.form-row { gap: 18px; }
+
+/* Transición suave al cambiar de página */
+@keyframes pageFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+main#main-content {
+    animation: pageFadeIn .45s ease both;
+}
+
+/* Menú móvil con blur */
+@media (max-width: 768px) {
+    .navbar.active, .mobile-menu.active, nav.active {
+        background: rgba(255,255,255,.92) !important;
+        backdrop-filter: blur(16px);
+    }
+    [data-theme='dark'] .navbar.active,
+    [data-theme='dark'] .mobile-menu.active,
+    [data-theme='dark'] nav.active {
+        background: rgba(15,23,19,.92) !important;
+    }
+}
+
+/* Focus visible mejorado (accesibilidad + se ve pro) */
+a:focus-visible, button:focus-visible, input:focus-visible,
+select:focus-visible, textarea:focus-visible {
+    outline: 3px solid rgba(102,187,106,.6);
+    outline-offset: 2px;
+    border-radius: 6px;
+}
+
+/* ══ CAPA WOW-7: pasos "cómo funciona" ══════════════════════════ */
+.como-funciona-card {
+    position: relative;
+    border-radius: 18px;
+    border: 1px solid rgba(46,125,50,.1);
+    padding: 28px 24px;
+    background: #fff;
+    transition: transform .35s ease, box-shadow .35s ease;
+    overflow: hidden;
+}
+.como-funciona-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #66BB6A, #4FC3F7);
+    opacity: 0;
+    transition: opacity .3s ease;
+}
+.como-funciona-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 40px rgba(20,60,35,.14);
+}
+.como-funciona-card:hover::before { opacity: 1; }
+.como-funciona-number {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; font-weight: 800;
+    color: #fff;
+    background: linear-gradient(135deg, #2E7D32, #66BB6A);
+    box-shadow: 0 8px 20px rgba(46,125,50,.35);
+    margin-bottom: 16px;
+}
+.como-funciona-card:nth-child(2) .como-funciona-number {
+    background: linear-gradient(135deg, #0288D1, #4FC3F7);
+    box-shadow: 0 8px 20px rgba(2,136,209,.3);
+}
+.como-funciona-card:nth-child(3) .como-funciona-number {
+    background: linear-gradient(135deg, #F57C00, #FFB74D);
+    box-shadow: 0 8px 20px rgba(245,124,0,.3);
+}
+.como-funciona-card:nth-child(4) .como-funciona-number {
+    background: linear-gradient(135deg, #6A1B9A, #BA68C8);
+    box-shadow: 0 8px 20px rgba(106,27,154,.3);
+}
+[data-theme='dark'] .como-funciona-card {
+    background: linear-gradient(160deg, rgba(30,41,35,.92), rgba(23,29,26,.92));
+    border-color: rgba(102,187,106,.18);
+}
+.como-funciona-card h3 { font-size: 1.05rem; margin-bottom: 8px; }
+.como-funciona-card p { font-size: .9rem; color: var(--gris-secundario); line-height: 1.6; }

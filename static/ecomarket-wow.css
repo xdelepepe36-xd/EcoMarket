@@ -2728,3 +2728,23 @@ main, .section { animation: ecoPageIn .45s cubic-bezier(.22,1,.36,1) both; }
 .logro-off { opacity: .45; filter: grayscale(.6); }
 .logro-on { background: linear-gradient(135deg, rgba(249,168,37,.14), rgba(46,125,50,.1)); border-color: rgba(249,168,37,.5); }
 .logro-on em { color: #b45309; }
+
+/* ── Destacado del día ── */
+.eco-destacado { max-width: 1100px; margin: 0 auto 20px; padding: 0 16px; }
+.eco-destacado-link {
+    display: flex; align-items: center; gap: 14px; padding: 12px 16px;
+    background: linear-gradient(120deg, rgba(249,168,37,.14), rgba(46,125,50,.1));
+    border: 1.5px solid rgba(249,168,37,.45); border-radius: 18px;
+    text-decoration: none; color: inherit; transition: transform .2s, box-shadow .2s;
+}
+.eco-destacado-link:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(249,168,37,.18); }
+.eco-destacado-link img { width: 64px; height: 64px; border-radius: 12px; object-fit: cover; flex-shrink: 0; }
+.eco-destacado-info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.eco-destacado-tag { font-size: .72rem; font-weight: 800; color: #b45309; text-transform: uppercase; letter-spacing: .04em; }
+.eco-destacado-info strong { font-size: .95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.eco-destacado-price { font-weight: 800; color: var(--verde, #2e7d32); }
+.eco-destacado-arrow { font-size: 1.3rem; color: #b45309; }
+@media (max-width: 640px) { .eco-destacado-link img { width: 52px; height: 52px; } }
+
+/* ── Countdown flash ── */
+.eco-flash-countdown { font-variant-numeric: tabular-nums; color: #e53935; font-weight: 700; }

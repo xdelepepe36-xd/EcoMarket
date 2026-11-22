@@ -65,6 +65,8 @@
             {% for cat in categorias %}
             <a href="{{ url_for('productos_view', categoria=cat) }}" class="filter-pill {{ 'active' if categoria_sel == cat }}">{{ cat }}</a>
             {% endfor %}
+            <a href="{{ url_for('productos_view', condicion='nuevo', categoria=categoria_sel, ofertas=request.args.get('ofertas')) }}" class="filter-pill {{ 'active' if request.args.get('condicion') == 'nuevo' }}" style="border-color:#2e7d32">✨ Nuevo</a>
+            <a href="{{ url_for('productos_view', condicion='usado', categoria=categoria_sel, ofertas=request.args.get('ofertas')) }}" class="filter-pill {{ 'active' if request.args.get('condicion') == 'usado' }}" style="border-color:#8d6e63">♻️ Usado</a>
         </div>
 
         <p style="font-size:0.85rem;color:var(--texto-sec);margin-bottom:16px"><i class="bi bi-box"></i> <span data-i18n="products.showing">Mostrando</span> {{ productos|length }} <span data-i18n="products.items">producto(s)</span></p>

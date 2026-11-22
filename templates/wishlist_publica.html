@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}EcoMarket - Wishlist de {{ dueno }}{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="section-title">
+            <h2>💚 Wishlist de {{ dueno }}</h2>
+            <p>{{ items|length }} producto(s) que le encantan — inspírate</p>
+        </div>
+        {% if items %}
+        <div class="productos-grid">
+            {% for p in items %}
+            <a href="{{ url_for('producto_detalle', producto_id=p.id) }}" class="product-card" style="text-decoration:none;color:inherit">
+                <div class="product-img-wrap">
+                    <img src="{{ url_for('static', filename=p.imagen) if p.imagen and not p.imagen.startswith('http') else (p.imagen or url_for('static', filename='assets/product-placeholder.svg')) }}" alt="{{ p.nombre }}" loading="lazy" onerror="this.src='{{ url_for('static', filename='assets/product-placeholder.svg') }}'">
+                    {% if p.precio_original and p.precio_original > p.precio %}
+                    <span class="card-badge badge-oferta">-{{ ((1 - p.precio / p.precio_original) * 100)|round|int }}%</span>
+                    {% endif %}
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">{{ p.categoria }}</span>
+                    <h3>{{ p.nombre }}</h3>
+                    <div class="product-price">
+                        S/. {{ '%.2f'|format(p.precio) }}
+                        {% if p.precio_original and p.precio_original > p.precio %}<s>S/. {{ '%.2f'|format(p.precio_original) }}</s>{% endif %}
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align:center;padding:60px 20px;color:var(--texto-sec)">
+            <div style="font-size:3rem">🍃</div>
+            <p>Todavía no hay productos en esta wishlist.</p>
+        </div>
+        {% endif %}
+        <div style="text-align:center;margin-top:30px">
+            <a href="{{ url_for('index') }}" class="btn-principal">Explorar EcoMarket</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

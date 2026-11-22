@@ -663,6 +663,17 @@
                         '<span class="eco-flash-price">S/. ' + (+p.precio).toFixed(2) + ' <s>S/. ' + (+p.precio_original).toFixed(2) + '</s></span></div></a>';
                 }).join('');
                 sec.style.display = 'block';
+                // Countdown a medianoche: "nuevas ofertas pronto"
+                var cd = document.createElement('span');
+                cd.className = 'eco-flash-countdown';
+                sec.querySelector('.section-title p').appendChild(document.createTextNode(' · ⏰ '));
+                sec.querySelector('.section-title p').appendChild(cd);
+                (function tick() {
+                    var now = new Date(), mid = new Date(now); mid.setHours(24, 0, 0, 0);
+                    var s = Math.max(0, Math.floor((mid - now) / 1000));
+                    cd.textContent = 'ofertas del día · reset en ' + String(Math.floor(s/3600)).padStart(2,'0') + ':' + String(Math.floor(s%3600/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
+                    setTimeout(tick, 1000);
+                })();
             }).catch(function () { sec.style.display = 'none'; });
     }
 
@@ -715,6 +726,46 @@
                         }).catch(function () { document.getElementById('quizResult').innerHTML = '<div class="quiz-result-err">Error de conexión</div>'; });
                 });
             }).catch(function () { sec.style.display = 'none'; });
+    }
+
+    /* ═══════════ DESTACADO DEL DÍA (home) ═══════════ */
+    function initDestacado() {
+        if (location.pathname !== '/') return;
+        var hero = document.querySelector('.hero-section-enhanced');
+        if (!hero) return;
+        function esc(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+        fetch('/api/destacado').then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (d) {
+                if (!d || !d.producto) return;
+                var p = d.producto;
+                var img = (p.imagen || '').startsWith('assets/') ? '/static/' + p.imagen
+                    : (p.imagen && p.imagen.indexOf('http') === 0 ? p.imagen : '/static/assets/product-placeholder.svg');
+                var banner = document.createElement('div');
+                banner.className = 'eco-destacado';
+                banner.innerHTML = '<a href="/producto/' + p.id + '" class="eco-destacado-link">' +
+                    '<img src="' + img + '" alt="' + esc(p.nombre) + '" onerror="this.src=\'/static/assets/product-placeholder.svg\'">' +
+                    '<div class="eco-destacado-info"><span class="eco-destacado-tag">⭐ Destacado del día</span>' +
+                    '<strong>' + esc(p.nombre) + '</strong>' +
+                    '<span class="eco-destacado-price">S/. ' + (+p.precio).toFixed(2) + '</span></div>' +
+                    '<span class="eco-destacado-arrow">→</span></a>';
+                hero.parentNode.insertBefore(banner, hero.nextSibling);
+            }).catch(function () {});
+    }
+
+    /* ═══════════ WISHLIST COMPARTIBLE ═══════════ */
+    function initWishlistShare() {
+        var btn = document.getElementById('btnShareWishlist');
+        if (!btn) return;
+        btn.addEventListener('click', function () {
+            fetch('/api/wishlist/compartir', { method: 'POST' }).then(function (r) { return r.json(); })
+                .then(function (d) {
+                    if (d.url) {
+                        if (navigator.clipboard) navigator.clipboard.writeText(d.url).catch(function () {});
+                        if (window.EcoToast) EcoToast.show('🔗 Link copiado', 'Comparte tu wishlist con quien quieras', 'success');
+                        else prompt('Tu link de wishlist:', d.url);
+                    } else if (window.EcoToast) EcoToast.show('⚠️', d.error || 'Error', 'warning');
+                }).catch(function () { if (window.EcoToast) EcoToast.show('⚠️', 'Error de conexión', 'warning'); });
+        });
     }
 
     /* ═══════════ LOGROS: check automático + panel en perfil ═══════════ */
@@ -770,5 +821,7 @@
         initQuiz();
         initLogrosCheck();
         initLogrosPanel();
+        initDestacado();
+        initWishlistShare();
     });
 })();

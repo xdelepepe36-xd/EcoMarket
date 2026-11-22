@@ -1136,6 +1136,31 @@ def init_db():
     ''')
     conn.commit()
 
+    # Newsletter: suscriptores
+    try:
+        conn.execute('''CREATE TABLE IF NOT EXISTS suscriptores (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT UNIQUE NOT NULL,
+            nombre TEXT DEFAULT "",
+            preferencias TEXT DEFAULT "[]",
+            activo INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )''')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
+    # Wishlist compartible por link público
+    try:
+        conn.execute('''CREATE TABLE IF NOT EXISTS wishlist_share (
+            token TEXT PRIMARY KEY,
+            usuario_id INTEGER NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )''')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
     # ── Migraciones para campos de usuario ──────────────────
     for col, ddl in [
         ('apellidos', 'TEXT DEFAULT ""'),
@@ -7284,27 +7309,102 @@ def api_obtener_tickets():
 
 @app.route('/api/newsletter/suscribir', methods=['POST'])
 def api_suscribir_newsletter():
-    """Suscribe al newsletter"""
-    if not newsletter_system:
-        return jsonify({'error': 'Sistema no disponible'}), 503
-    
-    data = request.get_json()
-    suscriptor = newsletter_system.suscribir(
-        data['email'],
-        data.get('nombre', ''),
-        data.get('preferencias', [])
-    )
-    return jsonify(suscriptor)
+    """Suscribe al newsletter (SQLite)."""
+    data = request.get_json(silent=True) or {}
+    email = sanitize_string(data.get('email', ''), max_length=120).strip().lower()
+    nombre = sanitize_string(data.get('nombre', ''), max_length=80).strip()
+    if not is_valid_email(email):
+        return jsonify({'error': 'Email inválido'}), 400
+    prefs = json.dumps([str(p)[:40] for p in (data.get('preferencias') or [])][:10])
+    conn = get_db()
+    try:
+        conn.execute(
+            'INSERT INTO suscriptores (email, nombre, preferencias) VALUES (?,?,?) '
+            'ON CONFLICT(email) DO UPDATE SET nombre=excluded.nombre, activo=1',
+            (email, nombre, prefs))
+        conn.commit()
+    except sqlite3.Error:
+        conn.rollback()
+        conn.close()
+        return jsonify({'error': 'No se pudo guardar la suscripción'}), 500
+    conn.close()
+    return jsonify({'success': True, 'email': email}), 201
+
 
 @app.route('/api/newsletter/desuscribir', methods=['POST'])
 def api_desuscribir_newsletter():
-    """Desuscribe del newsletter"""
-    if not newsletter_system:
-        return jsonify({'error': 'Sistema no disponible'}), 503
-    
-    data = request.get_json()
-    resultado = newsletter_system.desuscribir(data['email'])
-    return jsonify(resultado)
+    """Desuscribe del newsletter."""
+    data = request.get_json(silent=True) or {}
+    email = sanitize_string(data.get('email', ''), max_length=120).strip().lower()
+    conn = get_db()
+    cur = conn.execute('UPDATE suscriptores SET activo=0 WHERE email=?', (email,))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': cur.rowcount > 0})
+
+
+@app.route('/api/destacado')
+def api_destacado():
+    """Producto destacado del día (determinista por fecha)."""
+    conn = get_db()
+    total = conn.execute(
+        "SELECT COUNT(*) FROM productos WHERE COALESCE(vendido,0)=0").fetchone()[0]
+    if not total:
+        conn.close()
+        return jsonify({'producto': None})
+    import random as _r
+    dia = datetime.now().timetuple().tm_yday
+    idx = (dia * 7 + total) % total
+    row = conn.execute('''
+        SELECT p.id, p.nombre, p.precio, p.precio_original, p.imagen, p.categoria, p.eco_score,
+               COALESCE(AVG(r.rating),0) AS rating_promedio
+        FROM productos p LEFT JOIN resenas r ON r.producto_id = p.id
+        WHERE COALESCE(p.vendido,0)=0
+        GROUP BY p.id ORDER BY p.id LIMIT 1 OFFSET ?''', (idx,)).fetchone()
+    conn.close()
+    return jsonify({'producto': dict(row) if row else None})
+
+
+# ── Wishlist compartible ───────────────────────────────────────────
+
+@app.route('/api/wishlist/compartir', methods=['POST'])
+@login_required
+def api_wishlist_compartir():
+    """Genera (o reutiliza) un link público de la wishlist del usuario."""
+    uid = session['usuario_id']
+    conn = get_db()
+    row = conn.execute('SELECT token FROM wishlist_share WHERE usuario_id=?', (uid,)).fetchone()
+    if row:
+        conn.close()
+        return jsonify({'token': row['token'], 'url': url_for('wishlist_publica', token=row['token'], _external=True)})
+    token = secrets.token_urlsafe(10)
+    conn.execute('INSERT INTO wishlist_share (token, usuario_id) VALUES (?,?)', (token, uid))
+    conn.commit()
+    conn.close()
+    return jsonify({'token': token, 'url': url_for('wishlist_publica', token=token, _external=True)})
+
+
+@app.route('/w/<token>')
+def wishlist_publica(token):
+    """Página pública con los favoritos de un usuario."""
+    conn = get_db()
+    share = conn.execute('SELECT usuario_id FROM wishlist_share WHERE token=?', (token,)).fetchone()
+    if not share:
+        conn.close()
+        flash('Este link de wishlist no existe o fue revocado.', 'warning')
+        return redirect(url_for('index'))
+    uid = share['usuario_id']
+    dueno = conn.execute('SELECT nombre FROM usuarios WHERE id=?', (uid,)).fetchone()
+    items = conn.execute('''
+        SELECT p.id, p.nombre, p.precio, p.precio_original, p.imagen, p.categoria, p.eco_score,
+               COALESCE(p.vendido,0) AS vendido
+        FROM favoritos f JOIN productos p ON p.id = f.producto_id
+        WHERE f.usuario_id=? AND COALESCE(p.vendido,0)=0
+        ORDER BY f.created_at DESC LIMIT 60''', (uid,)).fetchall()
+    conn.close()
+    return render_template('wishlist_publica.html',
+                           dueno=(dueno['nombre'] if dueno else 'Un usuario'),
+                           items=[dict(r) for r in items])
 
 # ── Rutas para Templates de Nuevas Funcionalidades ───────────────────────────────
 

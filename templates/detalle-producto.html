@@ -16,10 +16,10 @@
 {
     "@context": "https://schema.org",
     "@type": "Product",
-    "name": "{{ producto.nombre }}",
-    "description": "{{ producto.descripcion[:200] }}",
-    "image": "{{ imagen_principal }}",
-    "category": "{{ producto.categoria }}",
+    "name": {{ producto.nombre|tojson }},
+    "description": {{ producto.descripcion[:200]|tojson }},
+    "image": {{ imagen_principal|tojson }},
+    "category": {{ producto.categoria|tojson }},
     "offers": {
         "@type": "Offer",
         "price": "{{ producto.precio }}",

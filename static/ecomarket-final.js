@@ -2612,7 +2612,7 @@ const EcoQuickView = {
                 <div class="modal-body">
                     <div class="quick-view-modal">
                         <div class="quick-view-image">
-                            <img src="" alt="Producto">
+                            <img data-src="" alt="Producto">
                         </div>
                         <div class="quick-view-info">
                             <h3 class="product-name"></h3>
@@ -2638,7 +2638,7 @@ const EcoQuickView = {
         const price = this.modal.querySelector('.quick-view-price');
         const description = this.modal.querySelector('.quick-view-description');
         
-        img.src = product.image || '';
+        if (product.image) img.src = product.image;
         name.textContent = product.name || '';
         price.textContent = product.price ? `S/. ${parseFloat(product.price).toFixed(2)}` : '';
         description.textContent = product.description || '';

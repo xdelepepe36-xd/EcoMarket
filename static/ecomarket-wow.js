@@ -190,3 +190,44 @@ document.addEventListener('click', function (e) {
     btn.querySelector('i').className = show ? 'bi bi-eye-slash' : 'bi bi-eye';
     btn.setAttribute('aria-label', show ? 'Ocultar contraseña' : 'Mostrar contraseña');
 });
+
+/* ── Mascota interactiva: sigue el cursor sutilmente ────────── */
+(function () {
+    const mascot = document.querySelector('.hero-mascot');
+    if (!mascot || !window.matchMedia('(pointer:fine)').matches) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let raf = null;
+    document.addEventListener('mousemove', (e) => {
+        if (raf) return;
+        raf = requestAnimationFrame(() => {
+            const r = mascot.getBoundingClientRect();
+            const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+            const dx = (e.clientX - cx) / window.innerWidth;
+            const dy = (e.clientY - cy) / window.innerHeight;
+            mascot.style.transform = `translate(${dx * 18}px, ${dy * 14}px) rotate(${dx * 4}deg)`;
+            raf = null;
+        });
+    });
+    document.addEventListener('mouseleave', () => {
+        mascot.style.transform = '';
+    });
+})();
+
+/* ── Tilt 3D sutil en tarjetas de producto ─────────────────── */
+(function () {
+    if (!window.matchMedia('(pointer:fine)').matches) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.addEventListener('mousemove', (e) => {
+        const card = e.target.closest('.product-card, .producto-card, .card-producto');
+        if (!card) return;
+        const r = card.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        card.style.transform = `perspective(700px) rotateY(${px * 5}deg) rotateX(${-py * 5}deg) translateY(-3px)`;
+        card.style.transition = 'transform .12s ease';
+    }, { passive: true });
+    document.addEventListener('mouseout', (e) => {
+        const card = e.target.closest('.product-card, .producto-card, .card-producto');
+        if (card) { card.style.transform = ''; card.style.transition = 'transform .3s ease'; }
+    }, { passive: true });
+})();

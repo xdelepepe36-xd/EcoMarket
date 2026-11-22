@@ -429,7 +429,7 @@ function cambiarImagen(btn, src) {
     lb.innerHTML = '<div class="lb-backdrop"></div>' +
         '<button class="lb-close" aria-label="Cerrar">✕</button>' +
         '<button class="lb-nav lb-prev" aria-label="Anterior">‹</button>' +
-        '<img class="lb-img" alt="">' +
+        '<img class="lb-img" alt="" src="{{ url_for('static', filename='assets/product-placeholder.svg') }}">' +
         '<button class="lb-nav lb-next" aria-label="Siguiente">›</button>' +
         '<div class="lb-counter"></div>';
     document.body.appendChild(lb);

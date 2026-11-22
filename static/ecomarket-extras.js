@@ -108,36 +108,4 @@
         else img.addEventListener('load', function () { img.classList.add('loaded'); });
     });
 
-    /* ── 8. Modo kiosco: pantalla limpia para presentaciones ── */
-    (function kiosk() {
-        var btn = document.createElement('button');
-        btn.className = 'eco-kiosk-btn';
-        btn.innerHTML = '🖥️';
-        btn.title = 'Modo presentación (pantalla limpia)';
-        btn.setAttribute('aria-label', 'Modo presentación');
-        document.body.appendChild(btn);
-        var kioskPrevTheme = null;
-        function setKiosk(on) {
-            if (on && !kioskPrevTheme) {
-                kioskPrevTheme = document.documentElement.getAttribute('data-theme') || 'light';
-            }
-            document.body.classList.toggle('eco-kiosk', on);
-            btn.innerHTML = on ? '✕' : '🖥️';
-            btn.title = on ? 'Salir de modo presentación' : 'Modo presentación';
-            if (!on && kioskPrevTheme) {
-                // restaurar el tema que había antes de presentar
-                document.documentElement.setAttribute('data-theme', kioskPrevTheme);
-                try { localStorage.setItem('ecomarket-theme', kioskPrevTheme); } catch (e) {}
-                kioskPrevTheme = null;
-            }
-        }
-        btn.addEventListener('click', function () {
-            setKiosk(!document.body.classList.contains('eco-kiosk'));
-        });
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'F11') { /* dejar que el navegador lo maneje */ }
-            if (e.key === 'Escape' && document.body.classList.contains('eco-kiosk')) {
-                setKiosk(false);
-            }
-        });
-    })();
+

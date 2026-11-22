@@ -2302,23 +2302,6 @@ main, .section { animation: ecoPageIn .45s cubic-bezier(.22,1,.36,1) both; }
 [data-theme='ocean'] .detalle-price-history, [data-theme='midnight'] .detalle-price-history,
 [data-theme='rose'] .detalle-price-history { color: #86EFAC; }
 
-/* ===== Modo kiosco / presentación ===== */
-.eco-kiosk-btn {
-    position: fixed; left: 22px; bottom: 88px; z-index: 9000;
-    width: 46px; height: 46px; border-radius: 50%; border: 2px solid rgba(255,255,255,.3);
-    background: rgba(20,83,45,.92); color: #fff; font-size: 1.1rem; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 8px 20px rgba(0,0,0,.3); transition: transform .2s;
-}
-.eco-kiosk-btn:hover { transform: scale(1.1); }
-body.eco-kiosk header, body.eco-kiosk nav, body.eco-kiosk footer,
-body.eco-kiosk .asistente-fab, body.eco-kiosk .eco-back-top,
-body.eco-kiosk .eco-scroll-progress, body.eco-kiosk .eco-kiosk-btn ~ *:not(main):not(.flash-deal):not(.eco-cursor) {
-    display: none !important;
-}
-body.eco-kiosk .eco-kiosk-btn { display: flex !important; }
-body.eco-kiosk main, body.eco-kiosk .section { animation: none; }
-
 /* ===== Lightbox galería ===== */
 #ecoLightbox { position: fixed; inset: 0; z-index: 10000; display: none; align-items: center; justify-content: center; }
 #ecoLightbox.open { display: flex; }
@@ -2537,34 +2520,7 @@ body.eco-kiosk main, body.eco-kiosk .section { animation: none; }
 .eco-lb-list strong { flex: 0 0 auto; }
 .eco-lb-list em { margin-left: auto; font-style: normal; font-size: .8rem; color: var(--texto-sec, #555); }
 
-.eco-script-box {
-    position: fixed; left: 50%; bottom: 34px; transform: translateX(-50%);
-    z-index: 9500; max-width: min(680px, 92vw); text-align: center;
-    background: rgba(15,40,22,.92); color: #eaffea;
-    border: 1px solid rgba(129,199,132,.4); border-radius: 16px;
-    padding: 16px 26px; backdrop-filter: blur(8px);
-    box-shadow: 0 16px 50px rgba(0,0,0,.4);
-}
-.eco-script-text { font-size: 1rem; font-weight: 500; }
-.eco-script-dots { margin-top: 10px; display: flex; gap: 6px; justify-content: center; }
-.eco-script-dots i {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: rgba(255,255,255,.25); display: inline-block;
-}
-.eco-script-dots i.on { background: #81c784; }
-
-[data-theme='dark'] .eco-sim-card, [data-theme='nature'] .eco-sim-card,
-[data-theme='ocean'] .eco-sim-card, [data-theme='midnight'] .eco-sim-card,
-[data-theme='rose'] .eco-sim-card { background: rgba(20,28,24,.9); border-color: rgba(129,199,132,.2); }
-[data-theme='dark'] .eco-sim-card h3, [data-theme='nature'] .eco-sim-card h3,
-[data-theme='ocean'] .eco-sim-card h3, [data-theme='midnight'] .eco-sim-card h3,
-[data-theme='rose'] .eco-sim-card h3 { color: #a5d6a7; }
-[data-theme='dark'] .eco-sim-results > div, [data-theme='nature'] .eco-sim-results > div,
-[data-theme='ocean'] .eco-sim-results > div, [data-theme='midnight'] .eco-sim-results > div,
-[data-theme='rose'] .eco-sim-results > div { background: rgba(129,199,132,.12); }
-
 @media (max-width: 640px) {
     .eco-sim-results { grid-template-columns: 1fr; }
     .eco-sim-card { padding: 20px; }
-    .eco-script-box { bottom: 16px; }
 }

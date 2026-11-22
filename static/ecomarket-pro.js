@@ -201,57 +201,11 @@
             .catch(function () {});
     }
 
-    /* ═══════════ 5. MODO PRESENTACIÓN — GUION AUTOMÁTICO ═══════════ */
-    var SCRIPT = [
-        '🤖 IA con memoria: busca, pagina y recuerda lo que le pides',
-        '📊 Comparador visual: hasta 4 productos lado a lado',
-        '💰 Historial de precios + alerta cuando baja un favorito',
-        '🎨 6 temas + partículas que cambian con cada uno',
-        '🖼️ Fotos reales únicas para cada producto',
-        '🔒 Registro seguro, validado y con CSRF',
-        '🌍 6 idiomas: ES · EN · PT · FR · DE · IT',
-        '💾 Backups automáticos + restauración en 1 clic'
-    ];
-    var scriptIdx = 0, scriptTimer = null, scriptBox = null;
-
-    function initPresentation() {
-        var obs = new MutationObserver(function () {
-            var on = document.body.classList.contains('eco-kiosk');
-            if (on && !scriptBox) showScript();
-            if (!on && scriptBox) hideScript();
-        });
-        obs.observe(document.body, { attributes: true, attributeFilter: ['class'] });
-    }
-
-    function showScript() {
-        scriptBox = document.createElement('div');
-        scriptBox.className = 'eco-script-box';
-        scriptBox.innerHTML = '<div class="eco-script-text"></div><div class="eco-script-dots"></div>';
-        document.body.appendChild(scriptBox);
-        tickScript();
-        scriptTimer = setInterval(tickScript, 6000);
-    }
-
-    function hideScript() {
-        clearInterval(scriptTimer);
-        if (scriptBox) { scriptBox.remove(); scriptBox = null; }
-    }
-
-    function tickScript() {
-        if (!scriptBox) return;
-        scriptIdx = (scriptIdx + 1) % SCRIPT.length;
-        scriptBox.querySelector('.eco-script-text').textContent = SCRIPT[scriptIdx];
-        scriptBox.querySelector('.eco-script-dots').innerHTML = SCRIPT.map(function (_, i) {
-            return '<i class="' + (i === scriptIdx ? 'on' : '') + '"></i>';
-        }).join('');
-    }
-
     /* ═══════════ INIT ═══════════ */
     document.addEventListener('DOMContentLoaded', function () {
         initParticles();
         initCursorTrail();
         initSimulator();
         initLeaderboard();
-        initPresentation();
     });
 })();

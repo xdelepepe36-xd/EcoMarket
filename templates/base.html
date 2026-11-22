@@ -31,6 +31,7 @@
          + rediseño.css encima (nuevo diseño gana donde define estilos) -->
     <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-final.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-rediseño.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='ecomarket-wow.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='accessibility.css') }}">
     
     <!-- JS esencial: final.js expone toda la API que usan las plantillas
@@ -39,6 +40,7 @@
     <script src="{{ url_for('static', filename='ecomarket-security-enhanced.js') }}" defer></script>
     <script src="{{ url_for('static', filename='ecomarket-i18n-complete.js') }}" defer></script>
     <script src="{{ url_for('static', filename='ecomarket-validation.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='ecomarket-wow.js') }}" defer></script>
     
     {% block head %}{% endblock %}
 </head>
@@ -50,7 +52,7 @@
     <header class="header">
         <div class="container header-container">
             <a href="{{ url_for('index') }}" class="logo">
-                <i class="bi bi-flower2"></i> EcoMarket
+                <img src="{{ url_for('static', filename='assets/logo.svg') }}" alt="EcoMarket" class="logo-img">
             </a>
             
             <!-- Navegación Desktop -->
@@ -132,7 +134,7 @@
             <div class="footer-grid">
                 <div class="footer-col footer-brand">
                     <a class="logo" href="{{ url_for('index') }}">
-                        <i class="bi bi-flower2"></i> EcoMarket
+                        <img src="{{ url_for('static', filename='assets/logo.svg') }}" alt="EcoMarket" class="logo-img">
                     </a>
                     <p data-i18n="footer.description">Marketplace ecológico donde puedes comprar, vender y dar una segunda vida a productos reciclados y sostenibles.</p>
                     <div class="footer-social">

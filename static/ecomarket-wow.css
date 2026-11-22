@@ -1,0 +1,639 @@
+/* ═══════════════════════════════════════════════════════════════
+   EcoMarket WOW Layer — hero cinematográfico, lluvia de hojas,
+   modo oscuro degradado, cards con vida. Carga AL FINAL.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── LOGO ────────────────────────────────────────────────────── */
+.logo-img {
+    height: 38px;
+    width: auto;
+    display: block;
+}
+.logo { gap: 0; }
+.footer .logo-img { height: 34px; }
+@media (max-width: 768px) { .logo-img { height: 32px; } }
+
+/* ── Lluvia de hojas/florecitas (canvas fijo) ────────────────── */
+#leaf-rain {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 2;
+    opacity: .55;
+}
+[data-theme='dark'] #leaf-rain { opacity: .8; }
+
+/* Asegurar que el contenido quede sobre el canvas */
+main#main-content, .header, .footer {
+    position: relative;
+    z-index: 3;
+}
+.header, .footer { background: transparent; }
+
+/* ── HERO CINEMATOGRÁFICO ─────────────────────────────────────── */
+.hero-section-enhanced {
+    min-height: clamp(560px, 88vh, 780px);
+    isolation: isolate;
+}
+
+.hero-background {
+    background:
+        radial-gradient(ellipse 60% 50% at 85% 10%, rgba(102,187,106,.35), transparent 60%),
+        radial-gradient(ellipse 50% 60% at 10% 90%, rgba(56,142,60,.30), transparent 60%),
+        radial-gradient(ellipse 40% 40% at 50% 50%, rgba(129,199,132,.18), transparent 70%),
+        linear-gradient(160deg, #0d2818 0%, #14532d 45%, #1b5e20 75%, #2e7d32 100%);
+}
+
+/* Orbes de luz animados dentro del hero */
+.hero-background::before,
+.hero-background::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(70px);
+    opacity: .5;
+    animation: orbFloat 14s ease-in-out infinite;
+}
+.hero-background::before {
+    width: 420px; height: 420px;
+    background: radial-gradient(circle, rgba(102,187,106,.5), transparent 70%);
+    top: -120px; right: -80px;
+}
+.hero-background::after {
+    width: 360px; height: 360px;
+    background: radial-gradient(circle, rgba(255,193,7,.28), transparent 70%);
+    bottom: -100px; left: 8%;
+    animation-delay: -7s;
+}
+@keyframes orbFloat {
+    0%,100% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(30px,-40px) scale(1.12); }
+}
+
+/* La foto de fondo queda como textura tenue encima del gradiente */
+.hero-bg-image {
+    opacity: .28;
+    mix-blend-mode: luminosity;
+    transform: scale(1.05);
+    animation: heroKenBurns 24s ease-in-out infinite alternate;
+}
+@keyframes heroKenBurns {
+    from { transform: scale(1.02) translateX(-1%); }
+    to   { transform: scale(1.1)  translateX(1%); }
+}
+
+.hero-overlay {
+    background: linear-gradient(100deg,
+        rgba(10,32,18,.92) 0%,
+        rgba(13,52,29,.75) 45%,
+        rgba(13,52,29,.25) 100%);
+}
+
+/* Titular con presencia */
+.hero-title {
+    font-size: clamp(2.6rem, 5.2vw, 4.2rem);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -.5px;
+    max-width: 820px;
+    color: #fff;
+    text-shadow: 0 4px 30px rgba(0,0,0,.35);
+    animation: heroRise .8s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes heroRise {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero-description {
+    font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+    max-width: 560px;
+    color: rgba(255,255,255,.88);
+    animation: heroRise .8s .12s cubic-bezier(.22,1,.36,1) both;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.3);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    font-weight: 600;
+    font-size: .9rem;
+    margin-bottom: 22px;
+    animation: heroRise .8s .05s cubic-bezier(.22,1,.36,1) both;
+}
+.hero-badge i { color: #a5d6a7; font-size: 1rem; }
+
+/* Stats del hero como pills glass */
+.hero-stats-quick {
+    gap: clamp(14px, 2.5vw, 34px);
+    margin-bottom: 30px;
+    animation: heroRise .8s .2s cubic-bezier(.22,1,.36,1) both;
+}
+.hero-stat-item {
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.2);
+    backdrop-filter: blur(6px);
+    border-radius: 14px;
+    padding: 12px 22px;
+    min-width: 110px;
+}
+.hero-stat-item strong {
+    display: block;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.1;
+}
+.hero-stat-item span {
+    font-size: .78rem;
+    color: rgba(255,255,255,.75);
+    text-transform: uppercase;
+    letter-spacing: .8px;
+}
+
+/* Botones del hero con brillo */
+.hero-buttons { animation: heroRise .8s .28s cubic-bezier(.22,1,.36,1) both; }
+.btn-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 15px 34px;
+    font-size: 1.02rem;
+    border-radius: 14px;
+}
+.btn-hero::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -80%;
+    width: 50%; height: 100%;
+    background: linear-gradient(100deg, transparent, rgba(255,255,255,.35), transparent);
+    transform: skewX(-20deg);
+    transition: left .6s ease;
+}
+.btn-hero:hover::after { left: 130%; }
+
+.hero-trust-badges { animation: heroRise .8s .36s cubic-bezier(.22,1,.36,1) both; }
+.trust-badge {
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.18);
+    backdrop-filter: blur(6px);
+    border-radius: 999px;
+    padding: 8px 16px;
+    color: rgba(255,255,255,.9);
+    font-size: .85rem;
+}
+.trust-badge i { color: #ffd54f; }
+
+/* ── BARRA DE BÚSQUEDA FLOTANTE ───────────────────────────────── */
+.search-bar-section {
+    margin-top: -46px;
+    position: relative;
+    z-index: 5;
+}
+.search-bar {
+    background: #fff;
+    border-radius: 20px;
+    padding: 10px;
+    box-shadow: 0 18px 50px rgba(20,60,35,.22);
+    border: 1px solid rgba(46,125,50,.1);
+}
+[data-theme='dark'] .search-bar {
+    background: #1B2620;
+    border-color: rgba(102,187,106,.2);
+}
+.search-bar form { display: flex; gap: 10px; }
+.search-bar .search-input {
+    flex: 1;
+    border: none !important;
+    background: transparent !important;
+    font-size: 1.05rem;
+    padding: 12px 18px;
+    color: inherit;
+}
+.search-bar .btn-principal {
+    border-radius: 14px;
+    padding: 12px 30px;
+    white-space: nowrap;
+}
+
+/* ── CARDS CON VIDA ──────────────────────────────────────────── */
+.producto-card, .product-card, .categoria-card {
+    transition: transform .35s cubic-bezier(.22,1,.36,1),
+                box-shadow .35s ease,
+                border-color .35s ease;
+}
+.producto-card:hover, .product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 24px 48px rgba(20,60,35,.18);
+}
+.producto-card:hover img, .product-card:hover img {
+    transform: scale(1.06);
+}
+.producto-card img, .product-card img {
+    transition: transform .5s ease;
+}
+.categoria-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 18px 40px rgba(46,125,50,.18);
+    border-color: rgba(46,125,50,.3);
+}
+
+/* Imagen de card: marco redondeado con fondo */
+.producto-card .card-img-wrap,
+.product-card .card-img-wrap {
+    overflow: hidden;
+    border-radius: 12px 12px 0 0;
+    background: linear-gradient(135deg, #E8F5E9, #F1F8E9);
+}
+[data-theme='dark'] .producto-card .card-img-wrap,
+[data-theme='dark'] .product-card .card-img-wrap {
+    background: linear-gradient(135deg, #1E2B23, #16211B);
+}
+
+/* Precios y badges con color */
+.precio-actual, .product-price, .price-now {
+    color: var(--verde-intenso, #2e7d32);
+    font-weight: 800;
+}
+.badge-descuento, .discount-badge {
+    background: linear-gradient(135deg, #FF7043, #F4511E);
+    color: #fff;
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: .72rem;
+    font-weight: 700;
+}
+
+/* ── SUBRAYADOS / LINKS: limpieza global ─────────────────────── */
+.producto-card a, .product-card a,
+.categoria-card a, .categoria-nombre,
+.product-info a, .card-body a {
+    text-decoration: none !important;
+}
+/* Subrayado solo en hover para links de texto */
+.footer-col a:hover, .auth-footer a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+/* Quitar subrayados del navegador en títulos/botones */
+.btn-principal, .btn-secundario, .nav-link {
+    text-decoration: none !important;
+}
+
+/* ── TEXTO RECORTADO: nav y categorías ───────────────────────── */
+.nav-link {
+    overflow: visible !important;
+    white-space: nowrap;
+    padding: 9px 16px;
+}
+.nav-link::before, .nav-link::after { display: none; }
+.categoria-nombre {
+    font-size: .92rem;
+    line-height: 1.3;
+    word-break: break-word;
+    overflow: visible;
+    white-space: normal;
+    min-height: 2.4em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.categoria-card { overflow: visible; }
+.categoria-card::before { display: none; }
+
+/* ── SECCIONES: títulos con acento decorativo ────────────────── */
+.section-title {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+.section-title::after {
+    content: '';
+    width: 46px; height: 4px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--verde-intenso, #22C55E), #A5D6A7);
+}
+.section-title i { color: var(--verde-intenso, #2e7d32); }
+
+/* ── MODO OSCURO: degradado profundo + glassmorphism ─────────── */
+[data-theme='dark'] body {
+    background:
+        radial-gradient(ellipse 70% 50% at 80% -10%, rgba(46,125,50,.22), transparent 60%),
+        radial-gradient(ellipse 60% 40% at 10% 110%, rgba(21,101,192,.12), transparent 60%),
+        linear-gradient(180deg, #0A100D 0%, #0F1713 50%, #0A100D 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+[data-theme='dark'] .producto-card,
+[data-theme='dark'] .product-card,
+[data-theme='dark'] .categoria-card,
+[data-theme='dark'] .form-card,
+[data-theme='dark'] .checkout-form-card,
+[data-theme='dark'] .checkout-summary-card,
+[data-theme='dark'] .contact-card {
+    background: linear-gradient(160deg, rgba(30,41,35,.92), rgba(23,29,26,.92));
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(102,187,106,.16);
+    box-shadow: 0 8px 30px rgba(0,0,0,.35);
+}
+[data-theme='dark'] .producto-card:hover,
+[data-theme='dark'] .product-card:hover {
+    border-color: rgba(102,187,106,.45);
+    box-shadow: 0 20px 50px rgba(0,0,0,.5), 0 0 30px rgba(102,187,106,.08);
+}
+[data-theme='dark'] .section {
+    position: relative;
+}
+[data-theme='dark'] .footer {
+    background: linear-gradient(180deg, transparent, rgba(6,12,9,.9));
+    border-top: 1px solid rgba(102,187,106,.15);
+}
+[data-theme='dark'] .header {
+    background: rgba(10,16,13,.75);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(102,187,106,.15);
+}
+
+/* ── SCROLLBAR personalizada ─────────────────────────────────── */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #66BB6A, #2E7D32);
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+/* ── RESPONSIVE WOW ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .hero-section-enhanced { min-height: 78vh; }
+    .hero-title { font-size: clamp(2rem, 9vw, 2.8rem); }
+    .hero-content-wrapper { text-align: center; }
+    .hero-description { margin-left: auto; margin-right: auto; }
+    .hero-stats-quick { justify-content: center; }
+    .hero-buttons { display: flex; flex-direction: column; gap: 12px; align-items: stretch; }
+    .btn-hero { text-align: center; }
+    .hero-trust-badges { justify-content: center; }
+    .search-bar-section { margin-top: -30px; }
+    .section-title::after { display: none; }
+}
+@media (max-width: 480px) {
+    .hero-stat-item { min-width: 88px; padding: 10px 14px; }
+    .hero-stat-item strong { font-size: 1.3rem; }
+    .search-bar form { flex-direction: column; }
+    .search-bar .btn-principal { width: 100%; }
+}
+
+/* ── ACCESIBILIDAD: menos movimiento ─────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .hero-bg-image, .hero-background::before, .hero-background::after,
+    .hero-title, .hero-description, .hero-badge, .hero-stats-quick,
+    .hero-buttons, .hero-trust-badges { animation: none !important; }
+    #leaf-rain { display: none; }
+}
+
+/* ══ CAPA WOW-2: marquee, contadores, iconos, testimonios ══════ */
+
+/* ── MARQUEE Ecológico ───────────────────────────────────────── */
+.eco-marquee {
+    overflow: hidden;
+    padding: 14px 0;
+    background: linear-gradient(90deg, #14532d, #1b5e20, #2e7d32, #1b5e20, #14532d);
+    background-size: 300% 100%;
+    animation: marqueeBg 18s linear infinite;
+    border-top: 1px solid rgba(255,255,255,.12);
+    border-bottom: 1px solid rgba(255,255,255,.12);
+    position: relative;
+    z-index: 4;
+}
+@keyframes marqueeBg {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+}
+.eco-marquee-track {
+    display: flex;
+    gap: 48px;
+    white-space: nowrap;
+    animation: marqueeScroll 28s linear infinite;
+    width: max-content;
+}
+.eco-marquee:hover .eco-marquee-track { animation-play-state: paused; }
+@keyframes marqueeScroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+}
+.eco-marquee-item {
+    color: rgba(255,255,255,.92);
+    font-weight: 600;
+    font-size: .95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+.eco-marquee-item i { color: #ffd54f; }
+.eco-marquee-item .dot { color: rgba(255,255,255,.4); }
+
+/* ── ICONOS DE CATEGORÍA: círculos con gradiente ─────────────── */
+.categoria-icon {
+    width: 74px;
+    height: 74px;
+    margin: 0 auto var(--spacing-sm);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.9rem;
+    color: #fff;
+    background: linear-gradient(135deg, #66BB6A, #2E7D32);
+    box-shadow: 0 8px 20px rgba(46,125,50,.3), inset 0 -3px 8px rgba(0,0,0,.15);
+    transition: transform .4s cubic-bezier(.22,1,.36,1), box-shadow .4s ease;
+}
+.categoria-card:hover .categoria-icon {
+    transform: scale(1.12) rotate(-6deg);
+    box-shadow: 0 12px 28px rgba(46,125,50,.4), 0 0 0 6px rgba(102,187,106,.15);
+}
+.categoria-icon i { color: #fff; }
+
+/* Colores alternos por posición para variedad */
+.categorias-grid .categoria-card:nth-child(3n+2) .categoria-icon {
+    background: linear-gradient(135deg, #4FC3F7, #0288D1);
+    box-shadow: 0 8px 20px rgba(2,136,209,.3), inset 0 -3px 8px rgba(0,0,0,.15);
+}
+.categorias-grid .categoria-card:nth-child(3n) .categoria-icon {
+    background: linear-gradient(135deg, #FFB74D, #F57C00);
+    box-shadow: 0 8px 20px rgba(245,124,0,.3), inset 0 -3px 8px rgba(0,0,0,.15);
+}
+
+/* ── CONTADORES DE IMPACTO animados ──────────────────────────── */
+.impacto-stat {
+    position: relative;
+    padding: 28px 20px;
+    border-radius: 18px;
+    background: linear-gradient(160deg, rgba(255,255,255,.9), rgba(232,245,233,.7));
+    border: 1px solid rgba(46,125,50,.12);
+    text-align: center;
+    transition: transform .35s ease, box-shadow .35s ease;
+}
+.impacto-stat:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 36px rgba(46,125,50,.18);
+}
+.impacto-valor {
+    font-size: clamp(1.9rem, 4vw, 2.8rem);
+    font-weight: 800;
+    background: linear-gradient(135deg, #2E7D32, #66BB6A);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.1;
+}
+.impacto-label { font-size: .88rem; color: var(--gris-secundario); margin-top: 6px; }
+[data-theme='dark'] .impacto-stat {
+    background: linear-gradient(160deg, rgba(30,41,35,.9), rgba(23,29,26,.9));
+    border-color: rgba(102,187,106,.2);
+}
+
+/* ── TESTIMONIOS con comillas decorativas ────────────────────── */
+.testimonio-card {
+    position: relative;
+    padding: 30px 26px 24px;
+    border-radius: 18px;
+    background: #fff;
+    border: 1px solid rgba(46,125,50,.1);
+    box-shadow: 0 6px 24px rgba(20,60,35,.07);
+    transition: transform .35s ease, box-shadow .35s ease;
+}
+.testimonio-card:hover {
+    transform: translateY(-8px) rotate(-.5deg);
+    box-shadow: 0 20px 44px rgba(20,60,35,.16);
+}
+.testimonio-card::before {
+    content: '\201C';
+    position: absolute;
+    top: -6px; left: 18px;
+    font-size: 4.5rem;
+    font-family: Georgia, serif;
+    color: rgba(102,187,106,.25);
+    line-height: 1;
+}
+.testimonio-stars { color: #FFB300; letter-spacing: 3px; font-size: .95rem; margin-bottom: 10px; }
+.testimonio-card p { font-size: .98rem; line-height: 1.65; color: var(--gris-oscuro); }
+.testimonio-author { margin-top: 14px; display: flex; flex-direction: column; }
+.testimonio-author strong { color: var(--verde-intenso); }
+.testimonio-author span { font-size: .82rem; color: var(--gris-secundario); }
+[data-theme='dark'] .testimonio-card {
+    background: linear-gradient(160deg, rgba(30,41,35,.92), rgba(23,29,26,.92));
+    border-color: rgba(102,187,106,.18);
+}
+
+/* ── FAQ cards ───────────────────────────────────────────────── */
+.faq-item {
+    background: #fff;
+    border: 1px solid rgba(46,125,50,.1);
+    border-radius: 14px;
+    padding: 20px 24px;
+    transition: border-color .3s ease, box-shadow .3s ease, transform .3s ease;
+}
+.faq-item:hover {
+    border-color: rgba(46,125,50,.35);
+    box-shadow: 0 10px 26px rgba(20,60,35,.1);
+    transform: translateY(-3px);
+}
+.faq-item h3 { font-size: 1.02rem; margin-bottom: 8px; color: var(--gris-oscuro); }
+.faq-item p { font-size: .92rem; color: var(--gris-secundario); line-height: 1.6; }
+[data-theme='dark'] .faq-item {
+    background: rgba(30,41,35,.9);
+    border-color: rgba(102,187,106,.16);
+}
+
+/* ── CTA SECTION: banner degradado con patrón ───────────────── */
+.cta-section {
+    background:
+        radial-gradient(circle at 15% 20%, rgba(255,213,79,.14), transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(102,187,106,.2), transparent 45%),
+        linear-gradient(135deg, #0d2818 0%, #14532d 55%, #1b5e20 100%);
+    color: #fff;
+    padding: clamp(48px, 8vw, 90px) 0;
+    position: relative;
+    overflow: hidden;
+}
+.cta-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,.06) 1px, transparent 1px);
+    background-size: 26px 26px;
+    pointer-events: none;
+}
+.cta-section h2 { color: #fff; font-size: clamp(1.7rem, 4vw, 2.6rem); }
+.cta-section p { color: rgba(255,255,255,.85); font-size: 1.1rem; max-width: 620px; }
+.cta-feature { color: rgba(255,255,255,.92); }
+.cta-feature i { color: #ffd54f; }
+.cta-section .btn-secundario {
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.4);
+    color: #fff;
+    backdrop-filter: blur(6px);
+}
+.cta-section .btn-secundario:hover { background: rgba(255,255,255,.22); }
+
+/* ── BENEFICIO CARDS ─────────────────────────────────────────── */
+.beneficio-card {
+    border-radius: 18px;
+    border: 1px solid rgba(46,125,50,.1);
+    transition: transform .35s ease, box-shadow .35s ease;
+    overflow: hidden;
+    position: relative;
+}
+.beneficio-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #66BB6A, #FFB74D);
+    opacity: 0;
+    transition: opacity .3s ease;
+}
+.beneficio-card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(20,60,35,.14); }
+.beneficio-card:hover::after { opacity: 1; }
+.beneficio-icon {
+    width: 60px; height: 60px;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem;
+    background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
+    color: #2E7D32;
+    margin-bottom: 16px;
+}
+[data-theme='dark'] .beneficio-icon {
+    background: linear-gradient(135deg, rgba(102,187,106,.2), rgba(46,125,50,.15));
+    color: #A5D6A7;
+}
+
+/* ── How-it-works steps numerados ────────────────────────────── */
+.step-number, .paso-numero {
+    background: linear-gradient(135deg, #2E7D32, #66BB6A);
+    color: #fff;
+    border-radius: 50%;
+    width: 44px; height: 44px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 800;
+    box-shadow: 0 6px 16px rgba(46,125,50,.35);
+}
+
+/* ── RESPONSIVE extras ───────────────────────────────────────── */
+@media (max-width: 768px) {
+    .eco-marquee-item { font-size: .82rem; gap: 6px; }
+    .eco-marquee-track { gap: 26px; }
+    .testimonio-card::before { font-size: 3.4rem; }
+    .categoria-icon { width: 62px; height: 62px; font-size: 1.6rem; }
+    .impacto-stat { padding: 20px 14px; }
+}

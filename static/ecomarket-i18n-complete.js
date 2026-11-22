@@ -4569,6 +4569,45 @@ const EcoI18n = {
         },
     },
 
+    marqueeI18n: {
+        es: {
+            'marquee.eco1': '100% Ecológico',
+            'marquee.eco2': 'Productos verificados',
+            'marquee.eco3': 'Vendedores locales',
+            'marquee.eco4': 'Segunda vida',
+        },
+        en: {
+            'marquee.eco1': '100% Eco-friendly',
+            'marquee.eco2': 'Verified products',
+            'marquee.eco3': 'Local sellers',
+            'marquee.eco4': 'Second life',
+        },
+        pt: {
+            'marquee.eco1': '100% Ecológico',
+            'marquee.eco2': 'Produtos verificados',
+            'marquee.eco3': 'Vendedores locais',
+            'marquee.eco4': 'Segunda vida',
+        },
+        fr: {
+            'marquee.eco1': '100% Écologique',
+            'marquee.eco2': 'Produits vérifiés',
+            'marquee.eco3': 'Vendeurs locaux',
+            'marquee.eco4': 'Seconde vie',
+        },
+        de: {
+            'marquee.eco1': '100% Ökologisch',
+            'marquee.eco2': 'Verifizierte Produkte',
+            'marquee.eco3': 'Lokale Verkäufer',
+            'marquee.eco4': 'Zweites Leben',
+        },
+        it: {
+            'marquee.eco1': '100% Ecologico',
+            'marquee.eco2': 'Prodotti verificati',
+            'marquee.eco3': 'Venditori locali',
+            'marquee.eco4': 'Seconda vita',
+        },
+    },
+
     init() {
         for (const lang in this.homeI18n) {
             this.translations[lang] = Object.assign({}, this.translations[lang], this.homeI18n[lang]);
@@ -4626,6 +4665,9 @@ const EcoI18n = {
         }
         for (const lang in this.couponI18n) {
             this.translations[lang] = Object.assign({}, this.translations[lang], this.couponI18n[lang]);
+        }
+        for (const lang in this.marqueeI18n) {
+            this.translations[lang] = Object.assign({}, this.translations[lang], this.marqueeI18n[lang]);
         }
         // Fallback: idiomas secundarios heredan inglés para claves no traducidas
         ['pt', 'fr', 'de', 'it'].forEach(l => {

@@ -1,0 +1,20 @@
+<svg width="220" height="52" viewBox="0 0 220 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="lgLeaf" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#43A047"/>
+      <stop offset="100%" stop-color="#1B5E20"/>
+    </linearGradient>
+    <linearGradient id="lgBadge" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#E8F5E9"/>
+      <stop offset="100%" stop-color="#C8E6C9"/>
+    </linearGradient>
+  </defs>
+  <!-- Badge circular con hoja -->
+  <circle cx="26" cy="26" r="24" fill="url(#lgBadge)" stroke="#66BB6A" stroke-width="2.5"/>
+  <path d="M26 12c5.2 0 10.4 3.1 12.6 8.2 1.7 4.9-.9 10.7-5.7 13.4-3.5 2.4-7.2 5.5-10.1 11.4-.9 1.5-2.5.9-2.9-.7-1.3-4.4-4.3-10.6-10.4-14.3C4.9 27.4 4.6 21.6 8.4 17.3 12.1 13.1 17.4 12 26 12Z" fill="url(#lgLeaf)"/>
+  <path d="M27.5 24.5c6.7 0 11.5-.8 11.5-3.5 0-3.4-7-11-15-11-4.8 0-10.2 6.1-10.2 14.5 0 3.2 4.3 0 13.7 0Z" fill="#FFFFFF"/>
+  <!-- Wordmark -->
+  <text x="60" y="35" font-family="Poppins, 'Segoe UI', Arial, sans-serif" font-size="25" font-weight="800">
+    <tspan fill="#1B5E20">Eco</tspan><tspan fill="#43A047">Market</tspan>
+  </text>
+</svg>

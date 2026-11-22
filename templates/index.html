@@ -80,6 +80,24 @@
     </div>
 </section>
 
+<!-- MARQUEE Ecológico -->
+<div class="eco-marquee" aria-hidden="true">
+    <div class="eco-marquee-track">
+        <span class="eco-marquee-item"><i class="bi bi-recycle"></i> <span data-i18n="marquee.eco1">100% Ecológico</span></span><span class="dot">✦</span>
+        <span class="eco-marquee-item"><i class="bi bi-patch-check"></i> <span data-i18n="marquee.eco2">Productos verificados</span></span><span class="dot">✦</span>
+        <span class="eco-marquee-item"><i class="bi bi-geo-alt"></i> <span data-i18n="marquee.eco3">Vendedores locales</span></span><span class="dot">✦</span>
+        <span class="eco-marquee-item"><i class="bi bi-arrow-repeat"></i> <span data-i18n="marquee.eco4">Segunda vida</span></span><span class="dot">✦</span>
+        <span class="eco-marquee-item"><i class="bi bi-shield-check"></i> <span data-i18n="hero.trust.payment">Pago seguro</span></span><span class="dot">✦</span>
+        <span class="eco-marquee-item"><i class="bi bi-truck"></i> <span data-i18n="hero.trust.shipping">Envío gratis</span></span><span class="dot">✦</span>
+        <span class="eco-marquee-item"><i class="bi bi-recycle"></i> <span data-i18n="marquee.eco1">100% Ecológico</span></span><span class="dot">✦</span>
+        <span class="eco-marquee-item"><i class="bi bi-patch-check"></i> <span data-i18n="marquee.eco2">Productos verificados</span></span><span class="dot">✦</span>
+        <span class="eco-marquee-item"><i class="bi bi-geo-alt"></i> <span data-i18n="marquee.eco3">Vendedores locales</span></span><span class="dot">✦</span>
+        <span class="eco-marquee-item"><i class="bi bi-arrow-repeat"></i> <span data-i18n="marquee.eco4">Segunda vida</span></span><span class="dot">✦</span>
+        <span class="eco-marquee-item"><i class="bi bi-shield-check"></i> <span data-i18n="hero.trust.payment">Pago seguro</span></span><span class="dot">✦</span>
+        <span class="eco-marquee-item"><i class="bi bi-truck"></i> <span data-i18n="hero.trust.shipping">Envío gratis</span></span><span class="dot">✦</span>
+    </div>
+</div>
+
 <!-- 3. CATEGORÍAS DE PRODUCTOS -->
 <section class="categorias-section section">
     <div class="container">
@@ -127,12 +145,12 @@
         </div>
         <div class="productos-grid">
             {% for producto in productos[:8] %}
-            {% set img_url = producto.imagen if producto.imagen.startswith('http') else url_for('static', filename=producto.imagen) %}
+            {% set img_url = producto.imagen if producto.imagen.startswith('http') else (producto.imagen if producto.imagen.startswith('/') else url_for('static', filename=producto.imagen)) %}
             <a href="{{ url_for('producto_detalle', producto_id=producto.id) }}" class="product-card-link">
                 <article class="product-card">
                     <div class="product-image-container">
                         {% if producto.imagen and producto.imagen != 'uploads/placeholder.svg' %}
-                        <img class="product-image" src="{{ img_url }}" alt="{{ producto.nombre }}" loading="lazy">
+                        <img class="product-image" src="{{ img_url }}" alt="{{ producto.nombre }}" loading="lazy" onerror="this.onerror=null;this.src='{{ url_for('static', filename='assets/product-placeholder.svg') }}'">
                         {% else %}
                         <div class="product-image-placeholder">
                             <i class="bi bi-box-seam"></i>
@@ -360,7 +378,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!items.length) return;
         grid.innerHTML = items.map(p => {
             const img = (p.imagen && p.imagen !== 'uploads/placeholder.svg')
-                ? (p.imagen.startsWith('http') ? p.imagen : '/static/' + p.imagen)
+                ? (p.imagen.startsWith('http') || p.imagen.startsWith('/') ? p.imagen : '/static/' + p.imagen)
                 : '';
             return `<a href="/producto/${p.id}" class="product-card-link">
                 <article class="product-card">

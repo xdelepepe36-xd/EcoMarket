@@ -2582,6 +2582,22 @@ def api_asistente():
                     'sugerencias': ['¿Cómo funciona?', 'Quiero vender', 'Cupones', 'Consejos ecológicos']})
 
 
+@app.route('/api/leaderboard')
+def api_leaderboard():
+    """Leaderboard ecológico: usuarios con más puntos + actividad de ventas."""
+    conn = get_db()
+    rows = conn.execute('''
+        SELECT u.id, u.nombre, u.eco_puntos, u.nivel,
+               (SELECT COUNT(*) FROM productos p WHERE p.usuario_id = u.id) AS productos,
+               (SELECT COUNT(*) FROM productos p WHERE p.usuario_id = u.id AND p.vendido = 1) AS ventas
+        FROM usuarios u
+        ORDER BY u.eco_puntos DESC, productos DESC, ventas DESC
+        LIMIT 10
+    ''').fetchall()
+    conn.close()
+    return jsonify({'top': [dict(r) for r in rows]})
+
+
 @app.route('/api/categorias')
 def api_categorias():
     """Lista de categorías para filtros y prefetch del cache/PWA."""
@@ -3285,6 +3301,48 @@ def _chat_respuesta(msg, lang, conn):
         if lang == 'es':
             return f'💵 **{p["nombre"]}** cuesta **S/.{p["precio"]:.2f}** (categoría: {p["categoria"]}).\n[Ver producto](/producto/{p["id"]})'
         return f'💵 **{p["nombre"]}** costs **S/.{p["precio"]:.2f}** (category: {p["categoria"]}).\n[View product](/producto/{p["id"]})'
+
+    # 3e) Comparación rápida: "compara bicicleta y patineta", "compare X vs Y"
+    if _kwhit(msg_n, ['compara', 'compare', 'cual es mejor', 'cuál es mejor', 'which is better', 'diferencia entre']):
+        kws = _chat_keywords(msg_n)
+        prods = _chat_products(conn, buscar=kws, limite=4) if kws else _chat_products(conn, limite=4)
+        if len(prods) >= 2:
+            session['chat_ctx'] = {'kind': 'products', 'items': prods, 'shown': len(prods)}
+            lineas = '\n'.join(
+                f'• [{p["nombre"]}](/producto/{p["id"]}) — S/.{p["precio"]:.2f} · {p["categoria"]}'
+                for p in prods)
+            extra = '\n\nDime "el primero" o "el segundo" para ver el detalle, o usa el comparador visual en /comparar 🙂' if lang == 'es' \
+                else '\n\nSay "the first" or "the second" for details, or try the visual comparator at /comparar 🙂'
+            return ('⚖️ **Comparativa:**\n' if lang == 'es' else '⚖️ **Comparison:**\n') + lineas + extra
+
+    # 3f) Intención semántica: regalos, niños, lo mejor, más ecológico
+    if _kwhit(msg_n, ['regalo', 'regalar', 'gift', 'obsequio', 'sorpresa', 'cumpleanos', 'cumpleaños']):
+        prods = conn.execute(
+            "SELECT id, nombre, precio, categoria, eco_score FROM productos WHERE categoria IN ('Accesorios','Juguetes','Arte','Bebés','Libros') ORDER BY eco_score DESC, precio DESC LIMIT 4"
+        ).fetchall()
+        prods = [dict(r) for r in prods]
+        if prods:
+            session['chat_ctx'] = {'kind': 'products', 'items': prods, 'shown': len(prods)}
+            lineas = '\n'.join(f'• [{p["nombre"]}](/producto/{p["id"]}) — S/.{p["precio"]:.2f} · {p["categoria"]}' for p in prods)
+            return ('🎁 **Ideas de regalo ecológicas:**\n' if lang == 'es' else '🎁 **Eco gift ideas:**\n') + lineas
+    if _kwhit(msg_n, ['ninos', 'niños', 'kids', 'bebe', 'bebé', 'baby', 'hijo', 'hija', 'child']):
+        prods = conn.execute(
+            "SELECT id, nombre, precio, categoria, eco_score FROM productos WHERE categoria IN ('Juguetes','Bebés') ORDER BY eco_score DESC LIMIT 4"
+        ).fetchall()
+        prods = [dict(r) for r in prods]
+        if prods:
+            session['chat_ctx'] = {'kind': 'products', 'items': prods, 'shown': len(prods)}
+            lineas = '\n'.join(f'• [{p["nombre"]}](/producto/{p["id"]}) — S/.{p["precio"]:.2f} · {p["categoria"]}' for p in prods)
+            return ('🧸 **Para los peques:**\n' if lang == 'es' else '🧸 **For the little ones:**\n') + lineas
+    if _kwhit(msg_n, ['los mejores', 'lo mejor', 'the best', 'top productos', 'mas populares', 'más populares', 'mas eco', 'más ecológico', 'sostenible']):
+        prods = conn.execute(
+            "SELECT id, nombre, precio, categoria, eco_score FROM productos WHERE vendido = 0 ORDER BY eco_score DESC, vistas DESC LIMIT 4"
+        ).fetchall()
+        prods = [dict(r) for r in prods]
+        if prods:
+            session['chat_ctx'] = {'kind': 'products', 'items': prods, 'shown': len(prods)}
+            lineas = '\n'.join(f'• [{p["nombre"]}](/producto/{p["id"]}) — S/.{p["precio"]:.2f} · eco {p.get("eco_score", "?")}' for p in prods) if prods[0].get('eco_score') is not None else '\n'.join(f'• [{p["nombre"]}](/producto/{p["id"]}) — S/.{p["precio"]:.2f}' for p in prods)
+            return ('🌿 **Los más ecológicos y populares:**\n' if lang == 'es' else '🌿 **The most eco and popular:**\n') + lineas
 
     # 4) Intenciones fijas
     for intent in CHAT_INTENTS:

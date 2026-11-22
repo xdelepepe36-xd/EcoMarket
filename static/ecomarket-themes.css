@@ -87,15 +87,17 @@
 [data-theme='rose'] a { color:#FDA4AF; }
 [data-theme='rose'] .btn-principal { background:linear-gradient(135deg,#9F1239,#FB7185); }
 
-/* ── ALTO CONTRASTE: blanco/negro puro, accesible ── */
+/* ── ALTO CONTRASTE: limpio, legible, estilo señalética ── */
 [data-theme='high-contrast'] body { background:#fff !important; color:#000 !important; }
-[data-theme='high-contrast'] .product-card, [data-theme='high-contrast'] .card, [data-theme='high-contrast'] .form-card,
-[data-theme='high-contrast'] .section, [data-theme='high-contrast'] header, [data-theme='high-contrast'] footer,
-[data-theme='high-contrast'] .hero-section-enhanced, [data-theme='high-contrast'] nav {
-    background:#fff !important; border:3px solid #000; color:#000 !important;
+[data-theme='high-contrast'] .product-card, [data-theme='high-contrast'] .card, [data-theme='high-contrast'] .form-card {
+    background:#fff !important; border:2px solid #000; color:#000 !important;
+    box-shadow: 4px 4px 0 #000;
 }
+[data-theme='high-contrast'] .section, [data-theme='high-contrast'] .hero-section-enhanced { background:#fff !important; }
+[data-theme='high-contrast'] header, [data-theme='high-contrast'] nav, [data-theme='high-contrast'] footer { background:#fff !important; border-bottom:3px solid #000; color:#000 !important; }
+[data-theme='high-contrast'] footer { border-bottom:none; border-top:3px solid #000; }
 [data-theme='high-contrast'] .hero-bg-image { display:none; }
-[data-theme='high-contrast'] .hero-overlay { background:rgba(255,255,255,.55) !important; }
+[data-theme='high-contrast'] .hero-overlay { background:rgba(255,255,255,.6) !important; }
 [data-theme='high-contrast'] h1, [data-theme='high-contrast'] h2, [data-theme='high-contrast'] h3,
 [data-theme='high-contrast'] h4, [data-theme='high-contrast'] p, [data-theme='high-contrast'] span,
 [data-theme='high-contrast'] label, [data-theme='high-contrast'] li, [data-theme='high-contrast'] td,
@@ -105,21 +107,21 @@
 [data-theme='high-contrast'] .product-card h3, [data-theme='high-contrast'] .product-card p { color:#000 !important; }
 [data-theme='high-contrast'] .section-title h2 { background:none; -webkit-background-clip:unset; background-clip:unset; color:#000 !important; }
 [data-theme='high-contrast'] input, [data-theme='high-contrast'] textarea, [data-theme='high-contrast'] select {
-    background:#fff !important; color:#000 !important; border:3px solid #000 !important;
+    background:#fff !important; color:#000 !important; border:2px solid #000 !important;
 }
-[data-theme='high-contrast'] input::placeholder { color:#444; }
 [data-theme='high-contrast'] a, [data-theme='high-contrast'] nav a { color:#0000EE !important; text-decoration:underline; }
 [data-theme='high-contrast'] .btn-principal, [data-theme='high-contrast'] .btn-secundario {
-    background:#000 !important; color:#fff !important; border:3px solid #000; font-weight:700;
+    background:#000 !important; color:#fff !important; border:2px solid #000; font-weight:700;
+    box-shadow: 3px 3px 0 #0000EE;
 }
 [data-theme='high-contrast'] .btn-principal:hover, [data-theme='high-contrast'] .btn-secundario:hover { background:#FFE600 !important; color:#000 !important; }
-[data-theme='high-contrast'] .theme-switcher, [data-theme='high-contrast'] .lang-switcher button { border:3px solid #000; }
+[data-theme='high-contrast'] .theme-switcher, [data-theme='high-contrast'] .lang-switcher button { border:2px solid #000; background:#fff; }
 [data-theme='high-contrast'] img { filter:contrast(1.05); }
 [data-theme='high-contrast'] ::selection { background:#000; color:#FFE600; }
 [data-theme='high-contrast'] .badge, [data-theme='high-contrast'] .pill { background:#000; color:#FFE600; border:2px solid #000; }
-[data-theme='high-contrast'] table { border:3px solid #000; }
-[data-theme='high-contrast'] th, [data-theme='high-contrast'] td { border:2px solid #000; }
-[data-theme='high-contrast'] .marquee-track, [data-theme='high-contrast'] .hero-float-card { border:3px solid #000; background:#fff; color:#000; }
+[data-theme='high-contrast'] th { border-bottom:3px solid #000; }
+[data-theme='high-contrast'] td { border-bottom:1px solid #999; }
+[data-theme='high-contrast'] .marquee-track, [data-theme='high-contrast'] .hero-float-card { border:2px solid #000; background:#fff; color:#000; }
 
 /* ===== Secciones y hero: sin rectángulos claros en temas oscuros ===== */
 [data-theme='dark'] .section, [data-theme='dark'] .section-alt, [data-theme='dark'] .productos-section,

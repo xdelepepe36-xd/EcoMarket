@@ -85,3 +85,25 @@
         setTimeout(function () { document.documentElement.classList.remove('theme-fading'); }, 400);
     });
 })();
+
+    /* ── 6. Countdown oferta relámpago (se renueva cada medianoche) ── */
+    (function flashDeal() {
+        var deal = document.getElementById('flashDeal');
+        if (!deal) return;
+        var H = document.getElementById('fdH'), M = document.getElementById('fdM'), S = document.getElementById('fdS');
+        function tick() {
+            var now = new Date();
+            var mid = new Date(now); mid.setHours(24, 0, 0, 0);
+            var diff = Math.max(0, mid - now);
+            H.textContent = String(Math.floor(diff / 3600000)).padStart(2, '0');
+            M.textContent = String(Math.floor(diff / 60000) % 60).padStart(2, '0');
+            S.textContent = String(Math.floor(diff / 1000) % 60).padStart(2, '0');
+        }
+        tick(); setInterval(tick, 1000);
+    })();
+
+    /* ── 7. Marcar imágenes cargadas (quitar shimmer) ── */
+    document.querySelectorAll('.product-card img, .categoria-card img').forEach(function (img) {
+        if (img.complete) img.classList.add('loaded');
+        else img.addEventListener('load', function () { img.classList.add('loaded'); });
+    });

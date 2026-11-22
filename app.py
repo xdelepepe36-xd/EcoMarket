@@ -1336,11 +1336,24 @@ def index():
     total_pedidos = conn.execute('SELECT COUNT(*) FROM pedidos').fetchone()[0]
     total_vendedores = conn.execute('SELECT COUNT(DISTINCT usuario_id) FROM productos WHERE usuario_id IS NOT NULL').fetchone()[0]
     total_visitas = conn.execute('SELECT COUNT(*) FROM visitas').fetchone()[0]
+    # oferta relámpago: producto con mayor descuento (o aleatorio del día)
+    import datetime as _dt, random as _rnd
+    _hoy = _dt.date.today().timetuple().tm_yday
+    _candidatos = conn.execute(
+        "SELECT id, nombre, precio, precio_original, imagen FROM productos "
+        "WHERE COALESCE(vendido,0)=0 AND precio > 0 ORDER BY (precio_original - precio) DESC LIMIT 20"
+    ).fetchall()
+    flash = None
+    if _candidatos:
+        con_dto = [r for r in _candidatos if r['precio_original'] and r['precio_original'] > r['precio']]
+        pool = con_dto if con_dto else list(_candidatos)
+        flash = dict(_rnd.Random(_hoy).choice(pool))
     conn.close()
     return render_template('index.html', productos=productos, categorias=categorias,
                            total_productos=total_productos, total_categorias=len(categorias),
                            total_usuarios=total_usuarios, total_pedidos=total_pedidos,
-                           total_vendedores=total_vendedores, total_visitas=total_visitas)
+                           total_vendedores=total_vendedores, total_visitas=total_visitas,
+                           flash_producto=flash)
 
 
 @app.route('/productos')

@@ -2225,3 +2225,54 @@ nav a:hover::after, .nav a:hover::after { width: 100%; }
 [data-theme='dark'] .cmp-score-card, [data-theme='nature'] .cmp-score-card, [data-theme='ocean'] .cmp-score-card,
 [data-theme='midnight'] .cmp-score-card, [data-theme='rose'] .cmp-score-card { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.14); }
 @media (max-width: 768px) { .cmp-score-card { flex-wrap: wrap; } }
+
+/* ===== Skeleton shimmer en imágenes de productos ===== */
+.product-card img, .categoria-card img, .cmp-head img, .cmp-score-card img {
+    background: linear-gradient(110deg, #eef2ee 30%, #f8faf8 45%, #eef2ee 60%);
+    background-size: 200% 100%;
+    animation: ecoShimmer 1.4s linear infinite;
+}
+@keyframes ecoShimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+.product-card img.loaded, .categoria-card img.loaded { animation: none; background: none; }
+[data-theme='dark'] .product-card img, [data-theme='nature'] .product-card img, [data-theme='ocean'] .product-card img,
+[data-theme='midnight'] .product-card img, [data-theme='rose'] .product-card img {
+    background: linear-gradient(110deg, rgba(255,255,255,.05) 30%, rgba(255,255,255,.1) 45%, rgba(255,255,255,.05) 60%);
+    background-size: 200% 100%;
+}
+img { transition: opacity .35s ease; }
+
+/* ===== Oferta relámpago countdown ===== */
+.flash-deal {
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+    background: linear-gradient(120deg, #7f1d1d, #b91c1c 55%, #f59e0b);
+    color: #fff; border-radius: 20px; padding: 18px 26px; margin: 26px 0;
+    box-shadow: 0 14px 34px -12px rgba(185,28,28,.5);
+    position: relative; overflow: hidden;
+}
+.flash-deal::before {
+    content:''; position:absolute; inset:0;
+    background: radial-gradient(40% 120% at 0% 50%, rgba(255,255,255,.14), transparent 60%);
+    pointer-events:none;
+}
+.flash-deal .fd-tag {
+    background: #fff; color: #b91c1c; font-weight: 800; font-size: .78rem;
+    letter-spacing: 1.5px; padding: 6px 14px; border-radius: 99px; text-transform: uppercase;
+    animation: fdPulse 1.6s ease-in-out infinite;
+}
+@keyframes fdPulse { 50% { transform: scale(1.06); } }
+.flash-deal .fd-info { flex: 1; min-width: 200px; }
+.flash-deal .fd-info b { font-size: 1.15rem; display: block; }
+.flash-deal .fd-info small { opacity: .9; }
+.flash-deal .fd-timer { display: flex; gap: 8px; }
+.flash-deal .fd-timer span {
+    background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.25);
+    border-radius: 12px; padding: 8px 12px; font-weight: 800; font-size: 1.3rem;
+    font-variant-numeric: tabular-nums; min-width: 58px; text-align: center;
+}
+.flash-deal .fd-timer small { display:block; font-size:.62rem; font-weight:600; letter-spacing:1px; opacity:.8; }
+.flash-deal a.fd-btn {
+    background: #fff; color: #b91c1c; font-weight: 800; padding: 12px 22px;
+    border-radius: 14px; text-decoration: none; white-space: nowrap;
+    transition: transform .18s ease;
+}
+.flash-deal a.fd-btn:hover { transform: translateY(-2px) scale(1.03); }

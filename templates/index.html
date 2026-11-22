@@ -202,6 +202,21 @@ sec.style.display='';
     </div>
 </section>
 
+<div class="container">
+  <div class="flash-deal" id="flashDeal">
+    <span class="fd-tag"><i class="bi bi-lightning-charge-fill"></i> Oferta relámpago</span>
+    <div class="fd-info">
+      <b id="fdName">{{ flash_producto.nombre if flash_producto else "Producto del día" }}</b>
+      <small id="fdPrice">{% if flash_producto and flash_producto.precio_original and flash_producto.precio_original > flash_producto.precio %}<s>S/. {{ '%.2f'|format(flash_producto.precio_original) }}</s> {% endif %}S/. {{ '%.2f'|format(flash_producto.precio if flash_producto else 0) }} · se renueva cada medianoche</small>
+    </div>
+    <div class="fd-timer">
+      <span><b id="fdH">00</b><small>HRS</small></span>
+      <span><b id="fdM">00</b><small>MIN</small></span>
+      <span><b id="fdS">00</b><small>SEG</small></span>
+    </div>
+    <a class="fd-btn" id="fdLink" href="{{ url_for('producto_detalle', producto_id=flash_producto.id) if flash_producto else '#' }}">Ver oferta</a>
+  </div>
+</div>
 <section class="productos-section section">
     <div class="container">
         <div class="section-title">

@@ -1,0 +1,99 @@
+/* ===== EcoMarket — Temas completos con identidad propia ===== */
+[data-theme] body { transition: background .45s ease, color .45s ease; }
+
+/* ── CLARO: limpio con glow verde/dorado ── */
+[data-theme='light'] body {
+    background:
+        radial-gradient(55% 35% at 88% -5%, rgba(34,197,94,.12), transparent 60%),
+        radial-gradient(45% 30% at 4% 8%, rgba(245,158,11,.09), transparent 60%),
+        linear-gradient(180deg, #f7fbf6 0%, #edf4ea 100%);
+    background-attachment: fixed;
+}
+
+/* ── SEPIA: papel antiguo ── */
+[data-theme='sepia'] body {
+    background:
+        radial-gradient(50% 35% at 85% 0%, rgba(201,166,107,.30), transparent 60%),
+        radial-gradient(40% 30% at 5% 10%, rgba(139,115,85,.18), transparent 60%),
+        linear-gradient(180deg, #FCF4E4, #F1E4C8);
+    background-attachment: fixed; color: #4A3728;
+}
+[data-theme='sepia'] .product-card, [data-theme='sepia'] .card, [data-theme='sepia'] .form-card { background:#FFFDF6; border-color:#E3D2B2; }
+[data-theme='sepia'] .section-title h2, [data-theme='sepia'] h2 { background:linear-gradient(100deg,#8B7355,#C9A66B); -webkit-background-clip:text; background-clip:text; color:transparent; }
+[data-theme='sepia'] .btn-principal { background:linear-gradient(135deg,#8B7355,#C9A66B); }
+
+/* ── NATURALEZA: bosque oscuro con árboles/hojas ── */
+[data-theme='nature'] body {
+    background:
+        radial-gradient(60% 40% at 80% -5%, rgba(74,222,128,.16), transparent 60%),
+        radial-gradient(45% 30% at 10% 15%, rgba(20,83,45,.35), transparent 65%),
+        linear-gradient(180deg, #0C1F12 0%, #123020 55%, #0A170E 100%);
+    background-attachment: fixed; color: #DFF0DC;
+}
+[data-theme='nature'] body::before {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.5;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cg fill='none' stroke='%234ADE80' stroke-width='1.6' opacity='.14'%3E%3Cpath d='M30 120 C 28 90 34 60 60 40 C 52 75 50 100 58 120 Z'/%3E%3Cpath d='M95 125 C 100 95 96 65 75 45 C 88 78 88 105 82 125 Z'/%3E%3Cpath d='M60 40 L 60 125' stroke-width='2'/%3E%3Ccircle cx='115' cy='35' r='4'/%3E%3Ccircle cx='18' cy='50' r='3'/%3E%3C/g%3E%3C/svg%3E");
+}
+[data-theme='nature'] .product-card, [data-theme='nature'] .card, [data-theme='nature'] .form-card { background:rgba(18,48,32,.92); border-color:rgba(74,222,128,.22); color:#DFF0DC; }
+[data-theme='nature'] .section-title h2 { background:linear-gradient(100deg,#BBF7D0,#4ADE80 60%,#FBBF24); -webkit-background-clip:text; background-clip:text; color:transparent; }
+[data-theme='nature'] input, [data-theme='nature'] textarea, [data-theme='nature'] select { background:rgba(255,255,255,.07); color:#EAF6E6; border-color:rgba(74,222,128,.25); }
+[data-theme='nature'] a { color:#86EFAC; }
+
+/* ── OCÉANO: azul profundo con olas ── */
+[data-theme='ocean'] body {
+    background:
+        radial-gradient(60% 40% at 85% -5%, rgba(56,189,248,.30), transparent 60%),
+        radial-gradient(45% 30% at 8% 12%, rgba(2,132,199,.35), transparent 65%),
+        linear-gradient(180deg, #062A43 0%, #0A3D5C 55%, #041E30 100%);
+    background-attachment: fixed; color: #DCEFFE;
+}
+[data-theme='ocean'] body::before {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.45;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='80'%3E%3Cg fill='none' stroke='%2338BDF8' stroke-width='1.6' opacity='.16'%3E%3Cpath d='M0 40 Q 40 18 80 40 T 160 40'/%3E%3Cpath d='M0 62 Q 40 40 80 62 T 160 62'/%3E%3Cpath d='M0 20 Q 40 -2 80 20 T 160 20'/%3E%3C/g%3E%3C/svg%3E");
+}
+[data-theme='ocean'] .product-card, [data-theme='ocean'] .card, [data-theme='ocean'] .form-card { background:rgba(10,45,72,.92); border-color:rgba(56,189,248,.25); color:#DCEFFE; }
+[data-theme='ocean'] .section-title h2 { background:linear-gradient(100deg,#BAE6FD,#38BDF8 60%,#818CF8); -webkit-background-clip:text; background-clip:text; color:transparent; }
+[data-theme='ocean'] input, [data-theme='ocean'] textarea, [data-theme='ocean'] select { background:rgba(255,255,255,.07); color:#E8F6FF; border-color:rgba(56,189,248,.3); }
+[data-theme='ocean'] a { color:#7DD3FC; }
+[data-theme='ocean'] .btn-principal { background:linear-gradient(135deg,#0369A1,#38BDF8); }
+
+/* ── MIDNIGHT: negro azulado profundo ── */
+[data-theme='midnight'] body {
+    background:
+        radial-gradient(55% 35% at 85% -5%, rgba(99,102,241,.22), transparent 60%),
+        radial-gradient(45% 30% at 5% 8%, rgba(139,92,246,.14), transparent 60%),
+        radial-gradient(30% 25% at 50% 100%, rgba(20,83,45,.18), transparent 60%),
+        linear-gradient(180deg, #050510 0%, #0B0B1E 55%, #070714 100%);
+    background-attachment: fixed; color: #E6E8F5;
+}
+[data-theme='midnight'] .product-card, [data-theme='midnight'] .card, [data-theme='midnight'] .form-card { background:rgba(17,17,38,.94); border-color:rgba(165,180,252,.18); color:#E6E8F5; }
+[data-theme='midnight'] .section-title h2 { background:linear-gradient(100deg,#C7D2FE,#818CF8 55%,#22D3EE); -webkit-background-clip:text; background-clip:text; color:transparent; }
+[data-theme='midnight'] input, [data-theme='midnight'] textarea, [data-theme='midnight'] select { background:rgba(255,255,255,.06); color:#E6E8F5; border-color:rgba(165,180,252,.22); }
+[data-theme='midnight'] a { color:#A5B4FC; }
+[data-theme='midnight'] .btn-principal { background:linear-gradient(135deg,#4338CA,#818CF8); }
+[data-theme='midnight'] th { color:#A5B4FC; }
+
+/* ── ROSE: vino/rosa oscuro elegante ── */
+[data-theme='rose'] body {
+    background:
+        radial-gradient(55% 35% at 85% -5%, rgba(244,63,94,.26), transparent 60%),
+        radial-gradient(45% 30% at 6% 10%, rgba(190,24,93,.25), transparent 60%),
+        linear-gradient(180deg, #2A0A18 0%, #3D1024 55%, #200812 100%);
+    background-attachment: fixed; color: #FBE4EC;
+}
+[data-theme='rose'] .product-card, [data-theme='rose'] .card, [data-theme='rose'] .form-card { background:rgba(58,16,34,.92); border-color:rgba(251,207,232,.2); color:#FBE4EC; }
+[data-theme='rose'] .section-title h2 { background:linear-gradient(100deg,#FDA4AF,#FB7185 55%,#F0ABFC); -webkit-background-clip:text; background-clip:text; color:transparent; }
+[data-theme='rose'] input, [data-theme='rose'] textarea, [data-theme='rose'] select { background:rgba(255,255,255,.07); color:#FFF0F5; border-color:rgba(251,207,232,.28); }
+[data-theme='rose'] a { color:#FDA4AF; }
+[data-theme='rose'] .btn-principal { background:linear-gradient(135deg,#9F1239,#FB7185); }
+
+/* ── ALTO CONTRASTE: negro/blanco puro, accesible ── */
+[data-theme='high-contrast'] body { background:#000; color:#fff; }
+[data-theme='high-contrast'] .product-card, [data-theme='high-contrast'] .card, [data-theme='high-contrast'] .form-card,
+[data-theme='high-contrast'] .section, [data-theme='high-contrast'] header, [data-theme='high-contrast'] footer { background:#000 !important; border:2px solid #fff; color:#fff; }
+[data-theme='high-contrast'] .section-title h2 { background:none; -webkit-background-clip:unset; background-clip:unset; color:#fff; }
+[data-theme='high-contrast'] input, [data-theme='high-contrast'] textarea, [data-theme='high-contrast'] select { background:#000; color:#fff; border:2px solid #fff !important; }
+[data-theme='high-contrast'] a, [data-theme='high-contrast'] nav a { color:#FFE600; text-decoration:underline; }
+[data-theme='high-contrast'] .btn-principal, [data-theme='high-contrast'] .btn-secundario { background:#000; color:#fff; border:2px solid #FFE600; }
+[data-theme='high-contrast'] img { filter:contrast(1.1); }
+[data-theme='high-contrast'] ::selection { background:#FFE600; color:#000; }

@@ -2495,3 +2495,6 @@ body.eco-kiosk main, body.eco-kiosk .section { animation: none; }
 @media (max-width: 768px) {
     .productos-header-section { min-height: 26vh; }
 }
+
+/* Cursor: más visible y nítido */
+.eco-cursor { filter: drop-shadow(0 3px 6px rgba(0,0,0,.45)) drop-shadow(0 0 6px rgba(255,255,255,.35)); }

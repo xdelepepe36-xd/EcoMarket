@@ -48,8 +48,8 @@
     }
 
     (function loop() {
-        x += (tx - x) * 0.3; y += (ty - y) * 0.3;
-        cur.style.transform = 'translate(' + (x - 17) + 'px,' + (y - 17) + 'px) rotate(' + ((tx - x) * 0.6) + 'deg)';
+        x += (tx - x) * 0.45; y += (ty - y) * 0.45;
+        cur.style.transform = 'translate(' + (x + 16 - 17) + 'px,' + (y + 16 - 17) + 'px) rotate(' + ((tx - x) * 0.5) + 'deg)';
         requestAnimationFrame(loop);
     })();
 

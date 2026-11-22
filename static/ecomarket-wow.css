@@ -1987,10 +1987,8 @@ body.tour-active .hero-mascot { filter: drop-shadow(0 0 34px rgba(34,197,94,.7))
     40% { transform: scale(1.35) rotate(-14deg); }
     70% { transform: scale(1.2) rotate(10deg); }
 }
-.eco-has-cursor, .eco-has-cursor a, .eco-has-cursor button,
-.eco-has-cursor input, .eco-has-cursor textarea, .eco-has-cursor select {
-    cursor: none !important;
-}
+/* El cursor del sistema sigue visible; la hoja es un compañero que va detrás */
+.eco-cursor { pointer-events: none; }
 
 /* ===== Tour pro ===== */
 .tour-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }

@@ -162,6 +162,7 @@
                     <h4 data-i18n="footer.account">Mi cuenta</h4>
                     {% if session.get('usuario_id') %}
                         <a href="{{ url_for('perfil') }}" data-i18n="footer.profile">Mi perfil</a>
+                        <a href="{{ url_for('mensajes_view') }}" data-i18n="nav.messages">Mensajes</a>
                         <a href="{{ url_for('publicar') }}" data-i18n="footer.publish">Publicar producto</a>
                         <a href="{{ url_for('logout') }}" data-i18n="footer.logout">Cerrar sesión</a>
                     {% else %}

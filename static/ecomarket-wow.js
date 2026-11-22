@@ -231,3 +231,20 @@ document.addEventListener('click', function (e) {
         if (card) { card.style.transform = ''; card.style.transition = 'transform .3s ease'; }
     }, { passive: true });
 })();
+
+/* ── Scroll reveal para secciones ───────────────────────────── */
+(function () {
+    if (!('IntersectionObserver' in window)) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const obs = new IntersectionObserver((entries) => {
+        entries.forEach(en => {
+            if (en.isIntersecting) { en.target.classList.add('visible'); obs.unobserve(en.target); }
+        });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('section:not(.hero-section-enhanced), .card, .stat-card').forEach(el => {
+        if (!el.closest('header') && el.offsetHeight > 60) {
+            el.classList.add('reveal');
+            obs.observe(el);
+        }
+    });
+})();

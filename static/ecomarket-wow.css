@@ -1561,3 +1561,25 @@ select:focus-visible, textarea:focus-visible {
     background: linear-gradient(180deg, #14532D, #0B3D20) !important;
 }
 footer a:hover { color: #FCD34D !important; }
+
+/* ══ TRANSICIONES DE PÁGINA ═══════════════════════════════════ */
+@keyframes pageFadeIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+main, .main-content, [role='main'] {
+    animation: pageFadeIn .45s cubic-bezier(.22,1,.36,1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+    main, .main-content { animation: none; }
+}
+/* secciones aparecen al hacer scroll */
+.reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity .6s ease, transform .6s cubic-bezier(.22,1,.36,1);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+}

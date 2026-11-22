@@ -3007,19 +3007,39 @@ CHAT_INTENTS = [
 ];
 
 
-def _chat_products(conn, categoria=None, limite=4, baratos=False):
-    """Obtiene productos reales de la BD (opcionalmente filtrados y baratos)."""
-    if categoria:
+def _chat_products(conn, categoria=None, limite=4, baratos=False, offset=0, buscar=None):
+    """Obtiene productos reales de la BD (filtrados, baratos, paginados o por texto)."""
+    if buscar:
+        _like = ' OR '.join(['nombre LIKE ?'] * len(buscar))
+        args = [f'%{w}%' for w in buscar] + [limite, offset]
         filas = conn.execute(
-            'SELECT nombre, precio, categoria FROM productos WHERE categoria = ? ORDER BY precio ASC LIMIT ?',
-            (categoria, limite)).fetchall()
+            f'SELECT id, nombre, precio, categoria FROM productos WHERE {_like} ORDER BY precio ASC LIMIT ? OFFSET ?',
+            args).fetchall()
+    elif categoria:
+        filas = conn.execute(
+            'SELECT id, nombre, precio, categoria FROM productos WHERE categoria = ? ORDER BY precio ASC LIMIT ? OFFSET ?',
+            (categoria, limite, offset)).fetchall()
     elif baratos:
         filas = conn.execute(
-            'SELECT nombre, precio, categoria FROM productos ORDER BY precio ASC LIMIT ?', (limite,)).fetchall()
+            'SELECT id, nombre, precio, categoria FROM productos ORDER BY precio ASC LIMIT ? OFFSET ?',
+            (limite, offset)).fetchall()
     else:
         filas = conn.execute(
-            'SELECT nombre, precio, categoria FROM productos ORDER BY vistas DESC LIMIT ?', (limite,)).fetchall()
+            'SELECT id, nombre, precio, categoria FROM productos ORDER BY vistas DESC LIMIT ? OFFSET ?',
+            (limite, offset)).fetchall()
     return [dict(r) for r in filas]
+
+
+_CHAT_STOP = {'tienes', 'hay', 'busco', 'busca', 'quiero', 'dame', 'muestra', 'dime', 'un', 'una',
+              'unos', 'unas', 'el', 'la', 'los', 'las', 'de', 'del', 'en', 'con', 'para', 'por',
+              'que', 'qué', 'como', 'cómo', 'me', 'te', 'se', 'lo', 'le', 'al', 'mas', 'más',
+              'producto', 'productos', 'item', 'items', 'algo', 'favor', 'favor'}
+
+
+def _chat_keywords(msg_n):
+    """Extrae palabras significativas (sin acentos) para buscar productos por nombre."""
+    palabras = re.findall(r'[a-z]{4,}', msg_n)
+    return [w for w in palabras if w not in _CHAT_STOP][:3]
 
 
 def _normalizar(s):

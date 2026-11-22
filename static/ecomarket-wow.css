@@ -40,6 +40,7 @@ main#main-content, .header, .footer {
 
 .hero-background {
     background:
+        url('/static/assets/patron-eco.svg') repeat,
         radial-gradient(ellipse 60% 50% at 85% 10%, rgba(102,187,106,.35), transparent 60%),
         radial-gradient(ellipse 50% 60% at 10% 90%, rgba(56,142,60,.30), transparent 60%),
         radial-gradient(ellipse 40% 40% at 50% 50%, rgba(129,199,132,.18), transparent 70%),
@@ -1689,3 +1690,9 @@ main, .main-content, [role='main'] {
 .auth-card .btn-principal { box-shadow: 0 6px 0 rgba(20,83,45,.9); }
 .auth-card .btn-principal:hover { transform: translateY(-2px); box-shadow: 0 8px 0 rgba(20,83,45,.9); }
 .auth-card .btn-principal:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(20,83,45,.9); }
+
+/* Patrón de tela en secciones claras */
+.section-alt, .beneficios-section, .categories-section {
+    background-image: url('/static/assets/patron-eco.svg');
+    background-repeat: repeat;
+}

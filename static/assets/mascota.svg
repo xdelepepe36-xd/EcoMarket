@@ -1,41 +1,78 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Eco, la mascota mapache de EcoMarket">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 250" role="img" aria-label="Eco, el mapache mascota de EcoMarket">
   <defs>
-    <linearGradient id="rgray" x1="0" y1="0" x2="0" y2="1">
+    <linearGradient id="polo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#22C55E"/>
+      <stop offset="1" stop-color="#16A34A"/>
+    </linearGradient>
+    <linearGradient id="rgray2" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#A8B5C4"/>
-      <stop offset="1" stop-color="#8A97A8"/>
+      <stop offset="1" stop-color="#7C8A9C"/>
     </linearGradient>
   </defs>
-  <!-- cola rayada -->
-  <path d="M152 168 C 178 160 186 128 172 104" fill="none" stroke="#8A97A8" stroke-width="20" stroke-linecap="round"/>
-  <path d="M152 168 C 178 160 186 128 172 104" fill="none" stroke="#3B4351" stroke-width="20" stroke-linecap="round" stroke-dasharray="10 14"/>
-  <!-- cuerpo -->
-  <ellipse cx="98" cy="146" rx="46" ry="38" fill="url(#rgray)"/>
-  <ellipse cx="98" cy="152" rx="26" ry="24" fill="#DDE4EC"/>
-  <!-- pies -->
-  <ellipse cx="72" cy="182" rx="16" ry="9" fill="#3B4351"/>
-  <ellipse cx="124" cy="182" rx="16" ry="9" fill="#3B4351"/>
+
+  <!-- cola rayada (detrás del cuerpo) -->
+  <path d="M158 218 C 196 208 206 160 190 118" fill="none" stroke="#8A97A8" stroke-width="20" stroke-linecap="round"/>
+  <path d="M158 218 C 196 208 206 160 190 118" fill="none" stroke="#3B4351" stroke-width="20" stroke-linecap="round" stroke-dasharray="10 14"/>
+
+  <!-- pierna izquierda -->
+  <rect x="76" y="212" width="16" height="22" rx="8" fill="#7C8A9C"/>
+  <ellipse cx="82" cy="236" rx="15" ry="8" fill="#2D3748"/>
+  <!-- pierna derecha -->
+  <rect x="108" y="212" width="16" height="22" rx="8" fill="#7C8A9C"/>
+  <ellipse cx="118" cy="236" rx="15" ry="8" fill="#2D3748"/>
+
+  <!-- brazo izquierdo (colgando) -->
+  <path d="M58 158 C 44 172 44 192 54 204" fill="none" stroke="#8A97A8" stroke-width="15" stroke-linecap="round"/>
+  <circle cx="55" cy="207" r="10" fill="#3B4351"/>
+
+  <!-- brazo derecho (saludando) -->
+  <path d="M142 156 C 158 142 166 122 160 102" fill="none" stroke="#8A97A8" stroke-width="15" stroke-linecap="round"/>
+  <circle cx="159" cy="97" r="11" fill="#3B4351"/>
+  <!-- dedos del saludo -->
+  <path d="M152 90 l-4 -8 M160 88 l0 -9 M168 90 l4 -8" stroke="#3B4351" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- torso: polo EcoMarket -->
+  <path d="M100 118 C 62 118 50 148 50 178 C 50 214 68 232 100 232 C 132 232 150 214 150 178 C 150 148 138 118 100 118 Z" fill="url(#polo)"/>
+  <!-- cuello del polo -->
+  <path d="M84 120 L 100 138 L 116 120 L 110 112 L 100 120 L 90 112 Z" fill="#14532D"/>
+  <!-- línea del polo -->
+  <path d="M100 140 L 100 228" stroke="#14532D" stroke-width="3" stroke-linecap="round" opacity=".55"/>
+  <!-- logo: hoja en círculo -->
+  <circle cx="100" cy="168" r="17" fill="#FFFFFF"/>
+  <path d="M100 158 C 94 162 92 170 96 177 C 100 173 102 166 100 158 Z" fill="#22C55E"/>
+  <path d="M100 158 C 104 162 106 170 102 177" fill="none" stroke="#14532D" stroke-width="2"/>
+  <text x="100" y="200" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-size="10" font-weight="700" fill="#FFFFFF" letter-spacing="1">EcoMarket</text>
+
+  <!-- mangas cortas del polo -->
+  <path d="M56 140 C 48 146 48 158 56 164 L 66 158 C 60 152 60 144 66 140 Z" fill="#16A34A"/>
+  <path d="M144 140 C 152 146 152 158 144 164 L 134 158 C 140 152 140 144 134 140 Z" fill="#16A34A"/>
+
   <!-- cabeza -->
-  <circle cx="100" cy="84" r="44" fill="url(#rgray)"/>
+  <circle cx="100" cy="72" r="42" fill="url(#rgray2)"/>
   <!-- orejas -->
-  <circle cx="66" cy="50" r="17" fill="url(#rgray)"/>
-  <circle cx="134" cy="50" r="17" fill="url(#rgray)"/>
-  <circle cx="66" cy="50" r="9" fill="#4A5568"/>
-  <circle cx="134" cy="50" r="9" fill="#4A5568"/>
-  <!-- máscara de mapache -->
-  <path d="M58 78 Q 100 58 142 78 Q 146 92 138 100 Q 100 112 62 100 Q 54 92 58 78 Z" fill="#2D3748"/>
+  <circle cx="64" cy="42" r="16" fill="url(#rgray2)"/>
+  <circle cx="136" cy="42" r="16" fill="url(#rgray2)"/>
+  <circle cx="64" cy="42" r="9" fill="#4A5568"/>
+  <circle cx="136" cy="42" r="9" fill="#4A5568"/>
+  <!-- máscara -->
+  <path d="M60 66 Q 100 48 140 66 Q 144 80 136 88 Q 100 100 64 88 Q 56 80 60 66 Z" fill="#2D3748"/>
+  <!-- cejas amigables -->
+  <path d="M74 60 Q 82 55 90 59 M110 59 Q 118 55 126 60" stroke="#2D3748" stroke-width="3.5" fill="none" stroke-linecap="round"/>
   <!-- ojos -->
-  <circle cx="82" cy="84" r="8" fill="#FFFFFF"/>
-  <circle cx="118" cy="84" r="8" fill="#FFFFFF"/>
-  <circle cx="83" cy="85" r="4" fill="#1A202C"/>
-  <circle cx="117" cy="85" r="4" fill="#1A202C"/>
-  <circle cx="84.5" cy="83" r="1.4" fill="#FFFFFF"/>
-  <circle cx="118.5" cy="83" r="1.4" fill="#FFFFFF"/>
+  <circle cx="82" cy="73" r="8.5" fill="#FFFFFF"/>
+  <circle cx="118" cy="73" r="8.5" fill="#FFFFFF"/>
+  <circle cx="83" cy="74" r="4.2" fill="#1A202C"/>
+  <circle cx="117" cy="74" r="4.2" fill="#1A202C"/>
+  <circle cx="84.5" cy="72" r="1.5" fill="#FFFFFF"/>
+  <circle cx="118.5" cy="72" r="1.5" fill="#FFFFFF"/>
   <!-- hocico -->
-  <ellipse cx="100" cy="106" rx="20" ry="13" fill="#DDE4EC"/>
-  <path d="M92 100 Q 100 95 108 100 Q 106 108 100 110 Q 94 108 92 100 Z" fill="#2D3748"/>
-  <path d="M100 110 Q 100 116 94 118 M100 110 Q 100 116 106 118" stroke="#2D3748" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-  <!-- patita con hoja -->
-  <ellipse cx="140" cy="168" rx="13" ry="10" fill="#3B4351"/>
-  <path d="M140 160 C 136 146 144 138 154 140 C 150 150 148 156 140 160 Z" fill="#22C55E"/>
-  <path d="M140 160 C 146 152 152 148 158 148" stroke="#16A34A" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <ellipse cx="100" cy="95" rx="21" ry="14" fill="#E8EDF3"/>
+  <path d="M91 88 Q 100 82 109 88 Q 107 97 100 99 Q 93 97 91 88 Z" fill="#2D3748"/>
+  <!-- sonrisa -->
+  <path d="M88 102 Q 100 112 112 102" stroke="#2D3748" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- cachetes -->
+  <circle cx="66" cy="92" r="6" fill="#F59E0B" opacity=".35"/>
+  <circle cx="134" cy="92" r="6" fill="#F59E0B" opacity=".35"/>
+  <!-- bigotes -->
+  <path d="M58 92 l-14 -3 M58 98 l-14 2 M142 92 l14 -3 M142 98 l14 2" stroke="#4A5568" stroke-width="2" stroke-linecap="round" opacity=".7"/>
 </svg>

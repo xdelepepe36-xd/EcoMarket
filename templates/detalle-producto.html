@@ -164,6 +164,11 @@ localStorage.setItem('eco_vistos',JSON.stringify(v.slice(0,8)));
             <button class="btn-secundario" onclick="contactarVendedor()" style="width:100%;margin-top:10px">
                 <i class="bi bi-chat-dots"></i> <span data-i18n="pd.contact_seller">Contactar vendedor</span>
             </button>
+            {% if producto.vendido or producto.stock <= 0 %}
+            <a href="{{ url_for('publicar') }}?categoria={{ producto.categoria }}&nombre={{ producto.nombre|urlencode }}" class="btn-secundario" style="width:100%;margin-top:8px;background:#e8f5e9;border-color:#a5d6a7;color:#2e7d32;font-weight:600">
+                <i class="bi bi-shop"></i> <span data-i18n="pd.sell_similar">Véndelo tú — publica uno igual</span>
+            </a>
+            {% endif %}
             {% if session.get('usuario_id') and session.get('usuario_id') != producto.usuario_id %}
             <button class="btn-secundario" onclick="reportarProducto()" style="width:100%;margin-top:8px;font-size:.82rem;color:#b91c1c;">
                 <i class="bi bi-flag"></i> <span data-i18n="pd.report">Reportar publicación</span>

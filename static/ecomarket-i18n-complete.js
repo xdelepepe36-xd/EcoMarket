@@ -4797,6 +4797,7 @@ const EcoI18n = {
     miscI18n: {
         es: {
             'pd.contact_seller': 'Contactar vendedor',
+            'pd.sell_similar': 'Véndelo tú — publica uno igual',
             'msg.title': 'Mensajes',
             'msg.subtitle': 'Conversaciones privadas con compradores y vendedores.',
             'msg.empty': 'Selecciona una conversación para ver los mensajes',
@@ -4812,6 +4813,7 @@ const EcoI18n = {
         },
         en: {
             'pd.contact_seller': 'Contact seller',
+            'pd.sell_similar': 'Sell it yourself — publish one',
             'msg.title': 'Messages',
             'msg.subtitle': 'Private chats with buyers and sellers.',
             'msg.empty': 'Select a conversation to view messages',
@@ -4827,6 +4829,7 @@ const EcoI18n = {
         },
         pt: {
             'pd.contact_seller': 'Contactar vendedor',
+            'pd.sell_similar': 'Venda você — publique um igual',
             'msg.title': 'Mensagens',
             'msg.subtitle': 'Conversas privadas com compradores e vendedores.',
             'msg.empty': 'Selecione uma conversa para ver as mensagens',
@@ -4842,6 +4845,7 @@ const EcoI18n = {
         },
         fr: {
             'pd.contact_seller': 'Contacter le vendeur',
+            'pd.sell_similar': 'Vendez-le vous-même — publiez-en un',
             'msg.title': 'Messages',
             'msg.subtitle': 'Discussions privées avec acheteurs et vendeurs.',
             'msg.empty': 'Sélectionnez une conversation pour voir les messages',
@@ -4857,6 +4861,7 @@ const EcoI18n = {
         },
         de: {
             'pd.contact_seller': 'Verkäufer kontaktieren',
+            'pd.sell_similar': 'Selbst verkaufen — eines inserieren',
             'msg.title': 'Nachrichten',
             'msg.subtitle': 'Private Unterhaltungen mit Käufern und Verkäufern.',
             'msg.empty': 'Wähle eine Unterhaltung, um Nachrichten zu sehen',
@@ -4872,6 +4877,7 @@ const EcoI18n = {
         },
         it: {
             'pd.contact_seller': 'Contatta il venditore',
+            'pd.sell_similar': 'Vendilo tu — pubblicane uno uguale',
             'msg.title': 'Messaggi',
             'msg.subtitle': 'Chat private con acquirenti e venditori.',
             'msg.empty': 'Seleziona una conversazione per vedere i messaggi',

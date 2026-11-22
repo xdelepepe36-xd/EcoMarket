@@ -1464,3 +1464,11 @@ select:focus-visible, textarea:focus-visible {
 @media (prefers-reduced-motion: reduce) {
     .hero-mascot, .poster-blob, .poster-glyph { animation: none; }
 }
+
+/* ══ PÁGINA DE MENSAJES ═══════════════════════════════════════ */
+#msgHilos { max-height: 560px; overflow-y: auto; }
+#msgHilos button:hover { background: rgba(46,125,50,.06) !important; }
+#msgConversacion { position: sticky; top: 90px; }
+#msgLista { background: #F6FAF6; border-radius: 0 0 18px 18px; }
+[data-theme='dark'] #msgLista { background: #141C17; }
+#msgInput:focus { outline: none; border-color: #2E7D32 !important; box-shadow: 0 0 0 3px rgba(46,125,50,.12); }

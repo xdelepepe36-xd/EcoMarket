@@ -1834,6 +1834,17 @@ def publicar():
             flash_t('datos_invalidos_pub', 'danger')
             return redirect(url_for('publicar'))
 
+        # Evitar duplicados accidentales: mismo usuario + mismo nombre (normalizado)
+        conn = get_db()
+        dup = conn.execute(
+            "SELECT id FROM productos WHERE usuario_id = ? AND LOWER(TRIM(nombre)) = LOWER(TRIM(?)) LIMIT 1",
+            (session['usuario_id'], nombre)
+        ).fetchone()
+        if dup:
+            conn.close()
+            flash('Ya tienes un producto con ese nombre. Edítalo en lugar de duplicarlo.', 'warning')
+            return redirect(url_for('publicar'))
+
         # Procesar especificaciones (formato: "clave: valor" por línea)
         especificaciones_json = ''
         if especificaciones_raw:
@@ -1845,7 +1856,6 @@ def publicar():
             if specs:
                 especificaciones_json = json.dumps(specs, ensure_ascii=False)
 
-        conn = get_db()
         cursor = conn.execute(
             'INSERT INTO productos (nombre, categoria, precio, descripcion, imagen, imagen_thumb, stock, condicion, especificaciones, usuario_id, ubicacion) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
             (nombre, categoria, precio_valor, descripcion, imagen, imagen_thumb, stock_valor, condicion, especificaciones_json, session['usuario_id'], ubicacion)

@@ -1811,3 +1811,6 @@ main, .main-content, [role='main'] {
 .prod-marquee-item img { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; background: #fff; }
 .pm-name { color: #fff; font-size: .8rem; font-weight: 600; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pm-price { color: #FDE68A; font-size: .85rem; font-weight: 800; }
+.float-chip { text-decoration: none; color: inherit; cursor: pointer; }
+.float-chip .chip-img { width: 46px; height: 46px; border-radius: 12px; object-fit: cover; border: 2px solid #fff; box-shadow: 0 3px 8px rgba(0,0,0,.15); }
+.float-chip:hover { transform: scale(1.05) rotate(0deg) !important; }

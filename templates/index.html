@@ -67,9 +67,14 @@
             <div class="poster-glyph glyph-1">✿</div>
             <div class="poster-glyph glyph-2">✦</div>
             <div class="poster-glyph glyph-3">❀</div>
-            <div class="float-chip chip-1"><span class="chip-emoji">🧺</span><div><strong>Canasta Andes</strong><small>S/. 24.90</small></div><span class="chip-badge">-15%</span></div>
-            <div class="float-chip chip-2"><span class="chip-emoji">♻️</span><div><strong>Botella Eco</strong><small>S/. 18.50</small></div><span class="chip-badge eco">Eco</span></div>
-            <div class="float-chip chip-3"><span class="chip-emoji">🌱</span><div><strong>Planta interior</strong><small>S/. 12.00</small></div><span class="chip-badge">Nuevo</span></div>
+            {% for producto in productos[:3] %}
+            {% set chip_img = producto.imagen if producto.imagen.startswith('http') else (producto.imagen if producto.imagen.startswith('/') else url_for('static', filename=producto.imagen)) %}
+            <a class="float-chip chip-{{ loop.index }}" href="{{ url_for('producto_detalle', producto_id=producto.id) }}">
+                <img class="chip-img" src="{{ chip_img }}" alt="{{ producto.nombre }}" loading="lazy" onerror="this.style.display='none'">
+                <div><strong>{{ producto.nombre }}</strong><small>S/. {{ '%.2f'|format(producto.precio) }}</small></div>
+                <span class="chip-badge eco">{{ producto.categoria[:12] }}</span>
+            </a>
+            {% endfor %}
         </div>
     </div>
 </section>

@@ -4825,6 +4825,8 @@ const EcoI18n = {
     // Traducir productos
     translateProducts() {
         document.querySelectorAll('[data-category]').forEach(element => {
+            // Solo traducir elementos de texto puro; nunca contenedores con hijos
+            if (element.children.length > 0) return;
             const category = element.dataset.category;
             const translation = this.getCategoryTranslation(category);
             if (translation) {

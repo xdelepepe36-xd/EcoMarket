@@ -71,7 +71,6 @@
                 data-id="{{ producto.id }}"
                 data-nombre="{{ producto.nombre }}"
                 data-categoria="{{ producto.categoria }}"
-                data-category="{{ producto.categoria }}"
                 data-precio="{{ '%.2f'|format(producto.precio) }}"
                 data-eco-score="{{ producto.eco_score or 0 }}"
                 data-condicion="{{ producto.condicion or 'nuevo' }}"
@@ -79,8 +78,13 @@
                 data-imagen="{{ img_src }}"
                 data-descripcion="{{ (producto.descripcion or '')[:200] }}">
                 <!-- Badge condición -->
-                <div style="position:absolute;top:12px;left:12px;z-index:2;background:{% if producto.condicion == 'nuevo' %}#2e7d32{% else %}#f59e0b{% endif %};color:#fff;padding:4px 10px;border-radius:999px;font-size:0.72rem;font-weight:700">
-                    {{ producto.condicion|upper }}
+                <div class="card-badges">
+                    <span class="card-badge {% if producto.condicion == 'nuevo' %}badge-nuevo{% else %}badge-usado{% endif %}">
+                        {{ producto.condicion|upper }}
+                    </span>
+                    {% if producto.eco_score and producto.eco_score >= 70 %}
+                    <span class="card-badge badge-eco"><i class="bi bi-recycle"></i> Eco {{ producto.eco_score }}</span>
+                    {% endif %}
                 </div>
                 {% if producto.precio_original and producto.precio_original > producto.precio %}
                 <span class="producto-descuento">-{{ ((1 - producto.precio / producto.precio_original) * 100)|round }}%</span>
@@ -100,7 +104,7 @@
                         {% endif %}
                     </div>
                     <div class="producto-body">
-                        <span class="producto-categoria">{{ producto.categoria }}</span>
+                        <span class="producto-categoria" data-category="{{ producto.categoria }}">{{ producto.categoria }}</span>
                         <h3 class="producto-nombre">{{ producto.nombre }}</h3>
                         <div class="producto-rating">
                             {% for i in range(5) %}

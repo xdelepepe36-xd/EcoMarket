@@ -637,3 +637,63 @@ main#main-content, .header, .footer {
     .categoria-icon { width: 62px; height: 62px; font-size: 1.6rem; }
     .impacto-stat { padding: 20px 14px; }
 }
+
+/* ── BADGES de card del catálogo ─────────────────────────────── */
+.card-badges {
+    position: absolute;
+    top: 12px; left: 12px; right: 12px;
+    display: flex;
+    gap: 8px;
+    z-index: 2;
+    pointer-events: none;
+}
+.card-badge {
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 700;
+    color: #fff;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 3px 10px rgba(0,0,0,.18);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.badge-nuevo { background: linear-gradient(135deg, #43A047, #2E7D32); }
+.badge-usado { background: linear-gradient(135deg, #FFB74D, #F57C00); }
+.badge-eco   { background: linear-gradient(135deg, rgba(46,125,50,.92), rgba(21,101,52,.92)); margin-left: auto; }
+.badge-eco i { color: #A5D6A7; }
+
+/* ── TOOLBAR del catálogo más limpia ─────────────────────────── */
+.catalog-toolbar {
+    gap: 14px;
+}
+.catalog-search-wrap {
+    box-shadow: 0 6px 20px rgba(20,60,35,.08);
+    border: 1px solid rgba(46,125,50,.12);
+    border-radius: 14px;
+    transition: box-shadow .3s ease, border-color .3s ease;
+}
+.catalog-search-wrap:focus-within {
+    border-color: rgba(46,125,50,.45);
+    box-shadow: 0 8px 26px rgba(46,125,50,.16);
+}
+.filter-pill {
+    border-radius: 999px;
+    transition: all .3s ease;
+}
+.filter-pill:hover { transform: translateY(-2px); }
+.filter-pill.active {
+    background: linear-gradient(135deg, #2E7D32, #43A047);
+    box-shadow: 0 6px 16px rgba(46,125,50,.3);
+}
+
+/* ── HEADER de sección catálogo conDecoración ────────────────── */
+.productos-header-section {
+    background:
+        radial-gradient(circle at 85% 20%, rgba(102,187,106,.25), transparent 45%),
+        linear-gradient(135deg, #0d2818 0%, #14532d 60%, #1b5e20 100%);
+    color: #fff;
+}
+.productos-header-section h1 { color: #fff; }
+.productos-header-section .productos-subtitle { color: rgba(255,255,255,.8); }

@@ -2349,3 +2349,51 @@ body.eco-kiosk main, body.eco-kiosk .section { animation: none; }
     background: rgba(0,0,0,.5); color: #fff; padding: 6px 16px; border-radius: 99px;
     font-size: .85rem; font-weight: 600;
 }
+
+/* ═══ Category cards con foto real ═══ */
+.categoria-card {
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+    min-height: 180px;
+    justify-content: flex-end;
+    text-align: left;
+    color: #fff;
+}
+.categoria-foto {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+.categoria-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.05) 30%, rgba(0,0,0,0.72) 100%);
+}
+.categoria-card:hover .categoria-foto { transform: scale(1.06); }
+.categoria-card .categoria-icon {
+    position: relative;
+    z-index: 2;
+    width: 46px;
+    height: 46px;
+    font-size: 1.25rem;
+    background: rgba(255,255,255,0.92);
+    color: var(--verde, #2e7d32);
+    backdrop-filter: blur(6px);
+    margin: 16px 0 0 16px;
+    align-self: flex-start;
+}
+.categoria-card .categoria-nombre {
+    position: relative;
+    z-index: 2;
+    padding: 10px 16px 14px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #fff;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+.categoria-card strong { color: #fff; }

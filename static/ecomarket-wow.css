@@ -1917,3 +1917,10 @@ main, .main-content, [role='main'] {
 }
 [data-theme='dark'] .float-chip { box-shadow: 5px 6px 0 rgba(0,0,0,.6), 0 0 20px rgba(34,197,94,.25); }
 [data-theme='dark'] .card-offer-ribbon { box-shadow: 0 4px 14px rgba(245,158,11,.5), 0 0 16px rgba(245,158,11,.3); }
+
+/* ===== Cursor personalizado de hojita ===== */
+@media (pointer: fine) {
+    body, a, button, .btn-principal, .btn-secundario, input, textarea, select, [role="button"] {
+        cursor: url('/static/assets/cursor-hoja.svg') 16 16, auto;
+    }
+}

@@ -699,6 +699,16 @@ def init_db():
             FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE CASCADE
         );
 
+        CREATE TABLE IF NOT EXISTS referidos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            referente_id INTEGER NOT NULL,
+            referido_id INTEGER NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(referido_id),
+            FOREIGN KEY (referente_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+            FOREIGN KEY (referido_id) REFERENCES usuarios(id) ON DELETE CASCADE
+        );
+
         CREATE TABLE IF NOT EXISTS trueques (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             producto_id INTEGER NOT NULL,
@@ -2832,6 +2842,35 @@ def api_reservar(producto_id):
     return jsonify({'success': True, 'hasta': hasta_str})
 
 
+@app.route('/api/notificaciones')
+@login_required
+def api_notificaciones():
+    """Últimas notificaciones del usuario para la campana del header."""
+    conn = get_db()
+    rows = conn.execute('''
+        SELECT id, titulo, mensaje, tipo, leida, created_at
+        FROM notificaciones WHERE usuario_id = ?
+        ORDER BY created_at DESC LIMIT 8
+    ''', (session['usuario_id'],)).fetchall()
+    no_leidas = conn.execute(
+        'SELECT COUNT(*) FROM notificaciones WHERE usuario_id = ? AND leida = 0',
+        (session['usuario_id'],)).fetchone()[0]
+    conn.close()
+    return jsonify({'notificaciones': [dict(r) for r in rows], 'no_leidas': no_leidas})
+
+
+@app.route('/api/referido')
+@login_required
+def api_referido():
+    """Datos del programa de referidos del usuario."""
+    uid = session['usuario_id']
+    conn = get_db()
+    total = conn.execute('SELECT COUNT(*) FROM referidos WHERE referente_id=?', (uid,)).fetchone()[0]
+    puntos = conn.execute('SELECT COALESCE(eco_puntos,0) FROM usuarios WHERE id=?', (uid,)).fetchone()[0]
+    conn.close()
+    return jsonify({'codigo': f'EC{uid}', 'total': total, 'puntos': puntos})
+
+
 @app.route('/api/mis-productos')
 @login_required
 def api_mis_productos():
@@ -3189,6 +3228,10 @@ def restablecer_password():
 def registro():
     if 'usuario_id' in session:
         return redirect(url_for('index'))
+    # Capturar código de referido ?ref=EC<id> para el registro
+    ref = request.args.get('ref') or request.form.get('ref')
+    if ref:
+        session['ref_code'] = ref
     if request.method == 'POST':
         nombre = request.form.get('nombre', '').strip()
         apellidos = request.form.get('apellidos', '').strip()
@@ -3238,6 +3281,22 @@ def registro():
             (nombre, apellidos or '', email, hashed_password, normalizar_telefono(telefono), ciudad or '', rol, None)
         )
         usuario = conn.execute('SELECT * FROM usuarios WHERE email = ?', (email,)).fetchone()
+        nuevo_id = usuario['id']
+        # Sistema de referidos: ?ref=EC<id> capturado en sesión
+        ref_code = session.pop('ref_code', '') or request.form.get('ref', '')
+        m_ref = re.match(r'EC(\d+)$', str(ref_code).strip().upper())
+        if m_ref:
+            referente_id = int(m_ref.group(1))
+            if referente_id != nuevo_id:
+                try:
+                    conn.execute('INSERT OR IGNORE INTO referidos (referente_id, referido_id) VALUES (?,?)',
+                                 (referente_id, nuevo_id))
+                    conn.execute('UPDATE usuarios SET eco_puntos = COALESCE(eco_puntos,0) + 100 WHERE id IN (?,?)',
+                                 (referente_id, nuevo_id))
+                    add_notificacion(referente_id, '🎁 ¡Alguien usó tu código!',
+                                     'Ganaste 100 pts eco porque un amigo se registró con tu código', 'success')
+                except sqlite3.IntegrityError:
+                    pass
         conn.commit()
         conn.close()
 

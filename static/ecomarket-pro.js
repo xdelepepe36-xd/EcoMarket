@@ -430,6 +430,97 @@
         window.addEventListener('pagehide', sendTime);
     }
 
+    /* ═══════════ 13. CAMPANA DE NOTIFICACIONES ═══════════ */
+    function initNotificaciones() {
+        if (!document.body.dataset.userId) return;
+        var wrap = document.querySelector('.header-container');
+        if (!wrap) return;
+        var anchor = wrap.querySelector('.theme-switcher') || wrap.lastElementChild;
+        anchor.insertAdjacentHTML('beforebegin',
+            '<div class="eco-bell-wrap">' +
+            '<button class="eco-bell-btn" id="ecoBellBtn" aria-label="Notificaciones"><i class="bi bi-bell"></i><span class="eco-bell-badge" id="ecoBellBadge" style="display:none">0</span></button>' +
+            '<div class="eco-bell-panel" id="ecoBellPanel">' +
+            '<div class="eco-bell-head"><span>🔔 Notificaciones</span><button id="ecoBellLeer">Marcar todas</button></div>' +
+            '<div id="ecoBellList"><p class="eco-bell-empty">Cargando…</p></div>' +
+            '</div></div>');
+        var badge = document.getElementById('ecoBellBadge');
+        var list = document.getElementById('ecoBellList');
+        var panel = document.getElementById('ecoBellPanel');
+        var ICONOS = { success: '✅', info: 'ℹ️', warning: '⚠️', danger: '🚨' };
+        function esc(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+        function timeAgo(ts) {
+            try {
+                var d = new Date((ts || '').replace(' ', 'T'));
+                var s = Math.floor((Date.now() - d.getTime()) / 1000);
+                if (s < 60) return 'ahora';
+                if (s < 3600) return Math.floor(s / 60) + 'm';
+                if (s < 86400) return Math.floor(s / 3600) + 'h';
+                return Math.floor(s / 86400) + 'd';
+            } catch (e) { return ''; }
+        }
+        function render(notifs) {
+            if (!notifs.length) { list.innerHTML = '<p class="eco-bell-empty">Sin notificaciones 🎉</p>'; return; }
+            list.innerHTML = notifs.map(function (n) {
+                return '<div class="eco-bell-item' + (n.leida ? '' : ' no-leida') + '" data-nid="' + n.id + '">' +
+                    '<span class="t-icon">' + (ICONOS[n.tipo] || '🔔') + '</span>' +
+                    '<div class="t-txt"><strong>' + esc(n.titulo) + '</strong><span>' + esc(n.mensaje) + '</span></div>' +
+                    '<span class="t-time">' + timeAgo(n.created_at) + '</span></div>';
+            }).join('');
+            list.querySelectorAll('.eco-bell-item').forEach(function (el) {
+                el.addEventListener('click', function () {
+                    fetch('/notificaciones/leer/' + el.dataset.nid, { method: 'POST' }).catch(function () {});
+                    el.classList.remove('no-leida');
+                });
+            });
+        }
+        function load() {
+            fetch('/api/notificaciones').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+                if (!d) return;
+                render(d.notificaciones || []);
+                badge.textContent = d.no_leidas || 0;
+                badge.style.display = d.no_leidas ? 'flex' : 'none';
+            }).catch(function () {});
+        }
+        document.getElementById('ecoBellBtn').addEventListener('click', function (e) {
+            e.stopPropagation();
+            panel.classList.toggle('open');
+            if (panel.classList.contains('open')) load();
+        });
+        document.addEventListener('click', function (e) {
+            if (!panel.contains(e.target)) panel.classList.remove('open');
+        });
+        document.getElementById('ecoBellLeer').addEventListener('click', function () {
+            fetch('/notificaciones/leer-todas', { method: 'POST' }).then(function () { load(); });
+        });
+        load();
+        setInterval(load, 60000);
+    }
+
+    /* ═══════════ 14. CARD DE REFERIDOS en perfil ═══════════ */
+    function initReferidos() {
+        if (location.pathname !== '/perfil') return;
+        var host = document.querySelector('.tab-content, .perfil-grid, .container');
+        if (!host || document.getElementById('ecoRefCard')) return;
+        fetch('/api/referido').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+            if (!d) return;
+            var card = document.createElement('div');
+            card.id = 'ecoRefCard';
+            card.className = 'eco-ref-card';
+            card.innerHTML = '<h3>🎁 Programa de referidos</h3>' +
+                '<p>Comparte tu código — si alguien se registra con él, <b>ambos ganan 100 pts eco</b> 🌱</p>' +
+                '<div class="eco-ref-row"><span class="eco-ref-code" id="ecoRefCode">' + d.codigo + '</span>' +
+                '<button class="eco-ref-btn" id="ecoRefCopy">📋 Copiar enlace</button>' +
+                '<a class="eco-ref-btn ghost" href="/registro?ref=' + d.codigo + '" style="text-decoration:none;display:inline-flex;align-items:center">Ver registro</a></div>' +
+                '<div class="eco-ref-stats"><div><b>' + d.total + '</b>amigos unidos</div><div><b>' + d.puntos + '</b>tus pts eco</div></div>';
+            host.insertBefore(card, host.firstChild);
+            document.getElementById('ecoRefCopy').addEventListener('click', function () {
+                var link = location.origin + '/registro?ref=' + d.codigo;
+                if (navigator.clipboard) navigator.clipboard.writeText(link);
+                if (window.EcoToast) EcoToast.show('📋 Copiado', 'Tu link de referido está en el portapapeles', 'success');
+            });
+        }).catch(function () {});
+    }
+
     /* ═══════════ INIT ═══════════ */
     document.addEventListener('DOMContentLoaded', function () {
         initParticles();
@@ -444,5 +535,7 @@
         initPriceAlerts();
         initLowStock();
         initEngagementAnalytics();
+        initNotificaciones();
+        initReferidos();
     });
 })();

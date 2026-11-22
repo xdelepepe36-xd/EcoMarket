@@ -4452,6 +4452,8 @@ const EcoI18n = {
             this.translations[l] = Object.assign({}, this.translations['en'] || {}, this.translations[l] || {});
         });
         this.currentLang = localStorage.getItem('ecomarket-lang') || 'es';
+        document.documentElement.lang = this.currentLang;
+        document.documentElement.dir = this.isRTL(this.currentLang) ? 'rtl' : 'ltr';
 
         this.initLanguageSelector();
         this.initAutoDetect();

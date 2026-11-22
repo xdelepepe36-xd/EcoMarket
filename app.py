@@ -5023,19 +5023,6 @@ def get_leaderboard():
         'compradores': [dict(c) for c in compradores]
     })
 
-@app.route('/api/cupones/disponibles')
-def get_available_coupons():
-    """API para obtener cupones disponibles."""
-    conn = get_db()
-    cupones = conn.execute('''
-        SELECT * FROM cupones
-        WHERE activo = 1 AND usos_actuales < usos_maximos
-        ORDER BY descuento DESC
-    ''').fetchall()
-    conn.close()
-    
-    return jsonify({'cupones': [dict(c) for c in cupones]})
-
 @app.route('/api/cupones/aplicar', methods=['POST'])
 @login_required
 def apply_coupon():

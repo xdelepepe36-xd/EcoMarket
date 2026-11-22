@@ -2078,3 +2078,64 @@ body.tour-active .hero-mascot { filter: drop-shadow(0 0 34px rgba(34,197,94,.7))
     .auth-brand { display: none; }
     .auth-card { border-radius: 26px; box-shadow: none; }
 }
+
+/* ===== Pulido global nivel universidad ===== */
+/* Headers de página con presencia */
+.page-header, .section-header { position: relative; }
+.page-header::after, .section-header::after {
+    content: ''; position: absolute; left: 0; bottom: -10px; width: 64px; height: 5px;
+    border-radius: 99px; background: linear-gradient(90deg, #22C55E, #F59E0B);
+}
+/* Cards y paneles: profundidad consistente */
+.product-card, .card, .form-card, .panel, .stat-card {
+    transition: transform .3s cubic-bezier(.2,.8,.3,1), box-shadow .3s ease;
+}
+.product-card:hover, .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 40px -12px rgba(20,83,45,.28), 0 4px 12px rgba(0,0,0,.08);
+}
+/* Botones con micro-interacción */
+.btn-principal, .btn-secundario, button[type='submit'] {
+    position: relative; overflow: hidden;
+    transition: transform .18s ease, box-shadow .25s ease, filter .2s;
+}
+.btn-principal:hover, .btn-secundario:hover, button[type='submit']:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px -8px rgba(34,197,94,.55);
+}
+.btn-principal:active, .btn-secundario:active { transform: translateY(0) scale(.98); }
+/* Inputs con foco verde brillante */
+input:focus, textarea:focus, select:focus {
+    border-color: #22C55E !important;
+    box-shadow: 0 0 0 4px rgba(34,197,94,.18) !important;
+    outline: none;
+}
+/* Scrollbar personalizada */
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: linear-gradient(#22C55E,#14532D); border-radius: 99px; border: 3px solid transparent; background-clip: content-box; }
+/* Selección de texto */
+::selection { background: #22C55E; color: #fff; }
+/* Tablas y listas con aire */
+table { border-collapse: separate; border-spacing: 0 6px; }
+th { text-transform: uppercase; letter-spacing: .6px; font-size: .78rem; color: #6b7280; }
+/* Badges y pills con gradiente */
+.badge, .pill, .tag {
+    background: linear-gradient(135deg, #14532D, #22C55E);
+    color: #fff; border-radius: 99px; padding: 4px 12px; font-weight: 600;
+}
+/* Links con subrayado animado */
+a:not(.btn-principal):not(.btn-secundario) { text-decoration: none; }
+nav a, .nav a { position: relative; }
+nav a::after, .nav a::after {
+    content: ''; position: absolute; left: 0; bottom: -4px; width: 0; height: 2px;
+    background: #F59E0B; border-radius: 2px; transition: width .25s ease;
+}
+nav a:hover::after, .nav a:hover::after { width: 100%; }
+/* Modo oscuro: resplandor sutil en el body */
+[data-theme='dark'] body {
+    background:
+        radial-gradient(60% 40% at 85% -5%, rgba(34,197,94,.14), transparent 60%),
+        radial-gradient(50% 35% at 5% 10%, rgba(245,158,11,.08), transparent 60%),
+        var(--bg, #0b1220);
+}

@@ -75,6 +75,28 @@
 </section>
 
 <!-- 2. BARRA DE BÚSQUEDA -->
+<!-- MARQUESINA DE PRODUCTOS -->
+<div class="prod-marquee" aria-hidden="true">
+    <div class="prod-marquee-track">
+        {% for producto in productos[:10] %}
+        {% set mimg = producto.imagen if producto.imagen.startswith('http') else (producto.imagen if producto.imagen.startswith('/') else url_for('static', filename=producto.imagen)) %}
+        <a class="prod-marquee-item" href="{{ url_for('producto_detalle', producto_id=producto.id) }}">
+            <img src="{{ mimg }}" alt="{{ producto.nombre }}" loading="lazy" onerror="this.style.display='none'">
+            <span class="pm-name">{{ producto.nombre }}</span>
+            <span class="pm-price">S/. {{ '%.2f'|format(producto.precio) }}</span>
+        </a>
+        {% endfor %}
+        {% for producto in productos[:10] %}
+        {% set mimg = producto.imagen if producto.imagen.startswith('http') else (producto.imagen if producto.imagen.startswith('/') else url_for('static', filename=producto.imagen)) %}
+        <a class="prod-marquee-item" href="{{ url_for('producto_detalle', producto_id=producto.id) }}">
+            <img src="{{ mimg }}" alt="{{ producto.nombre }}" loading="lazy" onerror="this.style.display='none'">
+            <span class="pm-name">{{ producto.nombre }}</span>
+            <span class="pm-price">S/. {{ '%.2f'|format(producto.precio) }}</span>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
 <section class="search-bar-section">
     <div class="container">
         <div class="search-bar">

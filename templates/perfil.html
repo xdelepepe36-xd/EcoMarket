@@ -80,6 +80,7 @@
             <button class="tab-btn" onclick="setTab(event,'favoritos')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-heart"></i> <span data-i18n="profile.tab_favorites">Favoritos</span> ({{ favoritos|length }})</button>
             <button class="tab-btn" onclick="setTab(event,'resenas')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-star"></i> <span data-i18n="profile.tab_reviews">Mis reseñas</span> ({{ resenas|length }})</button>
             <button class="tab-btn" onclick="setTab(event,'pedidos')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-bag-check"></i> <span data-i18n="profile.tab_orders">Pedidos</span> ({{ pedidos|length }})</button>
+            <button class="tab-btn" onclick="setTab(event,'notificaciones')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-bell"></i> <span data-i18n="profile.tab_notifications">Notificaciones</span> {% if notificaciones %}<span style="background:#e53935;color:#fff;border-radius:999px;font-size:.68rem;padding:1px 7px">{{ notificaciones|length }}</span>{% endif %}</button>
             <button class="tab-btn" onclick="setTab(event,'config')" style="padding:12px 20px;border:none;background:none;font-family:inherit;font-weight:700;font-size:0.9rem;color:var(--texto);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s"><i class="bi bi-gear"></i> <span data-i18n="profile.tab_settings">Configuración</span></button>
         </div>
 
@@ -247,6 +248,42 @@
                 {% endfor %}
             </div>
             {% endif %}
+        </div>
+        <div id="tab-notificaciones" class="tab-content" style="display:none">
+            <div style="background:var(--blanco);border-radius:20px;padding:24px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+                    <h3 style="margin:0;font-size:1.1rem;"><i class="bi bi-bell"></i> <span data-i18n="profile.notifications">Notificaciones</span></h3>
+                    {% if notificaciones %}
+                    <form method="POST" action="{{ url_for('marcar_todas_leidas') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn-secundario" style="padding:8px 16px;font-size:.82rem"><i class="bi bi-check2-all"></i> Marcar todas como leídas</button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% if notificaciones %}
+                <div style="display:flex;flex-direction:column;gap:10px">
+                    {% for n in notificaciones %}
+                    <div style="display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:14px;background:rgba(46,125,50,.05);border:1px solid rgba(46,125,50,.1)">
+                        <div style="font-size:1.3rem">{% if n.tipo == 'success' %}✅{% elif n.tipo == 'warning' %}⚠️{% elif n.tipo == 'danger' %}🚨{% else %}🔔{% endif %}</div>
+                        <div style="flex:1">
+                            <strong style="font-size:.9rem">{{ n.titulo }}</strong>
+                            <div style="font-size:.85rem;color:var(--texto-sec,#666);margin-top:2px">{{ n.mensaje }}</div>
+                            <div style="font-size:.72rem;color:var(--texto-sec,#999);margin-top:4px">{{ n.created_at[:16] }}</div>
+                        </div>
+                        <form method="POST" action="{{ url_for('marcar_notificacion_leida', notif_id=n.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn-secundario" style="padding:5px 12px;font-size:.75rem" title="Marcar como leída"><i class="bi bi-check"></i></button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div style="text-align:center;padding:40px;color:var(--texto-sec,#888)">
+                    <i class="bi bi-bell-slash" style="font-size:2.4rem;display:block;margin-bottom:10px;opacity:.4"></i>
+                    <span data-i18n="profile.no_notifications">No tienes notificaciones nuevas</span>
+                </div>
+                {% endif %}
+            </div>
         </div>
         <div id="tab-config" class="tab-content" style="display:none">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">

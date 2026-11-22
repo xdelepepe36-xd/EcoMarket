@@ -258,10 +258,22 @@ ITEMS_PER_PAGE_SMALL = 6  # Para móviles y carga rápida
 @app.context_processor
 def inject_globals():
     """Variables disponibles en todas las plantillas."""
+    no_leidas = 0
+    if session.get('usuario_id'):
+        try:
+            conn = get_db()
+            no_leidas = conn.execute(
+                'SELECT COUNT(*) FROM notificaciones WHERE usuario_id = ? AND leida = 0',
+                (session['usuario_id'],)
+            ).fetchone()[0]
+            conn.close()
+        except Exception:
+            pass
     return {
         'google_client_id': os.environ.get('GOOGLE_CLIENT_ID', ''),
         'SITIO_NOMBRE': 'EcoMarket',
         'ANIO_ACTUAL': datetime.now().year,
+        'notificaciones_no_leidas': no_leidas,
     }
 
 # Imágenes por defecto para productos (Unsplash)

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}EcoMarket - {{ u.nombre }}{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container" style="max-width:720px">
+        <div class="eco-pub-profile">
+            <div class="eco-pub-cover"></div>
+            <div class="eco-pub-head">
+                <div class="eco-pub-avatar" style="background:{{ u.avatar_color or 'linear-gradient(135deg,#166534,#22C55E)' }}">
+                    {% if u.avatar %}<img src="{{ url_for('static', filename=u.avatar) }}" alt="">{% else %}{{ u.nombre[0]|upper }}{% endif %}
+                </div>
+                <div class="eco-pub-info">
+                    <h2>{{ u.nombre }} {% if u.verificado %}<span class="eco-verified" title="Email verificado">✓</span>{% endif %}</h2>
+                    <p class="eco-pub-meta">
+                        {% if u.ciudad %}📍 {{ u.ciudad }} · {% endif %}
+                        🌱 Miembro desde {{ u.created_at[:4] }} · Nivel {{ u.nivel or 1 }}{% if u.rango %} · {{ u.rango }}{% endif %}
+                    </p>
+                    {% if u.bio %}<p class="eco-pub-bio">{{ u.bio }}</p>{% endif %}
+                </div>
+            </div>
+            <div class="eco-pub-stats">
+                <div><b>{{ u.eco_puntos }}</b><span>pts eco</span></div>
+                <div><b>{{ stats.productos }}</b><span>publicados</span></div>
+                <div><b>{{ stats.ventas }}</b><span>vendidos</span></div>
+                <div><b>{{ stats.resenas }}</b><span>reseñas</span></div>
+                <div><b>{{ stats.referidos }}</b><span>amigos</span></div>
+            </div>
+        </div>
+
+        {% if productos %}
+        <h3 style="margin:26px 0 14px">🛍️ Productos de {{ u.nombre.split(' ')[0] }}</h3>
+        <div class="productos-grid">
+            {% for p in productos %}
+            <article class="producto-card">
+                <a href="{{ url_for('producto_detalle', producto_id=p.id) }}" style="text-decoration:none;color:inherit">
+                    <div class="producto-img-container">
+                        <img class="producto-img-real" src="{{ p.imagen if p.imagen.startswith('http') or p.imagen.startswith('/') else url_for('static', filename=p.imagen) }}" alt="{{ p.nombre }}" loading="lazy" onerror="this.style.display='none'">
+                    </div>
+                    <div class="producto-body">
+                        <span class="producto-categoria" style="color:#2e7d32">{{ p.categoria }}</span>
+                        <h3 class="producto-nombre">{{ p.nombre }}</h3>
+                        <strong class="producto-precio">S/. {{ '%.2f'|format(p.precio) }}</strong>
+                    </div>
+                </a>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="text-align:center;color:var(--texto-sec);margin-top:30px">Aún no tiene productos publicados.</p>
+        {% endif %}
+    </div>
+</section>
+<style>
+.eco-pub-profile { background:var(--blanco,#fff); border-radius:20px; overflow:hidden; border:1px solid rgba(46,125,50,.12); box-shadow:0 4px 20px rgba(0,0,0,.06); }
+.eco-pub-cover { height:90px; background:linear-gradient(120deg,#14532d,#22C55E,#86efac); }
+.eco-pub-head { display:flex; gap:16px; padding:0 22px 18px; margin-top:-34px; align-items:flex-end; }
+.eco-pub-avatar { width:76px; height:76px; border-radius:50%; border:4px solid var(--blanco,#fff); display:flex; align-items:center; justify-content:center; font-size:1.8rem; font-weight:800; color:#fff; overflow:hidden; flex-shrink:0; box-shadow:0 4px 12px rgba(0,0,0,.15); }
+.eco-pub-avatar img { width:100%; height:100%; object-fit:cover; }
+.eco-pub-info h2 { margin:0; font-size:1.3rem; }
+.eco-verified { color:#1976d2; font-size:1.1rem; }
+.eco-pub-meta { margin:4px 0 0; font-size:.8rem; color:var(--texto-sec,#666); }
+.eco-pub-bio { margin:8px 0 0; font-size:.88rem; color:var(--texto-sec,#555); }
+.eco-pub-stats { display:flex; gap:0; border-top:1px solid rgba(46,125,50,.1); }
+.eco-pub-stats div { flex:1; text-align:center; padding:14px 6px; border-right:1px solid rgba(46,125,50,.08); }
+.eco-pub-stats div:last-child { border-right:none; }
+.eco-pub-stats b { display:block; font-size:1.15rem; color:#166534; }
+.eco-pub-stats span { font-size:.7rem; color:var(--texto-sec,#666); text-transform:uppercase; letter-spacing:.5px; }
+</style>
+{% endblock %}

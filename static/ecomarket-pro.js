@@ -521,6 +521,81 @@
         }).catch(function () {});
     }
 
+    /* ═══════════ 15. MONEDERO ECOCOINS en perfil ═══════════ */
+    function initMonedero() {
+        if (location.pathname !== '/perfil') return;
+        var host = document.querySelector('.tab-content, .perfil-grid, .container');
+        if (!host || document.getElementById('ecoWallet')) return;
+        fetch('/api/mis-cupones').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+            if (!d) return;
+            var card = document.createElement('div');
+            card.id = 'ecoWallet';
+            card.className = 'eco-ref-card';
+            card.style.background = 'linear-gradient(135deg,#fffbeb,#fef3c7)';
+            card.style.borderColor = '#f59e0b88';
+            var canjes = Object.keys(d.canjes || {}).map(function (p) {
+                return '<button class="eco-ref-btn" style="background:linear-gradient(135deg,#b45309,#f59e0b)" onclick="canjearEco(' + p + ')">🎟️ ' + p + ' pts → -' + d.canjes[p] + '%</button>';
+            }).join('');
+            card.innerHTML = '<h3 style="color:#92400e">🪙 Monedero EcoCoins</h3>' +
+                '<p style="color:#92400ecc">Tienes <b>' + d.puntos + ' pts eco</b> — canjéalos por cupones de descuento:</p>' +
+                '<div class="eco-ref-row">' + canjes + '</div>' +
+                '<div id="ecoMisCupones" style="margin-top:14px"></div>';
+            host.insertBefore(card, host.firstChild);
+            pintarCupones(d.cupones || []);
+        }).catch(function () {});
+    }
+    function pintarCupones(cupones) {
+        var host = document.getElementById('ecoMisCupones');
+        if (!host) return;
+        if (!cupones.length) { host.innerHTML = '<p style="font-size:.82rem;color:#92400e99">Aún no tienes cupones canjeados.</p>'; return; }
+        host.innerHTML = '<p style="font-size:.8rem;font-weight:700;color:#92400e;margin-bottom:8px">Tus cupones:</p>' + cupones.map(function (c) {
+            var vivo = !c.expira || new Date(c.expira.replace(' ', 'T')) > new Date();
+            return '<div style="display:flex;align-items:center;gap:10px;background:#fff;border:1.5px dashed #f59e0b;border-radius:12px;padding:10px 14px;margin-bottom:8px">' +
+                '<span style="font-family:monospace;font-weight:800;color:#b45309">' + c.codigo + '</span>' +
+                '<span style="font-size:.85rem;color:#166534;font-weight:700">-' + c.descuento + c.tipo + '</span>' +
+                '<span style="font-size:.72rem;color:#92400e99;margin-left:auto">' + (vivo ? 'válido hasta ' + (c.expira || '').slice(0, 10) : 'vencido') + '</span>' +
+                '<button class="eco-ref-btn ghost" style="padding:5px 12px;font-size:.75rem" onclick="copiarCupon(\'' + c.codigo + '\')">📋</button></div>';
+        }).join('');
+    }
+    window.canjearEco = function (puntos) {
+        fetch('/api/canjear-cupon', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ puntos: puntos }) })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                if (d.success) {
+                    if (window.EcoToast) EcoToast.show('🎟️ ¡Cupón listo!', d.codigo + ' (-' + d.descuento + '%) — cópialo en tu monedero', 'success', 6000);
+                    initMonederoRefresh();
+                } else { alert(d.error || 'No se pudo canjear'); }
+            }).catch(function () { alert('Error de conexión'); });
+    };
+    function initMonederoRefresh() {
+        var old = document.getElementById('ecoWallet');
+        if (old) old.remove();
+        initMonedero();
+    }
+    window.copiarCupon = function (codigo) {
+        if (navigator.clipboard) navigator.clipboard.writeText(codigo);
+        if (window.EcoToast) EcoToast.show('📋 Copiado', codigo, 'success', 2000);
+    };
+
+    /* ═══════════ 16. BÚSQUEDAS RECIENTES chips ═══════════ */
+    function initBusquedasRecientes() {
+        if (location.pathname !== '/productos' || !document.body.dataset.userId) return;
+        var input = document.querySelector('#busquedaInput, input[name="q"], .search-input input, form[action*="productos"] input[type="text"], form[action*="productos"] input[type="search"]');
+        if (!input || document.getElementById('ecoRecentSearches')) return;
+        fetch('/api/busquedas-recientes').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+            if (!d || !d.busquedas.length) return;
+            var bar = document.createElement('div');
+            bar.id = 'ecoRecentSearches';
+            bar.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0 4px';
+            bar.innerHTML = '<span style="font-size:.78rem;color:var(--texto-sec,#666)">🕘 Recientes:</span>' +
+                d.busquedas.map(function (t) {
+                    return '<a href="/productos?q=' + encodeURIComponent(t) + '" class="filter-pill" style="font-size:.78rem;padding:5px 14px">' + t + '</a>';
+                }).join('');
+            var form = input.closest('form') || input.parentElement;
+            form.parentNode.insertBefore(bar, form.nextSibling);
+        }).catch(function () {});
+    }
+
     /* ═══════════ INIT ═══════════ */
     document.addEventListener('DOMContentLoaded', function () {
         initParticles();
@@ -537,5 +612,7 @@
         initEngagementAnalytics();
         initNotificaciones();
         initReferidos();
+        initMonedero();
+        initBusquedasRecientes();
     });
 })();

@@ -1082,6 +1082,13 @@ def init_db():
     except sqlite3.OperationalError:
         pass
 
+    # Cupones personales (canje de puntos eco)
+    try:
+        conn.execute('ALTER TABLE cupones ADD COLUMN propietario_id INTEGER DEFAULT 0')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
     # Agregar columna imagen_thumb a producto_imagenes si no existe
     try:
         conn.execute('ALTER TABLE producto_imagenes ADD COLUMN imagen_thumb TEXT DEFAULT ""')
@@ -2857,6 +2864,91 @@ def api_notificaciones():
         (session['usuario_id'],)).fetchone()[0]
     conn.close()
     return jsonify({'notificaciones': [dict(r) for r in rows], 'no_leidas': no_leidas})
+
+
+# ── Monedero EcoCoins: canje de puntos por cupones ─────────────────
+
+CANJES = {500: 10, 1000: 15, 2000: 25}  # puntos -> % descuento
+
+@app.route('/api/canjear-cupon', methods=['POST'])
+@login_required
+def api_canjear_cupon():
+    """Canjea eco_puntos por un cupón personal de descuento."""
+    data = request.get_json(silent=True) or {}
+    puntos = int(data.get('puntos') or 0)
+    if puntos not in CANJES:
+        return jsonify({'error': 'Opción de canje inválida'}), 400
+    uid = session['usuario_id']
+    conn = get_db()
+    u = conn.execute('SELECT COALESCE(eco_puntos,0) AS pts FROM usuarios WHERE id=?', (uid,)).fetchone()
+    if not u or u['pts'] < puntos:
+        conn.close()
+        return jsonify({'error': f'Necesitas {puntos} pts eco (tienes {u["pts"] if u else 0})'}), 400
+    codigo = 'ECOM-' + secrets.token_hex(4).upper()
+    expira = (datetime.now() + timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')
+    conn.execute(
+        'INSERT INTO cupones (codigo, descuento, tipo, minimo, usos_maximos, usos_actuales, expira, activo, propietario_id) VALUES (?,?,?,?,?,?,?,?,?)',
+        (codigo, CANJES[puntos], '%', 20, 1, 0, expira, 1, uid))
+    conn.execute('UPDATE usuarios SET eco_puntos = COALESCE(eco_puntos,0) - ? WHERE id=?', (puntos, uid))
+    conn.commit()
+    conn.close()
+    add_notificacion(uid, '🎟️ ¡Cupón canjeado!', f'Tu código {codigo} (-{CANJES[puntos]}%) ya está en tu monedero', 'success')
+    return jsonify({'success': True, 'codigo': codigo, 'descuento': CANJES[puntos], 'puntos_restantes': u['pts'] - puntos})
+
+
+@app.route('/api/mis-cupones')
+@login_required
+def api_mis_cupones():
+    """Cupones personales del usuario (canjeados con puntos)."""
+    conn = get_db()
+    rows = conn.execute('''
+        SELECT codigo, descuento, tipo, expira, usos_actuales, usos_maximos
+        FROM cupones WHERE propietario_id = ? AND activo = 1 ORDER BY id DESC LIMIT 20
+    ''', (session['usuario_id'],)).fetchall()
+    puntos = conn.execute('SELECT COALESCE(eco_puntos,0) FROM usuarios WHERE id=?',
+                          (session['usuario_id'],)).fetchone()[0]
+    conn.close()
+    return jsonify({'cupones': [dict(r) for r in rows], 'puntos': puntos, 'canjes': CANJES})
+
+
+@app.route('/api/busquedas-recientes')
+@login_required
+def api_busquedas_recientes():
+    """Últimas búsquedas del usuario para chips de búsqueda rápida."""
+    conn = get_db()
+    rows = conn.execute('''
+        SELECT termino, MAX(created_at) AS ultima FROM historial_busquedas
+        WHERE usuario_id = ? GROUP BY LOWER(termino) ORDER BY ultima DESC LIMIT 6
+    ''', (session['usuario_id'],)).fetchall()
+    conn.close()
+    return jsonify({'busquedas': [r['termino'] for r in rows]})
+
+
+@app.route('/usuario/<int:usuario_id>')
+def perfil_publico(usuario_id):
+    """Perfil público ecológico de un usuario."""
+    conn = get_db()
+    u = conn.execute('''
+        SELECT id, nombre, avatar, avatar_color, bio, ciudad, created_at,
+               COALESCE(eco_puntos,0) AS eco_puntos, COALESCE(xp,0) AS xp, nivel, rango,
+               COALESCE(email_verificado,0) AS verificado
+        FROM usuarios WHERE id = ?
+    ''', (usuario_id,)).fetchone()
+    if not u:
+        conn.close()
+        return render_template('404.html'), 404
+    stats = {
+        'productos': conn.execute('SELECT COUNT(*) FROM productos WHERE usuario_id=?', (usuario_id,)).fetchone()[0],
+        'ventas': conn.execute('SELECT COUNT(*) FROM productos WHERE usuario_id=? AND vendido=1', (usuario_id,)).fetchone()[0],
+        'resenas': conn.execute('SELECT COUNT(*) FROM resenas r JOIN productos p ON p.id=r.producto_id WHERE p.usuario_id=?', (usuario_id,)).fetchone()[0],
+        'referidos': conn.execute('SELECT COUNT(*) FROM referidos WHERE referente_id=?', (usuario_id,)).fetchone()[0],
+    }
+    recientes = conn.execute('''
+        SELECT id, nombre, precio, imagen, categoria FROM productos
+        WHERE usuario_id=? AND COALESCE(vendido,0)=0 ORDER BY created_at DESC LIMIT 6
+    ''', (usuario_id,)).fetchall()
+    conn.close()
+    return render_template('perfil_publico.html', u=dict(u), stats=stats, productos=[dict(r) for r in recientes])
 
 
 @app.route('/api/referido')
@@ -6027,6 +6119,11 @@ def apply_coupon():
         conn.close()
         return jsonify({'error': 'Invalid or expired coupon'}), 400
     
+    # Cupón personal: solo su dueño puede usarlo
+    if cupon['propietario_id'] and cupon['propietario_id'] != session.get('usuario_id'):
+        conn.close()
+        return jsonify({'error': 'Este cupón no es tuyo'}), 403
+
     conn.close()
     
     return jsonify({
@@ -6034,7 +6131,7 @@ def apply_coupon():
         'cupon': dict(cupon),
         'descuento': cupon['descuento'],
         'tipo': cupon['tipo']
-    })()
+    })
 
 def validate_product_data(data):
     """Valida datos de producto de forma más estricta."""

@@ -2621,7 +2621,7 @@ const EcoQuickView = {
                 <div class="modal-body">
                     <div class="quick-view-modal">
                         <div class="quick-view-image">
-                            <img data-src="" alt="Producto">
+                            <img data-src="" src="/static/assets/product-placeholder.svg" alt="Producto">
                         </div>
                         <div class="quick-view-info">
                             <h3 class="product-name"></h3>

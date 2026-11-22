@@ -2289,6 +2289,27 @@ def api_recommendations():
     return jsonify({'products': _productos_api_json(limit=12, exclude=excl.split(','))})
 
 
+@app.route('/comparar')
+def comparar_view():
+    """Página del comparador visual de productos."""
+    registrar_visita('comparar')
+    conn = get_db()
+    rows = conn.execute(
+        "SELECT id, nombre, categoria, precio, precio_original, imagen, stock, condicion, eco_score, vistas, descripcion, ubicacion "
+        "FROM productos WHERE COALESCE(vendido,0) = 0 ORDER BY nombre LIMIT 300"
+    ).fetchall()
+    conn.close()
+    prods = [{
+        'id': r['id'], 'nombre': r['nombre'], 'categoria': r['categoria'],
+        'precio': r['precio'] or 0, 'precio_original': r['precio_original'],
+        'imagen': r['imagen'] or '', 'stock': r['stock'] or 0,
+        'condicion': r['condicion'] or '', 'eco_score': r['eco_score'] or 0,
+        'vistas': r['vistas'] or 0, 'descripcion': (r['descripcion'] or '')[:220],
+        'ubicacion': r['ubicacion'] or '',
+    } for r in rows]
+    return render_template('compare.html', productos_json=prods)
+
+
 @app.route('/api/compare', methods=['POST'])
 def api_compare():
     data = request.get_json() or {}

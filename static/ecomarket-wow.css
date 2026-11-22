@@ -2200,3 +2200,28 @@ nav a:hover::after, .nav a:hover::after { width: 100%; }
     to { transform: scale(2.4); opacity: 0; }
 }
 .btn-principal, .btn-secundario, button[type='submit'], .btn-hero, .theme-switcher { position: relative; overflow: hidden; }
+
+/* ===== Comparador visual ===== */
+.cmp-table { display: grid; gap: 10px; width: 100%; }
+.cmp-row { display: contents; }
+.cmp-label { font-weight: 700; font-size: .85rem; color: var(--texto-secundario, #64748b); padding: 12px 8px; align-self: center; }
+.cmp-cell { background: var(--blanco, #fff); border: 1px solid #e5e7eb; border-radius: 14px; padding: 14px; text-align: center; font-size: .92rem; }
+.cmp-head { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.cmp-head img { width: 110px; height: 110px; object-fit: cover; border-radius: 14px; }
+.cmp-name { font-weight: 700; font-size: 1rem; }
+.cmp-best { background: #f0fdf4; border-color: #22C55E; box-shadow: 0 0 0 2px rgba(34,197,94,.25); }
+[data-theme='dark'] .cmp-cell, [data-theme='nature'] .cmp-cell, [data-theme='ocean'] .cmp-cell,
+[data-theme='midnight'] .cmp-cell, [data-theme='rose'] .cmp-cell { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.14); color: #E8F0E8; }
+[data-theme='dark'] .cmp-label, [data-theme='nature'] .cmp-label, [data-theme='ocean'] .cmp-label,
+[data-theme='midnight'] .cmp-label, [data-theme='rose'] .cmp-label { color: #9DB8A4; }
+.cmp-score-list { display: grid; gap: 14px; }
+.cmp-score-card { display: flex; align-items: center; gap: 16px; background: var(--blanco,#fff); border:1px solid #e5e7eb; border-radius: 16px; padding: 16px 20px; }
+.cmp-score-card img { width: 64px; height: 64px; object-fit: cover; border-radius: 12px; }
+.cmp-score-rank { font-weight: 800; color: #14532D; }
+.cmp-score-info { flex: 1; }
+.cmp-score-bar { flex: 1; height: 14px; background: #e5e7eb; border-radius: 99px; overflow: hidden; position: relative; min-width: 120px; }
+.cmp-score-bar div { height: 100%; background: linear-gradient(90deg,#22C55E,#4ADE80); border-radius: 99px; transition: width .6s ease; }
+.cmp-score-bar span { position: absolute; right: 8px; top: 0; font-size: .72rem; font-weight: 700; color: #14532D; line-height: 14px; }
+[data-theme='dark'] .cmp-score-card, [data-theme='nature'] .cmp-score-card, [data-theme='ocean'] .cmp-score-card,
+[data-theme='midnight'] .cmp-score-card, [data-theme='rose'] .cmp-score-card { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.14); }
+@media (max-width: 768px) { .cmp-score-card { flex-wrap: wrap; } }

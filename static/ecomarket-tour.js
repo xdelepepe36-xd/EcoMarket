@@ -10,7 +10,7 @@
         { sel: '.lang-switcher', t: '6 idiomas + modo oscuro', txt: 'Todo el sitio traducido y con tema oscuro cinematográfico.' },
         { sel: '.footer, footer', t: 'Todo incluido', txt: 'Pagos, envíos, mensajería privada, cupones, XP y panel de vendedor.' }
     ];
-    var overlay, hole, tip, idx = 0, btn;
+    var overlay, hole, tip, idx = 0, btn, pending = null;
 
     function build() {
         overlay = document.createElement('div'); overlay.className = 'tour-overlay';
@@ -26,7 +26,8 @@
         var el = document.querySelector(p.sel);
         if (!el) { next(); return; }
         el.scrollIntoView({ behavior: 'auto', block: 'center' });
-        setTimeout(function () {
+        if (pending) { clearTimeout(pending); pending = null; }
+        pending = setTimeout(function () { pending = null;
             var r = el.getBoundingClientRect();
             hole.style.cssText = 'position:fixed;left:' + (r.left - 8) + 'px;top:' + (r.top - 8) +
                 'px;width:' + (r.width + 16) + 'px;height:' + (r.height + 16) + 'px;' +
@@ -47,7 +48,13 @@
         }, 450);
     }
     function start() { if (!overlay) build(); document.body.classList.add('tour-active'); overlay.style.display = 'block'; show(0); }
-    function stop() { document.body.classList.remove('tour-active'); overlay.style.display = 'none'; }
+    function stop() {
+        if (pending) { clearTimeout(pending); pending = null; }
+        document.body.classList.remove('tour-active');
+        if (overlay) overlay.style.display = 'none';
+        // limpieza extra: por si quedó alguna sombra/overlay residual
+        document.querySelectorAll('.tour-hole').forEach(function (h) { h.removeAttribute('style'); });
+    }
     function next() { if (idx < PASOS.length - 1) show(idx + 1); else stop(); }
 
     window.EcoTour = { start: start, stop: stop };

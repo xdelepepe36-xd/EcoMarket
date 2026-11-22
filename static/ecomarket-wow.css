@@ -1924,3 +1924,10 @@ main, .main-content, [role='main'] {
         cursor: url('/static/assets/cursor-hoja.svg') 16 16, auto;
     }
 }
+
+/* ===== Rating con estrellas en cards ===== */
+.product-card .product-rating, .card-rating {
+    display: inline-flex; align-items: center; gap: 3px;
+    color: #F59E0B; font-size: .8rem; letter-spacing: 1px;
+}
+.product-card .rating-count { color: #9CA3AF; font-size: .72rem; margin-left: 4px; }

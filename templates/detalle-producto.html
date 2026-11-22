@@ -363,7 +363,7 @@ localStorage.setItem('eco_vistos',JSON.stringify(v.slice(0,8)));
     <!-- PRODUCTOS RELACIONADOS -->
     {% if relacionados %}
     <div class="container" style="margin-top:48px">
-        <h3 style="font-size:1.4rem;color:var(--verde);margin-bottom:24px"><span data-i18n="pd.related">🔄 Productos relacionados</span></h3>
+        <h3 style="font-size:1.4rem;color:var(--verde);margin-bottom:24px"><span data-i18n="pd.related_x">✨ Porque viste esto también</span></h3>
         <div class="productos-grid">
             {% for r in relacionados %}
             <a href="{{ url_for('producto_detalle', producto_id=r.id) }}" class="producto-card" style="text-decoration:none;color:inherit">

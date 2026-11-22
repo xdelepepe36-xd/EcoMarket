@@ -4759,6 +4759,8 @@ const EcoI18n = {
             'pd.msg_title': 'Escribir al vendedor',
             'pd.msg_placeholder': 'Escribe tu mensaje...',
             'pd.msg_send': 'Enviar',
+            'pd.sold': 'Vendido',
+            'pd.sold_out': 'Producto vendido',
         },
         en: {
             'pd.contact_seller': 'Contact seller',
@@ -4772,6 +4774,8 @@ const EcoI18n = {
             'pd.msg_title': 'Message the seller',
             'pd.msg_placeholder': 'Write your message...',
             'pd.msg_send': 'Send',
+            'pd.sold': 'Sold',
+            'pd.sold_out': 'Sold product',
         },
         pt: {
             'pd.contact_seller': 'Contactar vendedor',
@@ -4785,6 +4789,8 @@ const EcoI18n = {
             'pd.msg_title': 'Escrever ao vendedor',
             'pd.msg_placeholder': 'Escreva sua mensagem...',
             'pd.msg_send': 'Enviar',
+            'pd.sold': 'Vendido',
+            'pd.sold_out': 'Produto vendido',
         },
         fr: {
             'pd.contact_seller': 'Contacter le vendeur',
@@ -4798,6 +4804,8 @@ const EcoI18n = {
             'pd.msg_title': 'Écrire au vendeur',
             'pd.msg_placeholder': 'Écrivez votre message...',
             'pd.msg_send': 'Envoyer',
+            'pd.sold': 'Vendu',
+            'pd.sold_out': 'Produit vendu',
         },
         de: {
             'pd.contact_seller': 'Verkäufer kontaktieren',
@@ -4811,6 +4819,8 @@ const EcoI18n = {
             'pd.msg_title': 'Verkäufer anschreiben',
             'pd.msg_placeholder': 'Schreibe deine Nachricht...',
             'pd.msg_send': 'Senden',
+            'pd.sold': 'Verkauft',
+            'pd.sold_out': 'Verkauftes Produkt',
         },
         it: {
             'pd.contact_seller': 'Contatta il venditore',
@@ -4824,6 +4834,8 @@ const EcoI18n = {
             'pd.msg_title': 'Scrivi al venditore',
             'pd.msg_placeholder': 'Scrivi il tuo messaggio...',
             'pd.msg_send': 'Invia',
+            'pd.sold': 'Venduto',
+            'pd.sold_out': 'Prodotto venduto',
         },
     },
 

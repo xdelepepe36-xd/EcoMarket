@@ -112,6 +112,9 @@
                     <i class="bi bi-star-fill"></i> Eco-score: {{ producto.eco_score }}/100
                 </span>
                 {% endif %}
+                {% if producto.vendido %}
+                <span class="badge" style="background:#eceff1;color:#455a64;font-weight:700;">✓ <span data-i18n="pd.sold">Vendido</span></span>
+                {% endif %}
             </div>
 
             <p class="detalle-description">{{ producto.descripcion }}</p>
@@ -127,9 +130,15 @@
             {% endif %}
 
             <div class="detalle-actions">
+                {% if producto.vendido %}
+                <button class="btn-secundario" disabled style="flex:1;opacity:.6;cursor:not-allowed;">
+                    <i class="bi bi-bag-x"></i> <span data-i18n="pd.sold_out">Producto vendido</span>
+                </button>
+                {% else %}
                 <button class="btn-principal add-cart" data-producto-id="{{ producto.id }}" data-producto-nombre="{{ producto.nombre }}" data-producto-categoria="{{ producto.categoria }}" data-producto-precio="{{ '%.2f'|format(producto.precio) }}" data-producto-imagen="{{ producto.imagen }}" style="flex:1">
                     <i class="bi bi-bag-plus"></i> <span data-i18n="add_cart">Agregar al carrito</span>
                 </button>
+                {% endif %}
                 {% if session.get('usuario_id') %}
                 <button id="favBtn" onclick="toggleFavorito({{ producto.id }})" class="btn-secundario detalle-fav-btn" style="{% if es_favorito %}background:#fdecea;border-color:#e53935;color:#e53935{% endif %}">
                     <i class="bi {% if es_favorito %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>

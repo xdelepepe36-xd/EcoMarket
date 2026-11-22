@@ -927,6 +927,13 @@ def init_db():
     except sqlite3.OperationalError:
         pass
 
+    # Agregar columna vendido a productos si no existe
+    try:
+        conn.execute('ALTER TABLE productos ADD COLUMN vendido INTEGER DEFAULT 0')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
     # Agregar columnas envio y descuento a pedidos si no existen
     try:
         conn.execute('ALTER TABLE pedidos ADD COLUMN envio REAL DEFAULT 0')
@@ -1129,6 +1136,7 @@ def get_productos_destacados(limit=6):
         FROM productos p
         LEFT JOIN usuarios u ON p.usuario_id = u.id
         LEFT JOIN resenas r ON p.id = r.producto_id
+        WHERE COALESCE(p.vendido, 0) = 0
         GROUP BY p.id
         ORDER BY p.vistas DESC, p.created_at DESC
         LIMIT ?
@@ -1334,9 +1342,9 @@ def productos_view():
             FROM productos p
             LEFT JOIN usuarios u ON p.usuario_id = u.id
             LEFT JOIN resenas r ON p.id = r.producto_id
-            WHERE 1=1
+            WHERE COALESCE(p.vendido, 0) = 0
         '''
-        count_query = 'SELECT COUNT(*) FROM (SELECT p.id FROM productos p WHERE 1=1'
+        count_query = 'SELECT COUNT(*) FROM (SELECT p.id FROM productos p WHERE COALESCE(p.vendido,0) = 0'
         params = []
         count_params = []
 
@@ -1914,6 +1922,25 @@ def editar_producto(producto_id):
 
     conn.close()
     return render_template('publicar.html', producto=producto, editando=True)
+
+
+@app.route('/producto/<int:producto_id>/vendido', methods=['POST'])
+@login_required
+def toggle_vendido(producto_id):
+    """Marca/desmarca un producto propio como vendido."""
+    conn = get_db()
+    prod = conn.execute('SELECT vendido FROM productos WHERE id = ? AND usuario_id = ?',
+                        (producto_id, session['usuario_id'])).fetchone()
+    if not prod:
+        conn.close()
+        flash_t('producto_no_encontrado', 'danger')
+        return redirect(url_for('perfil'))
+    nuevo = 0 if prod['vendido'] else 1
+    conn.execute('UPDATE productos SET vendido = ? WHERE id = ?', (nuevo, producto_id))
+    conn.commit()
+    conn.close()
+    flash('Producto marcado como vendido' if nuevo else 'Producto reactivado', 'success')
+    return redirect(url_for('perfil'))
 
 
 @app.route('/producto/<int:producto_id>/eliminar', methods=['POST'])

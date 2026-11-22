@@ -107,8 +107,14 @@
                         </div>
                         <div class="producto-footer">
                             <strong style="font-size:1.1rem;color:var(--verde)">S/. {{ '%.2f'|format(p.precio) }}</strong>
-                            <div style="display:flex;gap:6px">
+                            <div style="display:flex;gap:6px;flex-wrap:wrap">
+                                {% if p.vendido %}<span style="background:#6c757d;color:#fff;font-size:.72rem;padding:3px 10px;border-radius:999px;font-weight:700;align-self:center">VENDIDO</span>{% endif %}
                                 <a href="{{ url_for('producto_detalle', producto_id=p.id) }}" class="btn-secundario" style="padding:6px 14px;font-size:0.82rem"><i class="bi bi-eye"></i></a>
+                                <a href="{{ url_for('editar_producto', producto_id=p.id) }}" class="btn-secundario" style="padding:6px 14px;font-size:0.82rem"><i class="bi bi-pencil"></i></a>
+                                <form method="POST" action="{{ url_for('toggle_vendido', producto_id=p.id) }}" style="display:inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn-secundario" style="padding:6px 14px;font-size:0.82rem" title="{{ 'Reactivar' if p.vendido else 'Marcar como vendido' }}"><i class="bi bi-{{ 'arrow-counterclockwise' if p.vendido else 'check2-circle' }}"></i></button>
+                                </form>
                                 <form method="POST" action="{{ url_for('eliminar_producto', producto_id=p.id) }}" style="display:inline" onsubmit="return confirm('¿Eliminar este producto?')">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button type="submit" class="btn-danger" style="padding:6px 14px;font-size:0.82rem"><i class="bi bi-trash"></i></button>

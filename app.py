@@ -3,7 +3,7 @@ EcoMarket - Marketplace Ecológico v3.2
 Backend completo con SQLite, subida de imágenes, API REST, dashboard y más.
 Optimizado con mejor manejo de errores, caching, seguridad y accesibilidad.
 """
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory, send_file
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory, send_file, Response
 from whitenoise import WhiteNoise
 import sqlite3
 import os
@@ -3203,6 +3203,29 @@ def api_chat():
         quick = ['productos baratos', 'Envíos', 'Cupones', 'Consejos eco', 'Mi cuenta']
 
     return jsonify({'reply': respuesta, 'lang': lang, 'quick_replies': quick})
+
+
+@app.route('/api/mis_productos.csv')
+@login_required
+def exportar_productos_csv():
+    """Exporta los productos del vendedor a CSV."""
+    conn = get_db()
+    rows = conn.execute(
+        "SELECT nombre, categoria, precio, precio_original, stock, condicion, vistas, created_at "
+        "FROM productos WHERE usuario_id = ? ORDER BY created_at DESC",
+        (session['usuario_id'],)).fetchall()
+    conn.close()
+
+    def esc(v):
+        return '"' + str(v if v is not None else '').replace('"', '""') + '"'
+
+    lineas = ['nombre,categoria,precio,precio_original,stock,condicion,vistas,fecha']
+    for r in rows:
+        lineas.append(','.join(esc(x) for x in (
+            r['nombre'], r['categoria'], r['precio'], r['precio_original'],
+            r['stock'], r['condicion'], r['vistas'], r['created_at'])))
+    return Response(chr(10).join(lineas), mimetype='text/csv',
+                    headers={'Content-Disposition': 'attachment; filename=mis_productos.csv'})
 
 
 @app.route('/perfil')

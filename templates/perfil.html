@@ -102,6 +102,9 @@
         <!-- TAB: MIS PRODUCTOS -->
         <div id="tab-productos" class="tab-content">
             {% if mis_productos %}
+            <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+                <a href="/api/mis_productos.csv" class="btn-secundario" style="padding:9px 18px;font-size:.85rem;text-decoration:none"><i class="bi bi-download"></i> Exportar CSV</a>
+            </div>
             <div class="productos-grid">
                 {% for p in mis_productos %}
                 <article class="producto-card" style="position:relative">

@@ -3015,12 +3015,16 @@ def _chat_ia_real(mensaje, historial, lang, conn):
                 r = requests.post(
                     'https://api.groq.com/openai/v1/chat/completions',
                     headers={'Authorization': f'Bearer {key}', 'Content-Type': 'application/json'},
-                    json={'model': os.environ.get('GROQ_MODEL', 'llama-3.1-8b-instant'),
-                          'messages': msgs, 'temperature': 0.6, 'max_tokens': 400},
-                    timeout=15)
+                    json={'model': os.environ.get('GROQ_MODEL', 'openai/gpt-oss-20b'),
+                          'messages': msgs, 'temperature': 0.6, 'max_tokens': 1200},
+                    timeout=30)
                 if r.status_code == 200:
-                    return r.json()['choices'][0]['message']['content'].strip()
-                logger.warning(f'Groq API {r.status_code}: {r.text[:200]}')
+                    txt = r.json()['choices'][0]['message'].get('content') or ''
+                    if txt.strip():
+                        return txt.strip()
+                    logger.warning('Groq devolvio contenido vacio (reasoning consumio tokens)')
+                else:
+                    logger.warning(f'Groq API {r.status_code}: {r.text[:200]}')
             except Exception as e:
                 logger.warning(f'Groq falló: {e}')
 

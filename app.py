@@ -1358,6 +1358,11 @@ def init_db():
     conn.close()
 
 
+# Inicializar la base de datos apenas se define, antes de los singletons
+# (búsqueda semántica, recomendador ML) que consultan tablas al importarse.
+init_db()
+
+
 # ── Decoradores ──────────────────────────────────────────────────────────────
 
 def login_required(f):
@@ -8173,8 +8178,7 @@ def server_error(e):
 
 # ── Inicio ────────────────────────────────────────────────────────────────────
 
-# Inicializar la base de datos al importar el módulo
-init_db()
+# init_db() ya se ejecutó tras su definición; aquí solo backups y arranque.
 _backup_loop()
 
 if __name__ == '__main__':

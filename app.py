@@ -21,6 +21,7 @@ import hmac
 import time
 from PIL import Image
 import logging
+import requests
 from functools import lru_cache
 
 # Importar sistemas de mejoras adicionales
@@ -39,6 +40,7 @@ except ImportError:
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
+_START_TIME = time.time()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.environ.get('DATABASE_URL', os.path.join(BASE_DIR, 'data', 'ecomarket.db'))
 UPLOAD_FOLDER = os.environ.get('UPLOADS_DIR', os.path.join(BASE_DIR, 'static', 'uploads'))
@@ -1592,6 +1594,69 @@ def add_notificacion(usuario_id, titulo, mensaje, tipo='info'):
         conn.close()
 
 
+# ── Email transaccional (SMTP configurable por variables de entorno) ──
+def enviar_email(destinatario, asunto, html):
+    """Envía un email HTML vía SMTP. Requiere SMTP_HOST; si no está
+    configurado, registra en el log y devuelve False (no rompe nada)."""
+    host = os.environ.get('SMTP_HOST')
+    if not host:
+        logger.info(f'[EMAIL-SKIP] Para {destinatario}: {asunto}')
+        return False
+    try:
+        import smtplib
+        from email.mime.text import MIMEText
+        from email.mime.multipart import MIMEMultipart
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = asunto
+        msg['From'] = os.environ.get('SMTP_FROM', os.environ.get('SMTP_USER', 'EcoMarket <no-reply@ecomarket.app>'))
+        msg['To'] = destinatario
+        msg.attach(MIMEText(html, 'html', 'utf-8'))
+        port = int(os.environ.get('SMTP_PORT', '587'))
+        user = os.environ.get('SMTP_USER', '')
+        pwd = os.environ.get('SMTP_PASS', '')
+        with smtplib.SMTP(host, port, timeout=15) as s:
+            s.starttls()
+            if user:
+                s.login(user, pwd)
+            s.send_message(msg)
+        logger.info(f'[EMAIL-OK] Enviado a {destinatario}: {asunto}')
+        return True
+    except Exception as e:
+        logger.error(f'[EMAIL-FAIL] {destinatario}: {e}')
+        return False
+
+
+def email_bienvenida(nombre, email):
+    enviar_email(email, '🌱 ¡Bienvenido a EcoMarket!', f'''
+    <div style="font-family:Poppins,Arial,sans-serif;max-width:560px;margin:auto;background:#f6faf6;padding:24px;border-radius:16px">
+      <h2 style="color:#2e7d32">Hola {nombre} 👋</h2>
+      <p>Tu cuenta en <strong>EcoMarket</strong> está lista. Aquí puedes comprar y vender productos ecológicos de segunda mano.</p>
+      <ul>
+        <li>🌱 Gana <strong>EcoCoins</strong> por cada compra y venta verde</li>
+        <li>🏆 Sube de nivel con <strong>logros y rachas</strong></li>
+        <li>👑 Hazte <strong>EcoPremium</strong> con tus puntos</li>
+      </ul>
+      <a href="{request.url_root}publicar" style="display:inline-block;background:#2e7d32;color:#fff;padding:12px 28px;border-radius:999px;text-decoration:none;font-weight:bold">Publicar mi primer producto</a>
+      <p style="color:#888;font-size:12px;margin-top:24px">EcoMarket — Compra y vende productos sostenibles.</p>
+    </div>''')
+
+
+def email_confirmacion_pedido(email, nombre, pedido_id, total, items):
+    filas = ''.join(f'<tr><td style="padding:8px;border-bottom:1px solid #eee">{i["nombre"]}</td><td style="padding:8px;border-bottom:1px solid #eee;text-align:center">{i["cantidad"]}</td><td style="padding:8px;border-bottom:1px solid #eee;text-align:right">S/.{i["precio"] * i["cantidad"]:.2f}</td></tr>' for i in items)
+    enviar_email(email, f'📦 Pedido #{pedido_id} confirmado — EcoMarket', f'''
+    <div style="font-family:Poppins,Arial,sans-serif;max-width:600px;margin:auto;background:#f6faf6;padding:24px;border-radius:16px">
+      <h2 style="color:#2e7d32">¡Gracias por tu compra, {nombre}! 🌱</h2>
+      <p>Tu pedido <strong>#{pedido_id}</strong> fue confirmado. Esto es lo que pediste:</p>
+      <table style="width:100%;border-collapse:collapse;font-size:14px">
+        <tr style="background:#e8f5e9"><th style="padding:8px;text-align:left">Producto</th><th style="padding:8px;text-align:center">Cant.</th><th style="padding:8px;text-align:right">Subtotal</th></tr>
+        {filas}
+      </table>
+      <p style="text-align:right;font-size:18px;font-weight:bold;color:#2e7d32">Total: S/.{total:.2f}</p>
+      <p style="color:#666;font-size:13px">Puedes seguir tu pedido en tu perfil o compartir el link de rastreo con quien reciba el envío.</p>
+      <p style="color:#888;font-size:12px;margin-top:24px">EcoMarket — Cada compra reutiliza y cuida el planeta. 💚</p>
+    </div>''')
+
+
 def registrar_visita(pagina):
     try:
         conn = get_db()
@@ -2150,6 +2215,12 @@ def checkout():
 
         conn.commit()
         conn.close()
+
+        try:
+            email_items = [{'nombre': n, 'precio': pr, 'cantidad': c} for _, n, pr, c in items_validados]
+            email_confirmacion_pedido(email, nombre_comp or nombre, pedido_id, total_final, email_items)
+        except Exception:
+            pass
 
         add_notificacion(session['usuario_id'], '📦 Pedido confirmado',
                          f'Tu pedido #{pedido_id} por S/.{total_final:.2f} ha sido confirmado.', 'success')
@@ -2915,19 +2986,63 @@ _ASISTENTE_AYUDA = {
 }
 
 
+def _chat_ia_real(mensaje, historial, lang, conn):
+    """IA real vía Groq (API gratis). Devuelve None si no hay key o falla."""
+    key = os.environ.get('GROQ_API_KEY')
+    if not key:
+        return None
+    try:
+        # Contexto real: categorías y productos destacados para respuestas con datos
+        cats = [r['categoria'] for r in conn.execute('SELECT DISTINCT categoria FROM productos LIMIT 12').fetchall()]
+        prods = conn.execute(
+            'SELECT nombre, precio, categoria FROM productos WHERE COALESCE(vendido,0)=0 ORDER BY vistas DESC LIMIT 8').fetchall()
+        catalogo = '\n'.join(f'- {p["nombre"]} (S/.{p["precio"]:.2f}, {p["categoria"]})' for p in prods)
+        system = (
+            'Eres Eco, la asistente IA de EcoMarket, un marketplace ecológico de segunda mano en Perú. '
+            'Responde en el idioma del usuario, de forma cálida, breve (máx 120 palabras) y útil. '
+            'Puedes mencionar productos reales del catálogo cuando sea relevante usando su nombre exacto. '
+            'Usa **negritas** y listas con guiones. No inventes precios ni productos. '
+            f'Categorías: {", ".join(cats)}.\nProductos destacados:\n{catalogo}\n'
+            'Si el usuario quiere comprar algo concreto, sugiere buscarlo en /productos.'
+        )
+        msgs = [{'role': 'system', 'content': system}]
+        for h in (historial or [])[-8:]:
+            role = 'user' if h.get('role') == 'user' else 'assistant'
+            msgs.append({'role': role, 'content': str(h.get('content', ''))[:400]})
+        msgs.append({'role': 'user', 'content': mensaje})
+        r = requests.post(
+            'https://api.groq.com/openai/v1/chat/completions',
+            headers={'Authorization': f'Bearer {key}', 'Content-Type': 'application/json'},
+            json={'model': 'llama-3.1-8b-instant', 'messages': msgs, 'temperature': 0.6, 'max_tokens': 400},
+            timeout=15)
+        if r.status_code != 200:
+            logger.warning(f'Groq API {r.status_code}: {r.text[:200]}')
+            return None
+        return r.json()['choices'][0]['message']['content'].strip()
+    except Exception as e:
+        logger.warning(f'Groq falló, usando cerebro local: {e}')
+        return None
+
+
 @app.route('/api/asistente', methods=['POST'])
 def api_asistente():
-    """Asistente virtual: intents por reglas + respuestas del sistema."""
+    """Asistente virtual: IA real (Groq) con fallback a reglas + búsqueda."""
     data = request.get_json(silent=True) or {}
-    mensaje = (data.get('mensaje') or '').strip()[:500].lower()
+    mensaje = (data.get('mensaje') or '').strip()[:500]
+    historial = data.get('historial') or []
     if not mensaje:
         return jsonify({'respuesta': 'Escribe tu pregunta y te ayudo.', 'sugerencias': []})
 
+    mensaje_l = mensaje.lower()
     # Cerebro conversacional con memoria y búsqueda real
     lang = session.get('lang', 'es')
     conn = get_db()
     try:
-        resp = _chat_respuesta(mensaje, lang, conn)
+        # 1) Intentar IA real primero
+        resp = _chat_ia_real(mensaje_l, historial, lang, conn)
+        # 2) Fallback: reglas + datos reales
+        if resp is None:
+            resp = _chat_respuesta(mensaje_l, lang, conn)
     finally:
         conn.close()
     html = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', resp)
@@ -2987,9 +3102,15 @@ def api_health():
     try:
         productos = conn.execute('SELECT COUNT(*) FROM productos').fetchone()[0]
         usuarios = conn.execute('SELECT COUNT(*) FROM usuarios').fetchone()[0]
+        pedidos = conn.execute('SELECT COUNT(*) FROM pedidos').fetchone()[0]
+        db_size = os.path.getsize(DB_PATH) if os.path.exists(DB_PATH) else 0
+    except sqlite3.Error:
+        productos = usuarios = pedidos = db_size = 0
     finally:
         conn.close()
     return jsonify({'status': 'ok', 'productos': productos, 'usuarios': usuarios,
+                    'pedidos': pedidos, 'db_mb': round(db_size / 1048576, 2),
+                    'uptime_s': int(time.time() - _START_TIME),
                     'version': '3.2', 'time': datetime.now().isoformat()})
 
 
@@ -3798,8 +3919,16 @@ def recuperar_password():
                 (usuario['id'], token_hash, expires)
             )
             conn.commit()
-            if not os.environ.get('SMTP_HOST'):
-                enlace_demo = url_for('restablecer_password', token=token, _external=True)
+            # Enviar email con el enlace de reseteo si hay SMTP configurado
+            enlace = url_for('restablecer_password', token=token, _external=True)
+            enviar_email(email, '🔑 Restablece tu contraseña — EcoMarket', f'''
+            <div style="font-family:Poppins,Arial,sans-serif;max-width:520px;margin:auto;background:#f6faf6;padding:28px;border-radius:16px">
+              <h2 style="color:#2e7d32">Restablecer contraseña</h2>
+              <p>Recibimos una solicitud para cambiar tu contraseña. El enlace expira en <strong>1 hora</strong>.</p>
+              <a href="{enlace}" style="display:inline-block;background:#2e7d32;color:#fff;padding:13px 30px;border-radius:999px;text-decoration:none;font-weight:bold;margin:10px 0">Cambiar mi contraseña</a>
+              <p style="color:#888;font-size:12px">Si no fuiste tú, ignora este mensaje — tu cuenta está segura.</p>
+            </div>''')
+            enlace_demo = None
         conn.close()
         # Mensaje genérico: no revelar si el correo existe
         return render_template('recuperar.html', enviado=True, enlace_demo=enlace_demo)
@@ -3934,6 +4063,10 @@ def registro():
         session['email'] = usuario['email']
         session['rol'] = usuario['rol']
         flash_t('cuenta_creada', 'success', nombre=nombre)
+        try:
+            email_bienvenida(nombre, email)
+        except Exception:
+            pass
         return redirect(url_for('index'))
     return render_template('registro.html')
 
@@ -5214,44 +5347,6 @@ class AssetOptimizer:
 asset_optimizer = AssetOptimizer()
 
 # ── Sistema de Lazy Loading ───────────────────────────────────────────────────────────
-
-class LazyLoader:
-    """Sistema de lazy loading para mejorar performance."""
-    
-    def __init__(self):
-        self.loaded_scripts = set()
-        self.loaded_styles = set()
-    
-    def should_load_script(self, script_name, current_page):
-        """Determina si un script debe cargarse en la página actual."""
-        # Scripts que siempre cargan
-        always_load = ['ecomarket-consolidated', 'ecomarket-security']
-        if script_name in always_load:
-            return True
-        
-        # Scripts específicos por página
-        page_scripts = {
-            'index': ['ecommerce-analytics', 'ecomarket-social'],
-            'detalle_producto': ['ecomarket-comments', 'ecomarket-compare'],
-            'checkout': ['ecomarket-payments'],
-            'perfil': ['ecomarket-gamification']
-        }
-        
-        return script_name in page_scripts.get(current_page, [])
-    
-    def get_critical_css(self, current_page):
-        """Obtiene CSS crítico para la página actual."""
-        critical_css = {
-            'index': ['ecomarket-consolidated', 'accessibility'],
-            'detalle_producto': ['ecomarket-consolidated', 'ecomarket-advanced-features'],
-            'checkout': ['ecomarket-consolidated'],
-            'default': ['ecomarket-consolidated', 'accessibility']
-        }
-        
-        return critical_css.get(current_page, critical_css['default'])
-
-# Instancia global de lazy loader
-lazy_loader = LazyLoader()
 
 # ── Sistema de A/B Testing ───────────────────────────────────────────────────────────
 

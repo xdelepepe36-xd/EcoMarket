@@ -2,29 +2,34 @@
 {% block title %}EcoMarket - Política de Privacidad{% endblock %}
 
 {% block content %}
-<section class="section">
-    <div class="container" style="max-width:800px;margin:0 auto">
-        <h2 class="section-title">🔒 <span data-i18n="priv.title">Política de Privacidad</span></h2>
-        <p style="color:var(--texto-sec);margin-bottom:32px"><span data-i18n="terms.updated">Última actualización: Julio 2026</span></p>
+<section class="section" style="padding-top:60px">
+    <div class="container" style="max-width:760px">
+        <h1 style="font-size:2rem;margin-bottom:8px">🌱 Política de Privacidad</h1>
+        <p style="color:var(--texto-sec);margin-bottom:28px">Última actualización: 2026</p>
 
-        <div style="background:var(--blanco);border-radius:24px;padding:36px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">
-            <h3 style="color:var(--verde);margin-bottom:12px"><span data-i18n="priv.s1_title">1. Información que recopilamos</span></h3>
-            <p style="color:var(--texto-sec);line-height:1.8;margin-bottom:24px"><span data-i18n="priv.s1_text">Recopilamos información que nos proporcionas al registrarte: nombre, correo electrónico y contraseña. También recopilamos datos de navegación como páginas visitadas y productos vistos.</span></p>
+        <div style="background:var(--blanco);border-radius:18px;padding:32px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,.1);line-height:1.8;font-size:.95rem">
+            <h2 style="color:var(--verde);font-size:1.15rem;margin:20px 0 8px">1. Qué datos recopilamos</h2>
+            <p>• <strong>Cuenta:</strong> nombre, apellido, email, teléfono, ciudad, contraseña (cifrada con hash seguro).</p>
+            <p>• <strong>Actividad:</strong> productos publicados, pedidos, favoritos, reseñas, mensajes y puntos eco.</p>
+            <p>• <strong>Analítica:</strong> páginas visitadas, búsquedas y eventos de uso (sin datos personales identificables fuera de tu sesión).</p>
+            <p>• <strong>Técnico:</strong> dirección IP solo para seguridad (rate-limit de login) y registro de visitas.</p>
 
-            <h3 style="color:var(--verde);margin-bottom:12px"><span data-i18n="priv.s2_title">2. Uso de la información</span></h3>
-            <p style="color:var(--texto-sec);line-height:1.8;margin-bottom:24px"><span data-i18n="priv.s2_text">Usamos tu información para: procesar tus pedidos, mejorar la plataforma, enviar notificaciones relevantes y personalizar tu experiencia de compra.</span></p>
+            <h2 style="color:var(--verde);font-size:1.15rem;margin:20px 0 8px">2. Para qué los usamos</h2>
+            <p>Operar el marketplace, procesar pedidos, mostrar tu impacto ambiental, enviarte notificaciones y mejorar el servicio. <strong>Nunca vendemos tus datos.</strong></p>
 
-            <h3 style="color:var(--verde);margin-bottom:12px"><span data-i18n="priv.s3_title">3. Protección de datos</span></h3>
-            <p style="color:var(--texto-sec);line-height:1.8;margin-bottom:24px"><span data-i18n="priv.s3_text">Implementamos medidas de seguridad técnicas y organizativas para proteger tus datos personales contra acceso no autorizado, pérdida o alteración.</span></p>
+            <h2 style="color:var(--verde);font-size:1.15rem;margin:20px 0 8px">3. Cookies y almacenamiento local</h2>
+            <p>Usamos <strong>localStorage</strong> para tu sesión, carrito, tema visual, alertas de precio y preferencias de idioma. No usamos cookies de rastreo publicitario.</p>
 
-            <h3 style="color:var(--verde);margin-bottom:12px"><span data-i18n="priv.s4_title">4. Cookies</span></h3>
-            <p style="color:var(--texto-sec);line-height:1.8;margin-bottom:24px"><span data-i18n="priv.s4_text">Utilizamos cookies esenciales para el funcionamiento de la plataforma. No usamos cookies de rastreo de terceros sin tu consentimiento.</span></p>
+            <h2 style="color:var(--verde);font-size:1.15rem;margin:20px 0 8px">4. Tus derechos</h2>
+            <p>• <strong>Acceder</strong>: Perfil → Configuración → "Descargar mis datos" (JSON completo).</p>
+            <p>• <strong>Eliminar</strong>: puedes borrar tu cuenta desde Perfil → Configuración → "Eliminar cuenta". Tus datos se anonimizan y no podrán recuperarse.</p>
+            <p>• <strong>Rectificar</strong>: edita tu perfil en cualquier momento.</p>
 
-            <h3 style="color:var(--verde);margin-bottom:12px"><span data-i18n="priv.s5_title">5. Tus derechos</span></h3>
-            <p style="color:var(--texto-sec);line-height:1.8;margin-bottom:24px"><span data-i18n="priv.s5_text">Tienes derecho a acceder, rectificar o eliminar tus datos personales en cualquier momento desde tu perfil. También puedes solicitar la exportación de tus datos.</span></p>
+            <h2 style="color:var(--verde);font-size:1.15rem;margin:20px 0 8px">5. Seguridad</h2>
+            <p>Contraseñas con hash Werkzeug, protección CSRF en formularios, rate-limit en login, validación de todos los inputs y backups automáticos de la base de datos.</p>
 
-            <h3 style="color:var(--verde);margin-bottom:12px"><span data-i18n="priv.s6_title">6. Contacto</span></h3>
-            <p style="color:var(--texto-sec);line-height:1.8"><span data-i18n="priv.s6_text">Para consultas sobre privacidad, escríbenos a</span> <a href="mailto:privacidad@ecomarket.com" style="color:var(--verde)">privacidad@ecomarket.com</a>.</p>
+            <h2 style="color:var(--verde);font-size:1.15rem;margin:20px 0 8px">6. Contacto</h2>
+            <p>Para dudas de privacidad escríbenos a <strong>hola@ecomarket.com</strong>.</p>
         </div>
     </div>
 </section>

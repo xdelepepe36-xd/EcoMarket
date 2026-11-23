@@ -2,9 +2,9 @@
  * EcoMarket Service Worker v2.0
  * Estrategia: Cache First para estáticos, Network First para dinámicos
  */
-const CACHE_NAME = 'ecomarket-v4';
-const STATIC_CACHE = 'ecomarket-static-v4';
-const ASSETS_CACHE = 'ecomarket-assets-v4';
+const CACHE_NAME = 'ecomarket-v5';
+const STATIC_CACHE = 'ecomarket-static-v5';
+const ASSETS_CACHE = 'ecomarket-assets-v5';
 
 const urlsToCache = [
   '/',

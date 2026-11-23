@@ -127,9 +127,9 @@ nums.forEach(function(n){io.observe(n);});
                     </div>
                 </div>
                 <div class="chart-legend">
-                    <div class="legend-item"><span style="background: #2e7d32;"></span> <span data-i18n="imp2.legend_new">Nuevos (45%)</span></div>
-                    <div class="legend-item"><span style="background: #4caf50;"></span> <span data-i18n="imp2.legend_active">Activos (35%)</span></div>
-                    <div class="legend-item"><span style="background: #81c784;"></span> <span data-i18n="imp2.legend_returning">Recurrentes (20%)</span></div>
+                    <div class="legend-item"><span style="background: #2e7d32;"></span> <span data-i18n="imp2.legend_new">Nuevos ({{ pct_nuevos }}%)</span> · {{ n_nuevos }}</div>
+                    <div class="legend-item"><span style="background: #4caf50;"></span> <span data-i18n="imp2.legend_active">Activos ({{ pct_activos }}%)</span> · {{ n_activos }}</div>
+                    <div class="legend-item"><span style="background: #81c784;"></span> <span data-i18n="imp2.legend_returning">Recurrentes ({{ pct_recurrentes }}%)</span></div>
                 </div>
             </div>
             <div class="impact-chart-card" style="grid-column: 1 / -1">

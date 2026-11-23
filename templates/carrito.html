@@ -25,6 +25,7 @@
                     <p class="resumen-line resumen-total"><span data-i18n="cart.total">Total</span>: <strong id="cartTotal">S/. 0.00</strong></p>
                     <div id="couponHint" class="coupon-hint" style="display:none"></div>
                     <button class="btn-principal" id="checkoutButton" disabled data-i18n="cart.checkout_button">Proceder al pago</button>
+                    <button class="btn-secundario" id="shareCartBtn" style="width:100%;margin-top:8px;font-size:.85rem" data-i18n="cart.share_group"><i class="bi bi-people"></i> Compartir selección (compra en grupo)</button>
                     <p class="cart-note" data-i18n="cart.note">El carrito se guarda localmente en tu navegador.</p>
                 </div>
             </aside>
@@ -266,6 +267,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.addEventListener('ecocart:update', renderCart);
     renderCart();
+
+    // Compartir selección como link de compra en grupo
+    var shareCartBtn = document.getElementById('shareCartBtn');
+    if (shareCartBtn) {
+        shareCartBtn.addEventListener('click', function() {
+            var items = [];
+            try { items = JSON.parse(localStorage.getItem('ecomarket-cart') || '[]'); } catch(e) {}
+            if (!items.length) { if (window.EcoToast) EcoToast.show('🛒', 'Tu carrito está vacío', 'info'); return; }
+            var ids = items.map(function(i) { return i.id; }).join(',');
+            var url = location.origin + '/grupo/' + ids;
+            if (navigator.clipboard) navigator.clipboard.writeText(url).catch(function(){});
+            if (window.EcoToast) EcoToast.show('🔗 Link copiado', 'Comparte para comprar en grupo', 'success');
+            else prompt('Link de compra en grupo:', url);
+        });
+    }
 
     checkoutButton.addEventListener('click', function() {
         window.location.href = '/checkout';

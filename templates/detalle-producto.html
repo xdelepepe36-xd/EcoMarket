@@ -223,6 +223,13 @@ localStorage.setItem('eco_vistos',JSON.stringify(v.slice(0,8)));
                 <button class="share-btn" onclick="compartir('whatsapp')" title="Compartir en WhatsApp" aria-label="Compartir en WhatsApp"><i class="bi bi-whatsapp"></i></button>
                 <button class="share-btn" onclick="compartir('copy')" title="Copiar enlace" aria-label="Copiar enlace"><i class="bi bi-link-45deg"></i></button>
             </div>
+            {% if session.get('usuario_id') and session.get('usuario_id') == producto.usuario_id %}
+            <div class="detalle-share-row" style="margin-top:10px">
+                <span><i class="bi bi-tools"></i> <span data-i18n="pd.owner_tools">Herramientas de vendedor</span>:</span>
+                <a class="share-btn" href="{{ url_for('editar_producto', producto_id=producto.id) }}" title="Editar producto" aria-label="Editar producto" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center"><i class="bi bi-pencil"></i></a>
+                <button class="share-btn" onclick="copiarDescripcion()" title="Copiar descripción" aria-label="Copiar descripción"><i class="bi bi-clipboard"></i></button>
+            </div>
+            {% endif %}
         </div>
     </div>
 
@@ -638,6 +645,30 @@ function toggleFavorito(productoId) {
 }
 
 // ── Compartir ────────────────────────────────────
+function copiarDescripcion() {
+    var el = document.querySelector('#tab-descripcion .detalle-tab-content, .descripcion-producto, [data-i18n="pd.tab_desc"]');
+    var panel = document.getElementById('tab-descripcion');
+    var texto = '';
+    // Buscar el contenido de la pestaña descripción
+    var candidates = document.querySelectorAll('.detalle-tab-content');
+    candidates.forEach(function(c) {
+        if (c.offsetParent !== null || c.id === 'tab-descripcion') texto = c.innerText || '';
+    });
+    if (!texto && panel) texto = panel.innerText || '';
+    var titulo = '{{ producto.nombre }}';
+    var full = titulo + '\n\n' + texto.trim();
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(full).then(function() {
+            if (window.EcoToast) EcoToast.show('📋 Copiado', 'Descripción lista para pegar', 'success');
+        }).catch(function() { fallbackCopy(full); });
+    } else fallbackCopy(full);
+    function fallbackCopy(t) {
+        var ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy'); ta.remove();
+        if (window.EcoToast) EcoToast.show('📋 Copiado', 'Descripción lista para pegar', 'success');
+    }
+}
+
 function compartir(red) {
     const url = encodeURIComponent(window.location.href);
     const titulo = encodeURIComponent(document.title);

@@ -2325,6 +2325,16 @@ def impacto():
     ''').fetchall()
     co2_mensual = [{'mes': r['mes'], 'co2': round(r['pts'] * 0.4, 1)} for r in co2_rows]
     co2_total = round(sum(m['co2'] for m in co2_mensual), 1)
+
+    # Crecimiento real de la comunidad (donut de /impacto)
+    nuevos = conn.execute(
+        "SELECT COUNT(*) FROM usuarios WHERE created_at >= date('now', '-30 days')").fetchone()[0]
+    activos = conn.execute('''SELECT COUNT(DISTINCT usuario_id) FROM pedidos
+        WHERE created_at >= date('now', '-30 days') AND usuario_id IS NOT NULL''').fetchone()[0]
+    base = max(1, total_usuarios)
+    pct_nuevos = round(nuevos / base * 100)
+    pct_activos = round(activos / base * 100)
+    pct_recurrentes = max(0, 100 - pct_nuevos - pct_activos)
     conn.close()
     return render_template('impacto.html',
                            total_productos=total,
@@ -2334,7 +2344,11 @@ def impacto():
                            total_visitas=total_visitas,
                            total_pedidos=total_pedidos,
                            co2_mensual=co2_mensual,
-                           co2_total=co2_total)
+                           co2_total=co2_total,
+                           pct_nuevos=pct_nuevos,
+                           pct_activos=pct_activos,
+                           pct_recurrentes=pct_recurrentes,
+                           n_nuevos=nuevos, n_activos=activos)
 
 
 # ── API Dashboard ────────────────────────────────────────────────────────────
@@ -7563,6 +7577,34 @@ def rastrear_pedido(token):
                          (p['id'],)).fetchall()
     conn.close()
     return render_template('rastrear.html', pedido=dict(p), items=[dict(i) for i in items])
+
+
+# ── Carrito compartible (compra en grupo) ──────────────────────────
+
+@app.route('/grupo/<ids>')
+def grupo_compra(ids):
+    """Link compartible: /grupo/1,5,9 — muestra productos y permite agregarlos todos."""
+    try:
+        id_list = [int(x) for x in ids.split(',') if x.strip().isdigit()][:12]
+    except ValueError:
+        id_list = []
+    if not id_list:
+        flash('Selección inválida.', 'warning')
+        return redirect(url_for('index'))
+    conn = get_db()
+    placeholders = ','.join('?' * len(id_list))
+    items = conn.execute(f'''
+        SELECT p.id, p.nombre, p.precio, p.precio_original, p.imagen, p.categoria,
+               p.stock, COALESCE(p.vendido,0) AS vendido
+        FROM productos p WHERE p.id IN ({placeholders}) AND COALESCE(p.vendido,0)=0''',
+        id_list).fetchall()
+    orden = {pid: i for i, pid in enumerate(id_list)}
+    items = sorted((dict(r) for r in items), key=lambda r: orden.get(r['id'], 999))
+    conn.close()
+    if not items:
+        flash('Esos productos ya no están disponibles.', 'warning')
+        return redirect(url_for('index'))
+    return render_template('grupo.html', items=items, ids=ids)
 
 # ── Rutas para Templates de Nuevas Funcionalidades ───────────────────────────────
 

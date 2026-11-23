@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}EcoMarket - Compra en grupo{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container" style="max-width:900px">
+        <div class="section-title">
+            <h2>👥 Selección de grupo</h2>
+            <p>{{ items|length }} producto(s) compartidos — agrégalos todos a tu carrito y compra junto</p>
+        </div>
+        <div class="productos-grid">
+            {% for p in items %}
+            <article class="producto-card">
+                <a href="{{ url_for('producto_detalle', producto_id=p.id) }}">
+                    <img src="{{ p.imagen if p.imagen.startswith('http') else url_for('static', filename=p.imagen) }}" alt="{{ p.nombre }}" loading="lazy" onerror="this.src='{{ url_for('static', filename='assets/product-placeholder.svg') }}'">
+                </a>
+                <div class="producto-info">
+                    <span class="categoria">{{ p.categoria }}</span>
+                    <h3>{{ p.nombre }}</h3>
+                    <div class="producto-footer">
+                        <strong style="color:var(--verde)">S/. {{ '%.2f'|format(p.precio) }}</strong>
+                        <span style="font-size:.75rem;color:var(--texto-sec)">stock: {{ p.stock }}</span>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        <div style="position:sticky;bottom:16px;margin-top:24px;text-align:center">
+            <button id="btnAddAll" class="btn-principal" style="padding:14px 34px;font-size:1rem;border-radius:999px;box-shadow:0 8px 24px rgba(46,125,50,.35)">
+                🛒 Agregar todo al carrito ({{ items|length }})
+            </button>
+            <p style="font-size:.78rem;color:var(--texto-sec);margin-top:8px">El carrito se guarda en tu navegador — también puedes abrir cada producto por separado.</p>
+        </div>
+    </div>
+</section>
+
+<script>
+(function() {
+    var items = {{ items|tojson }};
+    document.getElementById('btnAddAll').addEventListener('click', function() {
+        var KEYS = ['ecomarket-cart', 'ecomarket_cart', 'ecomarket-carrito'];
+        var cart = [];
+        try { cart = JSON.parse(localStorage.getItem('ecomarket-cart') || '[]'); } catch(e) {}
+        var byId = {};
+        cart.forEach(function(i) { byId[i.id] = i; });
+        var added = 0;
+        items.forEach(function(p) {
+            var id = parseInt(p.id, 10);
+            if (byId[id]) { byId[id].qty = (byId[id].qty || 1) + 1; }
+            else {
+                var it = { id: id, name: p.nombre, price: parseFloat(p.precio), image: p.imagen, category: p.categoria, qty: 1 };
+                cart.push(it); byId[id] = it;
+            }
+            added++;
+        });
+        KEYS.forEach(function(k) { localStorage.setItem(k, JSON.stringify(cart)); });
+        window.dispatchEvent(new CustomEvent('ecocart:update'));
+        if (window.EcoToast) EcoToast.show('🛒 ¡Listo!', added + ' productos agregados al carrito', 'success');
+        setTimeout(function() { window.location.href = '/carrito'; }, 900);
+    });
+})();
+</script>
+{% endblock %}

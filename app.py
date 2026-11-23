@@ -2987,10 +2987,8 @@ _ASISTENTE_AYUDA = {
 
 
 def _chat_ia_real(mensaje, historial, lang, conn):
-    """IA real vía Groq (API gratis). Devuelve None si no hay key o falla."""
-    key = os.environ.get('GROQ_API_KEY')
-    if not key:
-        return None
+    """IA real: Groq si hay GROQ_API_KEY, si no Pollinations (gratis, sin key).
+    Devuelve None si todo falla → el caller usa el cerebro local."""
     try:
         # Contexto real: categorías y productos destacados para respuestas con datos
         cats = [r['categoria'] for r in conn.execute('SELECT DISTINCT categoria FROM productos LIMIT 12').fetchall()]
@@ -3010,17 +3008,39 @@ def _chat_ia_real(mensaje, historial, lang, conn):
             role = 'user' if h.get('role') == 'user' else 'assistant'
             msgs.append({'role': role, 'content': str(h.get('content', ''))[:400]})
         msgs.append({'role': 'user', 'content': mensaje})
-        r = requests.post(
-            'https://api.groq.com/openai/v1/chat/completions',
-            headers={'Authorization': f'Bearer {key}', 'Content-Type': 'application/json'},
-            json={'model': 'llama-3.1-8b-instant', 'messages': msgs, 'temperature': 0.6, 'max_tokens': 400},
-            timeout=15)
-        if r.status_code != 200:
-            logger.warning(f'Groq API {r.status_code}: {r.text[:200]}')
-            return None
-        return r.json()['choices'][0]['message']['content'].strip()
+
+        key = os.environ.get('GROQ_API_KEY')
+        if key:
+            try:
+                r = requests.post(
+                    'https://api.groq.com/openai/v1/chat/completions',
+                    headers={'Authorization': f'Bearer {key}', 'Content-Type': 'application/json'},
+                    json={'model': os.environ.get('GROQ_MODEL', 'llama-3.1-8b-instant'),
+                          'messages': msgs, 'temperature': 0.6, 'max_tokens': 400},
+                    timeout=15)
+                if r.status_code == 200:
+                    return r.json()['choices'][0]['message']['content'].strip()
+                logger.warning(f'Groq API {r.status_code}: {r.text[:200]}')
+            except Exception as e:
+                logger.warning(f'Groq falló: {e}')
+
+        # Fallback: Pollinations.ai — IA gratuita sin API key (POST OpenAI-compatible)
+        try:
+            r = requests.post(
+                'https://text.pollinations.ai/openai',
+                json={'model': 'openai', 'messages': msgs, 'max_tokens': 400},
+                timeout=20)
+            if r.status_code == 200:
+                txt = r.json()['choices'][0]['message']['content'].strip()
+                if txt:
+                    logger.info('[ASISTENTE] Respuesta via Pollinations (sin key)')
+                    return txt
+            logger.warning(f'Pollinations {r.status_code}: {r.text[:150]}')
+        except Exception as e:
+            logger.warning(f'Pollinations falló: {e}')
+        return None
     except Exception as e:
-        logger.warning(f'Groq falló, usando cerebro local: {e}')
+        logger.warning(f'IA real no disponible, usando cerebro local: {e}')
         return None
 
 
@@ -3051,44 +3071,6 @@ def api_asistente():
     quick = (['productos baratos', 'Envíos', 'Cupones', 'Consejos eco', 'Mi cuenta'] if lang == 'es'
              else ['cheap products', 'Shipping', 'Coupons', 'Eco tips', 'My account'])
     return jsonify({'respuesta': html, 'respuesta_raw': resp, 'sugerencias': quick})
-
-    norm = ''.join(c for c in unicodedata.normalize('NFD', mensaje) if unicodedata.category(c) != 'Mn')
-
-    # Búsqueda de productos por nombre/categoría
-    if any(k in norm for k in ['buscar', 'encuentra', 'tienes', 'hay', 'muestra', 'quiero ver', 'venden']):
-        termino = re.sub(r'(buscar|encuentra|tienes|hay|muestra|quiero ver|venden|de|del|la|el|un|una|productos?|algo)\s*', ' ', norm).strip()
-        conn = get_db()
-        like = f'%{termino}%' if termino else '%'
-        rows = conn.execute(
-            "SELECT id, nombre, precio, categoria FROM productos WHERE nombre LIKE ? OR categoria LIKE ? OR descripcion LIKE ? LIMIT 4",
-            (like, like, like)
-        ).fetchall()
-        conn.close()
-        if rows:
-            items = ''.join(
-                f'<a href="/producto/{r["id"]}" class="asistente-link">{r["nombre"]} <small>S/.{r["precio"]:.2f}</small></a>'
-                for r in rows
-            )
-            return jsonify({'respuesta': f'Encontré {len(rows)} producto(s) para ti:<br>{items}', 'sugerencias': ['Más resultados', 'Otras categorías', 'Cupones']})
-        return jsonify({'respuesta': f'No encontré "{termino}" todavía, pero hay 332+ productos. ¿Probamos con otra palabra o navegas el catálogo?',
-                        'sugerencias': ['/productos', 'Categorías', 'Contacto']})
-
-    for patrones, respuesta, sugerencias in _ASISTENTE_REGLAS:
-        if any(p in norm for p in patrones):
-            return jsonify({'respuesta': respuesta, 'sugerencias': sugerencias})
-
-    # Sugerir categorías si menciona una
-    conn = get_db()
-    cats = [r['categoria'] for r in conn.execute('SELECT DISTINCT categoria FROM productos').fetchall()]
-    conn.close()
-    mencionada = next((c for c in cats if c.lower().replace('á','a').replace('é','e').replace('í','i').replace('ó','o').replace('ú','u') in norm), None)
-    if mencionada:
-        return jsonify({'respuesta': f'¡Buena elección! Tenemos productos de {mencionada}. Puedes verlos todos en el catálogo filtrado.',
-                        'sugerencias': [f'/productos?categoria={mencionada}', 'Ver todo', 'Cupones']})
-
-    return jsonify({'respuesta': 'Hmm, no estoy segura de eso 🤔. Puedo ayudarte con: cómo comprar/vender, cupones, envíos, pagos, consejos ecológicos o buscar productos. ¿Qué necesitas?',
-                    'sugerencias': ['¿Cómo funciona?', 'Quiero vender', 'Cupones', 'Consejos ecológicos']})
-
 
 @app.route('/changelog')
 def changelog_page():

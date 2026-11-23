@@ -18,7 +18,7 @@
     "precio": 18.0,
     "precio_original": 18.0,
     "descripcion": "Bolsa reutilizable de algodón orgánico 100% biodegradable. Resistente, lavable y con diseño moderno. Ideal para compras diarias. Capacidad: 15L.",
-    "imagen": "https://images.unsplash.com/photo-1616627561954-2e08a6b99b0c?w=400&h=300&fit=crop",
+    "imagen": "",
     "stock": 50,
     "condicion": "nuevo",
     "vistas": 890
@@ -78,7 +78,7 @@
     "precio": 28.0,
     "precio_original": 28.0,
     "descripcion": "Pack de 6 snacks orgánicos: frutos secos, barras de granola, chips de kale, coco deshidratado, mix de semillas y chocolate amargo. Sin azúcares añadidos.",
-    "imagen": "https://images.unsplash.com/photo-1607549001741-01e4f8e24e7e?w=400&h=300&fit=crop",
+    "imagen": "",
     "stock": 60,
     "condicion": "nuevo",
     "vistas": 980
@@ -162,7 +162,7 @@
     "precio": 9.0,
     "precio_original": 9.0,
     "descripcion": "Bolsa de malla de algodón orgánico para frutas y verduras. Transpirable, lavable y reutilizable. Pack de 3 unidades de diferentes tamaños.",
-    "imagen": "https://images.unsplash.com/photo-1616627561954-2e08a6b99b0c?w=400&h=300&fit=crop",
+    "imagen": "",
     "stock": 150,
     "condicion": "nuevo",
     "vistas": 920
@@ -750,7 +750,7 @@
     "precio": 15.0,
     "precio_original": 15.0,
     "descripcion": "Set de 5 bolsas de malla de algodón orgánico para comprar frutas y verduras a granel. Tamaños variados, livianas y lavables. Pesa solo 20g cada una.",
-    "imagen": "https://images.unsplash.com/photo-1616627561954-2e08a6b99b0c?w=400&h=300&fit=crop",
+    "imagen": "",
     "stock": 110,
     "condicion": "nuevo",
     "vistas": 410
@@ -846,7 +846,7 @@
     "precio": 24.0,
     "precio_original": 24.0,
     "descripcion": "Surtido de frutos secos orgánicos: almendras, nueces, pecanas y avellanas tostadas sin sal. Rico en proteínas y grasas saludables. Sin azúcar añadida.",
-    "imagen": "https://images.unsplash.com/photo-1607549001741-01e4f8e24e7e?w=400&h=300&fit=crop",
+    "imagen": "",
     "stock": 70,
     "condicion": "nuevo",
     "vistas": 530
@@ -882,7 +882,7 @@
     "precio": 22.0,
     "precio_original": 22.0,
     "descripcion": "Café orgánico de altura cultivado en Chanchamayo, selva central del Perú. Tueste medio, notas a chocolate y caramelo. Tostado y empacado localmente.",
-    "imagen": "https://images.unsplash.com/photo-1607549001741-01e4f8e24e7e?w=400&h=300&fit=crop",
+    "imagen": "",
     "stock": 55,
     "condicion": "nuevo",
     "vistas": 640

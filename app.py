@@ -993,6 +993,19 @@ def init_db():
         except (json.JSONDecodeError, OSError, sqlite3.Error):
             pass
 
+    # Reparar imágenes rotas de seeds antiguos (URLs de Unsplash eliminadas)
+    try:
+        filas = conn.execute(
+            "SELECT id, categoria, imagen FROM productos WHERE imagen LIKE '%1616627561954%' OR imagen LIKE '%1607549001741%'"
+        ).fetchall()
+        for f in filas:
+            conn.execute('UPDATE productos SET imagen = ? WHERE id = ?',
+                         (get_product_image(f['categoria']), f['id']))
+        if filas:
+            conn.commit()
+    except sqlite3.Error:
+        pass
+
     # Seed cupones (idempotente: INSERT OR IGNORE para no duplicar códigos existentes)
     cupones = [
         ('ECO10', 10, '%', 30, 100, '2026-12-31'),

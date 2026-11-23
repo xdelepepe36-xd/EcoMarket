@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+
+<head>
+    <script>
+    // Aplicar tema guardado antes del primer paint (evita flash claro)
+    (function(){try{var t=localStorage.getItem('ecomarket-theme');var ok=['light','dark','nature','ocean','midnight','rose','autumn','christmas'];if(t&&ok.indexOf(t)!==-1){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoMarket - Marketplace Ecológico<script src="/static/ecomarket-autocomplete.js"></script>
+<script>
+(function(){try{
+var v=JSON.parse(localStorage.getItem('eco_vistos')||'[]');
+if(!v.length)return;
+var sec=document.getElementById('vistosSection'),grid=document.getElementById('vistosGrid');
+if(!sec||!grid)return;
+grid.innerHTML=v.map(function(p){
+ var img=(p.imagen&&(p.imagen.indexOf('http')===0||p.imagen.indexOf('/')===0))?p.imagen:(p.imagen?'/static/'+p.imagen:'');
+ return '<a href="/producto/'+p.id+'" class="product-card-link"><article class="product-card"><div class="product-image-container">'+
+ (img?'<img class="product-image" src="'+img+'" alt="'+p.nombre+'" loading="lazy" onerror="this.src='/static/assets/product-placeholder.svg'">':'<div class="product-image-placeholder"><i class="bi bi-box-seam"></i></div>')+
+ '</div><div class="product-content"><h3 class="product-nombre">'+p.nombre+'</h3><div class="product-precio">S/. '+p.precio+'</div></div></article></a>';}).join('');
+sec.style.display='';
+}catch(e){}})();
+</script>
+</title>
+    <meta name="description" content="EcoMarket - Marketplace ecológico. Compra y vende productos sostenibles.">
+    <meta name="theme-color" content="#2e7d32">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="EcoMarket">
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="icon" type="image/svg+xml" href="/static/assets/badge-leaf.svg">
+    <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+    <meta property="og:title" content="EcoMarket - Marketplace Ecológico">
+    <meta property="og:description" content="Compra y vende productos sostenibles. Marketplace 100% ecológico.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ecomarket-5-kf6r.onrender.com/">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1200&h=630&fit=crop">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="EcoMarket - Marketplace Ecológico">
+    <meta name="twitter:description" content="Compra y vende productos sostenibles. Marketplace 100% ecológico.">
+    <link rel="canonical" href="https://ecomarket-5-kf6r.onrender.com/">
+    
+    <!-- Fuentes e Iconos -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- CSS: final.css como base (cubre todas las clases de las plantillas)
+         + rediseño.css encima (nuevo diseño gana donde define estilos) -->
+    <link rel="stylesheet" href="/static/ecomarket-final.css?v=30">
+    <link rel="stylesheet" href="/static/ecomarket-redise%C3%B1o.css?v=30">
+    <link rel="stylesheet" href="/static/ecomarket-dark-mode.css?v=30">
+    <link rel="stylesheet" href="/static/ecomarket-wow.css?v=40">
+    <link rel="stylesheet" href="/static/ecomarket-themes.css?v=32">
+    <link rel="stylesheet" href="/static/accessibility.css?v=30">
+    
+    <!-- JS esencial: final.js expone toda la API que usan las plantillas
+         (EcoCart.getSummary, EcoFavorites, EcoToast, etc.) -->
+    <script src="/static/ecomarket-final.js?v=33" defer></script>
+    <script src="/static/ecomarket-security-enhanced.js?v=30" defer></script>
+    <script src="/static/ecomarket-i18n-complete.js?v=30" defer></script>
+    <script src="/static/ecomarket-validation.js?v=30" defer></script>
+    <script src="/static/ecomarket-wow.js?v=30" defer></script>
+    <script src="/static/ecomarket-asistente.js?v=31" defer></script>
+    <script src="/static/ecomarket-flycart.js?v=30" defer></script>
+    <!-- tour/presentación desactivado -->
+    <script src="/static/ecomarket-cursor.js?v=30" defer></script>
+    <script src="/static/ecomarket-extras.js?v=32" defer></script>
+    <script src="/static/ecomarket-pro.js?v=16" defer></script>
+    
+    
+</head>
+<div class="eco-loader" id="ecoLoader"><img src="/static/assets/mascota.svg" alt="Cargando"><span>Cargando EcoMarket…</span></div>
+<body data-user-id="">
+    <!-- Skip Navigation para accesibilidad -->
+    <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+
+    <!-- Header Mejorado -->
+    <header class="header">
+        <div class="container header-container">
+            <a href="/" class="logo">
+                <img src="/static/assets/logo.svg" alt="EcoMarket" class="logo-img">
+            </a>
+            
+            <!-- Navegación Desktop -->
+            <nav class="navbar desktop-nav">
+                <a href="/" class="nav-link" data-i18n="nav.home">Inicio</a>
+                <a href="/productos" class="nav-link" data-i18n="nav.products">Productos</a>
+                <a href="/favoritos" class="nav-link" data-i18n="nav.favorites">Favoritos</a>
+                <a href="/carrito" class="nav-link">
+                    <i class="bi bi-cart3"></i> <span data-i18n="nav.cart">Carrito</span>
+                    <span class="cart-badge" id="cartCount">0</span>
+                </a>
+                <a href="/impacto" class="nav-link" data-i18n="nav.impact">Impacto</a>
+                
+                
+                    <a href="/login" class="nav-link" data-i18n="nav.login">Ingresar</a>
+                    <a href="/registro" class="btn-principal"><span data-i18n="nav.register">Registrarse</span></a>
+                
+            </nav>
+            
+            <!-- Selector de idioma (EcoI18n lo rellena) -->
+            <div class="lang-switcher"></div>
+
+            <!-- Selector de tema -->
+            <div data-theme-switcher class="theme-switcher" role="button" tabindex="0" aria-label="Cambiar tema" title="Cambiar tema"></div>
+            
+            <!-- Botón Menú Móvil -->
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Abrir menú">
+                <i class="bi bi-list"></i>
+            </button>
+        </div>
+        
+        <!-- Menú Móvil -->
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="/" class="mobile-nav-link" data-i18n="nav.home">Inicio</a>
+            <a href="/productos" class="mobile-nav-link" data-i18n="nav.products">Productos</a>
+            <a href="/favoritos" class="mobile-nav-link" data-i18n="nav.favorites">Favoritos</a>
+            <a href="/carrito" class="mobile-nav-link" data-i18n="nav.cart">Carrito</a>
+            <a href="/impacto" class="mobile-nav-link" data-i18n="nav.impact">Impacto</a>
+            
+            
+                <a href="/login" class="mobile-nav-link" data-i18n="nav.login">Ingresar</a>
+                <a href="/registro" class="mobile-nav-link" data-i18n="nav.register">Registrarse</a>
+            
+            <div data-theme-switcher class="theme-switcher theme-switcher-mobile" role="button" tabindex="0" aria-label="Cambiar tema" title="Cambiar tema"></div>
+        </div>
+    </header>
+
+    <main id="main-content">
+        <div class="container">
+            <!-- Flash Messages -->
+            
+                
+            
+            
+            
+
+<!-- 1. HERO SECTION MEJORADO CON HAMSTER -->
+<section class="hero-section-enhanced">
+    <div class="hero-background">
+        <div class="hero-image-container">
+            <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1920&q=80" alt="Productos ecológicos" class="hero-bg-image">
+            <div class="hero-overlay"></div>
+        </div>
+    </div>
+    <div class="container hero-content-wrapper">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="bi bi-leaf"></i>
+                <span data-i18n="hero.badge">Marketplace 100% ecológico</span>
+            </div>
+            <h1 class="hero-title" data-i18n="hero.title">Compra y vende productos sostenibles</h1>
+            <p class="hero-description" data-i18n="hero.subtitle">
+                Descubre miles de productos ecológicos de vendedores comprometidos con el planeta. 
+                Cada compra genera un impacto positivo real.
+            </p>
+            <div class="hero-stats-quick">
+                <div class="hero-stat-item">
+                    <strong>98</strong>
+                    <span data-i18n="home.stat_products">Productos</span>
+                </div>
+                <div class="hero-stat-item">
+                    <strong>11</strong>
+                    <span data-i18n="home.stat_categories">Categorías</span>
+                </div>
+                <div class="hero-stat-item">
+                    <strong>0</strong>
+                    <span data-i18n="home.stat_users">Usuarios</span>
+                </div>
+            </div>
+            <div class="hero-buttons">
+                <a href="/productos" class="btn-principal btn-hero">
+                    <i class="bi bi-bag"></i> <span data-i18n="hero.explore">Explorar productos</span>
+                </a>
+                <a href="/publicar" class="btn-secundario btn-hero">
+                    <i class="bi bi-plus-lg"></i> <span data-i18n="hero.publish">Publicar gratis</span>
+                </a>
+            </div>
+            <div class="hero-trust-badges">
+                <div class="trust-badge">
+                    <i class="bi bi-truck"></i>
+                    <span data-i18n="hero.trust.shipping">Envío coordinado</span>
+                </div>
+                <div class="trust-badge">
+                    <i class="bi bi-shield-check"></i>
+                    <span data-i18n="hero.trust.payment">Pago directo</span>
+                </div>
+                <div class="trust-badge">
+                    <i class="bi bi-arrow-repeat"></i>
+                    <span data-i18n="hero.trust.returns">Devoluciones claras</span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-illustrations" aria-hidden="true">
+            <img src="/static/assets/mascota.svg" class="hero-mascot" alt="Eco, la mascota de EcoMarket">
+            <div class="poster-blob blob-1"></div>
+            <div class="poster-blob blob-2"></div>
+            <div class="poster-blob blob-3"></div>
+            <div class="poster-glyph glyph-1">✿</div>
+            <div class="poster-glyph glyph-2">✦</div>
+            <div class="poster-glyph glyph-3">❀</div>
+            
+            
+            <a class="float-chip chip-1" href="/producto/11">
+                <img class="chip-img" src="/static/assets/product-placeholder.svg" alt="Set de 4 Popotes de Acero" loading="lazy" onerror="this.style.display='none'">
+                <div><strong>Set de 4 Popotes de Acero</strong><small>S/. 6.00</small></div>
+                <span class="chip-badge eco">Accesorios</span>
+            </a>
+            
+            
+            <a class="float-chip chip-2" href="/producto/5">
+                <img class="chip-img" src="https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?w=400&amp;h=300&amp;fit=crop" alt="Jabón Natural de Coco y Lavanda" loading="lazy" onerror="this.style.display='none'">
+                <div><strong>Jabón Natural de Coco y Lavanda</strong><small>S/. 15.00</small></div>
+                <span class="chip-badge eco">Higiene</span>
+            </a>
+            
+            
+            <a class="float-chip chip-3" href="/producto/3">
+                <img class="chip-img" src="https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=400&amp;h=300&amp;fit=crop" alt="Cepillo de Bambú Natural con Carbón" loading="lazy" onerror="this.style.display='none'">
+                <div><strong>Cepillo de Bambú Natural con Carbón</strong><small>S/. 12.00</small></div>
+                <span class="chip-badge eco">Higiene</span>
+            </a>
+            
+        </div>
+    </div>
+</section>
+
+<!-- GALERÍA ECO CON FOTOS REALES -->
+<section class="eco-gallery" aria-label="Galería de productos ecológicos">
+    <div class="eco-gallery-track">
+        
+        
+        <figure class="eco-gallery-item">
+            <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&q=70&auto=format&fit=crop" alt="Mercados sostenibles" loading="eager">
+            <figcaption>Mercados sostenibles</figcaption>
+        </figure>
+        
+        <figure class="eco-gallery-item">
+            <img src="https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=600&q=70&auto=format&fit=crop" alt="Alimentos frescos" loading="eager">
+            <figcaption>Alimentos frescos</figcaption>
+        </figure>
+        
+        <figure class="eco-gallery-item">
+            <img src="https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=600&q=70&auto=format&fit=crop" alt="Reutiliza y reduce" loading="eager">
+            <figcaption>Reutiliza y reduce</figcaption>
+        </figure>
+        
+        <figure class="eco-gallery-item">
+            <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600&q=70&auto=format&fit=crop" alt="Vuelve a la naturaleza" loading="eager">
+            <figcaption>Vuelve a la naturaleza</figcaption>
+        </figure>
+        
+        <figure class="eco-gallery-item">
+            <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=600&q=70&auto=format&fit=crop" alt="Comunidad EcoMarket" loading="eager">
+            <figcaption>Comunidad EcoMarket</figcaption>
+        </figure>
+        
+        <figure class="eco-gallery-item">
+            <img src="https://images.unsplash.com/photo-1493770348161-369560ae357d?w=600&q=70&auto=format&fit=crop" alt="Come sano, compra eco" loading="eager">
+            <figcaption>Come sano, compra eco</figcaption>
+        </figure>
+        
+        
+        <figure class="eco-gallery-item" aria-hidden="true">
+            <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&q=70&auto=format&fit=crop" alt="" loading="eager">
+            <figcaption>Mercados sostenibles</figcaption>
+        </figure>
+        
+        <figure class="eco-gallery-item" aria-hidden="true">
+            <img src="https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=600&q=70&auto=format&fit=crop" alt="" loading="eager">
+            <figcaption>Alimentos frescos</figcaption>
+        </figure>
+        
+        <figure class="eco-gallery-item" aria-hidden="true">
+            <img src="https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=600&q=70&auto=format&fit=crop" alt="" loading="eager">
+            <figcaption>Reutiliza y reduce</figcaption>
+        </figure>
+        
+        <figure class="eco-gallery-item" aria-hidden="true">
+            <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600&q=70&auto=format&fit=crop" alt="" loading="eager">
+            <figcaption>Vuelve a la naturaleza</figcaption>
+        </figure>
+        
+        <figure class="eco-gallery-item" aria-hidden="true">
+            <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=600&q=70&auto=format&fit=crop" alt="" loading="eager">
+            <figcaption>Comunidad EcoMarket</figcaption>
+        </figure>
+        
+        <figure class="eco-gallery-item" aria-hidden="true">
+            <img src="https://images.unsplash.com/photo-1493770348161-369560ae357d?w=600&q=70&auto=format&fit=crop" alt="" loading="eager">
+            <figcaption>Come sano, compra eco</figcaption>
+        </figure>
+        
+    </div>
+</section>
+
+<!-- 2. BARRA DE BÚSQUEDA -->
+<!-- MARQUESINA DE PRODUCTOS -->
+<div class="prod-marquee" aria-hidden="true">
+    <div class="prod-marquee-track">
+        
+        
+        <a class="prod-marquee-item" href="/producto/11">
+            <img src="/static/assets/product-placeholder.svg" alt="Set de 4 Popotes de Acero" loading="lazy" onerror="this.style.display='none'">
+            <span class="pm-name">Set de 4 Popotes de Acero</span>
+            <span class="pm-price">S/. 6.00</span>
+        </a>
+        
+        
+        <a class="prod-marquee-item" href="/producto/5">
+            <img src="https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?w=400&amp;h=300&amp;fit=crop" alt="Jabón Natural de Coco y Lavanda" loading="lazy" onerror="this.style.display='none'">
+            <span class="pm-name">Jabón Natural de Coco y Lavanda</span>
+            <span class="pm-price">S/. 15.00</span>
+        </a>
+        
+        
+        <a class="prod-marquee-item" href="/producto/3">
+            <img src="https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=400&amp;h=300&amp;fit=crop" alt="Cepillo de Bambú Natural con Carbón" loading="lazy" onerror="this.style.display='none'">
+            <span class="pm-name">Cepillo de Bambú Natural con Carbón</span>
+            <span class="pm-price">S/. 12.00</span>
+        </a>
+        
+        
+        <a class="prod-marquee-item" href="/producto/1">
+            <img src="https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400&amp;h=300&amp;fit=crop" alt="Botella Reutilizable de Acero 750ml" loading="lazy" onerror="this.style.display='none'">
+            <span class="pm-name">Botella Reutilizable de Acero 750ml</span>
+            <span class="pm-price">S/. 45.00</span>
+        </a>
+        
+        
+        <a class="prod-marquee-item" href="/producto/27">
+            <img src="https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&amp;h=300&amp;fit=crop" alt="Almohadillas Desmaquillantes Reutilizables" loading="lazy" onerror="this.style.display='none'">
+            <span class="pm-name">Almohadillas Desmaquillantes Reutilizables</span>
+            <span class="pm-price">S/. 10.00</span>
+        </a>
+        
+        
+        <a class="prod-marquee-item" href="/producto/12">
+            <img src="https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&amp;h=300&amp;fit=crop" alt="Shampoo Sólido Natural Lavanda" loading="lazy" onerror="this.style.display='none'">
+            <span class="pm-name">Shampoo Sólido Natural Lavanda</span>
+            <span class="pm-price">S/. 25.00</span>
+        </a>
+        
+        
+        
+        <a class="prod-marquee-item" href="/producto/11">
+            <img src="/static/assets/product-placeholder.svg" alt="Set de 4 Popotes de Acero" loading="lazy" onerror="this.style.display='none'">
+            <span class="pm-name">Set de 4 Popotes de Acero</span>
+            <span class="pm-price">S/. 6.00</span>
+        </a>
+        
+        
+        <a class="prod-marquee-item" href="/producto/5">
+            <img src="https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?w=400&amp;h=300&amp;fit=crop" alt="Jabón Natural de Coco y Lavanda" loading="lazy" onerror="this.style.display='none'">
+            <span class="pm-name">Jabón Natural de Coco y Lavanda</span>
+            <span class="pm-price">S/. 15.00</span>
+        </a>
+        
+        
+        <a class="prod-marquee-item" href="/producto/3">
+            <img src="https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=400&amp;h=300&amp;fit=crop" alt="Cepillo de Bambú Natural con Carbón" loading="lazy" onerror="this.style.display='none'">
+            <span class="pm-name">Cepillo de Bambú Natural con Carbón</span>
+            <span class="pm-price">S/. 12.00</span>
+        </a>
+        
+        
+        <a class="prod-marquee-item" href="/producto/1">
+            <img src="https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400&amp;h=300&amp;fit=crop" alt="Botella Reutilizable de Acero 750ml" loading="lazy" onerror="this.style.display='none'">
+            <span class="pm-name">Botella Reutilizable de Acero 750ml</span>
+            <span class="pm-price">S/. 45.00</span>
+        </a>
+        
+        
+        <a class="prod-marquee-item" href="/producto/27">
+            <img src="https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&amp;h=300&amp;fit=crop" alt="Almohadillas Desmaquillantes Reutilizables" loading="lazy" onerror="this.style.display='none'">
+            <span class="pm-name">Almohadillas Desmaquillantes Reutilizables</span>
+            <span class="pm-price">S/. 10.00</span>
+        </a>
+        
+        
+        <a class="prod-marquee-item" href="/producto/12">
+            <img src="https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&amp;h=300&amp;fit=crop" alt="Shampoo Sólido Natural Lavanda" loading="lazy" onerror="this.style.display='none'">
+            <span class="pm-name">Shampoo Sólido Natural Lavanda</span>
+            <span class="pm-price">S/. 25.00</span>
+        </a>
+        
+    </div>
+</div>
+
+<section class="search-bar-section">
+    <div class="container">
+        <div class="search-bar">
+            <form action="/productos" method="GET">
+                <input 
+                    type="text" 
+                    name="q" 
+                    class="search-input" 
+                    placeholder="Buscar productos ecológicos..." data-i18n-placeholder="home.search_placeholder"
+                    aria-label="Buscar productos"
+                >
+                <button type="submit" class="btn-principal"><span data-i18n="home.search_button">Buscar</span></button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- MARQUEE Ecológico -->
+<div class="eco-marquee" aria-hidden="true">
+    <div class="eco-marquee-track">
+        <span class="eco-marquee-item"><i class="bi bi-recycle"></i> <span data-i18n="marquee.eco1">100% Ecológico</span></span><span class="dot">✦</span>
+        <span class="eco-marquee-item"><i class="bi bi-patch-check"></i> <span data-i18n="marquee.eco2">Vendedores por niveles</span></span><span class="dot">✦</span>
+        <span class="eco-marquee-item"><i class="bi bi-geo-alt"></i> <span data-i18n="marquee.eco3">Vendedores locales</span></span><span class="dot">✦</span>
+        <span class="eco-marquee-item"><i class="bi bi-arrow-repeat"></i> <span data-i18n="marquee.eco4">Segunda vida</span></span><span class="dot">✦</span>
+        <span class="eco-marquee-item"><i class="bi bi-shield-check"></i> <span data-i18n="hero.trust.payment">Pago directo</span></span><span class="dot">✦</span>
+        <span class="eco-marquee-item"><i class="bi bi-truck"></i> <span data-i18n="hero.trust.shipping">Envío coordinado</span></span><span class="dot">✦</span>
+        <span class="eco-marquee-item"><i class="bi bi-recycle"></i> <span data-i18n="marquee.eco1">100% Ecológico</span></span><span class="dot">✦</span>
+        <span class="eco-marquee-item"><i class="bi bi-patch-check"></i> <span data-i18n="marquee.eco2">Vendedores por niveles</span></span><span class="dot">✦</span>
+        <span class="eco-marquee-item"><i class="bi bi-geo-alt"></i> <span data-i18n="marquee.eco3">Vendedores locales</span></span><span class="dot">✦</span>
+        <span class="eco-marquee-item"><i class="bi bi-arrow-repeat"></i> <span data-i18n="marquee.eco4">Segunda vida</span></span><span class="dot">✦</span>
+        <span class="eco-marquee-item"><i class="bi bi-shield-check"></i> <span data-i18n="hero.trust.payment">Pago directo</span></span><span class="dot">✦</span>
+        <span class="eco-marquee-item"><i class="bi bi-truck"></i> <span data-i18n="hero.trust.shipping">Envío coordinado</span></span><span class="dot">✦</span>
+    </div>
+</div>
+
+<!-- 3. CATEGORÍAS DE PRODUCTOS -->
+<section class="categorias-section section">
+    <div class="container">
+        <div class="section-title">
+            <h2 data-i18n="categories.title">Categorías de productos</h2>
+            <p data-i18n="home.categories_subtitle">Explora nuestra variedad de productos sostenibles</p>
+        </div>
+        <div class="categorias-grid">
+            
+            
+            <a href="/productos?categoria=Accesorios" class="categoria-card">
+                
+                <img class="categoria-foto" src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&q=70&auto=format&fit=crop" alt="Accesorios" loading="lazy">
+                
+                <div class="categoria-icon">
+                    <i class="bi bi-gem"></i>
+                    
+                </div>
+                <div class="categoria-nombre" data-category="Accesorios">Accesorios</div>
+            </a>
+            
+            <a href="/productos?categoria=Alimentaci%C3%B3n" class="categoria-card">
+                
+                <img class="categoria-foto" src="https://images.unsplash.com/photo-1493770348161-369560ae357d?w=400&q=70&auto=format&fit=crop" alt="Alimentación" loading="lazy">
+                
+                <div class="categoria-icon">
+                    <i class="bi bi-cup-straw"></i>
+                    
+                </div>
+                <div class="categoria-nombre" data-category="Alimentación">Alimentación</div>
+            </a>
+            
+            <a href="/productos?categoria=Electrodom%C3%A9sticos+usados" class="categoria-card">
+                
+                <div class="categoria-icon">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <div class="categoria-nombre" data-category="Electrodomésticos usados">Electrodomésticos usados</div>
+            </a>
+            
+            <a href="/productos?categoria=Higiene" class="categoria-card">
+                
+                <img class="categoria-foto" src="https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400&q=70&auto=format&fit=crop" alt="Higiene" loading="lazy">
+                
+                <div class="categoria-icon">
+                    <i class="bi bi-droplet"></i>
+                    
+                </div>
+                <div class="categoria-nombre" data-category="Higiene">Higiene</div>
+            </a>
+            
+            <a href="/productos?categoria=Hogar" class="categoria-card">
+                
+                <img class="categoria-foto" src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&q=70&auto=format&fit=crop" alt="Hogar" loading="lazy">
+                
+                <div class="categoria-icon">
+                    <i class="bi bi-house-heart"></i>
+                    
+                </div>
+                <div class="categoria-nombre" data-category="Hogar">Hogar</div>
+            </a>
+            
+            <a href="/productos?categoria=Jard%C3%ADn" class="categoria-card">
+                
+                <img class="categoria-foto" src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=70&auto=format&fit=crop" alt="Jardín" loading="lazy">
+                
+                <div class="categoria-icon">
+                    <i class="bi bi-flower1"></i>
+                    
+                </div>
+                <div class="categoria-nombre" data-category="Jardín">Jardín</div>
+            </a>
+            
+            <a href="/productos?categoria=Manualidades+recicladas" class="categoria-card">
+                
+                <div class="categoria-icon">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <div class="categoria-nombre" data-category="Manualidades recicladas">Manualidades recicladas</div>
+            </a>
+            
+            <a href="/productos?categoria=Materiales+reciclables" class="categoria-card">
+                
+                <div class="categoria-icon">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <div class="categoria-nombre" data-category="Materiales reciclables">Materiales reciclables</div>
+            </a>
+            
+            <a href="/productos?categoria=Muebles+reutilizables" class="categoria-card">
+                
+                <div class="categoria-icon">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <div class="categoria-nombre" data-category="Muebles reutilizables">Muebles reutilizables</div>
+            </a>
+            
+            <a href="/productos?categoria=Ropa" class="categoria-card">
+                
+                <img class="categoria-foto" src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400&q=70&auto=format&fit=crop" alt="Ropa" loading="lazy">
+                
+                <div class="categoria-icon">
+                    <i class="bi bi-handbag"></i>
+                    
+                </div>
+                <div class="categoria-nombre" data-category="Ropa">Ropa</div>
+            </a>
+            
+            <a href="/productos?categoria=Segunda+mano" class="categoria-card">
+                
+                <div class="categoria-icon">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <div class="categoria-nombre" data-category="Segunda mano">Segunda mano</div>
+            </a>
+            
+        </div>
+    </div>
+</section>
+
+<!-- 4. PRODUCTOS DESTACADOS -->
+<!-- VISTOS RECIENTEMENTE -->
+<section class="productos-section section" id="vistosSection" style="display:none">
+    <div class="container">
+        <div class="section-title">
+            <h2 data-i18n="home.recently_title">Vistos recientemente</h2>
+            <p data-i18n="home.recently_subtitle">Retoma donde lo dejaste</p>
+        </div>
+        <div class="productos-grid" id="vistosGrid"></div>
+    </div>
+</section>
+
+<div class="container">
+  <div class="flash-deal" id="flashDeal">
+    <span class="fd-tag"><i class="bi bi-lightning-charge-fill"></i> Oferta relámpago</span>
+    <div class="fd-info">
+      <b id="fdName">Bicicleta ruta 26&#34; (reacondicionada)</b>
+      <small id="fdPrice"><s>S/. 350.00</s> S/. 180.00 · se renueva cada medianoche</small>
+    </div>
+    <div class="fd-timer">
+      <span><b id="fdH">00</b><small>HRS</small></span>
+      <span><b id="fdM">00</b><small>MIN</small></span>
+      <span><b id="fdS">00</b><small>SEG</small></span>
+    </div>
+    <a class="fd-btn" id="fdLink" href="/producto/82">Ver oferta</a>
+  </div>
+</div>
+<section class="productos-section section">
+    <div class="container">
+        <div class="section-title">
+            <h2 data-i18n="home.featured_title">Productos destacados</h2>
+            <p data-i18n="home.featured_subtitle">Los más vendidos esta semana</p>
+        </div>
+        <div class="productos-grid">
+            
+            
+            <a href="/producto/11" class="product-card-link">
+                <article class="product-card">
+                    <div class="product-image-container">
+                        
+                        <img class="product-image" src="/static/assets/product-placeholder.svg" alt="Set de 4 Popotes de Acero" loading="lazy" onerror="this.onerror=null;this.src='/static/assets/product-placeholder.svg'">
+                        
+                        
+                        
+                    </div>
+                    <div class="product-content">
+                        <div class="product-categoria" data-category="Accesorios">Accesorios</div>
+                        <h3 class="product-nombre">Set de 4 Popotes de Acero</h3>
+                        <div class="product-precio">
+                            
+                            S/. 6.00
+                        </div>
+                        <div class="product-disponibilidad disponible" data-i18n="home.product_available">Disponible</div>
+                        <div class="product-botones">
+                            <button class="btn-card btn-primary" data-i18n="home.view_details">Ver detalles</button>
+                        </div>
+                    </div>
+                </article>
+            </a>
+            
+            
+            <a href="/producto/5" class="product-card-link">
+                <article class="product-card">
+                    <div class="product-image-container">
+                        
+                        <img class="product-image" src="https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?w=400&amp;h=300&amp;fit=crop" alt="Jabón Natural de Coco y Lavanda" loading="lazy" onerror="this.onerror=null;this.src='/static/assets/product-placeholder.svg'">
+                        
+                        
+                        
+                    </div>
+                    <div class="product-content">
+                        <div class="product-categoria" data-category="Higiene">Higiene</div>
+                        <h3 class="product-nombre">Jabón Natural de Coco y Lavanda</h3>
+                        <div class="product-precio">
+                            
+                            S/. 15.00
+                        </div>
+                        <div class="product-disponibilidad disponible" data-i18n="home.product_available">Disponible</div>
+                        <div class="product-botones">
+                            <button class="btn-card btn-primary" data-i18n="home.view_details">Ver detalles</button>
+                        </div>
+                    </div>
+                </article>
+            </a>
+            
+            
+            <a href="/producto/3" class="product-card-link">
+                <article class="product-card">
+                    <div class="product-image-container">
+                        
+                        <img class="product-image" src="https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=400&amp;h=300&amp;fit=crop" alt="Cepillo de Bambú Natural con Carbón" loading="lazy" onerror="this.onerror=null;this.src='/static/assets/product-placeholder.svg'">
+                        
+                        
+                        
+                    </div>
+                    <div class="product-content">
+                        <div class="product-categoria" data-category="Higiene">Higiene</div>
+                        <h3 class="product-nombre">Cepillo de Bambú Natural con Carbón</h3>
+                        <div class="product-precio">
+                            
+                            S/. 12.00
+                        </div>
+                        <div class="product-disponibilidad disponible" data-i18n="home.product_available">Disponible</div>
+                        <div class="product-botones">
+                            <button class="btn-card btn-primary" data-i18n="home.view_details">Ver detalles</button>
+                        </div>
+                    </div>
+                </article>
+            </a>
+            
+            
+            <a href="/producto/1" class="product-card-link">
+                <article class="product-card">
+                    <div class="product-image-container">
+                        
+                        <img class="product-image" src="https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400&amp;h=300&amp;fit=crop" alt="Botella Reutilizable de Acero 750ml" loading="lazy" onerror="this.onerror=null;this.src='/static/assets/product-placeholder.svg'">
+                        
+                        
+                        <span class="card-offer-ribbon">-25.0%</span>
+                        
+                        
+                    </div>
+                    <div class="product-content">
+                        <div class="product-categoria" data-category="Accesorios">Accesorios</div>
+                        <h3 class="product-nombre">Botella Reutilizable de Acero 750ml</h3>
+                        <div class="product-precio">
+                            <s>S/. 60.00</s>
+                            S/. 45.00
+                        </div>
+                        <div class="product-disponibilidad disponible" data-i18n="home.product_available">Disponible</div>
+                        <div class="product-botones">
+                            <button class="btn-card btn-primary" data-i18n="home.view_details">Ver detalles</button>
+                        </div>
+                    </div>
+                </article>
+            </a>
+            
+            
+            <a href="/producto/27" class="product-card-link">
+                <article class="product-card">
+                    <div class="product-image-container">
+                        
+                        <img class="product-image" src="https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&amp;h=300&amp;fit=crop" alt="Almohadillas Desmaquillantes Reutilizables" loading="lazy" onerror="this.onerror=null;this.src='/static/assets/product-placeholder.svg'">
+                        
+                        
+                        
+                    </div>
+                    <div class="product-content">
+                        <div class="product-categoria" data-category="Higiene">Higiene</div>
+                        <h3 class="product-nombre">Almohadillas Desmaquillantes Reutilizables</h3>
+                        <div class="product-precio">
+                            
+                            S/. 10.00
+                        </div>
+                        <div class="product-disponibilidad disponible" data-i18n="home.product_available">Disponible</div>
+                        <div class="product-botones">
+                            <button class="btn-card btn-primary" data-i18n="home.view_details">Ver detalles</button>
+                        </div>
+                    </div>
+                </article>
+            </a>
+            
+            
+            <a href="/producto/12" class="product-card-link">
+                <article class="product-card">
+                    <div class="product-image-container">
+                        
+                        <img class="product-image" src="https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&amp;h=300&amp;fit=crop" alt="Shampoo Sólido Natural Lavanda" loading="lazy" onerror="this.onerror=null;this.src='/static/assets/product-placeholder.svg'">
+                        
+                        
+                        
+                    </div>
+                    <div class="product-content">
+                        <div class="product-categoria" data-category="Higiene">Higiene</div>
+                        <h3 class="product-nombre">Shampoo Sólido Natural Lavanda</h3>
+                        <div class="product-precio">
+                            
+                            S/. 25.00
+                        </div>
+                        <div class="product-disponibilidad disponible" data-i18n="home.product_available">Disponible</div>
+                        <div class="product-botones">
+                            <button class="btn-card btn-primary" data-i18n="home.view_details">Ver detalles</button>
+                        </div>
+                    </div>
+                </article>
+            </a>
+            
+        </div>
+    </div>
+</section>
+
+<!-- 4b. RECOMENDADOS PARA TI (solo usuarios con sesión) -->
+<section id="recomendadosSection" class="productos-section section" style="display:none">
+    <div class="container">
+        <div class="section-title">
+            <h2 data-i18n="rec.title">Recomendados para ti</h2>
+            <p data-i18n="rec.subtitle">Basado en tus favoritos y visitas</p>
+        </div>
+        <div class="productos-grid" id="recomendadosGrid"></div>
+    </div>
+</section>
+
+<!-- 4c. OFERTAS FLASH -->
+<section id="flashSection" class="section" style="display:none;padding:24px 0">
+    <div class="container">
+        <div class="section-title">
+            <h2>⚡ Ofertas Flash</h2>
+            <p>Los mayores descuentos del momento</p>
+        </div>
+        <div id="flashStrip" style="display:flex;gap:14px;overflow-x:auto;padding-bottom:10px;scroll-snap-type:x mandatory"></div>
+    </div>
+</section>
+
+<!-- 4d. QUIZ SEMANAL -->
+<section class="section section-alt" id="quizSection" style="display:none">
+    <div class="container" style="max-width:640px">
+        <div class="section-title">
+            <h2>🎓 Quiz Ecológico Semanal</h2>
+            <p>5 preguntas · 20 pts eco por acierto · un intento por semana</p>
+        </div>
+        <div id="quizCard" class="quiz-card"></div>
+    </div>
+</section>
+
+<!-- 5. ¿CÓMO FUNCIONA ECOMARKET? -->
+<section class="section" style="background: var(--blanco);">
+    <div class="container">
+        <div class="section-title">
+            <h2 data-i18n="home.how_title">¿Cómo funciona EcoMarket?</h2>
+            <p data-i18n="home.how_subtitle">Comprar y vender productos sostenibles nunca fue tan fácil</p>
+        </div>
+        <div class="como-funciona-grid">
+            <div class="como-funciona-card">
+                <div class="como-funciona-number">1</div>
+                <h3 data-i18n="home.how1_title">Regístrate gratis</h3>
+                <p data-i18n="home.how1_desc">Crea tu cuenta en segundos y empieza a explorar productos ecológicos.</p>
+            </div>
+            <div class="como-funciona-card">
+                <div class="como-funciona-number">2</div>
+                <h3 data-i18n="home.how2_title">Explora productos</h3>
+                <p data-i18n="home.how2_desc">Encuentra artículos sostenibles que se adapten a tu estilo de vida.</p>
+            </div>
+            <div class="como-funciona-card">
+                <div class="como-funciona-number">3</div>
+                <h3 data-i18n="home.how3_title">Compra segura</h3>
+                <p data-i18n="home.how3_desc">Paga de forma segura y recibe tus productos en casa.</p>
+            </div>
+            <div class="como-funciona-card">
+                <div class="como-funciona-number">4</div>
+                <h3 data-i18n="home.how4_title">Impacto real</h3>
+                <p data-i18n="home.how4_desc">Cada compra contribuye a reducir residuos y proteger el planeta.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 6. BENEFICIOS PARA COMPRADORES Y VENDEDORES -->
+<section class="section section-alt">
+    <div class="container">
+        <div class="section-title">
+            <h2 data-i18n="home.benefits_title">Beneficios para todos</h2>
+            <p data-i18n="home.benefits_subtitle">Tanto compradores como vendedores ganan en EcoMarket</p>
+        </div>
+        <div class="beneficios-grid">
+            <div class="beneficio-card">
+                <div class="beneficio-icon">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <h3 data-i18n="home.buyers_title">Para compradores</h3>
+                <ul>
+                    <li data-i18n="home.buyers1">Segunda mano y materiales reciclados</li>
+                    <li data-i18n="home.buyers2">Pagas directo al vendedor</li>
+                    <li data-i18n="home.buyers3">Envío coordinado contigo</li>
+                    <li data-i18n="home.buyers4">Comunidad que responde</li>
+                </ul>
+            </div>
+            <div class="beneficio-card">
+                <div class="beneficio-icon">
+                    <i class="bi bi-currency-dollar"></i>
+                </div>
+                <h3 data-i18n="home.sellers_title">Para vendedores</h3>
+                <ul>
+                    <li data-i18n="home.sellers1">Publica productos gratis</li>
+                    <li data-i18n="home.sellers2">Sin suscripción para vender</li>
+                    <li data-i18n="home.sellers3">Panel de control completo</li>
+                    <li data-i18n="home.sellers4">Alcance a toda la comunidad</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 7. ESTADÍSTICAS DE IMPACTO AMBIENTAL -->
+<section class="impacto-section">
+    <div class="container">
+        <div class="section-title">
+            <h2 style="color: var(--verde-oscuro);" data-i18n="home.impact_title">Nuestro impacto ambiental</h2>
+            <p style="color: var(--gris-secundario);" data-i18n="home.impact_subtitle">Cifras reales de nuestro compromiso con el planeta</p>
+        </div>
+        <div class="impacto-stats">
+            <div class="impacto-stat">
+                <div class="impacto-valor">98</div>
+                <div class="impacto-label" data-i18n="impact.products">Productos publicados</div>
+            </div>
+            <div class="impacto-stat">
+                <div class="impacto-valor">11</div>
+                <div class="impacto-label" data-i18n="impact.categories">Categorías disponibles</div>
+            </div>
+            <div class="impacto-stat">
+                <div class="impacto-valor">3</div>
+                <div class="impacto-label" data-i18n="impact.visits">Visitas a la plataforma</div>
+            </div>
+            <div class="impacto-stat">
+                <div class="impacto-valor">0</div>
+                <div class="impacto-label" data-i18n="impact.members">Miembros de la comunidad</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 8. SECCIÓN PARA INVITAR A PUBLICAR PRODUCTOS -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2 data-i18n="cta.title">¿Tienes cosas que ya no usas?</h2>
+            <p data-i18n="cta.desc">Dale una segunda vida: publícalo gratis y encuentra compradores en tu comunidad.</p>
+            <div class="cta-features">
+                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> <span data-i18n="cta.feature.no_commission">Publicación 100% gratis</span></div>
+                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> <span data-i18n="cta.feature.dashboard">Panel de vendedor completo</span></div>
+                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> <span data-i18n="cta.feature.payments">Pagos directos y coordinados</span></div>
+                <div class="cta-feature"><i class="bi bi-check-circle-fill"></i> <span data-i18n="cta.feature.support">Ayuda en cada paso</span></div>
+            </div>
+            <div class="cta-buttons">
+                <a href="/publicar" class="btn-principal"><span data-i18n="cta.publish_now">Publicar ahora</span></a>
+                <a href="/registro" class="btn-secundario"><span data-i18n="cta.create_account">Crear cuenta gratis</span></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 9. HISTORIAS DE REUTILIZACIÓN -->
+<section class="section" style="background: var(--blanco);">
+    <div class="container">
+        <div class="section-title">
+            <h2 data-i18n="home.testimonials_title">Historias de reutilización</h2>
+            <p data-i18n="home.testimonials_subtitle">Ejemplos del tipo de comunidad que estamos construyendo en Collique</p>
+        </div>
+        <div class="testimonios-grid">
+            <div class="testimonio-card">
+                <div class="testimonio-stars">♻️</div>
+                <p data-i18n="home.test1_text">Una familia de Comas vende su licuadora vieja por S/.35 en vez de botarla. Otro vecino la compra para los jugos de la semana: misma función, cero basura nueva.</p>
+                <div class="testimonio-author">
+                    <strong data-i18n="home.test1_name">Reutilización en acción</strong>
+                    <span data-i18n="home.test1_city">Collique, Perú</span>
+                </div>
+            </div>
+            <div class="testimonio-card">
+                <div class="testimonio-stars">🌱</div>
+                <p data-i18n="home.test2_text">Los botellones PET que antes iban al botadero ahora se venden a talleres de manualidades. Cada lote vendido es material que no termina contaminando los ríos.</p>
+                <div class="testimonio-author">
+                    <strong data-i18n="home.test2_name">Materiales con segunda vida</strong>
+                    <span data-i18n="home.test2_city">Reciclaje local</span>
+                </div>
+            </div>
+            <div class="testimonio-card">
+                <div class="testimonio-stars">🏠</div>
+                <p data-i18n="home.test3_text">El escritorio y las sillas que una familia ya no necesita encuentran hogar en otra casa del distrito. Muebles útiles que siguen sirviendo años más.</p>
+                <div class="testimonio-author">
+                    <strong data-i18n="home.test3_name">Economía circular</strong>
+                    <span data-i18n="home.test3_city">Comunidad local</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 10. PREGUNTAS FRECUENTES -->
+<section class="section">
+    <div class="container">
+        <div class="section-title">
+            <h2 data-i18n="home.faq_title">Preguntas frecuentes</h2>
+            <p data-i18n="home.faq_subtitle">Todo lo que necesitas saber sobre EcoMarket</p>
+        </div>
+        <div class="faq-grid">
+            <div class="faq-item">
+                <h3 data-i18n="home.faq1_q">¿Es gratis registrarse?</h3>
+                <p data-i18n="home.faq1_a">Sí, el registro es completamente gratuito para compradores y vendedores.</p>
+            </div>
+            <div class="faq-item">
+                <h3 data-i18n="home.faq2_q">¿Cómo funciona el pago?</h3>
+                <p data-i18n="home.faq2_a">Coordinas el pago directamente con el vendedor (Yape, Plin o transferencia). EcoMarket no procesa pagos con tarjeta por ahora.</p>
+            </div>
+            <div class="faq-item">
+                <h3 data-i18n="home.faq3_q">¿Puedo devolver un producto?</h3>
+                <p data-i18n="home.faq3_a">Las devoluciones se coordinan directamente con el vendedor. Revisa la descripción del producto y acuerda las condiciones antes de comprar.</p>
+            </div>
+            <div class="faq-item">
+                <h3 data-i18n="home.faq4_q">¿Cómo verifican a los vendedores?</h3>
+                <p data-i18n="home.faq4_a">Los vendedores suben de nivel (Básico, Confirmado, Verificado, Premium, Top Seller) según sus ventas, valoraciones y datos reales registrados en la plataforma.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Recomendados para ti (solo si hay sesión)
+document.addEventListener('DOMContentLoaded', async () => {
+    const section = document.getElementById('recomendadosSection');
+    const grid = document.getElementById('recomendadosGrid');
+    if (!section || !grid) return;
+    try {
+        if (!window.__ECOMARKET_AUTH__) return;
+        const resp = await fetch('/api/recommendations/ml?limit=8');
+        if (!resp.ok) return; // 401 invitados -> oculto
+        const data = await resp.json();
+        const items = data.recommendations || [];
+        if (!items.length) return;
+        grid.innerHTML = items.map(p => {
+            const img = (p.imagen && p.imagen !== 'uploads/placeholder.svg')
+                ? (p.imagen.startsWith('http') || p.imagen.startsWith('/') ? p.imagen : '/static/' + p.imagen)
+                : '';
+            return `<a href="/producto/${p.id}" class="product-card-link">
+                <article class="product-card">
+                    <div class="product-image-container">
+                        ${img ? `<img class="product-image" src="${img}" alt="${p.nombre}" loading="lazy">` : '<div class="product-image-placeholder"><i class="bi bi-box-seam"></i></div>'}
+                    </div>
+                    <div class="product-content">
+                        <div class="product-categoria">${p.categoria || ''}</div>
+                        <h3 class="product-nombre">${p.nombre}</h3>
+                        <div class="product-precio">S/. ${parseFloat(p.precio || 0).toFixed(2)}</div>
+                        <div class="product-disponibilidad disponible">Disponible</div>
+                        <div class="product-botones"><button class="btn-card btn-primary">Ver detalles</button></div>
+                    </div>
+                </article>
+            </a>`;
+        }).join('');
+        section.style.display = '';
+    } catch (e) { /* silencioso: sin recomendaciones no se muestra */ }
+});
+</script>
+
+
+        </div>
+    </main>
+
+    <!-- Footer Profesional Rediseñado -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col footer-brand">
+                    <a class="logo" href="/">
+                        <img src="/static/assets/logo.svg" alt="EcoMarket" class="logo-img">
+                    </a>
+                    <p data-i18n="footer.description">Marketplace ecológico donde puedes comprar, vender y dar una segunda vida a productos reciclados y sostenibles.</p>
+                    <div class="footer-social">
+                        <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" aria-label="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h4 data-i18n="footer.navigation">Navegación</h4>
+                    <a href="/" data-i18n="nav.home">Inicio</a>
+                    <a href="/productos" data-i18n="nav.catalog">Catálogo</a>
+                    <a href="/favoritos" data-i18n="nav.favorites">Favoritos</a>
+                    <a href="/impacto" data-i18n="nav.impact">Impacto ambiental</a>
+                </div>
+                
+                <div class="footer-col">
+                    <h4 data-i18n="footer.account">Mi cuenta</h4>
+                    
+                        <a href="/login" data-i18n="footer.login">Iniciar sesión</a>
+                        <a href="/registro" data-i18n="footer.register">Registrarse</a>
+                    
+                    <a href="/carrito" data-i18n="footer.cart">Mi carrito</a>
+                    <a href="/newsletter">📬 Boletín ecológico</a>
+                </div>
+                
+                <div class="footer-col">
+                    <h4 data-i18n="footer.legal">Legal</h4>
+                    <a href="/terminos" data-i18n="footer.terms">Términos y condiciones</a>
+                    <a href="/privacidad" data-i18n="footer.privacy">Política de privacidad</a>
+                    <a href="/contacto" data-i18n="footer.contact">Contacto</a>
+                </div>
+                
+                <div class="footer-col">
+                    <h4 data-i18n="footer.contact">Contacto</h4>
+                    <p><i class="bi bi-envelope"></i> <span data-i18n="footer.email">hola@ecomarket.com</span></p>
+                    <p><i class="bi bi-telephone"></i> <span data-i18n="footer.phone">+51 999 888 777</span></p>
+                    <p><i class="bi bi-geo-alt"></i> <span data-i18n="footer.location">Lima, Perú</span></p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p data-i18n="footer.copyright">&copy; 2026 EcoMarket. Todos los derechos reservados.</p>
+                <p id="serverStatus" style="font-size:.72rem;color:var(--texto-sec);margin-top:6px">
+                    <span id="serverDot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#9ca3af;margin-right:6px"></span>
+                    <span id="serverStatusText">Verificando servidor…</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script para menú móvil -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileToggle = document.getElementById('mobileMenuToggle');
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            if (mobileToggle && mobileMenu) {
+                mobileToggle.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('active');
+                    const icon = mobileToggle.querySelector('i');
+                    if (mobileMenu.classList.contains('active')) {
+                        icon.classList.remove('bi-list');
+                        icon.classList.add('bi-x');
+                    } else {
+                        icon.classList.remove('bi-x');
+                        icon.classList.add('bi-list');
+                    }
+                });
+            }
+        });
+    </script>
+<div id="cookieBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#1a2e1a;color:#fff;padding:14px 20px;z-index:9998;font-size:.85rem;box-shadow:0 -4px 20px rgba(0,0,0,.3)">
+    <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <span style="flex:1;min-width:220px">🍪 Usamos cookies locales para tu sesión, carrito y tema. Sin rastreo publicitario. <a href="/privacidad" style="color:#a7f3d0">Privacidad</a></span>
+        <button onclick="aceptarCookies()" style="background:#43a047;color:#fff;border:none;padding:8px 22px;border-radius:999px;font-weight:700;cursor:pointer">Aceptar</button>
+    </div>
+</div>
+<script>
+function aceptarCookies(){localStorage.setItem('eco-cookies-ok','1');document.getElementById('cookieBanner').style.display='none';}
+if(!localStorage.getItem('eco-cookies-ok')){document.getElementById('cookieBanner').style.display='block';}
+</script>
+<script>
+window.addEventListener('load',function(){var l=document.getElementById('ecoLoader');if(l){l.classList.add('done');setTimeout(function(){l.remove()},500);}});
+setTimeout(function(){var l=document.getElementById('ecoLoader');if(l)l.remove();},4000);
+// Estado del servidor en footer
+fetch('/api/health').then(function(r){return r.json();}).then(function(d){
+  var dot=document.getElementById('serverDot'),txt=document.getElementById('serverStatusText');
+  if(dot&&txt){dot.style.background='#22c55e';txt.textContent='Servidor operativo · v'+(d.version||'');}
+}).catch(function(){
+  var dot=document.getElementById('serverDot'),txt=document.getElementById('serverStatusText');
+  if(dot&&txt){dot.style.background='#ef4444';txt.textContent='Servidor no disponible';}
+});
+</script>
+</body>
+</html>

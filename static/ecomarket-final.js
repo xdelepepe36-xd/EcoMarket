@@ -2862,3 +2862,13 @@ window.addEventListener('unhandledrejection', (event) => {
 // ════════════════════════════════════════════════════════════
 // FIN DEL JAVASCRIPT UNIFICADO ECOMARKET FINAL
 // ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════
+// SERVICE WORKER (PWA / modo offline)
+// ════════════════════════════════════════════════════════════
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/static/sw.js').catch(function (err) {
+            console.warn('SW: no se pudo registrar', err);
+        });
+    });
+}

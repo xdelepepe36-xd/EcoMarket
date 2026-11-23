@@ -2,20 +2,20 @@
  * EcoMarket Service Worker v2.0
  * Estrategia: Cache First para estáticos, Network First para dinámicos
  */
-const CACHE_NAME = 'ecomarket-v3';
-const STATIC_CACHE = 'ecomarket-static-v3';
-const ASSETS_CACHE = 'ecomarket-assets-v3';
+const CACHE_NAME = 'ecomarket-v4';
+const STATIC_CACHE = 'ecomarket-static-v4';
+const ASSETS_CACHE = 'ecomarket-assets-v4';
 
 const urlsToCache = [
   '/',
-  '/static/eco-market.css',
-  '/static/main.js',
-  '/static/eco-auth.js',
-  '/static/eco-cart.js',
-  '/static/eco-theme.js',
-  '/static/eco-toast.js',
-  '/static/eco-favorites.js',
-  '/static/eco-search.js',
+  '/static/ecomarket-final.css',
+  '/static/ecomarket-themes.css',
+  '/static/ecomarket-wow.css',
+  '/static/ecomarket-final.js',
+  '/static/ecomarket-pro.js',
+  '/static/assets/logo.svg',
+  '/static/assets/mascota.svg',
+  '/static/assets/product-placeholder.svg',
   'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css',
   'https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap'
 ];

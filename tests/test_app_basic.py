@@ -66,7 +66,7 @@ class TestEcoMarketBasic(unittest.TestCase):
 
     def test_static_files(self):
         """Test de archivos estáticos"""
-        response = self.client.get('/static/ecomarket-consolidated.css')
+        response = self.client.get('/static/ecomarket-final.css')
         self.assertEqual(response.status_code, 200)
 
     def test_database_connection(self):

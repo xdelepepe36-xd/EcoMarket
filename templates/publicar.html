@@ -92,6 +92,15 @@
             </div>
 
             <div>
+                <label><span data-i18n="publicar.pack_label">Pack / precio por cantidad (opcional)</span></label>
+                <div style="display:flex;gap:10px;flex-wrap:wrap">
+                    <input type="number" name="pack_cantidad" min="2" max="99" placeholder="Compra N" value="{{ producto.pack_cantidad if producto and producto.pack_cantidad }}" style="width:110px;padding:12px;border:1.5px solid rgba(46,125,50,.18);border-radius:12px;font-family:inherit">
+                    <input type="number" name="pack_precio" min="0.01" step="0.01" placeholder="Precio c/u (S/.)" value="{{ producto.pack_precio if producto and producto.pack_precio }}" style="width:160px;padding:12px;border:1.5px solid rgba(46,125,50,.18);border-radius:12px;font-family:inherit">
+                </div>
+                <small style="color:var(--texto-sec);font-size:.78rem">Ej: compra 3 por S/.25 c/u — si el carrito lleva N o más, cada unidad cuesta ese precio.</small>
+            </div>
+
+            <div>
                 <label><span data-i18n="publicar.specs_label">Especificaciones técnicas</span></label>
 <textarea name="especificaciones" rows="4" data-i18n-placeholder="publicar.specs_placeholder" placeholder="Formato: clave: valor (una por línea)&#10;Ej:&#10;Material: Acero inoxidable&#10;Capacidad: 750ml&#10;Peso: 300g">{% if producto and producto.especificaciones %}{% set specs = producto.especificaciones|fromjson %}{% for k, v in specs.items() %}{{ k }}: {{ v }}
 {% endfor %}{% endif %}</textarea>

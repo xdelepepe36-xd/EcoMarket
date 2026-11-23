@@ -1212,6 +1212,14 @@ def init_db():
     except sqlite3.OperationalError:
         pass
 
+    # Pack / precio por cantidad ("compra 3 por S/.X c/u")
+    for col, ddl in [('pack_cantidad', 'INTEGER DEFAULT 0'), ('pack_precio', 'REAL DEFAULT 0')]:
+        try:
+            conn.execute(f'ALTER TABLE productos ADD COLUMN {col} {ddl}')
+            conn.commit()
+        except sqlite3.OperationalError:
+            pass
+
     # Alertas de búsqueda ("avísame cuando exista X")
     try:
         conn.execute('''CREATE TABLE IF NOT EXISTS alertas_busqueda (
@@ -2016,15 +2024,18 @@ def checkout():
                 continue
             ids.add(pid)
             fila = conn.execute(
-                'SELECT id, nombre, precio, stock FROM productos WHERE id = ?', (pid,)
+                'SELECT id, nombre, precio, stock, pack_cantidad, pack_precio FROM productos WHERE id = ?', (pid,)
             ).fetchone()
             if not fila:
                 continue
             if cantidad > fila['stock']:
                 conn.close()
                 return jsonify({'error': f'Stock insuficiente de "{fila["nombre"]}"'}), 400
-            items_validados.append((pid, fila['nombre'], fila['precio'], cantidad))
-            total += fila['precio'] * cantidad
+            precio_unit = fila['precio']
+            if fila['pack_cantidad'] and fila['pack_precio'] and cantidad >= fila['pack_cantidad']:
+                precio_unit = fila['pack_precio']
+            items_validados.append((pid, fila['nombre'], precio_unit, cantidad))
+            total += precio_unit * cantidad
         conn.close()
 
         if not items_validados:
@@ -2196,9 +2207,17 @@ def publicar():
         variantes_raw = request.form.get('variantes', '').strip()
         variantes_json = _parse_variantes(variantes_raw)
 
+        try:
+            pack_cantidad = int(request.form.get('pack_cantidad') or 0)
+            pack_precio = float(request.form.get('pack_precio') or 0)
+        except ValueError:
+            pack_cantidad, pack_precio = 0, 0.0
+        if pack_cantidad < 2 or pack_precio <= 0 or pack_precio >= precio_valor:
+            pack_cantidad, pack_precio = 0, 0.0
+
         cursor = conn.execute(
-            'INSERT INTO productos (nombre, categoria, precio, descripcion, imagen, imagen_thumb, stock, condicion, especificaciones, usuario_id, ubicacion, es_digital, variantes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
-            (nombre, categoria, precio_valor, descripcion, imagen, imagen_thumb, stock_valor, condicion, especificaciones_json, session['usuario_id'], ubicacion, es_digital, variantes_json)
+            'INSERT INTO productos (nombre, categoria, precio, descripcion, imagen, imagen_thumb, stock, condicion, especificaciones, usuario_id, ubicacion, es_digital, variantes, pack_cantidad, pack_precio) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+            (nombre, categoria, precio_valor, descripcion, imagen, imagen_thumb, stock_valor, condicion, especificaciones_json, session['usuario_id'], ubicacion, es_digital, variantes_json, pack_cantidad, pack_precio)
         )
         producto_id = cursor.lastrowid
         conn.execute('INSERT INTO historial_precios (producto_id, precio) VALUES (?,?)', (producto_id, precio_valor))
@@ -2279,6 +2298,17 @@ def editar_producto(producto_id):
         especificaciones_raw = request.form.get('especificaciones', '').strip()
         variantes_raw = request.form.get('variantes', '').strip()
         variantes_json = _parse_variantes(variantes_raw)
+        try:
+            pack_cantidad = int(request.form.get('pack_cantidad') or 0)
+            pack_precio = float(request.form.get('pack_precio') or 0)
+        except ValueError:
+            pack_cantidad, pack_precio = 0, 0.0
+        try:
+            precio_base = float(precio)
+        except ValueError:
+            precio_base = 0.0
+        if pack_cantidad < 2 or pack_precio <= 0 or pack_precio >= precio_base:
+            pack_cantidad, pack_precio = 0, 0.0
 
         # Procesar especificaciones
         especificaciones_json = ''
@@ -2294,8 +2324,8 @@ def editar_producto(producto_id):
         if all([nombre, categoria, precio, descripcion]):
             viejo = conn.execute('SELECT precio FROM productos WHERE id = ?', (producto_id,)).fetchone()
             conn.execute(
-                'UPDATE productos SET nombre=?, categoria=?, precio=?, descripcion=?, stock=?, especificaciones=?, variantes=? WHERE id=?',
-                (nombre, categoria, float(precio), descripcion, int(stock), especificaciones_json, variantes_json, producto_id)
+                'UPDATE productos SET nombre=?, categoria=?, precio=?, descripcion=?, stock=?, especificaciones=?, variantes=?, pack_cantidad=?, pack_precio=? WHERE id=?',
+                (nombre, categoria, float(precio), descripcion, int(stock), especificaciones_json, variantes_json, pack_cantidad, pack_precio, producto_id)
             )
             if viejo and abs((viejo['precio'] or 0) - float(precio)) > 0.001:
                 nuevo_precio = float(precio)

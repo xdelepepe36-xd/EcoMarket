@@ -4597,6 +4597,14 @@ def perfil():
         'SELECT COUNT(*) FROM pedido_items pi JOIN productos p ON pi.producto_id = p.id WHERE p.usuario_id = ?',
         (session['usuario_id'],)
     ).fetchone()[0]
+    total_consultas = conn.execute(
+        'SELECT COUNT(*) FROM preguntas pr JOIN productos p ON pr.producto_id = p.id WHERE p.usuario_id = ?',
+        (session['usuario_id'],)
+    ).fetchone()[0]
+    consultas_pendientes = conn.execute(
+        "SELECT COUNT(*) FROM preguntas pr JOIN productos p ON pr.producto_id = p.id WHERE p.usuario_id = ? AND (pr.respuesta IS NULL OR pr.respuesta = '')",
+        (session['usuario_id'],)
+    ).fetchone()[0]
     valor_total = sum(p['precio'] for p in mis_productos)
 
     conn.close()
@@ -4616,6 +4624,8 @@ def perfil():
                            total_favoritos=total_favoritos,
                            total_resenas_recibidas=total_resenas_recibidas,
                            total_ventas=total_ventas,
+                           total_consultas=total_consultas,
+                           consultas_pendientes=consultas_pendientes,
                            valor_total=valor_total)
 
 

@@ -109,7 +109,13 @@
         <!-- TAB: MIS PRODUCTOS -->
         <div id="tab-productos" class="tab-content">
             {% if mis_productos %}
-            <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap">
+                {% if total_consultas %}
+                <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:12px;padding:8px 14px;font-size:.82rem;color:#7a5b00">
+                    <i class="bi bi-chat-dots"></i> <strong>{{ total_consultas }}</strong> consulta{{ 's' if total_consultas != 1 }} recibida{{ 's' if total_consultas != 1 }}
+                    {% if consultas_pendientes %}· <strong style="color:#c62828">{{ consultas_pendientes }} sin responder</strong>{% endif %}
+                </div>
+                {% endif %}
                 <a href="/api/mis_productos.csv" class="btn-secundario" style="padding:9px 18px;font-size:.85rem;text-decoration:none"><i class="bi bi-download"></i> Exportar CSV</a>
             </div>
             <div class="productos-grid">

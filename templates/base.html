@@ -204,6 +204,10 @@
             
             <div class="footer-bottom">
                 <p data-i18n="footer.copyright">&copy; 2026 EcoMarket. Todos los derechos reservados.</p>
+                <p id="serverStatus" style="font-size:.72rem;color:var(--texto-sec);margin-top:6px">
+                    <span id="serverDot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#9ca3af;margin-right:6px"></span>
+                    <span id="serverStatusText">Verificando servidor…</span>
+                </p>
             </div>
         </div>
     </footer>
@@ -232,6 +236,14 @@
 <script>
 window.addEventListener('load',function(){var l=document.getElementById('ecoLoader');if(l){l.classList.add('done');setTimeout(function(){l.remove()},500);}});
 setTimeout(function(){var l=document.getElementById('ecoLoader');if(l)l.remove();},4000);
+// Estado del servidor en footer
+fetch('/api/health').then(function(r){return r.json();}).then(function(d){
+  var dot=document.getElementById('serverDot'),txt=document.getElementById('serverStatusText');
+  if(dot&&txt){dot.style.background='#22c55e';txt.textContent='Servidor operativo · v'+(d.version||'');}
+}).catch(function(){
+  var dot=document.getElementById('serverDot'),txt=document.getElementById('serverStatusText');
+  if(dot&&txt){dot.style.background='#ef4444';txt.textContent='Servidor no disponible';}
+});
 </script>
 </body>
 </html>

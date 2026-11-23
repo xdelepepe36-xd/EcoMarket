@@ -104,6 +104,11 @@ localStorage.setItem('eco_vistos',JSON.stringify(v.slice(0,8)));
                     </div>
                     {% endif %}
                 </div>
+                {% if producto.pack_cantidad and producto.pack_precio %}
+                <div class="detalle-pack-pill" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#fef3c7,#fde68a);color:#92400e;padding:6px 14px;border-radius:999px;font-size:.82rem;font-weight:700;margin-top:8px">
+                    <i class="bi bi-box-seam"></i> 📦 Pack: compra {{ producto.pack_cantidad }}+ y paga S/. {{ '%.2f'|format(producto.pack_precio) }} c/u
+                </div>
+                {% endif %}
                 <div class="detalle-delivery-pill"><i class="bi bi-truck"></i> <span data-i18n="pd.free_shipping_lima">Envío gratis en Lima</span></div>
                 {% if precio_historial %}
                 <div class="detalle-price-history" title="Historial de precios">

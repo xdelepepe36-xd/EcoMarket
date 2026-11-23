@@ -7726,6 +7726,25 @@ def rastrear_pedido(token):
     return render_template('rastrear.html', pedido=dict(p), items=[dict(i) for i in items])
 
 
+@app.route('/factura/<int:pedido_id>')
+@login_required
+def factura_pedido(pedido_id):
+    """Factura imprimible del pedido — solo para el dueño."""
+    conn = get_db()
+    p = conn.execute('SELECT * FROM pedidos WHERE id=? AND usuario_id=?',
+                     (pedido_id, session['usuario_id'])).fetchone()
+    if not p:
+        conn.close()
+        flash('Pedido no encontrado.', 'danger')
+        return redirect(url_for('perfil'))
+    items = conn.execute('SELECT nombre, cantidad, precio FROM pedido_items WHERE pedido_id=?',
+                         (pedido_id,)).fetchall()
+    u = conn.execute('SELECT nombre FROM usuarios WHERE id=?', (session['usuario_id'],)).fetchone()
+    conn.close()
+    return render_template('factura.html', pedido=dict(p), items=[dict(i) for i in items],
+                           usuario=dict(u) if u else {})
+
+
 # ── Carrito compartible (compra en grupo) ──────────────────────────
 
 @app.route('/grupo/<ids>')

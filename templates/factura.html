@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Factura #{{ pedido.id }} — EcoMarket</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Poppins',system-ui,sans-serif; background:#f0fdf4; color:#1a2e1a; padding:24px; }
+  .factura { max-width:720px; margin:0 auto; background:#fff; border-radius:16px; box-shadow:0 8px 30px rgba(46,125,50,.12); overflow:hidden; }
+  .header { background:linear-gradient(135deg,#2e7d32,#43a047); color:#fff; padding:28px 32px; display:flex; justify-content:space-between; align-items:center; }
+  .header h1 { font-size:1.4rem; }
+  .header small { opacity:.85 }
+  .body { padding:28px 32px; }
+  .meta { display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:24px; font-size:.88rem; }
+  .meta div strong { display:block; color:#2e7d32; font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; margin-bottom:2px; }
+  table { width:100%; border-collapse:collapse; font-size:.9rem; }
+  th { text-align:left; padding:10px 8px; border-bottom:2px solid #2e7d32; color:#2e7d32; font-size:.78rem; text-transform:uppercase; }
+  td { padding:10px 8px; border-bottom:1px solid #e8f5e9; }
+  .totales { margin-top:20px; margin-left:auto; width:280px; font-size:.9rem; }
+  .totales div { display:flex; justify-content:space-between; padding:6px 0; }
+  .totales .final { border-top:2px solid #2e7d32; font-weight:800; font-size:1.05rem; color:#2e7d32; padding-top:10px; }
+  .footer { padding:16px 32px; background:#f8faf8; font-size:.75rem; color:#666; text-align:center; }
+  .acciones { text-align:center; margin:20px 0; }
+  .btn { background:#2e7d32; color:#fff; border:none; padding:12px 28px; border-radius:999px; font-size:.9rem; font-weight:600; cursor:pointer; text-decoration:none; display:inline-block; }
+  @media print {
+    body { background:#fff; padding:0; }
+    .acciones { display:none; }
+    .factura { box-shadow:none; border-radius:0; }
+  }
+</style>
+</head>
+<body>
+<div class="acciones">
+  <button class="btn" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+</div>
+<div class="factura">
+  <div class="header">
+    <div>
+      <h1>🌱 EcoMarket</h1>
+      <small>Marketplace ecológico</small>
+    </div>
+    <div style="text-align:right">
+      <strong>FACTURA #{{ pedido.id }}</strong><br>
+      <small>{{ pedido.created_at }}</small>
+    </div>
+  </div>
+  <div class="body">
+    <div class="meta">
+      <div><strong>Cliente</strong>{{ pedido.nombre or usuario.nombre or '—' }}<br>{{ pedido.email or '' }}</div>
+      <div><strong>Dirección de envío</strong>{{ pedido.direccion or '—' }}<br>{{ pedido.ciudad or '' }}{% if pedido.telefono %} · {{ pedido.telefono }}{% endif %}</div>
+      <div><strong>Pago</strong>{{ pedido.metodo_pago or '—' }}<br>Estado: <strong>{{ pedido.estado or 'confirmado' }}</strong></div>
+    </div>
+    <table>
+      <thead><tr><th>Producto</th><th style="text-align:center">Cant.</th><th style="text-align:right">Precio</th><th style="text-align:right">Subtotal</th></tr></thead>
+      <tbody>
+      {% for i in items %}
+        <tr><td>{{ i.nombre }}</td><td style="text-align:center">{{ i.cantidad }}</td><td style="text-align:right">S/. {{ '%.2f'|format(i.precio) }}</td><td style="text-align:right">S/. {{ '%.2f'|format(i.precio * i.cantidad) }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <div class="totales">
+      {% if pedido.descuento %}<div><span>Descuento (cupón)</span><span>-S/. {{ '%.2f'|format(pedido.descuento) }}</span></div>{% endif %}
+      {% if pedido.envio %}<div><span>Envío</span><span>S/. {{ '%.2f'|format(pedido.envio) }}</span></div>{% endif %}
+      <div class="final"><span>TOTAL</span><span>S/. {{ '%.2f'|format(pedido.total) }}</span></div>
+    </div>
+    {% if pedido.regalo_mensaje %}<p style="margin-top:20px;font-style:italic;color:#7c2d12">🎁 "{{ pedido.regalo_mensaje }}"</p>{% endif %}
+  </div>
+  <div class="footer">EcoMarket — Compra y vende productos sostenibles · factura generada el {{ pedido.created_at }}</div>
+</div>
+</body>
+</html>

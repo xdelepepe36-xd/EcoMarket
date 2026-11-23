@@ -85,6 +85,13 @@
             </div>
 
             <div>
+                <label><span data-i18n="publicar.variants_label">Variantes (opcional)</span></label>
+                <textarea name="variantes" rows="3" placeholder="Una por línea: Nombre o Nombre: +precio_extra&#10;Ej:&#10;Talla S&#10;Talla M: +2.00&#10;Talla L: +4.50" style="width:100%;padding:12px;border:1.5px solid rgba(46,125,50,.18);border-radius:12px;font-family:inherit;font-size:.88rem;resize:vertical">{% if producto and producto.variantes %}{% for v in producto.variantes %}{{ v.nombre }}{% if v.extra %}: +{{ '%.2f'|format(v.extra) }}{% endif %}
+{% endfor %}{% endif %}</textarea>
+                <small style="color:var(--texto-sec);font-size:.78rem">Tallas, colores, presentaciones — el comprador elige al comprar. El precio extra se suma al base.</small>
+            </div>
+
+            <div>
                 <label><span data-i18n="publicar.specs_label">Especificaciones técnicas</span></label>
 <textarea name="especificaciones" rows="4" data-i18n-placeholder="publicar.specs_placeholder" placeholder="Formato: clave: valor (una por línea)&#10;Ej:&#10;Material: Acero inoxidable&#10;Capacidad: 750ml&#10;Peso: 300g">{% if producto and producto.especificaciones %}{% set specs = producto.especificaciones|fromjson %}{% for k, v in specs.items() %}{{ k }}: {{ v }}
 {% endfor %}{% endif %}</textarea>

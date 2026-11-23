@@ -138,7 +138,12 @@ localStorage.setItem('eco_vistos',JSON.stringify(v.slice(0,8)));
             <div class="detalle-seller-box">
                 <div class="detalle-seller-avatar">{{ producto.vendedor_nombre[0] }}</div>
                 <div>
-                    <strong><span data-i18n="pd.sold_by">Vendido por</span> {{ producto.vendedor_nombre }}</strong>
+                    <strong><span data-i18n="pd.sold_by">Vendido por</span> {{ producto.vendedor_nombre }}
+                        {% if producto.vendedor_nivel and producto.vendedor_nivel >= 2 %}
+                        {% set _nv = {2:('✓','#28a745'),3:('✓✓','#007bff'),4:('⭐','#ffc107'),5:('🏆','#17a2b8')}[producto.vendedor_nivel] %}
+                        <span title="Vendedor verificado nivel {{ producto.vendedor_nivel }}" style="display:inline-flex;align-items:center;gap:3px;background:{{ _nv[1] }};color:#fff;font-size:.62rem;font-weight:800;padding:2px 8px;border-radius:999px;vertical-align:middle;margin-left:4px">{{ _nv[0] }} NIVEL {{ producto.vendedor_nivel }}</span>
+                        {% endif %}
+                    </strong>
                     <div>{{ producto.total_vendedor_productos }} <span data-i18n="pd.products_published">producto(s) publicado(s)</span></div>
                 </div>
             </div>
@@ -150,7 +155,17 @@ localStorage.setItem('eco_vistos',JSON.stringify(v.slice(0,8)));
                     <i class="bi bi-bag-x"></i> <span data-i18n="pd.sold_out">Producto vendido</span>
                 </button>
                 {% else %}
-                <button class="btn-principal add-cart" data-producto-id="{{ producto.id }}" data-producto-nombre="{{ producto.nombre }}" data-producto-categoria="{{ producto.categoria }}" data-producto-precio="{{ '%.2f'|format(producto.precio) }}" data-producto-imagen="{{ producto.imagen }}" style="flex:1">
+                {% if producto.variantes %}
+                <div style="margin-bottom:12px">
+                    <label style="font-size:.82rem;font-weight:700;color:var(--texto-sec);display:block;margin-bottom:6px">VARIANTE</label>
+                    <select id="varianteSelect" style="width:100%;padding:11px 14px;border:1.5px solid rgba(46,125,50,.2);border-radius:12px;font-family:inherit;font-size:.9rem;background:#fff">
+                        {% for v in producto.variantes %}
+                        <option value="{{ v.nombre }}" data-extra="{{ v.extra }}">{{ v.nombre }}{% if v.extra %} (+S/. {{ '%.2f'|format(v.extra) }}){% endif %}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+                <button class="btn-principal add-cart" id="btnAddCart" data-producto-id="{{ producto.id }}" data-producto-nombre="{{ producto.nombre }}" data-producto-categoria="{{ producto.categoria }}" data-producto-precio="{{ '%.2f'|format(producto.precio) }}" data-producto-imagen="{{ producto.imagen }}" style="flex:1">
                     <i class="bi bi-bag-plus"></i> <span data-i18n="add_cart">Agregar al carrito</span>
                 </button>
                 {% endif %}
@@ -645,6 +660,29 @@ function toggleFavorito(productoId) {
 }
 
 // ── Compartir ────────────────────────────────────
+// Selector de variantes: ajusta nombre/precio del botón agregar
+(function() {
+    var sel = document.getElementById('varianteSelect');
+    var btn = document.getElementById('btnAddCart');
+    if (!sel || !btn) return;
+    var basePrecio = parseFloat(btn.getAttribute('data-producto-precio'));
+    var baseNombre = btn.getAttribute('data-producto-nombre');
+    function aplicar() {
+        var opt = sel.options[sel.selectedIndex];
+        var extra = parseFloat(opt.getAttribute('data-extra') || '0') || 0;
+        var precio = basePrecio + extra;
+        btn.setAttribute('data-producto-precio', precio.toFixed(2));
+        btn.setAttribute('data-producto-nombre', baseNombre + ' · ' + opt.value);
+        var priceEl = document.querySelector('.detalle-price, .price-main, h2 + .price, [class*="precio"]');
+        if (priceEl) {
+            var m = priceEl.textContent.match(/S\/\.\s*[\d.,]+/);
+            if (m) priceEl.textContent = priceEl.textContent.replace(m[0], 'S/. ' + precio.toFixed(2));
+        }
+    }
+    sel.addEventListener('change', aplicar);
+    aplicar();
+})();
+
 function copiarDescripcion() {
     var el = document.querySelector('#tab-descripcion .detalle-tab-content, .descripcion-producto, [data-i18n="pd.tab_desc"]');
     var panel = document.getElementById('tab-descripcion');

@@ -2751,13 +2751,13 @@ main, .section { animation: ecoPageIn .45s cubic-bezier(.22,1,.36,1) both; }
 
 /* ── Botón instalar PWA ── */
 .pwa-install-btn {
-    position: fixed; bottom: 20px; left: 20px; z-index: 1040;
+    position: fixed; bottom: 148px; left: 20px; z-index: 1040;
     background: linear-gradient(135deg,#2e7d32,#43a047); color: #fff; border: none;
     padding: 12px 20px; border-radius: 999px; font-weight: 700; font-size: .85rem;
     cursor: pointer; box-shadow: 0 6px 20px rgba(46,125,50,.35); transition: transform .2s;
 }
 .pwa-install-btn:hover { transform: translateY(-2px) scale(1.03); }
-@media (max-width: 640px) { .pwa-install-btn { bottom: 76px; left: 12px; padding: 10px 14px; font-size: .78rem; } }
+@media (max-width: 640px) { .pwa-install-btn { bottom: 196px; left: 12px; padding: 10px 14px; font-size: .78rem; } }
 
 /* ── Botón texto grande ── */
 .texto-grande-btn {
@@ -2774,3 +2774,19 @@ main, .section { animation: ecoPageIn .45s cubic-bezier(.22,1,.36,1) both; }
 html.texto-grande { font-size: 118%; }
 html.texto-grande .product-card h3, html.texto-grande .producto-card h3 { font-size: 1.05rem; }
 html.texto-grande body { line-height: 1.65; }
+
+/* ── Modo kiosco ── */
+.kiosco-btn {
+    position: fixed; bottom: 84px; left: 22px; z-index: 1041;
+    width: 46px; height: 46px; border-radius: 50%; border: 2px solid rgba(46,125,50,.35);
+    background: var(--blanco,#fff); font-size: 1.1rem; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0,0,0,.12); transition: transform .2s;
+}
+.kiosco-btn:hover { transform: scale(1.08); }
+@media (max-width: 640px) { .kiosco-btn { bottom: 140px; left: 12px; width: 42px; height: 42px; } }
+body.kiosco-mode nav, body.kiosco-mode footer, body.kiosco-mode .eco-cursor,
+body.kiosco-mode #asistenteBtn, body.kiosco-mode #textoGrandeBtn,
+body.kiosco-mode #pwaInstallBtn, body.kiosco-mode #kioscoBtn,
+body.kiosco-mode .eco-ticker, body.kiosco-mode .eco-loader { display: none !important; }
+body.kiosco-mode { cursor: default; }
+body.kiosco-mode .product-card:hover, body.kiosco-mode .btn-principal:hover { transform: none; }

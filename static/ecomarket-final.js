@@ -25,6 +25,9 @@ const EcoMarket = {
             var saved = localStorage.getItem('ecomarket-theme');
             var ok = ['light','dark','nature','ocean','midnight','rose','autumn','christmas'];
             if (saved && ok.indexOf(saved) !== -1) return saved;
+            // Tema navideño automático: 15 dic – 6 ene
+            var now = new Date(), md = (now.getMonth() + 1) * 100 + now.getDate();
+            if ((md >= 1215 && md <= 1231) || (md >= 101 && md <= 106)) return 'christmas';
             var h = new Date().getHours();
             if (h >= 20 || h < 6) return 'midnight';
             if (h >= 17 && h < 20) return 'ocean';

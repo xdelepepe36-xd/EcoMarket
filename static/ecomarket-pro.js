@@ -851,6 +851,56 @@
         }).catch(function () {});
     }
 
+    /* ═══════════ MODO KIOSCO (presentación limpia) ═══════════ */
+    function initKiosco() {
+        var btn = document.createElement('button');
+        btn.id = 'kioscoBtn';
+        btn.className = 'kiosco-btn';
+        btn.innerHTML = '🖥️';
+        btn.title = 'Modo presentación (Esc para salir)';
+        btn.setAttribute('aria-label', 'Modo presentación');
+        var savedTheme = null;
+        function enter() {
+            savedTheme = document.documentElement.getAttribute('data-theme');
+            document.body.classList.add('kiosco-mode');
+            btn.innerHTML = '✖️';
+        }
+        function exit() {
+            document.body.classList.remove('kiosco-mode');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                try { localStorage.setItem('ecomarket-theme', savedTheme); } catch (e) {}
+            }
+            savedTheme = null;
+            btn.innerHTML = '🖥️';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        btn.addEventListener('click', function () {
+            document.body.classList.contains('kiosco-mode') ? exit() : enter();
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && document.body.classList.contains('kiosco-mode')) exit();
+        });
+        document.body.appendChild(btn);
+    }
+
+    /* ═══════════ EXPORTAR MIS DATOS ═══════════ */
+    function initExportar() {
+        var btn = document.getElementById('btnExportar');
+        if (!btn) return;
+        btn.addEventListener('click', function () {
+            fetch('/api/exportar-datos').then(function (r) { return r.json(); }).then(function (d) {
+                var blob = new Blob([JSON.stringify(d, null, 2)], { type: 'application/json' });
+                var a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'ecomarket-mis-datos.json';
+                a.click();
+                URL.revokeObjectURL(a.href);
+                if (window.EcoToast) EcoToast.show('📥 Datos exportados', 'Revisa tu carpeta de descargas', 'success');
+            }).catch(function () { if (window.EcoToast) EcoToast.show('⚠️', 'Error al exportar', 'warning'); });
+        });
+    }
+
     /* ═══════════ INIT ═══════════ */
     document.addEventListener('DOMContentLoaded', function () {
         initParticles();
@@ -879,5 +929,7 @@
         initPWAInstall();
         initTextoGrande();
         initVerificacionBadge();
+        initKiosco();
+        initExportar();
     });
 })();

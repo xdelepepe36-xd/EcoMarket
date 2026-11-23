@@ -1205,6 +1205,13 @@ def init_db():
     except sqlite3.OperationalError:
         pass
 
+    # Variantes de producto (JSON: [{"nombre":"M","extra":5}])
+    try:
+        conn.execute('ALTER TABLE productos ADD COLUMN variantes TEXT DEFAULT "[]"')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
     # ── Migraciones para campos de usuario ──────────────────
     for col, ddl in [
         ('apellidos', 'TEXT DEFAULT ""'),
@@ -1323,6 +1330,54 @@ def get_productos_destacados(limit=6):
     return productos
 
 
+def _parse_variantes(raw):
+    """Parsea variantes del formulario: 'Nombre' o 'Nombre: +extra' por línea → JSON."""
+    if not raw:
+        return '[]'
+    out = []
+    for linea in raw.split('\n')[:10]:
+        linea = linea.strip()
+        if not linea:
+            continue
+        extra = 0.0
+        nombre = linea
+        if ':' in linea:
+            nombre, extra_s = linea.rsplit(':', 1)
+            extra_s = extra_s.strip().replace('S/.', '').replace('S/', '').replace('+', '').strip()
+            try:
+                extra = round(float(extra_s), 2)
+            except ValueError:
+                extra = 0.0
+            nombre = nombre.strip()
+        if nombre:
+            out.append({'nombre': nombre[:40], 'extra': extra})
+    return json.dumps(out, ensure_ascii=False) if out else '[]'
+
+
+def _nivel_vendedor(conn, uid):
+    """Nivel de verificación 0-5 de un vendedor (para sellos públicos)."""
+    if not uid:
+        return 0
+    u = conn.execute('''SELECT COALESCE(email_verificado,0) ev, COALESCE(telefono,'') tel,
+        (SELECT COUNT(*) FROM productos WHERE usuario_id=?) AS pub,
+        (SELECT COUNT(*) FROM productos WHERE usuario_id=? AND vendido=1) AS ven
+        FROM usuarios WHERE id=?''', (uid, uid, uid)).fetchone()
+    if not u:
+        return 0
+    rating = conn.execute('''SELECT COALESCE(AVG(r.rating),0) FROM resenas r
+        JOIN productos p ON p.id=r.producto_id WHERE p.usuario_id=?''', (uid,)).fetchone()[0]
+    if u['ven'] >= 25 and rating >= 4.5: return 5
+    if u['ven'] >= 10: return 4
+    if u['pub'] >= 3 and u['tel']: return 3
+    if u['ev'] and u['tel']: return 2
+    if u['ev']: return 1
+    return 0
+
+
+NIVEL_INFO = {0: ('', ''), 1: ('📝', '#6c757d'), 2: ('✓', '#28a745'), 3: ('✓✓', '#007bff'),
+              4: ('⭐', '#ffc107'), 5: ('🏆', '#17a2b8')}
+
+
 def get_producto_detalle(producto_id):
     conn = get_db()
     producto = conn.execute('''
@@ -1400,6 +1455,18 @@ def get_producto_detalle(producto_id):
                 especificaciones = json.loads(producto['especificaciones'])
             except (json.JSONDecodeError, TypeError):
                 especificaciones = {}
+
+        # Variantes del producto (JSON)
+        variantes = []
+        if producto.get('variantes'):
+            try:
+                variantes = json.loads(producto['variantes'])
+            except (json.JSONDecodeError, TypeError):
+                variantes = []
+        producto['variantes'] = variantes
+
+        # Nivel de verificación del vendedor (sello público)
+        producto['vendedor_nivel'] = _nivel_vendedor(conn, producto.get('usuario_id'))
 
         conn.close()
         return {
@@ -2097,9 +2164,12 @@ def publicar():
             if specs:
                 especificaciones_json = json.dumps(specs, ensure_ascii=False)
 
+        variantes_raw = request.form.get('variantes', '').strip()
+        variantes_json = _parse_variantes(variantes_raw)
+
         cursor = conn.execute(
-            'INSERT INTO productos (nombre, categoria, precio, descripcion, imagen, imagen_thumb, stock, condicion, especificaciones, usuario_id, ubicacion, es_digital) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
-            (nombre, categoria, precio_valor, descripcion, imagen, imagen_thumb, stock_valor, condicion, especificaciones_json, session['usuario_id'], ubicacion, es_digital)
+            'INSERT INTO productos (nombre, categoria, precio, descripcion, imagen, imagen_thumb, stock, condicion, especificaciones, usuario_id, ubicacion, es_digital, variantes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
+            (nombre, categoria, precio_valor, descripcion, imagen, imagen_thumb, stock_valor, condicion, especificaciones_json, session['usuario_id'], ubicacion, es_digital, variantes_json)
         )
         producto_id = cursor.lastrowid
         conn.execute('INSERT INTO historial_precios (producto_id, precio) VALUES (?,?)', (producto_id, precio_valor))
@@ -2162,6 +2232,8 @@ def editar_producto(producto_id):
         descripcion = request.form.get('descripcion', '').strip()
         stock = request.form.get('stock', '10').strip()
         especificaciones_raw = request.form.get('especificaciones', '').strip()
+        variantes_raw = request.form.get('variantes', '').strip()
+        variantes_json = _parse_variantes(variantes_raw)
 
         # Procesar especificaciones
         especificaciones_json = ''
@@ -2177,8 +2249,8 @@ def editar_producto(producto_id):
         if all([nombre, categoria, precio, descripcion]):
             viejo = conn.execute('SELECT precio FROM productos WHERE id = ?', (producto_id,)).fetchone()
             conn.execute(
-                'UPDATE productos SET nombre=?, categoria=?, precio=?, descripcion=?, stock=?, especificaciones=? WHERE id=?',
-                (nombre, categoria, float(precio), descripcion, int(stock), especificaciones_json, producto_id)
+                'UPDATE productos SET nombre=?, categoria=?, precio=?, descripcion=?, stock=?, especificaciones=?, variantes=? WHERE id=?',
+                (nombre, categoria, float(precio), descripcion, int(stock), especificaciones_json, variantes_json, producto_id)
             )
             if viejo and abs((viejo['precio'] or 0) - float(precio)) > 0.001:
                 nuevo_precio = float(precio)
@@ -7607,6 +7679,23 @@ def grupo_compra(ids):
     return render_template('grupo.html', items=items, ids=ids)
 
 # ── Rutas para Templates de Nuevas Funcionalidades ───────────────────────────────
+
+@app.route('/api/exportar-datos')
+@login_required
+def api_exportar_datos():
+    """Descarga todos los datos del usuario en JSON (portabilidad/GDPR)."""
+    uid = session['usuario_id']
+    conn = get_db()
+    perfil = dict(conn.execute('SELECT id, nombre, email, ciudad, telefono, bio, eco_puntos, xp, nivel, created_at FROM usuarios WHERE id=?', (uid,)).fetchone())
+    productos = [dict(r) for r in conn.execute('SELECT id, nombre, categoria, precio, stock, condicion, descripcion, created_at FROM productos WHERE usuario_id=?', (uid,)).fetchall()]
+    pedidos = [dict(r) for r in conn.execute('SELECT id, total, estado, metodo_pago, created_at FROM pedidos WHERE usuario_id=?', (uid,)).fetchall()]
+    favoritos = [dict(r) for r in conn.execute('SELECT producto_id, created_at FROM favoritos WHERE usuario_id=?', (uid,)).fetchall()]
+    resenas = [dict(r) for r in conn.execute('SELECT id, producto_id, rating, comentario, created_at FROM resenas WHERE usuario_id=?', (uid,)).fetchall()]
+    conn.close()
+    return jsonify({'exportado': datetime.now().isoformat(), 'usuario': perfil,
+                    'productos': productos, 'pedidos': pedidos,
+                    'favoritos': favoritos, 'resenas': resenas})
+
 
 @app.route('/api/verificacion/estado')
 @login_required

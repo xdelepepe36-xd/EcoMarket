@@ -1184,6 +1184,27 @@ def init_db():
         except sqlite3.OperationalError:
             pass
 
+    # Avisos de reposición de stock
+    try:
+        conn.execute('''CREATE TABLE IF NOT EXISTS avisos_stock (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            usuario_id INTEGER NOT NULL,
+            producto_id INTEGER NOT NULL,
+            notificado INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(usuario_id, producto_id)
+        )''')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
+    # Token público de rastreo de pedido
+    try:
+        conn.execute('ALTER TABLE pedidos ADD COLUMN token_rastreo TEXT DEFAULT ""')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
     # ── Migraciones para campos de usuario ──────────────────
     for col, ddl in [
         ('apellidos', 'TEXT DEFAULT ""'),
@@ -1663,12 +1684,33 @@ def producto_detalle(producto_id):
     ).fetchone()
     if hist and hist['n'] and hist['n'] > 1:
         precio_hist = {'min': hist['min_p'], 'max': hist['max_p'], 'cambios': hist['n']}
+
+    # Si el producto volvió a tener stock, notificar a quienes pidieron aviso
+    if data.get('producto', {}).get('stock', 0) > 0:
+        pendientes = conn.execute(
+            'SELECT usuario_id FROM avisos_stock WHERE producto_id = ? AND notificado = 0',
+            (producto_id,)).fetchall()
+        for av in pendientes:
+            add_notificacion(av['usuario_id'],
+                             f'📦 ¡{data["producto"]["nombre"]} volvió a tener stock!',
+                             'El producto que querías ya está disponible.', 'success')
+        if pendientes:
+            conn.execute('UPDATE avisos_stock SET notificado = 1 WHERE producto_id = ?', (producto_id,))
+            conn.commit()
+
+    # Estado del aviso de stock del usuario actual
+    aviso_activo = False
+    if 'usuario_id' in session:
+        aviso_activo = conn.execute(
+            'SELECT 1 FROM avisos_stock WHERE usuario_id = ? AND producto_id = ? AND notificado = 0',
+            (session['usuario_id'], producto_id)).fetchone() is not None
     conn.close()
 
     return render_template('detalle-producto.html',
                            **data,
                            es_favorito=es_favorito,
                            precio_historial=precio_hist,
+                           aviso_stock=aviso_activo,
                            ahora=datetime.now())
 
 
@@ -1935,8 +1977,8 @@ def checkout():
 
         conn = get_db()
         cursor = conn.execute(
-            'INSERT INTO pedidos (usuario_id, nombre, email, direccion, total, metodo_pago, ciudad, telefono, envio, descuento, regalo_mensaje) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
-            (session['usuario_id'], nombre_comp or nombre, email, direccion, total_final, metodo_pago, ciudad, telefono, envio, descuento, regalo_mensaje)
+            'INSERT INTO pedidos (usuario_id, nombre, email, direccion, total, metodo_pago, ciudad, telefono, envio, descuento, regalo_mensaje, token_rastreo) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
+            (session['usuario_id'], nombre_comp or nombre, email, direccion, total_final, metodo_pago, ciudad, telefono, envio, descuento, regalo_mensaje, uuid.uuid4().hex[:16])
         )
         pedido_id = cursor.lastrowid
 
@@ -7475,6 +7517,53 @@ def wishlist_publica(token):
                            dueno=(dueno['nombre'] if dueno else 'Un usuario'),
                            items=[dict(r) for r in items])
 
+
+# ── Avisos de reposición de stock ──────────────────────────────────
+
+@app.route('/api/avisar-stock/<int:producto_id>', methods=['POST'])
+@login_required
+def api_avisar_stock(producto_id):
+    """Toggle: pide o cancela aviso cuando el producto vuelva a tener stock."""
+    uid = session['usuario_id']
+    conn = get_db()
+    p = conn.execute('SELECT stock, nombre FROM productos WHERE id=?', (producto_id,)).fetchone()
+    if not p:
+        conn.close()
+        return jsonify({'error': 'Producto no encontrado'}), 404
+    if p['stock'] > 0:
+        conn.close()
+        return jsonify({'error': 'El producto ya tiene stock', 'activo': False}), 400
+    existente = conn.execute(
+        'SELECT id FROM avisos_stock WHERE usuario_id=? AND producto_id=?', (uid, producto_id)).fetchone()
+    if existente:
+        conn.execute('DELETE FROM avisos_stock WHERE id=?', (existente['id'],))
+        conn.commit()
+        conn.close()
+        return jsonify({'activo': False})
+    conn.execute('INSERT INTO avisos_stock (usuario_id, producto_id) VALUES (?,?)', (uid, producto_id))
+    conn.commit()
+    conn.close()
+    return jsonify({'activo': True})
+
+
+# ── Rastreo público de pedido ──────────────────────────────────────
+
+@app.route('/rastrear/<token>')
+def rastrear_pedido(token):
+    """Seguimiento público del pedido (sin login, solo con el token)."""
+    conn = get_db()
+    p = conn.execute('''
+        SELECT id, nombre, estado, total, created_at, metodo_pago, ciudad
+        FROM pedidos WHERE token_rastreo = ?''', (token,)).fetchone()
+    if not p:
+        conn.close()
+        flash('Pedido no encontrado. Verifica el link.', 'warning')
+        return redirect(url_for('index'))
+    items = conn.execute('SELECT nombre, cantidad, precio FROM pedido_items WHERE pedido_id=?',
+                         (p['id'],)).fetchall()
+    conn.close()
+    return render_template('rastrear.html', pedido=dict(p), items=[dict(i) for i in items])
+
 # ── Rutas para Templates de Nuevas Funcionalidades ───────────────────────────────
 
 @app.route('/verificacion')
@@ -7488,6 +7577,12 @@ def verificacion_vendedor():
 def soporte_cliente():
     """Página de soporte al cliente"""
     return render_template('soporte.html')
+
+@app.route('/guia-vendedor')
+def guia_vendedor():
+    """Guía práctica para vender mejor en EcoMarket."""
+    return render_template('guia_vendedor.html')
+
 
 @app.route('/newsletter')
 def newsletter():

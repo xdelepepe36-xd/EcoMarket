@@ -15,6 +15,14 @@
                 <span class="badge" style="background:#e8f5e9;color:#2e7d32;text-transform:capitalize"><i class="bi bi-check-circle"></i> {{ pedido.estado }}</span>
             </div>
 
+            {% if pedido.token_rastreo %}
+            <div style="background:rgba(46,125,50,.07);border:1.5px dashed rgba(46,125,50,.35);border-radius:14px;padding:14px 18px;margin-bottom:20px;text-align:center">
+                <div style="font-size:.82rem;color:var(--texto-sec);margin-bottom:6px">📍 Sigue tu pedido sin iniciar sesión:</div>
+                <a href="{{ url_for('rastrear_pedido', token=pedido.token_rastreo) }}" style="font-weight:700;color:var(--verde);word-break:break-all">{{ url_for('rastrear_pedido', token=pedido.token_rastreo, _external=True) }}</a>
+                <div style="font-size:.72rem;color:var(--texto-sec);margin-top:6px">Comparte este link para que el destinatario vea el estado del envío 🎁</div>
+            </div>
+            {% endif %}
+
             {% if items %}
             <div style="text-align:left;margin-bottom:18px">
                 {% for it in items %}

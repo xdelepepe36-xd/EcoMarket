@@ -168,6 +168,11 @@ localStorage.setItem('eco_vistos',JSON.stringify(v.slice(0,8)));
             <a href="{{ url_for('publicar') }}?categoria={{ producto.categoria }}&nombre={{ producto.nombre|urlencode }}" class="btn-secundario" style="width:100%;margin-top:8px;background:#e8f5e9;border-color:#a5d6a7;color:#2e7d32;font-weight:600">
                 <i class="bi bi-shop"></i> <span data-i18n="pd.sell_similar">Véndelo tú — publica uno igual</span>
             </a>
+            {% if session.get('usuario_id') and session.get('usuario_id') != producto.usuario_id %}
+            <button id="btnAvisarStock" class="btn-secundario" data-activo="{{ '1' if aviso_stock else '0' }}" style="width:100%;margin-top:8px;font-weight:600;{% if aviso_stock %}background:#fff8e1;border-color:#f9a825;color:#b45309{% endif %}">
+                <i class="bi bi-bell"></i> <span id="btnAvisarStockTxt">{% if aviso_stock %}🔔 Te avisaremos cuando haya stock{% else %}Avisarme cuando haya stock{% endif %}</span>
+            </button>
+            {% endif %}
             {% endif %}
             {% if session.get('usuario_id') and session.get('usuario_id') != producto.usuario_id %}
             <button class="btn-secundario" onclick="reportarProducto()" style="width:100%;margin-top:8px;font-size:.82rem;color:#b91c1c;">
@@ -545,6 +550,29 @@ function contactarVendedor() {
         }
     }, 350);
 }
+
+// Aviso de stock
+(function() {
+    var btn = document.getElementById('btnAvisarStock');
+    if (!btn) return;
+    btn.addEventListener('click', function() {
+        fetch('/api/avisar-stock/{{ producto.id }}', { method: 'POST' })
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+                if (d.error && !('activo' in d)) { alert(d.error); return; }
+                btn.dataset.activo = d.activo ? '1' : '0';
+                var txt = document.getElementById('btnAvisarStockTxt');
+                if (d.activo) {
+                    btn.style.background = '#fff8e1'; btn.style.borderColor = '#f9a825'; btn.style.color = '#b45309';
+                    txt.textContent = '🔔 Te avisaremos cuando haya stock';
+                    if (window.EcoToast) EcoToast.show('🔔 Aviso activado', 'Te notificaremos al volver el stock', 'success');
+                } else {
+                    btn.style.background = ''; btn.style.borderColor = ''; btn.style.color = '';
+                    txt.textContent = 'Avisarme cuando haya stock';
+                }
+            }).catch(function() { alert('Error de conexión'); });
+    });
+})();
 
 // ── Reseñas ──────────────────────────────────────
 function setRating(val) {

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}EcoMarket - Rastrear pedido #{{ pedido.id }}{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container" style="max-width:680px">
+        <div class="section-title">
+            <h2>📦 Pedido #ECO-{{ pedido.id }}</h2>
+            <p>Realizado el {{ pedido.created_at[:10] if pedido.created_at else '' }}</p>
+        </div>
+
+        <div style="background:var(--blanco);border-radius:20px;padding:24px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,.08);margin-bottom:20px">
+            {% set labels = ['Pedido recibido', 'Confirmado', 'Enviado', 'Entregado'] %}
+            {% set states = ['pendiente', 'confirmado', 'enviado', 'entregado'] %}
+            {% set idx = states.index(pedido.estado) if pedido.estado in states else 0 %}
+            <div style="display:flex;justify-content:space-between;position:relative;margin:20px 0">
+                {% for i in range(4) %}
+                <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;position:relative;z-index:1">
+                    <div style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;{% if i <= idx %}background:#2e7d32;color:#fff{% else %}background:rgba(46,125,50,.12);color:var(--texto-sec){% endif %}">
+                        {% if i < idx %}✓{% elif i == idx %}{{ i+1 }}{% else %}{{ i+1 }}{% endif %}
+                    </div>
+                    <span style="font-size:.7rem;text-align:center;color:{% if i <= idx %}var(--texto){% else %}var(--texto-sec){% endif %}">{{ labels[i] }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            <div style="text-align:center;margin-top:10px">
+                <span class="badge" style="background:#e8f5e9;color:#2e7d32;padding:8px 18px;border-radius:999px;font-weight:700;text-transform:capitalize">
+                    Estado: {{ pedido.estado }}
+                </span>
+            </div>
+        </div>
+
+        <div style="background:var(--blanco);border-radius:20px;padding:24px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,.08)">
+            <h3 style="font-size:1rem;margin-bottom:12px"><i class="bi bi-bag"></i> Productos</h3>
+            {% for it in items %}
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(46,125,50,.07);font-size:.9rem">
+                <span>{{ it.cantidad }} x {{ it.nombre }}</span>
+                <strong>S/. {{ '%.2f'|format(it.precio * it.cantidad) }}</strong>
+            </div>
+            {% endfor %}
+            <div style="display:flex;justify-content:space-between;padding:12px 0 0;font-weight:800;font-size:1.05rem">
+                <span>Total</span><span style="color:var(--verde)">S/. {{ '%.2f'|format(pedido.total) }}</span>
+            </div>
+            {% if pedido.ciudad %}<p style="font-size:.82rem;color:var(--texto-sec);margin-top:10px"><i class="bi bi-geo-alt"></i> Envío a {{ pedido.ciudad }}</p>{% endif %}
+        </div>
+
+        <div style="text-align:center;margin-top:24px">
+            <a href="{{ url_for('index') }}" class="btn-secundario">Volver al inicio</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

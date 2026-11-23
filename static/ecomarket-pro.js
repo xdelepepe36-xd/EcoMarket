@@ -901,6 +901,64 @@
         });
     }
 
+    /* ═══════════ RECIÉN LLEGADOS (home) ═══════════ */
+    function initRecienLlegados() {
+        if (location.pathname !== '/') return;
+        var anchor = document.getElementById('flashSection') || document.querySelector('.productos-section');
+        if (!anchor) return;
+        function esc(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+        fetch('/api/recien-llegados').then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (d) {
+                if (!d || !d.productos || !d.productos.length) return;
+                var sec = document.createElement('section');
+                sec.className = 'section eco-tendencias';
+                sec.innerHTML = '<div class="container"><div class="section-title"><h2>🆕 Recién llegados</h2><p>Los últimos productos publicados</p></div><div class="eco-tend-row" id="ecoNuevosRow"></div></div>';
+                anchor.parentNode.insertBefore(sec, anchor);
+                document.getElementById('ecoNuevosRow').innerHTML = d.productos.map(function (p) {
+                    var img = (p.imagen || '').startsWith('assets/') ? '/static/' + p.imagen : (p.imagen && p.imagen.indexOf('http') === 0 ? p.imagen : '/static/assets/product-placeholder.svg');
+                    return '<a href="/producto/' + p.id + '" class="eco-tend-card">' +
+                        '<img src="' + img + '" alt="' + esc(p.nombre) + '" loading="lazy" onerror="this.src=\'/static/assets/product-placeholder.svg\'">' +
+                        '<div><strong>' + esc(String(p.nombre).slice(0, 28)) + '</strong><span>S/. ' + (+p.precio).toFixed(2) + '</span></div></a>';
+                }).join('');
+            }).catch(function () {});
+    }
+
+    /* ═══════════ TOP VENDEDORES (leaderboard) ═══════════ */
+    function initTopVendedores() {
+        var box = document.getElementById('topVendedores');
+        if (!box) return;
+        fetch('/api/top-vendedores').then(function (r) { return r.json(); }).then(function (d) {
+            if (!d.vendedores || !d.vendedores.length) { box.innerHTML = '<p style="color:var(--texto-sec)">Aún no hay ventas este mes.</p>'; return; }
+            var medals = ['🥇','🥈','🥉'];
+            box.innerHTML = d.vendedores.map(function (v, i) {
+                return '<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(46,125,50,.05);border-radius:12px">' +
+                    '<span style="font-size:1.2rem">' + (medals[i] || (i+1) + 'º') + '</span>' +
+                    '<div style="flex:1"><strong>' + (v.nombre || 'Vendedor') + '</strong><br><small style="color:var(--texto-sec)">' + v.ventas + ' ventas · ' + (+v.rating).toFixed(1) + '★</small></div>' +
+                    '<span style="font-weight:800;color:var(--verde)">' + v.productos + ' productos</span></div>';
+            }).join('');
+        }).catch(function () {});
+    }
+
+    /* ═══════════ ALERTA DE BÚSQUEDA EN CATÁLOGO ═══════════ */
+    function initAlertaBusqueda() {
+        if (location.pathname !== '/productos') return;
+        var empty = document.querySelector('.no-results');
+        if (!empty) return;
+        var q = new URLSearchParams(location.search).get('q');
+        if (!q || !window.__ECOMARKET_AUTH__) return;
+        var wrap = document.createElement('div');
+        wrap.style.cssText = 'text-align:center;margin-top:14px';
+        wrap.innerHTML = '<button id="btnAlertaBusqueda" class="btn-secundario" style="padding:10px 22px;border-radius:999px"><i class="bi bi-bell"></i> 🔔 Avísame cuando exista "' + q.replace(/</g,'&lt;') + '"</button>';
+        empty.appendChild(wrap);
+        document.getElementById('btnAlertaBusqueda').addEventListener('click', function() {
+            fetch('/api/alerta-busqueda', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({termino: q}) })
+                .then(function(r){return r.json();}).then(function(d){
+                    if (d.activo) { this.textContent = '🔔 Alerta activada — te avisaremos'; this.disabled = true; }
+                    else if (window.EcoToast) EcoToast.show('🔕', 'Alerta desactivada', 'info');
+                }.bind(this)).catch(function(){});
+        });
+    }
+
     /* ═══════════ INIT ═══════════ */
     document.addEventListener('DOMContentLoaded', function () {
         initParticles();
@@ -931,5 +989,8 @@
         initVerificacionBadge();
         initKiosco();
         initExportar();
+        initRecienLlegados();
+        initTopVendedores();
+        initAlertaBusqueda();
     });
 })();

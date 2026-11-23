@@ -229,6 +229,9 @@
         <!-- TAB: PEDIDOS -->
         <div id="tab-pedidos" class="tab-content" style="display:none">
             {% if pedidos %}
+            <div style="margin-bottom:14px;text-align:right">
+                <a href="{{ url_for('mis_pedidos_csv') }}" class="btn-secundario" style="padding:8px 16px;font-size:.82rem;text-decoration:none;display:inline-block"><i class="bi bi-filetype-csv"></i> Descargar CSV</a>
+            </div>
             <div style="display:flex;flex-direction:column;gap:14px">
                 {% for pedido in pedidos %}
                 <div style="background:var(--blanco);border-radius:18px;padding:20px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,0.08)">

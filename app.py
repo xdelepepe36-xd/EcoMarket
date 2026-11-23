@@ -1205,9 +1205,24 @@ def init_db():
     except sqlite3.OperationalError:
         pass
 
-    # Variantes de producto (JSON: [{"nombre":"M","extra":5}])
+    # Variantes de producto (JSON: [{"nombre":"M","extra":5,"stock":3}])
     try:
         conn.execute('ALTER TABLE productos ADD COLUMN variantes TEXT DEFAULT "[]"')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
+    # Alertas de búsqueda ("avísame cuando exista X")
+    try:
+        conn.execute('''CREATE TABLE IF NOT EXISTS alertas_busqueda (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            usuario_id INTEGER NOT NULL,
+            termino TEXT NOT NULL,
+            activa INTEGER DEFAULT 1,
+            notificado INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(usuario_id, termino)
+        )''')
         conn.commit()
     except sqlite3.OperationalError:
         pass
@@ -1331,7 +1346,7 @@ def get_productos_destacados(limit=6):
 
 
 def _parse_variantes(raw):
-    """Parsea variantes del formulario: 'Nombre' o 'Nombre: +extra' por línea → JSON."""
+    """Parsea variantes: 'Nombre | extra | stock' o 'Nombre: +extra' por línea → JSON."""
     if not raw:
         return '[]'
     out = []
@@ -1339,9 +1354,20 @@ def _parse_variantes(raw):
         linea = linea.strip()
         if not linea:
             continue
-        extra = 0.0
-        nombre = linea
-        if ':' in linea:
+        nombre, extra, stock = linea, 0.0, None
+        if '|' in linea:
+            partes = [p.strip() for p in linea.split('|')]
+            nombre = partes[0]
+            try:
+                extra = round(float(partes[1].replace('S/.', '').replace('+', '').strip() or '0'), 2) if len(partes) > 1 and partes[1] else 0.0
+            except ValueError:
+                extra = 0.0
+            if len(partes) > 2 and partes[2]:
+                try:
+                    stock = max(0, int(partes[2]))
+                except ValueError:
+                    stock = None
+        elif ':' in linea:
             nombre, extra_s = linea.rsplit(':', 1)
             extra_s = extra_s.strip().replace('S/.', '').replace('S/', '').replace('+', '').strip()
             try:
@@ -1350,7 +1376,10 @@ def _parse_variantes(raw):
                 extra = 0.0
             nombre = nombre.strip()
         if nombre:
-            out.append({'nombre': nombre[:40], 'extra': extra})
+            v = {'nombre': nombre[:40], 'extra': extra}
+            if stock is not None:
+                v['stock'] = stock
+            out.append(v)
     return json.dumps(out, ensure_ascii=False) if out else '[]'
 
 
@@ -2173,6 +2202,22 @@ def publicar():
         )
         producto_id = cursor.lastrowid
         conn.execute('INSERT INTO historial_precios (producto_id, precio) VALUES (?,?)', (producto_id, precio_valor))
+
+        # Alertas de búsqueda: notificar a quienes buscaban algo parecido
+        try:
+            norm_nom = re.sub(r'[^a-z0-9áéíóúñ ]', '', nombre.lower())
+            alertas = conn.execute(
+                'SELECT id, usuario_id, termino FROM alertas_busqueda WHERE activa=1 AND notificado=0').fetchall()
+            for a in alertas:
+                term = re.sub(r'[^a-z0-9áéíóúñ ]', '', a['termino'].lower())
+                if term and (term in norm_nom or norm_nom in term):
+                    conn.execute(
+                        'INSERT INTO notificaciones (usuario_id, titulo, mensaje, tipo) VALUES (?,?,?,?)',
+                        (a['usuario_id'], '🔔 ¡Encontramos lo que buscabas!',
+                         f'"{nombre}" coincide con tu alerta "{a["termino"]}" — ya está disponible.', 'success'))
+                    conn.execute('UPDATE alertas_busqueda SET notificado=1 WHERE id=?', (a['id'],))
+        except sqlite3.Error:
+            pass
 
         # Subir imágenes adicionales (galería)
         if 'imagenes_extra' in request.files:
@@ -7679,6 +7724,78 @@ def grupo_compra(ids):
     return render_template('grupo.html', items=items, ids=ids)
 
 # ── Rutas para Templates de Nuevas Funcionalidades ───────────────────────────────
+
+@app.route('/api/alerta-busqueda', methods=['POST'])
+@login_required
+def api_alerta_busqueda():
+    """Toggle alerta 'avísame cuando exista X'."""
+    data = request.get_json(silent=True) or {}
+    termino = sanitize_string(data.get('termino', ''), max_length=80).strip()
+    if len(termino) < 3:
+        return jsonify({'error': 'Escribe qué buscas (mín. 3 letras)'}), 400
+    uid = session['usuario_id']
+    conn = get_db()
+    ex = conn.execute('SELECT id, activa FROM alertas_busqueda WHERE usuario_id=? AND termino=?',
+                      (uid, termino)).fetchone()
+    if ex:
+        conn.execute('UPDATE alertas_busqueda SET activa=? WHERE id=?', (0 if ex['activa'] else 1, ex['id']))
+        conn.commit(); conn.close()
+        return jsonify({'activo': not bool(ex['activa'])})
+    conn.execute('INSERT INTO alertas_busqueda (usuario_id, termino) VALUES (?,?)', (uid, termino))
+    conn.commit(); conn.close()
+    return jsonify({'activo': True})
+
+
+@app.route('/api/recien-llegados')
+def api_recien_llegados():
+    """Últimos 8 productos publicados."""
+    conn = get_db()
+    rows = conn.execute('''
+        SELECT p.id, p.nombre, p.precio, p.precio_original, p.imagen, p.categoria, p.created_at
+        FROM productos p WHERE COALESCE(p.vendido,0)=0
+        ORDER BY p.created_at DESC LIMIT 8''').fetchall()
+    conn.close()
+    return jsonify({'productos': [dict(r) for r in rows]})
+
+
+@app.route('/api/top-vendedores')
+def api_top_vendedores():
+    """Top vendedores del mes por ventas concretadas."""
+    conn = get_db()
+    rows = conn.execute('''
+        SELECT u.id, u.nombre, u.avatar_color,
+               COUNT(DISTINCT p.id) AS productos,
+               COALESCE(SUM(CASE WHEN p.vendido=1 THEN 1 ELSE 0 END),0) AS ventas,
+               COALESCE(AVG(r.rating),0) AS rating
+        FROM usuarios u
+        JOIN productos p ON p.usuario_id = u.id
+        LEFT JOIN resenas r ON r.producto_id = p.id
+        WHERE p.created_at >= date('now','-30 days') OR p.vendido=1
+        GROUP BY u.id
+        HAVING ventas > 0
+        ORDER BY ventas DESC, rating DESC LIMIT 10''').fetchall()
+    conn.close()
+    return jsonify({'vendedores': [dict(r) for r in rows]})
+
+
+@app.route('/mis-pedidos.csv')
+@login_required
+def mis_pedidos_csv():
+    """Descarga el historial de pedidos en CSV."""
+    import csv, io
+    uid = session['usuario_id']
+    conn = get_db()
+    rows = conn.execute('SELECT id, total, estado, metodo_pago, created_at FROM pedidos WHERE usuario_id=? ORDER BY created_at DESC', (uid,)).fetchall()
+    conn.close()
+    buf = io.StringIO()
+    w = csv.writer(buf)
+    w.writerow(['pedido_id', 'fecha', 'total', 'estado', 'metodo_pago'])
+    for r in rows:
+        w.writerow([r['id'], r['created_at'], r['total'], r['estado'], r['metodo_pago']])
+    out = Response(buf.getvalue(), mimetype='text/csv')
+    out.headers['Content-Disposition'] = 'attachment; filename=mis_pedidos.csv'
+    return out
+
 
 @app.route('/api/exportar-datos')
 @login_required

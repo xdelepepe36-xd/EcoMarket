@@ -160,7 +160,7 @@ localStorage.setItem('eco_vistos',JSON.stringify(v.slice(0,8)));
                     <label style="font-size:.82rem;font-weight:700;color:var(--texto-sec);display:block;margin-bottom:6px">VARIANTE</label>
                     <select id="varianteSelect" style="width:100%;padding:11px 14px;border:1.5px solid rgba(46,125,50,.2);border-radius:12px;font-family:inherit;font-size:.9rem;background:#fff">
                         {% for v in producto.variantes %}
-                        <option value="{{ v.nombre }}" data-extra="{{ v.extra }}">{{ v.nombre }}{% if v.extra %} (+S/. {{ '%.2f'|format(v.extra) }}){% endif %}</option>
+                        <option value="{{ v.nombre }}" data-extra="{{ v.extra }}" {% if v.stock is defined and v.stock == 0 %}disabled{% endif %}>{{ v.nombre }}{% if v.extra %} (+S/. {{ '%.2f'|format(v.extra) }}){% endif %}{% if v.stock is defined and v.stock == 0 %} — agotada{% endif %}{% if v.stock is defined and v.stock > 0 and v.stock <= 3 %} (¡quedan {{ v.stock }}!){% endif %}</option>
                         {% endfor %}
                     </select>
                 </div>

@@ -2935,7 +2935,7 @@ def api_asistente():
     html = html.replace('\n', '<br>')
     quick = (['productos baratos', 'Envíos', 'Cupones', 'Consejos eco', 'Mi cuenta'] if lang == 'es'
              else ['cheap products', 'Shipping', 'Coupons', 'Eco tips', 'My account'])
-    return jsonify({'respuesta': html, 'sugerencias': quick})
+    return jsonify({'respuesta': html, 'respuesta_raw': resp, 'sugerencias': quick})
 
     norm = ''.join(c for c in unicodedata.normalize('NFD', mensaje) if unicodedata.category(c) != 'Mn')
 

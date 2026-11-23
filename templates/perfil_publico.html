@@ -11,7 +11,7 @@
                     {% if u.avatar %}<img src="{{ url_for('static', filename=u.avatar) }}" alt="">{% else %}{{ u.nombre[0]|upper }}{% endif %}
                 </div>
                 <div class="eco-pub-info">
-                    <h2>{{ u.nombre }} {% if u.verificado %}<span class="eco-verified" title="Email verificado">✓</span>{% endif %}</h2>
+                    <h2>{{ u.nombre }} {% if u.premium %}<span class="eco-verified" title="EcoPremium" style="background:linear-gradient(135deg,#f59e0b,#b45309)">👑</span>{% endif %} {% if u.verificado %}<span class="eco-verified" title="Email verificado">✓</span>{% endif %}</h2>
                     <p class="eco-pub-meta">
                         {% if u.ciudad %}📍 {{ u.ciudad }} · {% endif %}
                         🌱 Miembro desde {{ u.created_at[:4] }} · Nivel {{ u.nivel or 1 }}{% if u.rango %} · {{ u.rango }}{% endif %}

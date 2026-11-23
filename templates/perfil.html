@@ -30,7 +30,7 @@
                     {{ session.get('nombre', 'U')[0] | upper }}
                 </div>
                 <div style="flex:1">
-                    <h3 style="font-size:1.3rem;font-weight:800;margin-bottom:2px">{{ session.get('nombre') }} <span id="verifBadge" class="badge" style="display:none;font-size:.68rem;padding:3px 10px;border-radius:999px;color:#fff;vertical-align:middle"></span></h3>
+                    <h3 style="font-size:1.3rem;font-weight:800;margin-bottom:2px">{{ session.get('nombre') }} {% if usuario and usuario.premium %}<a href="{{ url_for('premium_page') }}" title="EcoPremium" style="text-decoration:none;font-size:.75rem;background:linear-gradient(135deg,#f59e0b,#b45309);color:#fff;padding:3px 10px;border-radius:999px;vertical-align:middle">👑 Premium</a>{% endif %} <span id="verifBadge" class="badge" style="display:none;font-size:.68rem;padding:3px 10px;border-radius:999px;color:#fff;vertical-align:middle"></span></h3>
                     <p style="font-size:0.85rem;color:var(--texto-sec)">{{ usuario.bio if usuario and usuario.bio else '🌱 Eco warrior' }}</p>
                 </div>
                 <div style="display:flex;gap:16px;flex-wrap:wrap">

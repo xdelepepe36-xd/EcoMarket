@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}EcoMarket - EcoPremium 👑{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top:60px">
+    <div class="container" style="max-width:680px">
+        <div style="text-align:center;margin-bottom:32px">
+            <div style="font-size:3.5rem">👑</div>
+            <h1 style="font-size:2rem;font-weight:800;background:linear-gradient(135deg,#b45309,#f59e0b);-webkit-background-clip:text;background-clip:text;color:transparent">EcoPremium</h1>
+            <p style="color:var(--texto-sec)">El club de compradores y vendedores EcoMarket</p>
+        </div>
+
+        {% if activo %}
+        <div style="background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #f59e0b;border-radius:20px;padding:24px;text-align:center;margin-bottom:20px">
+            <div style="font-size:2rem">✅</div>
+            <h2 style="margin:8px 0 4px">Eres Premium</h2>
+            <p style="color:#92400e;font-size:.9rem">Vigente hasta <strong>{{ vence }}</strong> — disfruta tus beneficios</p>
+            <form method="POST" action="{{ url_for('premium_cancelar') }}" style="margin-top:14px">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" style="background:none;border:1.5px solid #b45309;color:#b45309;padding:8px 20px;border-radius:999px;cursor:pointer;font-weight:600">Cancelar suscripción</button>
+            </form>
+        </div>
+        {% else %}
+        <div style="background:var(--blanco);border-radius:20px;padding:28px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,.1);margin-bottom:20px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+                <div>
+                    <h2 style="font-size:1.3rem">Activa EcoPremium</h2>
+                    <p style="color:var(--texto-sec);font-size:.88rem">30 días de beneficios por <strong>{{ costo }} pts eco</strong> (tienes <strong>{{ pts }}</strong>)</p>
+                </div>
+                <div style="font-size:2rem">🌟</div>
+            </div>
+            <div style="display:grid;gap:10px;margin-bottom:22px">
+                <div style="display:flex;gap:10px;align-items:center;padding:12px 16px;background:rgba(46,125,50,.05);border-radius:12px"><span style="font-size:1.3rem">💚</span><div><strong>{{ dto }}% dto extra</strong> en todas tus compras, se suma a cupones</div></div>
+                <div style="display:flex;gap:10px;align-items:center;padding:12px 16px;background:rgba(46,125,50,.05);border-radius:12px"><span style="font-size:1.3rem">🏅</span><div><strong>Badge 👑 Premium</strong> en tu perfil y en el leaderboard</div></div>
+                <div style="display:flex;gap:10px;align-items:center;padding:12px 16px;background:rgba(46,125,50,.05);border-radius:12px"><span style="font-size:1.3rem">⚡</span><div><strong>Soporte prioritario</strong> y acceso anticipado a ofertas flash</div></div>
+                <div style="display:flex;gap:10px;align-items:center;padding:12px 16px;background:rgba(46,125,50,.05);border-radius:12px"><span style="font-size:1.3rem">🌱</span><div><strong>+20 pts eco</strong> de regalo al activar</div></div>
+            </div>
+            {% if session.get('usuario_id') %}
+            <form method="POST" action="{{ url_for('premium_activar') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn-principal" style="width:100%;padding:15px;font-size:1rem" {% if pts < costo %}disabled style="opacity:.5;cursor:not-allowed"{% endif %}>
+                    👑 Activar por {{ costo }} pts eco
+                </button>
+                {% if pts < costo %}<p style="text-align:center;color:var(--texto-sec);font-size:.82rem;margin-top:10px">Te faltan {{ costo - pts }} pts — sigue comprando y vendiendo 🌱</p>{% endif %}
+            </form>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="btn-principal" style="display:block;text-align:center;padding:15px;text-decoration:none">Inicia sesión para activar</a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div style="text-align:center;color:var(--texto-sec);font-size:.82rem">
+            <p>¿Cómo consigo pts eco? Compra, vende, refiere amigos, gana el quiz semanal y completa logros.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

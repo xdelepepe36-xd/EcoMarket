@@ -559,6 +559,40 @@ def csrf_protect():
             return redirect(request.referrer or url_for('index'))
 
 
+@app.before_request
+def modo_mantenimiento():
+    """Si el admin activó mantenimiento, solo él puede navegar."""
+    if request.endpoint in (None, 'static'):
+        return None
+    path = request.path
+    if path.startswith(('/static/', '/api/health')) or path in ('/login', '/logout', '/admin', '/mantenimiento'):
+        return None
+    try:
+        conn = get_db()
+        row = conn.execute("SELECT valor FROM ajustes WHERE clave='mantenimiento'").fetchone()
+        conn.close()
+        if row and row['valor'] == '1' and session.get('rol') != 'admin':
+            if request.method == 'GET':
+                return render_template('mantenimiento.html'), 503
+            return jsonify({'error': 'Modo mantenimiento'}), 503
+    except sqlite3.Error:
+        pass
+    return None
+
+
+def es_premium(uid):
+    """True si el usuario tiene EcoPremium vigente."""
+    if not uid:
+        return False
+    conn = get_db()
+    u = conn.execute('SELECT premium, premium_vence FROM usuarios WHERE id=?', (uid,)).fetchone()
+    conn.close()
+    if not u or not u['premium']:
+        return False
+    vence = u['premium_vence'] or ''
+    return not vence or vence >= datetime.now().strftime('%Y-%m-%d')
+
+
 # Rate limiting de credenciales por IP (en memoria; mejor protección en multi-worker con Redis)
 _login_ip_attempts = {}
 
@@ -1219,6 +1253,19 @@ def init_db():
             conn.commit()
         except sqlite3.OperationalError:
             pass
+
+    # EcoPremium (suscripción) + tabla de ajustes del sitio
+    for col, ddl in [('premium', 'INTEGER DEFAULT 0'), ('premium_vence', 'TEXT DEFAULT ""')]:
+        try:
+            conn.execute(f'ALTER TABLE usuarios ADD COLUMN {col} {ddl}')
+            conn.commit()
+        except sqlite3.OperationalError:
+            pass
+    conn.execute('''CREATE TABLE IF NOT EXISTS ajustes (
+        clave TEXT PRIMARY KEY,
+        valor TEXT DEFAULT ""
+    )''')
+    conn.commit()
 
     # Alertas de búsqueda ("avísame cuando exista X")
     try:
@@ -2074,6 +2121,12 @@ def checkout():
                         )
                         cupon_conn.commit()
             cupon_conn.close()
+
+        # EcoPremium: 5% de descuento adicional sobre el subtotal
+        descuento_premium = 0.0
+        if es_premium(session['usuario_id']):
+            descuento_premium = round((subtotal - descuento) * PREMIUM_DESCUENTO / 100, 2)
+            descuento = round(descuento + descuento_premium, 2)
 
         total_productos = round(max(subtotal - descuento, 0), 2)
         envio = 0.0
@@ -3395,7 +3448,7 @@ def perfil_publico(usuario_id):
     u = conn.execute('''
         SELECT id, nombre, avatar, avatar_color, bio, ciudad, created_at,
                COALESCE(eco_puntos,0) AS eco_puntos, COALESCE(xp,0) AS xp, nivel, rango,
-               COALESCE(email_verificado,0) AS verificado
+               COALESCE(email_verificado,0) AS verificado, COALESCE(premium,0) AS premium
         FROM usuarios WHERE id = ?
     ''', (usuario_id,)).fetchone()
     if not u:
@@ -7355,8 +7408,16 @@ def admin():
     except sqlite3.Error:
         stats.update({'eventos_hoy': 0, 'scroll_promedio': 0, 'tiempo_promedio': 0, 'busquedas_hoy': 0, 'top_paginas': []})
     conn.close()
+    mnt = False
+    try:
+        conn2 = get_db()
+        row = conn2.execute("SELECT valor FROM ajustes WHERE clave='mantenimiento'").fetchone()
+        conn2.close()
+        mnt = bool(row and row['valor'] == '1')
+    except sqlite3.Error:
+        pass
     return render_template('admin.html', productos=productos, usuarios=usuarios, stats=stats,
-                           reportes=[dict(r) for r in reportes])
+                           reportes=[dict(r) for r in reportes], mantenimiento=mnt)
 
 
 @app.route('/admin/reporte/<int:reporte_id>/resolver', methods=['POST'])
@@ -7825,6 +7886,76 @@ def api_top_vendedores():
         ORDER BY ventas DESC, rating DESC LIMIT 10''').fetchall()
     conn.close()
     return jsonify({'vendedores': [dict(r) for r in rows]})
+
+
+# ── EcoPremium (suscripción) ───────────────────────────────────────
+
+PREMIUM_COSTO_PTS = 2000
+PREMIUM_DIAS = 30
+PREMIUM_DESCUENTO = 5  # % extra en compras
+
+
+@app.route('/premium')
+def premium_page():
+    uid = session.get('usuario_id')
+    activo = es_premium(uid) if uid else False
+    vence = ''
+    pts = 0
+    if uid:
+        conn = get_db()
+        u = conn.execute('SELECT eco_puntos, premium_vence FROM usuarios WHERE id=?', (uid,)).fetchone()
+        conn.close()
+        if u:
+            pts = u['eco_puntos'] or 0
+            vence = u['premium_vence'] or ''
+    return render_template('premium.html', activo=activo, vence=vence, pts=pts,
+                           costo=PREMIUM_COSTO_PTS, dias=PREMIUM_DIAS, dto=PREMIUM_DESCUENTO)
+
+
+@app.route('/premium/activar', methods=['POST'])
+@login_required
+def premium_activar():
+    uid = session['usuario_id']
+    conn = get_db()
+    u = conn.execute('SELECT eco_puntos, premium, premium_vence FROM usuarios WHERE id=?', (uid,)).fetchone()
+    if not u:
+        conn.close(); flash('Usuario no encontrado', 'danger'); return redirect(url_for('premium_page'))
+    # Si ya está activo, extender 30 días gratis? No: renovar cuesta igual.
+    if (u['eco_puntos'] or 0) < PREMIUM_COSTO_PTS:
+        conn.close()
+        flash(f'Te faltan {PREMIUM_COSTO_PTS - (u["eco_puntos"] or 0)} pts eco para EcoPremium.', 'warning')
+        return redirect(url_for('premium_page'))
+    nuevo_vence = (datetime.now() + timedelta(days=PREMIUM_DIAS)).strftime('%Y-%m-%d')
+    conn.execute('UPDATE usuarios SET eco_puntos = eco_puntos - ?, premium = 1, premium_vence = ? WHERE id=?',
+                 (PREMIUM_COSTO_PTS, nuevo_vence, uid))
+    conn.execute('INSERT INTO notificaciones (usuario_id, titulo, mensaje, tipo) VALUES (?,?,?,?)',
+                 (uid, '👑 ¡EcoPremium activado!',
+                  f'Tienes {PREMIUM_DIAS} días de beneficios: {PREMIUM_DESCUENTO}% dto extra en compras y badge premium.', 'success'))
+    conn.commit(); conn.close()
+    flash('👑 EcoPremium activado por 30 días. ¡Disfruta tus beneficios!', 'success')
+    return redirect(url_for('premium_page'))
+
+
+@app.route('/premium/cancelar', methods=['POST'])
+@login_required
+def premium_cancelar():
+    conn = get_db()
+    conn.execute('UPDATE usuarios SET premium = 0, premium_vence = "" WHERE id=?', (session['usuario_id'],))
+    conn.commit(); conn.close()
+    flash('EcoPremium desactivado.', 'info')
+    return redirect(url_for('premium_page'))
+
+
+@app.route('/admin/mantenimiento', methods=['POST'])
+@login_required
+@admin_required
+def admin_mantenimiento():
+    estado = '1' if request.form.get('activar') == '1' else '0'
+    conn = get_db()
+    conn.execute("INSERT OR REPLACE INTO ajustes (clave, valor) VALUES ('mantenimiento', ?)", (estado,))
+    conn.commit(); conn.close()
+    flash('Modo mantenimiento ' + ('ACTIVADO' if estado == '1' else 'desactivado') + '.', 'success')
+    return redirect(url_for('admin'))
 
 
 @app.route('/mis-pedidos.csv')

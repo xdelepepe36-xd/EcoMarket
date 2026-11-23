@@ -109,7 +109,7 @@ localStorage.setItem('eco_vistos',JSON.stringify(v.slice(0,8)));
                     <i class="bi bi-box-seam"></i> 📦 Pack: compra {{ producto.pack_cantidad }}+ y paga S/. {{ '%.2f'|format(producto.pack_precio) }} c/u
                 </div>
                 {% endif %}
-                <div class="detalle-delivery-pill"><i class="bi bi-truck"></i> <span data-i18n="pd.free_shipping_lima">Envío gratis en Lima</span></div>
+                <div class="detalle-delivery-pill"><i class="bi bi-truck"></i> <span data-i18n="pd.free_shipping_lima">Envío coordinado con el vendedor</span></div>
                 {% if precio_historial %}
                 <div class="detalle-price-history" title="Historial de precios">
                     <i class="bi bi-graph-down-arrow"></i>
@@ -211,7 +211,7 @@ localStorage.setItem('eco_vistos',JSON.stringify(v.slice(0,8)));
             <div class="detalle-benefits">
                 <div class="benefit-item"><span data-i18n="pd.benefit_material">♻️ Material sostenible</span></div>
                 <div class="benefit-item"><span data-i18n="pd.benefit_shipping">🚚 Envío rápido disponible</span></div>
-                <div class="benefit-item"><span data-i18n="pd.benefit_returns">🔄 Devoluciones gratis</span></div>
+                <div class="benefit-item"><span data-i18n="pd.benefit_returns">🔄 Devoluciones coordinadas</span></div>
             </div>
 
             {% if producto.es_digital %}
@@ -229,9 +229,9 @@ localStorage.setItem('eco_vistos',JSON.stringify(v.slice(0,8)));
             <details class="eco-faq" style="margin-top:14px">
                 <summary style="cursor:pointer;font-weight:700;color:var(--verde,#2e7d32);font-size:.92rem">❓ <span data-i18n="pd.faq">Preguntas frecuentes</span></summary>
                 <div style="margin-top:10px;display:grid;gap:8px;font-size:.86rem;color:var(--texto-sec,#555)">
-                    <details style="padding:8px 12px;background:var(--blanco,#fff);border-radius:10px"><summary style="cursor:pointer;font-weight:600">🚚 ¿Cómo funciona el envío?</summary><p style="margin:6px 0 0">Coordinas el envío directamente con {{ producto.vendedor_nombre or 'el vendedor' }}. Envío gratis en Lima para compras verificadas.</p></details>
+                    <details style="padding:8px 12px;background:var(--blanco,#fff);border-radius:10px"><summary style="cursor:pointer;font-weight:600">🚚 ¿Cómo funciona el envío?</summary><p style="margin:6px 0 0">Coordinas el envío directamente con {{ producto.vendedor_nombre or 'el vendedor' }} (acuerdo entre ustedes: delivery, transporte o punto de entrega).</p></details>
                     <details style="padding:8px 12px;background:var(--blanco,#fff);border-radius:10px"><summary style="cursor:pointer;font-weight:600">♻️ ¿Puedo comprarlo de segunda mano?</summary><p style="margin:6px 0 0">¡Claro! EcoMarket promueve la reutilización. Si el producto tiene desgaste, el vendedor debe indicarlo en la descripción.</p></details>
-                    <details style="padding:8px 12px;background:var(--blanco,#fff);border-radius:10px"><summary style="cursor:pointer;font-weight:600">🔄 ¿Y si quiero devolverlo?</summary><p style="margin:6px 0 0">Tienes 7 días para devolver si el producto no coincide con la descripción. El reembolso es gratis.</p></details>
+                    <details style="padding:8px 12px;background:var(--blanco,#fff);border-radius:10px"><summary style="cursor:pointer;font-weight:600">🔄 ¿Y si quiero devolverlo?</summary><p style="margin:6px 0 0">Las devoluciones se coordinan directamente con el vendedor según lo acordado en la compra. Lee la descripción antes de adquirir.</p></details>
                     <details style="padding:8px 12px;background:var(--blanco,#fff);border-radius:10px"><summary style="cursor:pointer;font-weight:600">💱 ¿Aceptan trueque?</summary><p style="margin:6px 0 0">¡Sí! Usa el botón "Proponer trueque" para ofrecer uno de tus productos a cambio de este.</p></details>
                 </div>
             </details>
@@ -314,8 +314,8 @@ localStorage.setItem('eco_vistos',JSON.stringify(v.slice(0,8)));
                     </div>
                     <div class="envio-card">
                         <i class="bi bi-arrow-repeat" style="font-size:1.8rem;color:var(--verde)"></i>
-                        <strong><span data-i18n="pd.returns_free">Devoluciones gratis</span></strong>
-                        <p><span data-i18n="pd.returns_free_desc">30 días para devolver tu producto sin costo.</span></p>
+                        <strong><span data-i18n="pd.returns_free">Devoluciones coordinadas</span></strong>
+                        <p><span data-i18n="pd.returns_free_desc">Las devoluciones se acuerdan directamente con el vendedor.</span></p>
                     </div>
                 </div>
             </div>

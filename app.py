@@ -286,6 +286,11 @@ PRODUCT_IMAGES = {
     'Jardín': 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=300&fit=crop',
     'Alimentación': 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&h=300&fit=crop',
     'Ropa': 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=300&fit=crop',
+    'Segunda mano': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop',
+    'Electrodomésticos usados': 'https://images.unsplash.com/photo-1556911220-bff31c812dba?w=400&h=300&fit=crop',
+    'Materiales reciclables': 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=400&h=300&fit=crop',
+    'Muebles reutilizables': 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=300&fit=crop',
+    'Manualidades recicladas': 'https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=400&h=300&fit=crop',
     'default': 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&h=300&fit=crop'
 }
 
@@ -1573,13 +1578,20 @@ def get_producto_detalle(producto_id):
     return None
 
 
+CATEGORIAS_BASE = [
+    'Segunda mano', 'Electrodomésticos usados', 'Materiales reciclables',
+    'Muebles reutilizables', 'Manualidades recicladas',
+]
+
+
 @cached(ttl=600, key_prefix='categorias_')
 def get_categorias():
     conn = get_db()
     try:
-        categorias = [r['categoria'] for r in
-                      conn.execute('SELECT DISTINCT categoria FROM productos ORDER BY categoria').fetchall()]
-        return categorias
+        categorias = {r['categoria'] for r in
+                      conn.execute('SELECT DISTINCT categoria FROM productos').fetchall()}
+        categorias.update(CATEGORIAS_BASE)
+        return sorted(categorias)
     finally:
         conn.close()
 

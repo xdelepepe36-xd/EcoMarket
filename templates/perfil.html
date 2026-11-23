@@ -30,7 +30,7 @@
                     {{ session.get('nombre', 'U')[0] | upper }}
                 </div>
                 <div style="flex:1">
-                    <h3 style="font-size:1.3rem;font-weight:800;margin-bottom:2px">{{ session.get('nombre') }}</h3>
+                    <h3 style="font-size:1.3rem;font-weight:800;margin-bottom:2px">{{ session.get('nombre') }} <span id="verifBadge" class="badge" style="display:none;font-size:.68rem;padding:3px 10px;border-radius:999px;color:#fff;vertical-align:middle"></span></h3>
                     <p style="font-size:0.85rem;color:var(--texto-sec)">{{ usuario.bio if usuario and usuario.bio else '🌱 Eco warrior' }}</p>
                 </div>
                 <div style="display:flex;gap:16px;flex-wrap:wrap">

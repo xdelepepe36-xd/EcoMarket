@@ -7566,6 +7566,40 @@ def rastrear_pedido(token):
 
 # ── Rutas para Templates de Nuevas Funcionalidades ───────────────────────────────
 
+@app.route('/api/verificacion/estado')
+@login_required
+def api_verificacion_estado():
+    """Nivel de verificación real del vendedor según su actividad."""
+    uid = session['usuario_id']
+    conn = get_db()
+    u = conn.execute('''SELECT email_verificado, telefono,
+        (SELECT COUNT(*) FROM productos WHERE usuario_id=?) AS publicados,
+        (SELECT COUNT(*) FROM productos WHERE usuario_id=? AND vendido=1) AS ventas
+        FROM usuarios WHERE id=?''', (uid, uid, uid)).fetchone()
+    rating = conn.execute('''SELECT COALESCE(AVG(r.rating),0) FROM resenas r
+        JOIN productos p ON p.id=r.producto_id WHERE p.usuario_id=?''', (uid,)).fetchone()[0]
+    conn.close()
+    if not u:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+    checks = {
+        'email': bool(u['email_verificado']),
+        'telefono': bool(u['telefono']),
+        'publicaciones': u['publicados'] >= 3,
+        'ventas': u['ventas'] >= 10,
+        'top': u['ventas'] >= 25 and rating >= 4.5,
+    }
+    if checks['top']: nivel = 5; nombre = 'Top Seller'
+    elif checks['ventas']: nivel = 4; nombre = 'Premium'
+    elif checks['publicaciones'] and checks['telefono']: nivel = 3; nombre = 'Verificado'
+    elif checks['email'] and checks['telefono']: nivel = 2; nombre = 'Confirmado'
+    elif checks['email']: nivel = 1; nombre = 'Básico'
+    else: nivel = 0; nombre = 'Sin verificar'
+    return jsonify({'nivel': nivel, 'nombre': nombre, 'checks': checks,
+                    'stats': {'publicados': u['publicados'], 'ventas': u['ventas'],
+                              'rating': round(rating, 1), 'telefono': bool(u['telefono']),
+                              'email_verificado': bool(u['email_verificado'])}})
+
+
 @app.route('/verificacion')
 @login_required
 def verificacion_vendedor():

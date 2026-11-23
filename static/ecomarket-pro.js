@@ -836,6 +836,21 @@
         document.body.appendChild(btn);
     }
 
+    /* ═══════════ SELLO DE VERIFICACIÓN EN PERFIL ═══════════ */
+    function initVerificacionBadge() {
+        if (location.pathname.indexOf('/perfil') !== 0) return;
+        var badge = document.getElementById('verifBadge');
+        if (!badge) return;
+        fetch('/api/verificacion/estado').then(function (r) { return r.json(); }).then(function (d) {
+            if (!d || !d.nivel) return;
+            var colores = ['', '#6c757d', '#28a745', '#007bff', '#ffc107', '#17a2b8'];
+            var iconos = ['', '📝', '✓', '✓✓', '⭐', '🏆'];
+            badge.style.display = 'inline-flex';
+            badge.style.background = colores[d.nivel];
+            badge.textContent = iconos[d.nivel] + ' ' + d.nombre;
+        }).catch(function () {});
+    }
+
     /* ═══════════ INIT ═══════════ */
     document.addEventListener('DOMContentLoaded', function () {
         initParticles();
@@ -863,5 +878,6 @@
         initWishlistShare();
         initPWAInstall();
         initTextoGrande();
+        initVerificacionBadge();
     });
 })();

@@ -1,354 +1,80 @@
 /**
- * EcoMarket - Sistema de Verificación de Vendedores
- * Gestiona badges de verificación y niveles de confianza
+ * EcoMarket - Verificación de Vendedores (backend real)
+ * Nivel calculado en servidor según email, teléfono, actividad y rating.
  */
+(function () {
+    'use strict';
 
-const VerificacionVendedores = {
-    // Niveles de verificación
-    niveles: {
-        BASICO: {
-            id: 'basico',
-            nombre: 'Básico',
-            badge: '📝',
-            color: '#6c757d',
-            requisitos: ['Email verificado'],
-            confianza: 1
-        },
-        CONFIRMADO: {
-            id: 'confirmado',
-            nombre: 'Confirmado',
-            badge: '✓',
-            color: '#28a745',
-            requisitos: ['Email verificado', 'Teléfono verificado'],
-            confianza: 2
-        },
-        VERIFICADO: {
-            id: 'verificado',
-            nombre: 'Verificado',
-            badge: '✓✓',
-            color: '#007bff',
-            requisitos: ['Email verificado', 'Teléfono verificado', 'Documento verificado'],
-            confianza: 3
-        },
-        PREMIUM: {
-            id: 'premium',
-            nombre: 'Premium',
-            badge: '⭐',
-            color: '#ffc107',
-            requisitos: ['Email verificado', 'Teléfono verificado', 'Documento verificado', '+50 ventas exitosas'],
-            confianza: 4
-        },
-        TOP_SELLER: {
-            id: 'top_seller',
-            nombre: 'Top Seller',
-            badge: '🏆',
-            color: '#17a2b8',
-            requisitos: ['Email verificado', 'Teléfono verificado', 'Documento verificado', '+100 ventas exitosas', 'Rating 4.5+'],
-            confianza: 5
-        }
-    },
+    var NIVELES = [
+        { n: 1, nombre: 'Básico',    badge: '📝', color: '#6c757d', req: 'Email verificado' },
+        { n: 2, nombre: 'Confirmado',badge: '✓',  color: '#28a745', req: 'Email + teléfono' },
+        { n: 3, nombre: 'Verificado',badge: '✓✓', color: '#007bff', req: '3+ productos publicados' },
+        { n: 4, nombre: 'Premium',   badge: '⭐', color: '#ffc107', req: '10+ ventas concretadas' },
+        { n: 5, nombre: 'Top Seller',badge: '🏆', color: '#17a2b8', req: '25+ ventas + rating 4.5' }
+    ];
 
-    // Estado de verificación
-    estado: {
-        email_verificado: false,
-        telefono_verificado: false,
-        documento_verificado: false,
-        ventas_totales: 0,
-        rating_promedio: 0
-    },
+    function esc(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
 
-    /**
-     * Inicializa el sistema de verificación
-     */
-    init: function() {
-        this.cargarEstado();
-        this.renderizarBadge();
-        this.renderizarPanelVerificacion();
-        this.inicializarEventos();
-    },
-
-    /**
-     * Carga el estado de verificación del usuario
-     */
-    cargarEstado: function() {
-        const stored = localStorage.getItem('verificacion_estado');
-        if (stored) {
-            this.estado = JSON.parse(stored);
-        }
-    },
-
-    /**
-     * Guarda el estado de verificación
-     */
-    guardarEstado: function() {
-        localStorage.setItem('verificacion_estado', JSON.stringify(this.estado));
-    },
-
-    /**
-     * Obtiene el nivel actual de verificación
-     */
-    obtenerNivelActual: function() {
-        const { email_verificado, telefono_verificado, documento_verificado, ventas_totales, rating_promedio } = this.estado;
-
-        if (ventas_totales >= 100 && rating_promedio >= 4.5 && email_verificado && telefono_verificado && documento_verificado) {
-            return this.niveles.TOP_SELLER;
-        }
-        if (ventas_totales >= 50 && email_verificado && telefono_verificado && documento_verificado) {
-            return this.niveles.PREMIUM;
-        }
-        if (email_verificado && telefono_verificado && documento_verificado) {
-            return this.niveles.VERIFICADO;
-        }
-        if (email_verificado && telefono_verificado) {
-            return this.niveles.CONFIRMADO;
-        }
-        if (email_verificado) {
-            return this.niveles.BASICO;
-        }
-        return null;
-    },
-
-    /**
-     * Renderiza el badge de verificación
-     */
-    renderizarBadge: function() {
-        const nivel = this.obtenerNivelActual();
-        const badgeContainer = document.querySelector('.verificacion-badge');
-        
-        if (badgeContainer && nivel) {
-            badgeContainer.innerHTML = `
-                <span class="badge badge-verificado" style="background-color: ${nivel.color};">
-                    ${nivel.badge} ${nivel.nombre}
-                </span>
-            `;
-        }
-    },
-
-    /**
-     * Renderiza el panel de verificación
-     */
-    renderizarPanelVerificacion: function() {
-        const panel = document.getElementById('panel-verificacion');
+    function cargarYRenderizar() {
+        var panel = document.getElementById('panel-verificacion');
         if (!panel) return;
+        fetch('/api/verificacion/estado').then(function (r) { return r.json(); }).then(function (d) {
+            if (d.error) { panel.innerHTML = '<p style="color:#b91c1c">' + esc(d.error) + '</p>'; return; }
+            var nivel = NIVELES[d.nivel - 1] || null;
+            var stats = d.stats || {};
+            var checks = d.checks || {};
 
-        const nivel = this.obtenerNivelActual();
-        const siguienteNivel = this.obtenerSiguienteNivel();
+            var items = [
+                { ok: checks.email,        icon: '📧', label: 'Email verificado' },
+                { ok: checks.telefono,     icon: '📱', label: 'Teléfono registrado' },
+                { ok: checks.publicaciones,icon: '📦', label: '3+ productos publicados' },
+                { ok: checks.ventas,       icon: '🛒', label: '10+ ventas concretadas' },
+                { ok: checks.top,          icon: '🏆', label: '25+ ventas + rating 4.5' }
+            ];
 
-        panel.innerHTML = `
-            <div class="verificacion-header">
-                <h3>Estado de Verificación</h3>
-                ${nivel ? `
-                    <div class="nivel-actual" style="background-color: ${nivel.color};">
-                        ${nivel.badge} ${nivel.nombre}
-                    </div>
-                ` : '<div class="nivel-actual sin-verificar">Sin verificar</div>'}
-            </div>
+            var sig = NIVELES[d.nivel]; // siguiente nivel (index = nivel actual)
+            var html = '<div class="verificacion-header">' +
+                '<h3>Estado de Verificación</h3>' +
+                (nivel ? '<div class="nivel-actual" style="background-color:' + nivel.color + '">' + nivel.badge + ' ' + esc(d.nombre || nivel.nombre) + '</div>'
+                       : '<div class="nivel-actual sin-verificar">Sin verificar</div>') +
+                '</div>' +
+                '<div class="verificacion-progreso"><h4>Tu actividad</h4>' +
+                '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px">' +
+                '<div style="text-align:center;padding:10px;background:rgba(46,125,50,.06);border-radius:10px"><strong>' + (stats.publicados || 0) + '</strong><br><small style="color:var(--texto-sec)">Productos</small></div>' +
+                '<div style="text-align:center;padding:10px;background:rgba(46,125,50,.06);border-radius:10px"><strong>' + (stats.ventas || 0) + '</strong><br><small style="color:var(--texto-sec)">Ventas</small></div>' +
+                '<div style="text-align:center;padding:10px;background:rgba(46,125,50,.06);border-radius:10px"><strong>' + (stats.rating || '—') + '★</strong><br><small style="color:var(--texto-sec)">Rating</small></div>' +
+                '</div>' +
+                items.map(function (it) {
+                    return '<div class="verificacion-item ' + (it.ok ? 'completado' : 'pendiente') + '">' +
+                        '<span class="icono">' + it.icon + '</span><span class="label">' + it.label + '</span>' +
+                        '<span class="estado">' + (it.ok ? '✓' : '○') + '</span></div>';
+                }).join('') + '</div>';
 
-            <div class="verificacion-progreso">
-                <h4>Progreso de Verificación</h4>
-                ${this.renderizarItemsVerificacion()}
-            </div>
-
-            ${siguienteNivel ? `
-                <div class="siguiente-nivel">
-                    <h4>Siguiente Nivel: ${siguienteNivel.nombre}</h4>
-                    <p>Requisitos:</p>
-                    <ul>
-                        ${siguienteNivel.requisitos.map(req => `<li>${req}</li>`).join('')}
-                    </ul>
-                </div>
-            ` : ''}
-
-            <div class="acciones-verificacion">
-                ${this.renderizarAcciones()}
-            </div>
-        `;
-    },
-
-    /**
-     * Renderiza los items de verificación
-     */
-    renderizarItemsVerificacion: function() {
-        const items = [
-            { key: 'email_verificado', label: 'Email Verificado', icon: '📧' },
-            { key: 'telefono_verificado', label: 'Teléfono Verificado', icon: '📱' },
-            { key: 'documento_verificado', label: 'Documento Verificado', icon: '🆔' }
-        ];
-
-        return items.map(item => `
-            <div class="verificacion-item ${this.estado[item.key] ? 'completado' : 'pendiente'}">
-                <span class="icono">${item.icon}</span>
-                <span class="label">${item.label}</span>
-                <span class="estado">${this.estado[item.key] ? '✓' : '○'}</span>
-            </div>
-        `).join('');
-    },
-
-    /**
-     * Renderiza las acciones de verificación
-     */
-    renderizarAcciones: function() {
-        const acciones = [];
-
-        if (!this.estado.email_verificado) {
-            acciones.push(`
-                <button class="btn btn-verificar" data-tipo="email">
-                    📧 Verificar Email
-                </button>
-            `);
-        }
-
-        if (!this.estado.telefono_verificado) {
-            acciones.push(`
-                <button class="btn btn-verificar" data-tipo="telefono">
-                    📱 Verificar Teléfono
-                </button>
-            `);
-        }
-
-        if (!this.estado.documento_verificado) {
-            acciones.push(`
-                <button class="btn btn-verificar" data-tipo="documento">
-                    🆔 Verificar Documento
-                </button>
-            `);
-        }
-
-        return acciones.join('');
-    },
-
-    /**
-     * Obtiene el siguiente nivel a alcanzar
-     */
-    obtenerSiguienteNivel: function() {
-        const nivelActual = this.obtenerNivelActual();
-        const niveles = Object.values(this.niveles);
-
-        if (!nivelActual) return niveles[0];
-
-        const currentIndex = niveles.findIndex(n => n.id === nivelActual.id);
-        return niveles[currentIndex + 1] || null;
-    },
-
-    /**
-     * Inicializa los eventos
-     */
-    inicializarEventos: function() {
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('btn-verificar')) {
-                const tipo = e.target.dataset.tipo;
-                this.iniciarVerificacion(tipo);
+            if (sig) {
+                html += '<div class="siguiente-nivel"><h4>Siguiente nivel: ' + sig.badge + ' ' + sig.nombre + '</h4>' +
+                    '<p style="margin:6px 0">Requisito: <strong>' + sig.req + '</strong></p>' +
+                    '<div style="height:8px;background:rgba(0,0,0,.08);border-radius:99px;overflow:hidden">' +
+                    '<div style="height:100%;width:' + Math.round((d.nivel / 5) * 100) + '%;background:' + sig.color + '"></div></div>' +
+                    '<p style="font-size:.8rem;color:var(--texto-sec);margin-top:6px">Progreso: nivel ' + d.nivel + ' de 5</p></div>';
+            } else {
+                html += '<div class="siguiente-nivel" style="background:#d4edda"><h4>🏆 ¡Nivel máximo alcanzado!</h4><p>Eres Top Seller — la comunidad confía en ti.</p></div>';
             }
+
+            html += '<div class="acciones-verificacion">' +
+                (checks.email ? '' : '<a class="btn-verificar" style="text-decoration:none;display:inline-block" href="/perfil">📧 Verificar email en perfil</a>') +
+                (!stats.telefono ? '<a class="btn-verificar" style="text-decoration:none;display:inline-block;background:#007bff" href="/perfil">📱 Agregar teléfono en perfil</a>' : '') +
+                '<a class="btn-verificar" style="text-decoration:none;display:inline-block;background:#6c757d" href="/publicar">📦 Publicar producto</a>' +
+                '</div>';
+
+            panel.innerHTML = html;
+        }).catch(function () {
+            panel.innerHTML = '<p style="color:var(--texto-sec)">No se pudo cargar el estado de verificación.</p>';
         });
-    },
-
-    /**
-     * Inicia el proceso de verificación
-     */
-    iniciarVerificacion: function(tipo) {
-        switch(tipo) {
-            case 'email':
-                this.verificarEmail();
-                break;
-            case 'telefono':
-                this.verificarTelefono();
-                break;
-            case 'documento':
-                this.verificarDocumento();
-                break;
-        }
-    },
-
-    /**
-     * Verifica el email
-     */
-    verificarEmail: function() {
-        const email = prompt('Ingresa tu email para verificar:');
-        if (!email) return;
-
-        // Simulación de envío de código
-        alert(`Código de verificación enviado a ${email}`);
-        
-        const codigo = prompt('Ingresa el código de verificación:');
-        if (codigo === '123456') { // Código de prueba
-            this.estado.email_verificado = true;
-            this.guardarEstado();
-            this.renderizarBadge();
-            this.renderizarPanelVerificacion();
-            this.mostrarNotificacion('Email verificado exitosamente', 'success');
-        } else {
-            this.mostrarNotificacion('Código incorrecto', 'error');
-        }
-    },
-
-    /**
-     * Verifica el teléfono
-     */
-    verificarTelefono: function() {
-        const telefono = prompt('Ingresa tu número de teléfono:');
-        if (!telefono) return;
-
-        // Simulación de envío de SMS
-        alert(`Código SMS enviado al ${telefono}`);
-        
-        const codigo = prompt('Ingresa el código SMS:');
-        if (codigo === '123456') { // Código de prueba
-            this.estado.telefono_verificado = true;
-            this.guardarEstado();
-            this.renderizarBadge();
-            this.renderizarPanelVerificacion();
-            this.mostrarNotificación('Teléfono verificado exitosamente', 'success');
-        } else {
-            this.mostrarNotificación('Código incorrecto', 'error');
-        }
-    },
-
-    /**
-     * Verifica el documento
-     */
-    verificarDocumento: function() {
-        const tipo = prompt('Tipo de documento (DNI, Carnet, Pasaporte):');
-        const numero = prompt('Número de documento:');
-        
-        if (!tipo || !numero) return;
-
-        // Simulación de verificación
-        this.estado.documento_verificado = true;
-        this.guardarEstado();
-        this.renderizarBadge();
-        this.renderizarPanelVerificacion();
-        this.mostrarNotificación('Documento verificado exitosamente', 'success');
-    },
-
-    /**
-     * Muestra una notificación
-     */
-    mostrarNotificacion: function(mensaje, tipo) {
-        const notificacion = document.createElement('div');
-        notificacion.className = `notificacion notificacion-${tipo}`;
-        notificacion.textContent = mensaje;
-        document.body.appendChild(notificacion);
-
-        setTimeout(() => {
-            notificacion.remove();
-        }, 3000);
-    },
-
-    /**
-     * Actualiza las estadísticas del vendedor
-     */
-    actualizarEstadisticas: function(ventas, rating) {
-        this.estado.ventas_totales = ventas;
-        this.estado.rating_promedio = rating;
-        this.guardarEstado();
-        this.renderizarBadge();
-        this.renderizarPanelVerificacion();
     }
-};
 
-// Inicializar cuando el DOM esté listo
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => VerificacionVendedores.init());
-} else {
-    VerificacionVendedores.init();
-}
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', cargarYRenderizar);
+    } else {
+        cargarYRenderizar();
+    }
+})();

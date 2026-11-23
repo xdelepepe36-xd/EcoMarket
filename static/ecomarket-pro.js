@@ -959,6 +959,26 @@
         });
     }
 
+    /* ═══════════ CONTADORES COMUNITARIOS (home) ═══════════ */
+    function initStatsComunidad() {
+        if (location.pathname !== '/') return;
+        var anchor = document.getElementById('ecoNuevosRow') ? document.getElementById('ecoNuevosRow').closest('section') : document.querySelector('.productos-section');
+        if (!anchor) return;
+        fetch('/api/stats-comunidad').then(function (r) { return r.json(); }).then(function (d) {
+            if (!d.productos) return;
+            var strip = document.createElement('section');
+            strip.className = 'section';
+            strip.style.padding = '30px 0';
+            strip.innerHTML = '<div class="container"><div style="display:flex;justify-content:center;gap:clamp(20px,6vw,80px);flex-wrap:wrap;text-align:center">' +
+                '<div><div style="font-size:2rem;font-weight:800;color:var(--verde)">' + d.productos + '</div><div style="font-size:.8rem;color:var(--texto-sec)">productos ecológicos</div></div>' +
+                '<div><div style="font-size:2rem;font-weight:800;color:var(--azul,#1976d2)">' + d.usuarios + '</div><div style="font-size:.8rem;color:var(--texto-sec)">miembros verdes</div></div>' +
+                '<div><div style="font-size:2rem;font-weight:800;color:var(--naranja,#f57c00)">' + d.pedidos + '</div><div style="font-size:.8rem;color:var(--texto-sec)">pedidos completados</div></div>' +
+                '<div><div style="font-size:2rem;font-weight:800;color:#7c3aed">' + d.co2_kg + ' kg</div><div style="font-size:.8rem;color:var(--texto-sec)">CO₂ evitado</div></div>' +
+                '</div></div>';
+            anchor.parentNode.insertBefore(strip, anchor.nextSibling);
+        }).catch(function () {});
+    }
+
     /* ═══════════ INIT ═══════════ */
     document.addEventListener('DOMContentLoaded', function () {
         initParticles();
@@ -990,6 +1010,7 @@
         initKiosco();
         initExportar();
         initRecienLlegados();
+        initStatsComunidad();
         initTopVendedores();
         initAlertaBusqueda();
     });

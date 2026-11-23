@@ -7868,6 +7868,22 @@ def api_recien_llegados():
     return jsonify({'productos': [dict(r) for r in rows]})
 
 
+@app.route('/api/stats-comunidad')
+def api_stats_comunidad():
+    """Contadores públicos para el home/tríptico."""
+    conn = get_db()
+    productos = conn.execute('SELECT COUNT(*) FROM productos WHERE COALESCE(vendido,0)=0').fetchone()[0]
+    usuarios = conn.execute('SELECT COUNT(*) FROM usuarios').fetchone()[0]
+    pedidos = conn.execute('SELECT COUNT(*) FROM pedidos').fetchone()[0]
+    # CO2 evitado estimado: ventas × eco_score promedio × factor
+    co2 = conn.execute('''
+        SELECT COALESCE(SUM(p.eco_score),0) FROM pedido_items pi
+        JOIN productos p ON p.id = pi.producto_id''').fetchone()[0] or 0
+    conn.close()
+    return jsonify({'productos': productos, 'usuarios': usuarios, 'pedidos': pedidos,
+                    'co2_kg': round(co2 * 0.8, 1)})
+
+
 @app.route('/api/top-vendedores')
 def api_top_vendedores():
     """Top vendedores del mes por ventas concretadas."""

@@ -201,6 +201,26 @@ function previewFile(input) {
     }
 }
 
+// Drag & drop de imágenes en las zonas de subida
+document.addEventListener('DOMContentLoaded', function(){
+    // Las zonas de drop son los contenedores con borde dashed que envuelven los inputs
+    document.querySelectorAll("div[style*='dashed']").forEach(function(zone, i){
+        var input = zone.querySelector('input[type=file]');
+        if (input) wireDropzoneByEl(zone, input);
+    });
+    function wireDropzoneByEl(zone, input){
+        ['dragenter','dragover'].forEach(function(ev){ zone.addEventListener(ev, function(e){ e.preventDefault(); zone.style.borderColor='var(--verde-claro)'; zone.style.background='rgba(76,175,80,.08)'; }); });
+        ['dragleave','drop'].forEach(function(ev){ zone.addEventListener(ev, function(e){ e.preventDefault(); zone.style.borderColor=''; zone.style.background=''; }); });
+        zone.addEventListener('drop', function(e){
+            if (e.dataTransfer && e.dataTransfer.files.length) {
+                var dt = new DataTransfer();
+                Array.from(e.dataTransfer.files).forEach(function(f){ if(f.type.startsWith('image/')) dt.items.add(f); });
+                if (dt.items.length) { input.files = dt.files; input.dispatchEvent(new Event('change')); }
+            }
+        });
+    }
+});
+
 function previewExtraFiles(input) {
     const container = document.getElementById('extraPreviewContainer');
     container.innerHTML = '';

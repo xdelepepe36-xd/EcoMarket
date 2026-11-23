@@ -818,24 +818,6 @@
         });
     }
 
-    /* ═══════════ MODO TEXTO GRANDE ═══════════ */
-    function initTextoGrande() {
-        if (localStorage.getItem('ecomarket-texto-grande') === '1') {
-            document.documentElement.classList.add('texto-grande');
-        }
-        var btn = document.createElement('button');
-        btn.id = 'textoGrandeBtn';
-        btn.className = 'texto-grande-btn';
-        btn.textContent = 'Aa';
-        btn.title = 'Alternar texto grande';
-        btn.setAttribute('aria-label', 'Alternar texto grande');
-        btn.addEventListener('click', function () {
-            var on = document.documentElement.classList.toggle('texto-grande');
-            localStorage.setItem('ecomarket-texto-grande', on ? '1' : '0');
-        });
-        document.body.appendChild(btn);
-    }
-
     /* ═══════════ SELLO DE VERIFICACIÓN EN PERFIL ═══════════ */
     function initVerificacionBadge() {
         if (location.pathname.indexOf('/perfil') !== 0) return;
@@ -849,39 +831,6 @@
             badge.style.background = colores[d.nivel];
             badge.textContent = iconos[d.nivel] + ' ' + d.nombre;
         }).catch(function () {});
-    }
-
-    /* ═══════════ MODO KIOSCO (presentación limpia) ═══════════ */
-    function initKiosco() {
-        var btn = document.createElement('button');
-        btn.id = 'kioscoBtn';
-        btn.className = 'kiosco-btn';
-        btn.innerHTML = '🖥️';
-        btn.title = 'Modo presentación (Esc para salir)';
-        btn.setAttribute('aria-label', 'Modo presentación');
-        var savedTheme = null;
-        function enter() {
-            savedTheme = document.documentElement.getAttribute('data-theme');
-            document.body.classList.add('kiosco-mode');
-            btn.innerHTML = '✖️';
-        }
-        function exit() {
-            document.body.classList.remove('kiosco-mode');
-            if (savedTheme) {
-                document.documentElement.setAttribute('data-theme', savedTheme);
-                try { localStorage.setItem('ecomarket-theme', savedTheme); } catch (e) {}
-            }
-            savedTheme = null;
-            btn.innerHTML = '🖥️';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        btn.addEventListener('click', function () {
-            document.body.classList.contains('kiosco-mode') ? exit() : enter();
-        });
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape' && document.body.classList.contains('kiosco-mode')) exit();
-        });
-        document.body.appendChild(btn);
     }
 
     /* ═══════════ EXPORTAR MIS DATOS ═══════════ */
@@ -1005,9 +954,7 @@
         initDestacado();
         initWishlistShare();
         initPWAInstall();
-        initTextoGrande();
         initVerificacionBadge();
-        initKiosco();
         initExportar();
         initRecienLlegados();
         initStatsComunidad();

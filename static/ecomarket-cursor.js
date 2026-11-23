@@ -4,7 +4,7 @@
     if (!window.matchMedia('(pointer: fine)').matches) return;
     var cur = document.createElement('div');
     cur.className = 'eco-cursor';
-    cur.innerHTML = '<svg viewBox="0 0 32 32" width="34" height="34"><path d="M16 3 C 24 6 28 14 28 21 C 28 26 23 29 16 30 C 9 29 4 26 4 21 C 4 14 8 6 16 3 Z" fill="none" stroke="#fff" stroke-width="4.5" opacity=".85"/><path d="M16 3 C 24 6 28 14 28 21 C 28 26 23 29 16 30 C 9 29 4 26 4 21 C 4 14 8 6 16 3 Z" fill="#22C55E" stroke="#14532D" stroke-width="1.5"/><path d="M16 6 L 16 28" stroke="#14532D" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="15" r="1.6" fill="#14532D"/><circle cx="20" cy="15" r="1.6" fill="#14532D"/><path d="M12.5 19 Q 16 22 19.5 19" stroke="#14532D" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>';
+    cur.innerHTML = '<svg viewBox="0 0 32 32" width="22" height="22"><path d="M16 3 C 24 6 28 14 28 21 C 28 26 23 29 16 30 C 9 29 4 26 4 21 C 4 14 8 6 16 3 Z" fill="none" stroke="#fff" stroke-width="4.5" opacity=".85"/><path d="M16 3 C 24 6 28 14 28 21 C 28 26 23 29 16 30 C 9 29 4 26 4 21 C 4 14 8 6 16 3 Z" fill="#22C55E" stroke="#14532D" stroke-width="1.5"/><path d="M16 6 L 16 28" stroke="#14532D" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="15" r="1.6" fill="#14532D"/><circle cx="20" cy="15" r="1.6" fill="#14532D"/><path d="M12.5 19 Q 16 22 19.5 19" stroke="#14532D" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>';
     document.body.appendChild(cur);
     document.documentElement.classList.add('eco-has-cursor');
 
@@ -49,7 +49,7 @@
 
     (function loop() {
         x += (tx - x) * 0.45; y += (ty - y) * 0.45;
-        cur.style.transform = 'translate(' + (x + 16 - 17) + 'px,' + (y + 16 - 17) + 'px) rotate(' + ((tx - x) * 0.5) + 'deg)';
+        cur.style.transform = 'translate(' + (x - 11) + 'px,' + (y - 11) + 'px) rotate(' + ((tx - x) * 0.5) + 'deg)';
         requestAnimationFrame(loop);
     })();
 

@@ -1161,6 +1161,29 @@ def init_db():
     except sqlite3.OperationalError:
         pass
 
+    # Analytics persistente (eventos de engagement)
+    try:
+        conn.execute('''CREATE TABLE IF NOT EXISTS analytics_eventos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            evento TEXT NOT NULL,
+            usuario_id INTEGER,
+            propiedades TEXT DEFAULT "{}",
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )''')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_ae_evento ON analytics_eventos(evento)')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_ae_fecha ON analytics_eventos(created_at)')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+
+    # Racha de login diario
+    for col, ddl in [('ultimo_login', 'TEXT DEFAULT ""'), ('racha_dias', 'INTEGER DEFAULT 0')]:
+        try:
+            conn.execute(f'ALTER TABLE usuarios ADD COLUMN {col} {ddl}')
+            conn.commit()
+        except sqlite3.OperationalError:
+            pass
+
     # ── Migraciones para campos de usuario ──────────────────
     for col, ddl in [
         ('apellidos', 'TEXT DEFAULT ""'),
@@ -3464,6 +3487,26 @@ def login():
             session['nombre'] = usuario['nombre']
             session['email'] = usuario['email']
             session['rol'] = usuario['rol']
+            # Racha de login diario
+            try:
+                _conn = get_db()
+                _hoy = datetime.now().date().isoformat()
+                _ayer = (datetime.now().date() - timedelta(days=1)).isoformat()
+                _u = _conn.execute('SELECT ultimo_login, racha_dias FROM usuarios WHERE id=?', (usuario['id'],)).fetchone()
+                if _u:
+                    if _u['ultimo_login'] == _ayer:
+                        _racha = (_u['racha_dias'] or 0) + 1
+                    elif _u['ultimo_login'] == _hoy:
+                        _racha = _u['racha_dias'] or 0
+                    else:
+                        _racha = 1
+                    _conn.execute('UPDATE usuarios SET ultimo_login=?, racha_dias=? WHERE id=?',
+                                  (_hoy, _racha, usuario['id']))
+                    session['racha_dias'] = _racha
+                    _conn.commit()
+                _conn.close()
+            except sqlite3.Error:
+                pass
             flash_t('bienvenido', 'success', nombre=usuario['nombre'])
             return redirect(url_for('index'))
 
@@ -6134,7 +6177,18 @@ def track_analytics():
     properties = data.get('properties', {})
     
     advanced_analytics.track_event(event_name, user_id, properties)
-    
+
+    # Persistir en BD para dashboard admin (solo eventos ligeros)
+    if event_name in ('scroll_depth', 'time_on_page', 'page_view', 'add_to_cart', 'search'):
+        try:
+            conn = get_db()
+            conn.execute('INSERT INTO analytics_eventos (evento, usuario_id, propiedades) VALUES (?,?,?)',
+                         (event_name, user_id, json.dumps(properties or {}, ensure_ascii=False)[:500]))
+            conn.commit()
+            conn.close()
+        except sqlite3.Error:
+            pass
+
     return jsonify({'success': True})
 
 @app.route('/api/analytics/funnel')
@@ -7082,6 +7136,21 @@ def admin():
         'total_pedidos': conn.execute('SELECT COUNT(*) FROM pedidos').fetchone()[0],
         'total_visitas': conn.execute('SELECT COUNT(*) FROM visitas').fetchone()[0],
     }
+    # Engagement (analytics persistente)
+    try:
+        stats['eventos_hoy'] = conn.execute(
+            "SELECT COUNT(*) FROM analytics_eventos WHERE date(created_at)=date('now','localtime')").fetchone()[0]
+        stats['scroll_promedio'] = conn.execute(
+            "SELECT AVG(CAST(json_extract(propiedades,'$.depth') AS INTEGER)) FROM analytics_eventos WHERE evento='scroll_depth'").fetchone()[0] or 0
+        stats['tiempo_promedio'] = conn.execute(
+            "SELECT AVG(CAST(json_extract(propiedades,'$.seconds') AS INTEGER)) FROM analytics_eventos WHERE evento='time_on_page'").fetchone()[0] or 0
+        stats['busquedas_hoy'] = conn.execute(
+            "SELECT COUNT(*) FROM analytics_eventos WHERE evento='search' AND date(created_at)=date('now','localtime')").fetchone()[0]
+        top_paginas = conn.execute(
+            "SELECT json_extract(propiedades,'$.path') AS path, COUNT(*) AS n FROM analytics_eventos WHERE evento='page_view' GROUP BY path ORDER BY n DESC LIMIT 5").fetchall()
+        stats['top_paginas'] = [dict(r) for r in top_paginas]
+    except sqlite3.Error:
+        stats.update({'eventos_hoy': 0, 'scroll_promedio': 0, 'tiempo_promedio': 0, 'busquedas_hoy': 0, 'top_paginas': []})
     conn.close()
     return render_template('admin.html', productos=productos, usuarios=usuarios, stats=stats,
                            reportes=[dict(r) for r in reportes])

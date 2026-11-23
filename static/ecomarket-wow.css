@@ -2748,3 +2748,29 @@ main, .section { animation: ecoPageIn .45s cubic-bezier(.22,1,.36,1) both; }
 
 /* ── Countdown flash ── */
 .eco-flash-countdown { font-variant-numeric: tabular-nums; color: #e53935; font-weight: 700; }
+
+/* ── Botón instalar PWA ── */
+.pwa-install-btn {
+    position: fixed; bottom: 20px; left: 20px; z-index: 1040;
+    background: linear-gradient(135deg,#2e7d32,#43a047); color: #fff; border: none;
+    padding: 12px 20px; border-radius: 999px; font-weight: 700; font-size: .85rem;
+    cursor: pointer; box-shadow: 0 6px 20px rgba(46,125,50,.35); transition: transform .2s;
+}
+.pwa-install-btn:hover { transform: translateY(-2px) scale(1.03); }
+@media (max-width: 640px) { .pwa-install-btn { bottom: 76px; left: 12px; padding: 10px 14px; font-size: .78rem; } }
+
+/* ── Botón texto grande ── */
+.texto-grande-btn {
+    position: fixed; bottom: 96px; right: 24px; z-index: 1040;
+    width: 46px; height: 46px; border-radius: 50%; border: 2px solid rgba(46,125,50,.4);
+    background: var(--blanco, #fff); color: var(--verde, #2e7d32); font-weight: 800; font-size: .95rem;
+    cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,.12); transition: transform .2s;
+}
+.texto-grande-btn:hover { transform: scale(1.08); }
+.texto-grande-btn:active { transform: scale(.95); }
+@media (max-width: 640px) { .texto-grande-btn { bottom: 84px; right: 16px; width: 42px; height: 42px; } }
+
+/* ── Modo texto grande ── */
+html.texto-grande { font-size: 118%; }
+html.texto-grande .product-card h3, html.texto-grande .producto-card h3 { font-size: 1.05rem; }
+html.texto-grande body { line-height: 1.65; }

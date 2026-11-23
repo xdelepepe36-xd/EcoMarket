@@ -46,6 +46,12 @@
                         <div style="font-size:1.1rem;font-weight:800;color:var(--verde)">{{ usuario.xp if usuario else 0 }}</div>
                         <div style="font-size:0.72rem;color:var(--texto-sec)" data-i18n="profile.xp">Puntos</div>
                     </div>
+                    {% if usuario and usuario.racha_dias and usuario.racha_dias > 1 %}
+                    <div style="text-align:center" title="Días seguidos entrando">
+                        <div style="font-size:1.1rem;font-weight:800;color:#f97316">🔥 {{ usuario.racha_dias }}</div>
+                        <div style="font-size:0.72rem;color:var(--texto-sec)">Racha</div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

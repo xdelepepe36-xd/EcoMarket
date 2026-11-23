@@ -798,6 +798,44 @@
         }).catch(function () {});
     }
 
+    /* ═══════════ PWA: prompt de instalación ═══════════ */
+    function initPWAInstall() {
+        var deferred = null;
+        window.addEventListener('beforeinstallprompt', function (e) {
+            e.preventDefault();
+            deferred = e;
+            if (document.getElementById('pwaInstallBtn')) return;
+            var btn = document.createElement('button');
+            btn.id = 'pwaInstallBtn';
+            btn.className = 'pwa-install-btn';
+            btn.innerHTML = '📲 Instalar app';
+            btn.addEventListener('click', function () {
+                if (!deferred) return;
+                deferred.prompt();
+                deferred.userChoice.then(function () { deferred = null; btn.remove(); });
+            });
+            document.body.appendChild(btn);
+        });
+    }
+
+    /* ═══════════ MODO TEXTO GRANDE ═══════════ */
+    function initTextoGrande() {
+        if (localStorage.getItem('ecomarket-texto-grande') === '1') {
+            document.documentElement.classList.add('texto-grande');
+        }
+        var btn = document.createElement('button');
+        btn.id = 'textoGrandeBtn';
+        btn.className = 'texto-grande-btn';
+        btn.textContent = 'Aa';
+        btn.title = 'Alternar texto grande';
+        btn.setAttribute('aria-label', 'Alternar texto grande');
+        btn.addEventListener('click', function () {
+            var on = document.documentElement.classList.toggle('texto-grande');
+            localStorage.setItem('ecomarket-texto-grande', on ? '1' : '0');
+        });
+        document.body.appendChild(btn);
+    }
+
     /* ═══════════ INIT ═══════════ */
     document.addEventListener('DOMContentLoaded', function () {
         initParticles();
@@ -823,5 +861,7 @@
         initLogrosPanel();
         initDestacado();
         initWishlistShare();
+        initPWAInstall();
+        initTextoGrande();
     });
 })();

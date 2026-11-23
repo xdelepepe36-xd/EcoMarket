@@ -42,7 +42,40 @@
                 <strong>{{ stats.total_visitas }}</strong>
                 <span data-i18n="admin.visits">Visitas</span>
             </div>
+            <div class="admin-stat-card">
+                <i class="bi bi-graph-up"></i>
+                <strong>{{ stats.eventos_hoy }}</strong>
+                <span>Eventos hoy</span>
+            </div>
+            <div class="admin-stat-card">
+                <i class="bi bi-search"></i>
+                <strong>{{ stats.busquedas_hoy }}</strong>
+                <span>Búsquedas hoy</span>
+            </div>
+            <div class="admin-stat-card">
+                <i class="bi bi-clock-history"></i>
+                <strong>{{ '%.0f'|format(stats.tiempo_promedio) }}s</strong>
+                <span>Tiempo prom. en página</span>
+            </div>
+            <div class="admin-stat-card">
+                <i class="bi bi-arrow-down-up"></i>
+                <strong>{{ '%.0f'|format(stats.scroll_promedio) }}%</strong>
+                <span>Scroll promedio</span>
+            </div>
         </div>
+
+        {% if stats.top_paginas %}
+        <div style="background:var(--blanco);border-radius:16px;padding:20px;margin-bottom:24px;box-shadow:var(--sombra);border:1px solid rgba(46,125,50,.08)">
+            <h3 style="font-size:1rem;margin-bottom:12px"><i class="bi bi-bar-chart"></i> Páginas más vistas (eventos)</h3>
+            <div style="display:flex;flex-direction:column;gap:8px">
+                {% for tp in stats.top_paginas %}
+                <div style="display:flex;justify-content:space-between;font-size:.85rem;padding:6px 10px;background:rgba(46,125,50,.05);border-radius:8px">
+                    <code>{{ tp.path or '/' }}</code><strong>{{ tp.n }} eventos</strong>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
 
         {% if reportes %}
         <!-- Reportes pendientes -->

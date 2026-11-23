@@ -28,6 +28,7 @@
             <div class="catalog-search-wrap">
                 <i class="bi bi-search"></i>
                 <input id="searchInput" type="text" placeholder="Buscar productos..." data-i18n-placeholder="products.search_placeholder" autocomplete="off">
+                <button type="button" id="voiceSearchBtn" title="Buscar por voz" aria-label="Buscar por voz" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:1.15rem;cursor:pointer;color:var(--texto-sec);padding:6px;display:none">🎤</button>
                 <div id="searchSuggestions" class="search-suggestions"></div>
             </div>
             <select id="ordenSelect" onchange="window.location='{{ url_for('productos_view') }}?orden='+this.value">
@@ -196,6 +197,32 @@
 </section>
 
 <script>
+// Búsqueda por voz (Web Speech API)
+(function() {
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    var btn = document.getElementById('voiceSearchBtn');
+    var input = document.getElementById('searchInput');
+    if (!SR || !btn || !input) return;
+    btn.style.display = 'block';
+    var rec = null, listening = false;
+    btn.addEventListener('click', function() {
+        if (listening) { rec && rec.stop(); return; }
+        rec = new SR();
+        rec.lang = (document.documentElement.lang || 'es').startsWith('en') ? 'en-US' : 'es-PE';
+        rec.interimResults = false; rec.maxAlternatives = 1;
+        rec.onresult = function(e) {
+            var txt = e.results[0][0].transcript;
+            input.value = txt;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.form ? input.form.submit() : (window.location = '{{ url_for('productos_view') }}?q=' + encodeURIComponent(txt));
+        };
+        rec.onend = function() { listening = false; btn.textContent = '🎤'; };
+        rec.onerror = function() { listening = false; btn.textContent = '🎤'; };
+        listening = true; btn.textContent = '⏺️';
+        try { rec.start(); } catch(e) { listening = false; btn.textContent = '🎤'; }
+    });
+})();
+
 // Filtro de precio
 function aplicarFiltroPrecio() {
     const min = document.getElementById('precioMin').value;

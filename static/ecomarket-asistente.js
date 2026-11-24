@@ -44,7 +44,7 @@
         panel.setAttribute('aria-label', t().title);
         panel.innerHTML = `
             <div class="asistente-header">
-                <div class="asistente-avatar"><img src="/static/assets/mascota.svg" alt="Eco"></div>
+                <div class="asistente-avatar"><img src="/static/assets/mascota-sticker.svg" alt="Eco"></div>
                 <div class="asistente-id">
                     <strong>${t().title}</strong>
                     <small><span class="asistente-status-dot" id="asistenteStatusDot"></span> ${t().subtitle} · <span class="asistente-online">${t().online}</span></small>
@@ -108,7 +108,7 @@
 
         if (who === 'bot') {
             wrap.innerHTML = `
-                <div class="asistente-avatar sm"><img src="/static/assets/mascota.svg" alt="Eco"></div>
+                <div class="asistente-avatar sm"><img src="/static/assets/mascota-sticker.svg" alt="Eco"></div>
                 <div class="asistente-bubble bot">${html}</div>`;
         } else {
             wrap.innerHTML = `<div class="asistente-bubble user">${html}</div>`;
@@ -233,7 +233,7 @@
             typingEl = document.createElement('div');
             typingEl.className = 'asistente-row bot';
             typingEl.innerHTML = `
-                <div class="asistente-avatar sm"><img src="/static/assets/mascota.svg" alt="Eco"></div>
+                <div class="asistente-avatar sm"><img src="/static/assets/mascota-sticker.svg" alt="Eco"></div>
                 <div class="asistente-bubble bot typing"><span></span><span></span><span></span><em>${t().typing}…</em></div>`;
             messagesEl.appendChild(typingEl);
             messagesEl.scrollTop = messagesEl.scrollHeight;

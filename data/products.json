@@ -978,7 +978,8 @@
   "descripcion": "Bicicleta de ruta 26 pulgadas reacondicionada: cadena nueva, frenos ajustados, llantas infladas. Ideal para ir a la universidad o hacer ejercicio.",
   "stock": 1,
   "condicion": "usado",
-  "vistas": 0
+  "vistas": 0,
+  "imagen": "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=400&h=300&fit=crop"
  },
  {
   "id": 903,
@@ -1265,5 +1266,53 @@
   "stock": 1,
   "condicion": "usado",
   "vistas": 0
+ },
+ {
+  "id": 940,
+  "nombre": "Sofá 3 puestos (segunda mano)",
+  "categoria": "Segunda mano",
+  "precio": 80.0,
+  "precio_original": 250.0,
+  "descripcion": "Sofá amplio en buen estado, tapizado azul. Estructura firme, ideal para sala o sala de espera. Retiro coordinado en Collique.",
+  "stock": 1,
+  "condicion": "usado",
+  "vistas": 0,
+  "imagen": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop"
+ },
+ {
+  "id": 941,
+  "nombre": "Reloj de pulsera (segunda mano)",
+  "categoria": "Segunda mano",
+  "precio": 45.0,
+  "precio_original": 120.0,
+  "descripcion": "Reloj funciona perfecto, solo necesita pila nueva. Caja de acero, correa ajustable. Ideal regalo.",
+  "stock": 1,
+  "condicion": "usado",
+  "vistas": 0,
+  "imagen": "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&h=300&fit=crop"
+ },
+ {
+  "id": 942,
+  "nombre": "Cámara fotográfica digital (segunda mano)",
+  "categoria": "Electrodomésticos usados",
+  "precio": 150.0,
+  "precio_original": 400.0,
+  "descripcion": "Cámara compacta en excelente estado, incluye correa y estuche. Perfecta para eventos y recuerdos familiares.",
+  "stock": 1,
+  "condicion": "usado",
+  "vistas": 0,
+  "imagen": "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&h=300&fit=crop"
+ },
+ {
+  "id": 943,
+  "nombre": "Zapatillas deportivas (segunda mano)",
+  "categoria": "Segunda mano",
+  "precio": 20.0,
+  "precio_original": 60.0,
+  "descripcion": "Zapatillas talla 42, suela en buen estado, poco uso. Ideales para correr o gym.",
+  "stock": 2,
+  "condicion": "usado",
+  "vistas": 0,
+  "imagen": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=300&fit=crop"
  }
 ]

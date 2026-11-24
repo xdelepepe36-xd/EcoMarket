@@ -61,8 +61,11 @@
             </div>
         </div>
 
-        <div style="text-align:center;margin-top:30px">
+        <div style="text-align:center;margin-top:30px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
             <a href="{{ url_for('publicar') }}" class="btn-principal" style="padding:14px 32px;font-size:1rem"><i class="bi bi-plus-circle"></i> Publicar mi primer producto</a>
+            {% if session.get('usuario_id') %}
+            <a href="{{ url_for('verificacion_vendedor') }}" class="btn-secundario" style="padding:14px 32px;font-size:1rem;text-decoration:none"><i class="bi bi-patch-check"></i> Ver mi nivel de vendedor</a>
+            {% endif %}
         </div>
     </div>
 </section>

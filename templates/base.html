@@ -21,10 +21,15 @@
     <meta property="og:description" content="Compra y vende productos sostenibles. Marketplace 100% ecológico.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ request.url }}">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1200&h=630&fit=crop">
+    <meta property="og:site_name" content="EcoMarket">
+    <meta property="og:locale" content="es_PE">
+    <meta property="og:image" content="{{ url_for('static', filename='og-image.png', _external=True) }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="EcoMarket - Marketplace Ecológico">
     <meta name="twitter:description" content="Compra y vende productos sostenibles. Marketplace 100% ecológico.">
+    <meta name="twitter:image" content="{{ url_for('static', filename='og-image.png', _external=True) }}">
     <link rel="canonical" href="{{ request.url }}">
     
     <!-- Fuentes e Iconos -->

@@ -1493,6 +1493,8 @@ def get_producto_detalle(producto_id):
     producto = conn.execute('''
         SELECT p.*, u.nombre as vendedor_nombre, u.email as vendedor_email, u.avatar as vendedor_avatar,
             (SELECT COUNT(*) FROM productos WHERE usuario_id = p.usuario_id) as total_vendedor_productos,
+            (SELECT COUNT(*) FROM preguntas pr JOIN productos pp ON pr.producto_id = pp.id
+             WHERE pp.usuario_id = p.usuario_id AND pr.respuesta IS NOT NULL AND pr.respuesta != '') as vendedor_respuestas,
             COALESCE(AVG(r.rating), 0) as rating_promedio,
             COUNT(DISTINCT r.id) as total_resenas
         FROM productos p
@@ -7265,6 +7267,23 @@ def api_responder_pregunta(pregunta_id):
         )
         conn.commit()
         row = conn.execute('SELECT * FROM preguntas WHERE id = ?', (pregunta_id,)).fetchone()
+        # Notificar al comprador por email
+        try:
+            comprador = conn.execute(
+                'SELECT u.email, u.nombre, p.nombre as producto_nombre, p.id as producto_id FROM preguntas pr JOIN usuarios u ON pr.usuario_id = u.id JOIN productos p ON pr.producto_id = p.id WHERE pr.id = ?',
+                (pregunta_id,)
+            ).fetchone()
+            if comprador and comprador['email']:
+                enviar_email(comprador['email'],
+                    f'💬 {{vendedor}} respondió tu consulta — EcoMarket'.replace('{vendedor}', session.get('usuario_nombre', 'El vendedor')),
+                    f'''<div style="font-family:Poppins,Arial,sans-serif;max-width:560px;margin:auto;background:#f6faf6;padding:24px;border-radius:16px">
+                      <h2 style="color:#2e7d32">Hola {html_lib.escape(comprador['nombre'] or 'vecino')} 👋</h2>
+                      <p>El vendedor de <strong>"{html_lib.escape(comprador['producto_nombre'])}"</strong> respondió tu consulta:</p>
+                      <blockquote style="background:#fff;border-left:4px solid #66BB6A;padding:12px 16px;border-radius:8px;margin:16px 0">{html_lib.escape(respuesta)}</blockquote>
+                      <p><a href="/producto/{comprador['producto_id']}" style="background:#2e7d32;color:#fff;padding:10px 20px;border-radius:999px;text-decoration:none;font-weight:700">Ver producto</a></p>
+                    </div>''')
+        except Exception as e:
+            logger.error(f'[RESPUESTA-EMAIL] {e}')
         return jsonify({'respuesta': row['respuesta']})
     finally:
         conn.close()

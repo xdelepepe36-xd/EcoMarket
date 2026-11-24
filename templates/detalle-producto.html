@@ -150,6 +150,9 @@ localStorage.setItem('eco_vistos',JSON.stringify(v.slice(0,8)));
                         {% endif %}
                     </strong>
                     <div>{{ producto.total_vendedor_productos }} <span data-i18n="pd.products_published">producto(s) publicado(s)</span></div>
+                    {% if producto.vendedor_respuestas and producto.vendedor_respuestas >= 3 %}
+                    <div style="font-size:.75rem;color:#2e7d32;font-weight:600;margin-top:2px"><i class="bi bi-chat-dots"></i> Responde rápido · {{ producto.vendedor_respuestas }} respuestas</div>
+                    {% endif %}
                 </div>
             </div>
             {% endif %}

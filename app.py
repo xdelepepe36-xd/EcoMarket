@@ -3028,13 +3028,34 @@ def _chat_ia_real(mensaje, historial, lang, conn):
         prods = conn.execute(
             'SELECT nombre, precio, categoria FROM productos WHERE COALESCE(vendido,0)=0 ORDER BY vistas DESC LIMIT 8').fetchall()
         catalogo = '\n'.join(f'- {p["nombre"]} (S/.{p["precio"]:.2f}, {p["categoria"]})' for p in prods)
+        # Coincidencias exactas por palabra clave del mensaje (búsqueda tipo catálogo)
+        palabras = [w for w in re.findall(r'[a-záéíóúñ]{4,}', mensaje.lower()) if w not in
+                    ('tienen','tienes','quiero','puedes','hola','buenas','busco','venden','vendes','mismo','algo','para','con','los','las','una','del','por','como','esta','está','donde','dónde','cuando','cuánto','cuanto','será','sera')]
+        matches = []
+        if palabras:
+            # variantes sing/plural: "bicicletas" -> "bicicleta", "mesas" -> "mesa"
+            variantes = set()
+            for w in palabras:
+                variantes.add(w)
+                if w.endswith('es') and len(w) > 5:
+                    variantes.add(w[:-2])
+                elif w.endswith('s') and len(w) > 4:
+                    variantes.add(w[:-1])
+            variantes = list(variantes)[:8]
+            like = ' OR '.join(['p.nombre LIKE ? OR p.categoria LIKE ? OR p.descripcion LIKE ?'] * len(variantes))
+            params = [f'%{w}%' for w in variantes for _ in range(3)]
+            matches = conn.execute(
+                f'SELECT p.nombre, p.precio, p.categoria, p.id FROM productos p WHERE COALESCE(p.vendido,0)=0 AND ({like}) ORDER BY p.vistas DESC LIMIT 5',
+                params).fetchall()
+        coincidencias = '\n'.join(f'- {m["nombre"]} (S/.{m["precio"]:.2f}, {m["categoria"]}, /producto/{m["id"]})' for m in matches)
         system = (
             'Eres Eco, la asistente IA de EcoMarket, un marketplace ecológico de segunda mano en Perú. '
             'Responde en el idioma del usuario, de forma cálida, breve (máx 120 palabras) y útil. '
             'Puedes mencionar productos reales del catálogo cuando sea relevante usando su nombre exacto. '
             'Usa **negritas** y listas con guiones. No inventes precios ni productos. '
             f'Categorías: {", ".join(cats)}.\nProductos destacados:\n{catalogo}\n'
-            'Si el usuario quiere comprar algo concreto, sugiere buscarlo en /productos.'
+            + (f'PRODUCTOS QUE COINCIDEN con lo que el usuario busca (menciónalos si son relevantes):\n{coincidencias}\n' if coincidencias else '')
+            + 'Si el usuario quiere comprar algo concreto, sugiere buscarlo en /productos.'
         )
         msgs = [{'role': 'system', 'content': system}]
         for h in (historial or [])[-8:]:

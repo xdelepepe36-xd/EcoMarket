@@ -3130,6 +3130,41 @@ def api_health():
                     'version': '3.2', 'time': datetime.now().isoformat()})
 
 
+@app.route('/sitemap.xml')
+def sitemap_xml():
+    """Sitemap dinámico: páginas principales + todos los productos."""
+    base = request.url_root.rstrip('/')
+    paginas = [
+        ('/', 'daily', '1.0'),
+        ('/productos', 'daily', '0.9'),
+        ('/impacto', 'weekly', '0.7'),
+        ('/leaderboard', 'weekly', '0.6'),
+        ('/guia-vendedor', 'monthly', '0.5'),
+        ('/newsletter', 'monthly', '0.4'),
+        ('/privacidad', 'yearly', '0.2'),
+    ]
+    xml = ['<?xml version="1.0" encoding="UTF-8"?>',
+           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for ruta, freq, prio in paginas:
+        xml.append(f'  <url><loc>{base}{ruta}</loc><changefreq>{freq}</changefreq><priority>{prio}</priority></url>')
+    conn = get_db()
+    try:
+        ids = [r['id'] for r in conn.execute('SELECT id FROM productos').fetchall()]
+    except sqlite3.Error:
+        ids = []
+    finally:
+        conn.close()
+    for pid in ids:
+        xml.append(f'  <url><loc>{base}/producto/{pid}</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>')
+    xml.append('</urlset>')
+    return Response('\n'.join(xml), mimetype='application/xml')
+
+
+@app.route('/robots.txt')
+def robots_txt():
+    return send_from_directory(app.static_folder, 'robots.txt', mimetype='text/plain')
+
+
 @app.route('/api/precios')
 def api_precios():
     """Mapa id->precio de todos los productos (para alertas de bajada de precio)."""

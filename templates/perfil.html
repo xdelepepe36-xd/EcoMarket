@@ -118,6 +118,28 @@
                 {% endif %}
                 <a href="/api/mis_productos.csv" class="btn-secundario" style="padding:9px 18px;font-size:.85rem;text-decoration:none"><i class="bi bi-download"></i> Exportar CSV</a>
             </div>
+            {% if consultas %}
+            <div style="background:#fff;border:1px solid #e0e0e0;border-radius:16px;padding:18px;margin-bottom:20px">
+                <h3 style="margin:0 0 14px;font-size:1rem;color:#2e5e2e"><i class="bi bi-chat-left-text"></i> Consultas recibidas</h3>
+                {% for c in consultas %}
+                <div style="border:1px solid {% if not c.respuesta %}#ffcc80{% else %}#e0e0e0{% endif %};border-radius:12px;padding:12px 14px;margin-bottom:10px;background:{% if not c.respuesta %}#fffdf5{% else %}#fafafa{% endif %}">
+                    <div style="font-size:.78rem;color:var(--texto-sec);margin-bottom:6px">
+                        <strong>{{ c.comprador or 'Usuario' }}</strong> → <strong>{{ c.producto_nombre }}</strong> · {{ c.created_at[:10] if c.created_at else '' }}
+                        {% if not c.respuesta %}<span style="color:#c62828;font-weight:700">· sin responder</span>{% endif %}
+                    </div>
+                    <p style="margin:0 0 8px;font-size:.88rem">💬 {{ c.pregunta }}</p>
+                    {% if c.respuesta %}
+                    <p style="margin:0;font-size:.85rem;color:#2e5e2e;background:#e8f5e9;border-radius:8px;padding:8px 10px">✓ {{ c.respuesta }}</p>
+                    {% else %}
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                        <input type="text" id="resp-{{ c.id }}" placeholder="Escribe tu respuesta..." style="flex:1;min-width:200px;padding:8px 12px;border:1px solid #ccc;border-radius:8px;font-size:.85rem">
+                        <button class="btn-principal" style="padding:8px 16px;font-size:.82rem" onclick="responderConsulta({{ c.id }}, this)"><i class="bi bi-send"></i> Responder</button>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
             <div class="productos-grid">
                 {% for p in mis_productos %}
                 <article class="producto-card" style="position:relative">
@@ -596,5 +618,25 @@ function removeFav(productoId) {
         }).join('');
     }).catch(function(){ box.innerHTML = '<div class="vc-empty">Sin datos aún</div>'; });
 })();
+</script>
+<script>
+function responderConsulta(id, btn){
+    var inp = document.getElementById('resp-' + id);
+    var txt = (inp && inp.value || '').trim();
+    if (txt.length < 3) { if (inp) inp.focus(); return; }
+    btn.disabled = true;
+    fetch('/api/preguntas/' + id + '/responder', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({respuesta: txt})
+    }).then(function(r){ return r.json(); }).then(function(d){
+        if (d.respuesta !== undefined) {
+            location.reload();
+        } else {
+            alert(d.error || 'Error al responder');
+            btn.disabled = false;
+        }
+    }).catch(function(){ alert('Error de conexión'); btn.disabled = false; });
+}
 </script>
 {% endblock %}

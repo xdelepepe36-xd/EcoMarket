@@ -8,6 +8,7 @@ from whitenoise import WhiteNoise
 import sqlite3
 import os
 import json
+import html as html_lib
 from functools import wraps
 from datetime import datetime, timedelta, timezone
 from werkzeug.utils import secure_filename
@@ -4640,6 +4641,18 @@ def perfil():
         "SELECT COUNT(*) FROM preguntas pr JOIN productos p ON pr.producto_id = p.id WHERE p.usuario_id = ? AND (pr.respuesta IS NULL OR pr.respuesta = '')",
         (session['usuario_id'],)
     ).fetchone()[0]
+
+    consultas = conn.execute('''
+        SELECT pr.id, pr.pregunta, pr.respuesta, pr.created_at,
+               p.nombre as producto_nombre, u.nombre as comprador
+        FROM preguntas pr
+        JOIN productos p ON pr.producto_id = p.id
+        LEFT JOIN usuarios u ON pr.usuario_id = u.id
+        WHERE p.usuario_id = ?
+        ORDER BY (pr.respuesta IS NULL OR pr.respuesta = '') DESC, pr.created_at DESC
+        LIMIT 30
+    ''', (session['usuario_id'],)).fetchall()
+
     valor_total = sum(p['precio'] for p in mis_productos)
 
     conn.close()
@@ -4661,6 +4674,7 @@ def perfil():
                            total_ventas=total_ventas,
                            total_consultas=total_consultas,
                            consultas_pendientes=consultas_pendientes,
+                           consultas=consultas,
                            valor_total=valor_total)
 
 
@@ -7205,6 +7219,26 @@ def api_crear_pregunta(producto_id):
         )
         conn.commit()
         row = conn.execute('SELECT * FROM preguntas WHERE id = ?', (cur.lastrowid,)).fetchone()
+        # Notificar al vendedor por email (si SMTP está configurado)
+        try:
+            prod = conn.execute(
+                'SELECT p.nombre, u.email, u.nombre FROM productos p JOIN usuarios u ON p.usuario_id = u.id WHERE p.id = ?',
+                (producto_id,)
+            ).fetchone()
+            if prod and prod['email']:
+                comprador = conn.execute('SELECT nombre FROM usuarios WHERE id = ?', (session['usuario_id'],)).fetchone()
+                nombre_c = comprador['nombre'] if comprador else 'Un comprador'
+                enviar_email(prod['email'],
+                    f'💬 Nueva consulta en "{prod["nombre"]}" — EcoMarket',
+                    f'''<div style="font-family:Poppins,Arial,sans-serif;max-width:560px;margin:auto;background:#f6faf6;padding:24px;border-radius:16px">
+                      <h2 style="color:#2e7d32">Hola {prod['nombre']} 👋</h2>
+                      <p><strong>{nombre_c}</strong> hizo una consulta en tu producto <strong>"{prod['nombre']}"</strong>:</p>
+                      <blockquote style="background:#fff;border-left:4px solid #66BB6A;padding:12px 16px;border-radius:8px;margin:16px 0">{html_lib.escape(pregunta)}</blockquote>
+                      <p>Responde desde tu panel → <strong>Perfil → Mis productos → Consultas recibidas</strong></p>
+                      <p style="color:#888;font-size:.85rem">Responder rápido aumenta tus ventas. 🌱</p>
+                    </div>''')
+        except Exception as e:
+            logger.error(f'[PREGUNTA-EMAIL] {e}')
         return jsonify({'pregunta': _pregunta_json(row, conn)}), 201
     finally:
         conn.close()

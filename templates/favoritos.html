@@ -44,7 +44,7 @@
         </div>
         {% else %}
         <div class="no-results" style="text-align:center;padding:60px 20px">
-            <img src="{{ url_for('static', filename='assets/mascota-sticker.svg') }}" alt="Eco" style="width:110px;display:block;margin:0 auto 14px;opacity:.9;animation:mascotFloat 4s ease-in-out infinite">
+            <img src="{{ url_for('static', filename='assets/mascota.svg') }}" alt="Eco" style="width:110px;display:block;margin:0 auto 14px;opacity:.9;animation:mascotFloat 4s ease-in-out infinite">
             <h3 style="margin-bottom:8px" data-i18n="favorites.empty_title">Aún no tienes favoritos</h3>
             <p style="color:var(--texto-sec);margin-bottom:20px" data-i18n="favorites.empty_desc">Marca productos como favoritos desde el catálogo para encontrarlos aquí.</p>
             <a href="{{ url_for('productos_view') }}" class="btn-principal" style="display:inline-block"><i class="bi bi-grid"></i> <span data-i18n="favorites.explore">Explorar productos</span></a>
